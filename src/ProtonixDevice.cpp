@@ -101,7 +101,9 @@ ProtonixDeviceStatus* ProtonixDevice::Status() {
 }
 
 void ProtonixDevice::Summary(String additional) {
-	String summary = "[on:" + String(this->_status->On() ? "yes" : "no") + "]";
+    String state = this->_status->State();
+	String summary = "[on:" + String(this->_status->On() ? "yes" : "no") + "]"
+                    + (state == "" ? "" : " [state:" + state + "]");
 
 	unsigned int i = 0;
 	unsigned int count = this->_status->SensorCount();

@@ -113,7 +113,8 @@ String ProtonixRegistry::GetRaw(String key, String defaultValue) {
 
     String value = this->_bufferObj[key].as<String>();
 
-    return value == "" ? defaultValue : value;
+    // value == ""
+    return this->_bufferObj[key] == nullptr ? defaultValue : value;
 }
 
 bool ProtonixRegistry::SetRaw(String key, String value, bool commit) {
