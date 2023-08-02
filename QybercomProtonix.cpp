@@ -184,14 +184,12 @@ void Qybercom::Protonix::Device::Pipe () {
 	
 }
 
-//Qybercom::Protonix::Device* Qybercom::Protonix::Device::OnNetworkConnect (void (*callback)(Qybercom::Protonix::Device*)) {
 Qybercom::Protonix::Device* Qybercom::Protonix::Device::OnNetworkConnect(Qybercom::Protonix::Device::NetworkConnectCallback callback) {
 	this->_onNetworkConnect = callback;
 
 	return this;
 }
 
-//Qybercom::Protonix::Device* Qybercom::Protonix::Device::OnProtocolConnect (void (*callback)(Qybercom::Protonix::Device*)) {
 Qybercom::Protonix::Device* Qybercom::Protonix::Device::OnProtocolConnect(Qybercom::Protonix::Device::ProtocolConnectCallback callback) {
 	this->_onProtocolConnect = callback;
 

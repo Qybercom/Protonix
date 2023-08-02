@@ -101,8 +101,6 @@ namespace Qybercom {
 
         void Pipe();
 
-        /*Device* OnNetworkConnect(void (*callback)(Device*));
-        Device* OnProtocolConnect(void (*callback)(Device*));*/
         typedef void(*NetworkConnectCallback)(Device*);
         Device* OnNetworkConnect(NetworkConnectCallback callback);
         typedef void(*ProtocolConnectCallback)(Device*);
@@ -116,8 +114,6 @@ namespace Qybercom {
         URI* _uri;
         String _id;
         String _passphrase;
-        /*void (_onNetworkConnect)(Device*);
-        void (_onProtocolConnect)(Device*);*/
         NetworkConnectCallback _onNetworkConnect;
         ProtocolConnectCallback _onProtocolConnect;
     };
