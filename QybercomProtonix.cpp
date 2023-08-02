@@ -76,27 +76,65 @@ String Qybercom::Protonix::URI::Path () {
 
 
 
-Qybercom::Protonix::Networks::NWiFi::NWiFi (String ssid, String password, String mac) {
+Qybercom::Protonix::Networks::NWiFi::NWiFi (String ssid, String password, String mac, String hostname) {
 	this->_ssid = ssid;
 	this->_password = password;
 	this->_mac = mac;
+	this->_hostname = hostname;
 }
 
 bool Qybercom::Protonix::Networks::NWiFi::Connect () {
-	uint8_t mac[6] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
-	String buffer = this->_mac;
-	buffer.replace(":", "");
-	if (buffer.length() != 12) return false;
+	//String buffer = ;
+	/*buffer.replace(":", "");
+	if (buffer.length() != 12) return false;*/
 
-	uint i = 0;
-	while (i < 6) {
-		mac[i] = atoi(buffer.substring(i, 2).c_str());
+	/*uint8_t mac[6] = { 0x32, 0xAE, 0xA1, 0x01, 0x01, 0x01 };
+	b = buffer.c_str();*/
+	uint8_t mac[6] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+	Qybercom::Protonix::INetwork::ParseMAC(this->_mac, mac);
+	/*char buffer[18];
+	this->_mac.toCharArray(buffer, 18);
+	Serial.println(buffer);
+	uint8_t mac[6] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+	sscanf(buffer, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]);
+	Serial.println(mac[5]);*/
 
-		i++;
-	}
-	
+	//char b[2];
+	//Serial.println(m);
+	//uint8_t* oct;
+
+	///*Serial.println("---");
+	//uint i = 0;
+	//while (i < 12) {
+	//	Serial.println(m[i]);
+
+	//	i++;
+	//}
+	//Serial.println("---");*/
+
+	//uint i = 0;
+	//while (i < 6) {
+	//	b[0] = m[i * 2];
+	//	b[1] = m[i * 2 + 1];
+	//	Serial.println(b);
+	//	oct = (uint8_t*)b;
+
+	//	//mac[i] = atoi(b);
+	//	mac[i] = oct[0];// &oct[0];
+	//	//Serial.println(mac[i]);
+	//	/*Serial.println(buffer.substring(i * 2, i * 2 + 1));
+	//	mac[i] = atoi(buffer.substring(i * 2, i * 2 + 1).c_str());*/
+	//	//mac[i] = buffer.substring(i * 2, 2).c_str();
+	//	//sscanf(buffer.substring(i * 2, 2).c_str(), "%x", &mac[i]);
+	//	//Serial.print(mac[i]);
+
+	//	i++;
+	//}
+	////Serial.print(mac);
+	//
 	WiFi.mode(WIFI_STA);
 	esp_wifi_set_mac(WIFI_IF_STA, &mac[0]);
+	WiFi.hostname(this->_hostname.c_str());
 	WiFi.begin(this->_ssid, this->_password);
 
 	return true;
@@ -118,8 +156,20 @@ String Qybercom::Protonix::Networks::NWiFi::AddressIP () {
 
 
 
-void Qybercom::Protonix::Protocols::PWebSocket::Connect () {
+bool Qybercom::Protonix::Protocols::PWebSocket::Connect (Qybercom::Protonix::URI* uri) {
+	return this->_client.connect(
+		uri->Host(),
+		uri->Port(),
+		uri->Path()
+	);
+}
 
+bool Qybercom::Protonix::Protocols::PWebSocket::Connected () {
+	return this->_client.available();
+}
+
+void Qybercom::Protonix::Protocols::PWebSocket::Pipe() {
+	this->_client.poll();
 }
 
 
@@ -128,6 +178,9 @@ void Qybercom::Protonix::Protocols::PWebSocket::Connect () {
 
 
 Qybercom::Protonix::Device::Device (String id, String passphrase) {
+	this->_networkConnected = false;
+	this->_protocolConnected = false;
+
 	this->ID(id);
 	this->Passphrase(passphrase);
 }
@@ -180,17 +233,41 @@ void Qybercom::Protonix::Device::ServerEndpoint (String host, uint port, String 
 	this->Server(new Qybercom::Protonix::URI(host, port, path));
 }
 
-void Qybercom::Protonix::Device::Pipe () {
-	
+void Qybercom::Protonix::Device::Pipe (uint tick) {
+	if (this->_networkConnected && this->_protocolConnected) this->_protocol->Pipe();
+	else {
+		if (!this->_networkConnected || !this->_network->Connected()) {
+			if (!this->_networkConnected) {
+				Serial.println("[network:connect]");
+				this->_network->Connect();
+				this->_networkConnected = true;
+			}
+			Serial.print(".");
+
+			if (this->_network->Connected()) {
+				Serial.println("[network:connected]");
+				this->_onNetworkConnect(this);
+			}
+		}
+
+		if (!this->_protocolConnected || !this->_protocol->Connected()) {
+			this->_protocol->Connect(this->_uri);
+			this->_protocolConnected = true;
+
+			this->_onProtocolConnect(this);
+		}
+	}
+
+	delay(tick);
 }
 
-Qybercom::Protonix::Device* Qybercom::Protonix::Device::OnNetworkConnect(Qybercom::Protonix::Device::NetworkConnectCallback callback) {
+Qybercom::Protonix::Device* Qybercom::Protonix::Device::OnNetworkConnect (Qybercom::Protonix::Device::NetworkConnectCallback callback) {
 	this->_onNetworkConnect = callback;
 
 	return this;
 }
 
-Qybercom::Protonix::Device* Qybercom::Protonix::Device::OnProtocolConnect(Qybercom::Protonix::Device::ProtocolConnectCallback callback) {
+Qybercom::Protonix::Device* Qybercom::Protonix::Device::OnProtocolConnect (Qybercom::Protonix::Device::ProtocolConnectCallback callback) {
 	this->_onProtocolConnect = callback;
 
 	return this;

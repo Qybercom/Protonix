@@ -1,22 +1,10 @@
 #pragma once
 
 #include <Arduino.h>
+#include <ArduinoWebsockets.h>
 
 namespace Qybercom {
   namespace Protonix {
-    class INetwork {
-      public:
-        virtual bool Connect();
-        virtual bool Connected();
-        virtual String AddressMAC();
-        virtual String AddressIP();
-    };
-
-    class IProtocol {
-      public:
-        virtual void Connect();
-    };
-
     class URI {
       private:
         String _scheme;
@@ -49,15 +37,38 @@ namespace Qybercom {
         String Path();
     };
 
+    class INetwork {
+        public:
+            virtual bool Connect();
+            virtual bool Connected();
+            virtual String AddressMAC();
+            virtual String AddressIP();
+            // https://stackoverflow.com/a/12772708/2097055
+            static void ParseMAC (String mac, uint8_t out[6]) {
+                char buffer[18];
+                mac.toCharArray(buffer, 18);
+
+                sscanf(buffer, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &out[0], &out[1], &out[2], &out[3], &out[4], &out[5]);
+            }
+    };
+
+    class IProtocol {
+        public:
+            virtual bool Connect(URI* uri);
+            virtual bool Connected();
+            virtual void Pipe();
+    };
+
     namespace Networks {
       class NWiFi: public Qybercom::Protonix::INetwork {
         private:
           String _ssid;
           String _password;
           String _mac;
+          String _hostname;
         
         public:
-          NWiFi(String ssid, String password, String mac);
+          NWiFi(String ssid, String password, String mac, String hostname);
 
           bool Connect();
 
@@ -71,8 +82,13 @@ namespace Qybercom {
 
     namespace Protocols {
       class PWebSocket: public Qybercom::Protonix::IProtocol {
+        private:
+          websockets::WebsocketsClient _client;
+
         public:
-          void Connect();
+          bool Connect(URI* uri);
+          bool Connected();
+          void Pipe();
       };
     }
 
@@ -99,7 +115,7 @@ namespace Qybercom {
         void ServerEndpoint(String host, uint port);
         void ServerEndpoint(String host, uint port, String path);
 
-        void Pipe();
+        void Pipe(uint tick);
 
         typedef void(*NetworkConnectCallback)(Device*);
         Device* OnNetworkConnect(NetworkConnectCallback callback);
@@ -110,7 +126,9 @@ namespace Qybercom {
 
     private:
         INetwork* _network;
+        bool _networkConnected;
         IProtocol* _protocol;
+        bool _protocolConnected;
         URI* _uri;
         String _id;
         String _passphrase;
