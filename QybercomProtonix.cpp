@@ -84,57 +84,13 @@ Qybercom::Protonix::Networks::NWiFi::NWiFi (String ssid, String password, String
 }
 
 bool Qybercom::Protonix::Networks::NWiFi::Connect () {
-	//String buffer = ;
-	/*buffer.replace(":", "");
-	if (buffer.length() != 12) return false;*/
-
-	/*uint8_t mac[6] = { 0x32, 0xAE, 0xA1, 0x01, 0x01, 0x01 };
-	b = buffer.c_str();*/
 	uint8_t mac[6] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
 	Qybercom::Protonix::INetwork::ParseMAC(this->_mac, mac);
-	/*char buffer[18];
-	this->_mac.toCharArray(buffer, 18);
-	Serial.println(buffer);
-	uint8_t mac[6] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
-	sscanf(buffer, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]);
-	Serial.println(mac[5]);*/
 
-	//char b[2];
-	//Serial.println(m);
-	//uint8_t* oct;
-
-	///*Serial.println("---");
-	//uint i = 0;
-	//while (i < 12) {
-	//	Serial.println(m[i]);
-
-	//	i++;
-	//}
-	//Serial.println("---");*/
-
-	//uint i = 0;
-	//while (i < 6) {
-	//	b[0] = m[i * 2];
-	//	b[1] = m[i * 2 + 1];
-	//	Serial.println(b);
-	//	oct = (uint8_t*)b;
-
-	//	//mac[i] = atoi(b);
-	//	mac[i] = oct[0];// &oct[0];
-	//	//Serial.println(mac[i]);
-	//	/*Serial.println(buffer.substring(i * 2, i * 2 + 1));
-	//	mac[i] = atoi(buffer.substring(i * 2, i * 2 + 1).c_str());*/
-	//	//mac[i] = buffer.substring(i * 2, 2).c_str();
-	//	//sscanf(buffer.substring(i * 2, 2).c_str(), "%x", &mac[i]);
-	//	//Serial.print(mac[i]);
-
-	//	i++;
-	//}
-	////Serial.print(mac);
-	//
+	// https://randomnerdtutorials.com/esp32-set-custom-hostname-arduino/#comment-741757
+	WiFi.setHostname(this->_hostname.c_str());
 	WiFi.mode(WIFI_STA);
 	esp_wifi_set_mac(WIFI_IF_STA, &mac[0]);
-	WiFi.hostname(this->_hostname.c_str());
 	WiFi.begin(this->_ssid, this->_password);
 
 	return true;

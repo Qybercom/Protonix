@@ -43,7 +43,9 @@ namespace Qybercom {
             virtual bool Connected();
             virtual String AddressMAC();
             virtual String AddressIP();
+
             // https://stackoverflow.com/a/12772708/2097055
+            // https://stackoverflow.com/a/1755042/2097055
             static void ParseMAC (String mac, uint8_t out[6]) {
                 char buffer[18];
                 mac.toCharArray(buffer, 18);
