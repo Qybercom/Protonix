@@ -96,7 +96,7 @@ namespace Qybercom {
 		};
 
 		namespace Networks {
-			class NWiFi: public Qybercom::Protonix::INetwork {
+			class NWiFi: public INetwork {
 				private:
 					String _ssid;
 					String _password;
@@ -117,7 +117,7 @@ namespace Qybercom {
 		}
 
 		namespace Protocols {
-			class PWebSocket: public Qybercom::Protonix::IProtocol {
+			class PWebSocket: public IProtocol {
 				private:
 					websockets::WebsocketsClient _client;
 
@@ -130,16 +130,23 @@ namespace Qybercom {
 
 		class ProtonixDevice;
 		class IProtonixDevice {
-			virtual unsigned int DeviceTick();
-			virtual String DeviceID();
-			virtual String DevicePassphrase();
-			virtual void DeviceOnReady(ProtonixDevice* device);
+			public:
+				virtual unsigned int DeviceTick();
+				virtual String DeviceID();
+				virtual String DevicePassphrase();
+				virtual void DeviceOnReady(ProtonixDevice* device);
+				virtual void DeviceOnNetworkConnect(ProtonixDevice* device);
+				virtual void DeviceOnProtocolConnect(ProtonixDevice* device);
 		};
 
 		// http://tedfelix.com/software/c++-callbacks.html
 		class ProtonixDevice {
 			public:
 				ProtonixDevice(IProtonixDevice* device);
+
+				void Device(IProtonixDevice* device);
+				IProtonixDevice* Device();
+				ProtonixTimer* Timer();
 
 				void Network(INetwork* network);
 				INetwork* Network();
@@ -152,26 +159,21 @@ namespace Qybercom {
 
 				void ServerEndpoint(String host, uint port);
 				void ServerEndpoint(String host, uint port, String path);
-
-				ProtonixTimer* Timer();
+				
 				void Pipe();
-
-				/*ProtonixDevice* OnNetworkConnect(NetworkConnectCallback callback);
-				ProtonixDevice* OnProtocolConnect(ProtocolConnectCallback callback);*/
 
 				//void Command();
 
 			private:
+				IProtonixDevice* _device;
+				bool _ready;
+				ProtonixTimer* _timer;
 				INetwork* _network;
 				bool _networkConnected;
 				IProtocol* _protocol;
 				bool _protocolConnected;
 				ProtonixURI* _uri;
-				String _id;
-				String _passphrase;
-				ProtonixTimer _timer;
-				/*NetworkConnectCallback _onNetworkConnect;
-				ProtocolConnectCallback _onProtocolConnect;*/
+				void _pipe(ProtonixTimer* timer);
 		};
 	}
 }
