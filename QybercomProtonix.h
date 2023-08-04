@@ -4,138 +4,174 @@
 #include <ArduinoWebsockets.h>
 
 namespace Qybercom {
-  namespace Protonix {
-    class URI {
-      private:
-        String _scheme;
-        String _username;
-        String _password;
-        String _host;
-        uint _port;
-        String _path;
+	namespace Protonix {
+		class ProtonixURI {
+			private:
+				String _scheme;
+				String _username;
+				String _password;
+				String _host;
+				uint _port;
+				String _path;
 
-      public:
-        URI(String host, uint port);
-        URI(String host, uint port, String path);
+			public:
+				ProtonixURI(String host, uint port);
+				ProtonixURI(String host, uint port, String path);
 
-        void Scheme(String scheme);
-        String Scheme();
+				void Scheme(String scheme);
+				String Scheme();
 
-        void Username(String username);
-        String Username();
+				void Username(String username);
+				String Username();
 
-        void Password(String password);
-        String Password();
+				void Password(String password);
+				String Password();
 
-        void Host(String host);
-        String Host();
+				void Host(String host);
+				String Host();
 
-        void Port(uint port);
-        uint Port();
+				void Port(uint port);
+				uint Port();
 
-        void Path(String path);
-        String Path();
-    };
+				void Path(String path);
+				String Path();
+		};
 
-    class INetwork {
-        public:
-            virtual bool Connect();
-            virtual bool Connected();
-            virtual String AddressMAC();
-            virtual String AddressIP();
+		class ProtonixTimer {
+			public:
+				enum class ProtonixTimerUnit {
+					MICROSECONDS,
+					MILLISECONDS
+				};
 
-            // https://stackoverflow.com/a/12772708/2097055
-            // https://stackoverflow.com/a/1755042/2097055
-            static void ParseMAC (String mac, uint8_t out[6]) {
-                char buffer[18];
-                mac.toCharArray(buffer, 18);
+				typedef void(*ProtonixTimerCallback)(ProtonixTimer*);
 
-                sscanf(buffer, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &out[0], &out[1], &out[2], &out[3], &out[4], &out[5]);
-            }
-    };
+				ProtonixTimer();
+				ProtonixTimer(unsigned int interval);
+				ProtonixTimer(unsigned int interval, ProtonixTimerUnit unit);
+				ProtonixTimer(unsigned int interval, ProtonixTimerCallback callback);
+				ProtonixTimer(unsigned int interval, ProtonixTimerUnit unit, ProtonixTimerCallback callback);
 
-    class IProtocol {
-        public:
-            virtual bool Connect(URI* uri);
-            virtual bool Connected();
-            virtual void Pipe();
-    };
+				unsigned long Previous();
 
-    namespace Networks {
-      class NWiFi: public Qybercom::Protonix::INetwork {
-        private:
-          String _ssid;
-          String _password;
-          String _mac;
-          String _hostname;
-        
-        public:
-          NWiFi(String ssid, String password, String mac, String hostname);
+				void Interval(int interval);
+				unsigned int Interval();
 
-          bool Connect();
+				void Unit(ProtonixTimerUnit unit);
+				ProtonixTimerUnit Unit();
 
-          bool Connected();
+				ProtonixTimer* Callback(ProtonixTimerCallback callback);
 
-          String AddressMAC();
+				void Pipe();
 
-          String AddressIP();
-      };
-    }
+			private:
+				unsigned long _previous;
+				unsigned int _interval;
+				ProtonixTimerUnit _unit;
+				ProtonixTimerCallback _callback;
+		};
 
-    namespace Protocols {
-      class PWebSocket: public Qybercom::Protonix::IProtocol {
-        private:
-          websockets::WebsocketsClient _client;
+		class INetwork {
+			public:
+				virtual bool Connect();
+				virtual bool Connected();
+				virtual String AddressMAC();
+				virtual String AddressIP();
 
-        public:
-          bool Connect(URI* uri);
-          bool Connected();
-          void Pipe();
-      };
-    }
+				// https://stackoverflow.com/a/12772708/2097055
+				// https://stackoverflow.com/a/1755042/2097055
+				static void ParseMAC (String mac, uint8_t out[6]) {
+					char buffer[18];
+					mac.toCharArray(buffer, 18);
 
-    // http://tedfelix.com/software/c++-callbacks.html
-    class Device {
-      public:
-        Device(String id, String passphrase);
+					sscanf(buffer, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &out[0], &out[1], &out[2], &out[3], &out[4], &out[5]);
+				}
+		};
 
-        void ID(String id);
-        String ID();
+		class IProtocol {
+			public:
+				virtual bool Connect(ProtonixURI* uri);
+				virtual bool Connected();
+				virtual void Pipe();
+		};
 
-        void Passphrase(String passphrase);
-        String Passphrase();
+		namespace Networks {
+			class NWiFi: public Qybercom::Protonix::INetwork {
+				private:
+					String _ssid;
+					String _password;
+					String _mac;
+					String _hostname;
+				
+				public:
+					NWiFi(String ssid, String password, String mac, String hostname);
 
-        void Network(INetwork* network);
-        INetwork* Network();
+					bool Connect();
 
-        void Protocol(IProtocol* protocol);
-        IProtocol* Protocol();
+					bool Connected();
 
-        void Server(URI* uri);
-        URI* Server();
+					String AddressMAC();
 
-        void ServerEndpoint(String host, uint port);
-        void ServerEndpoint(String host, uint port, String path);
+					String AddressIP();
+			};
+		}
 
-        void Pipe(uint tick);
+		namespace Protocols {
+			class PWebSocket: public Qybercom::Protonix::IProtocol {
+				private:
+					websockets::WebsocketsClient _client;
 
-        typedef void(*NetworkConnectCallback)(Device*);
-        Device* OnNetworkConnect(NetworkConnectCallback callback);
-        typedef void(*ProtocolConnectCallback)(Device*);
-        Device* OnProtocolConnect(ProtocolConnectCallback callback);
+				public:
+					bool Connect(ProtonixURI* uri);
+					bool Connected();
+					void Pipe();
+			};
+		}
 
-        //void Command();
+		class ProtonixDevice;
+		class IProtonixDevice {
+			virtual unsigned int DeviceTick();
+			virtual String DeviceID();
+			virtual String DevicePassphrase();
+			virtual void DeviceOnReady(ProtonixDevice* device);
+		};
 
-    private:
-        INetwork* _network;
-        bool _networkConnected;
-        IProtocol* _protocol;
-        bool _protocolConnected;
-        URI* _uri;
-        String _id;
-        String _passphrase;
-        NetworkConnectCallback _onNetworkConnect;
-        ProtocolConnectCallback _onProtocolConnect;
-    };
-  }
+		// http://tedfelix.com/software/c++-callbacks.html
+		class ProtonixDevice {
+			public:
+				ProtonixDevice(IProtonixDevice* device);
+
+				void Network(INetwork* network);
+				INetwork* Network();
+
+				void Protocol(IProtocol* protocol);
+				IProtocol* Protocol();
+
+				void Server(ProtonixURI* uri);
+				ProtonixURI* Server();
+
+				void ServerEndpoint(String host, uint port);
+				void ServerEndpoint(String host, uint port, String path);
+
+				ProtonixTimer* Timer();
+				void Pipe();
+
+				/*ProtonixDevice* OnNetworkConnect(NetworkConnectCallback callback);
+				ProtonixDevice* OnProtocolConnect(ProtocolConnectCallback callback);*/
+
+				//void Command();
+
+			private:
+				INetwork* _network;
+				bool _networkConnected;
+				IProtocol* _protocol;
+				bool _protocolConnected;
+				ProtonixURI* _uri;
+				String _id;
+				String _passphrase;
+				ProtonixTimer _timer;
+				/*NetworkConnectCallback _onNetworkConnect;
+				ProtocolConnectCallback _onProtocolConnect;*/
+		};
+	}
 }

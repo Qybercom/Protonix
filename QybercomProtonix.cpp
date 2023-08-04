@@ -8,69 +8,148 @@
 #include "QybercomProtonix.h"
 
 
-Qybercom::Protonix::URI::URI (String host, uint port) {
+Qybercom::Protonix::ProtonixURI::ProtonixURI (String host, uint port) {
 	this->Host(host);
 	this->Port(port);
 }
 
-Qybercom::Protonix::URI::URI (String host, uint port, String path) {
+Qybercom::Protonix::ProtonixURI::ProtonixURI (String host, uint port, String path) {
 	this->Host(host);
 	this->Port(port);
 	this->Path(path);
 }
 
-void Qybercom::Protonix::URI::Scheme (String scheme) {
+void Qybercom::Protonix::ProtonixURI::Scheme (String scheme) {
 	this->_scheme = scheme;
 }
 
-String Qybercom::Protonix::URI::Scheme () {
+String Qybercom::Protonix::ProtonixURI::Scheme () {
 	return this->_scheme;
 }
 
-void Qybercom::Protonix::URI::Username (String username) {
+void Qybercom::Protonix::ProtonixURI::Username (String username) {
 	this->_username = username;
 }
 
-String Qybercom::Protonix::URI::Username () {
+String Qybercom::Protonix::ProtonixURI::Username () {
 	return this->_username;
 }
 
-void Qybercom::Protonix::URI::Password (String password) {
+void Qybercom::Protonix::ProtonixURI::Password (String password) {
 	this->_password = password;
 }
 
-String Qybercom::Protonix::URI::Password () {
+String Qybercom::Protonix::ProtonixURI::Password () {
 	return this->_password;
 }
 
-void Qybercom::Protonix::URI::Host (String host) {
+void Qybercom::Protonix::ProtonixURI::Host (String host) {
 	this->_host = host;
 }
 
-String Qybercom::Protonix::URI::Host () {
+String Qybercom::Protonix::ProtonixURI::Host () {
 	return this->_host;
 }
 
-void Qybercom::Protonix::URI::Port (uint port) {
+void Qybercom::Protonix::ProtonixURI::Port (uint port) {
 	this->_port = port;
 }
 
-uint Qybercom::Protonix::URI::Port () {
+uint Qybercom::Protonix::ProtonixURI::Port () {
 	return this->_port;
 }
 
-void Qybercom::Protonix::URI::Path (String path) {
+void Qybercom::Protonix::ProtonixURI::Path (String path) {
 	this->_path = path;
 }
 
-String Qybercom::Protonix::URI::Path () {
+String Qybercom::Protonix::ProtonixURI::Path () {
 	return this->_path;
 }
 
 
 
 
+Qybercom::Protonix::ProtonixTimer::ProtonixTimer () {
+	this->_previous = 0;
 
+	this->Interval(0);
+	this->Unit(Qybercom::Protonix::ProtonixTimer::ProtonixTimerUnit::MILLISECONDS);
+	this->Callback([](Qybercom::Protonix::ProtonixTimer* timer) {});
+}
+
+Qybercom::Protonix::ProtonixTimer::ProtonixTimer (unsigned int interval) {
+	this->_previous = 0;
+
+	this->Interval(interval);
+	this->Unit(Qybercom::Protonix::ProtonixTimer::ProtonixTimerUnit::MILLISECONDS);
+	this->Callback([](Qybercom::Protonix::ProtonixTimer* timer) {});
+}
+
+Qybercom::Protonix::ProtonixTimer::ProtonixTimer (unsigned int interval, Qybercom::Protonix::ProtonixTimer::ProtonixTimerUnit unit) {
+	this->_previous = 0;
+
+	this->Interval(interval);
+	this->Unit(unit);
+	this->Callback([](Qybercom::Protonix::ProtonixTimer* timer) {});
+}
+
+Qybercom::Protonix::ProtonixTimer::ProtonixTimer (unsigned int interval, Qybercom::Protonix::ProtonixTimer::ProtonixTimerCallback callback) {
+	this->_previous = 0;
+
+	this->Interval(interval);
+	this->Unit(Qybercom::Protonix::ProtonixTimer::ProtonixTimerUnit::MILLISECONDS);
+	this->Callback(callback);
+}
+
+Qybercom::Protonix::ProtonixTimer::ProtonixTimer (unsigned int interval, Qybercom::Protonix::ProtonixTimer::ProtonixTimerUnit unit, Qybercom::Protonix::ProtonixTimer::ProtonixTimerCallback callback) {
+	this->_previous = 0;
+
+	this->Interval(interval);
+	this->Unit(unit);
+	this->Callback(callback);
+}
+
+unsigned long Qybercom::Protonix::ProtonixTimer::Previous () {
+	return this->_previous;
+}
+
+void Qybercom::Protonix::ProtonixTimer::Interval (int interval) {
+	this->_interval = interval;
+}
+
+unsigned int Qybercom::Protonix::ProtonixTimer::Interval () {
+	return this->_interval;
+}
+
+void Qybercom::Protonix::ProtonixTimer::Unit (Qybercom::Protonix::ProtonixTimer::ProtonixTimerUnit unit) {
+	this->_unit = unit;
+}
+
+Qybercom::Protonix::ProtonixTimer::ProtonixTimerUnit Qybercom::Protonix::ProtonixTimer::Unit () {
+	return this->_unit;
+}
+
+Qybercom::Protonix::ProtonixTimer* Qybercom::Protonix::ProtonixTimer::Callback (Qybercom::Protonix::ProtonixTimer::ProtonixTimerCallback callback) {
+	this->_callback = callback;
+
+	return this;
+}
+
+void Qybercom::Protonix::ProtonixTimer::Pipe () {
+	unsigned long current = 0;
+
+	if (this->_unit == Qybercom::Protonix::ProtonixTimer::ProtonixTimerUnit::MILLISECONDS)
+		current = millis();
+
+	if (this->_unit == Qybercom::Protonix::ProtonixTimer::ProtonixTimerUnit::MICROSECONDS)
+		current = micros();
+
+	long diff = this->_previous - current;
+
+	if (diff < 0 || diff >= this->_interval)
+		this->_callback(this);
+}
 
 
 
@@ -112,7 +191,7 @@ String Qybercom::Protonix::Networks::NWiFi::AddressIP () {
 
 
 
-bool Qybercom::Protonix::Protocols::PWebSocket::Connect (Qybercom::Protonix::URI* uri) {
+bool Qybercom::Protonix::Protocols::PWebSocket::Connect (Qybercom::Protonix::ProtonixURI* uri) {
 	return this->_client.connect(
 		uri->Host(),
 		uri->Port(),
@@ -133,64 +212,61 @@ void Qybercom::Protonix::Protocols::PWebSocket::Pipe() {
 
 
 
-Qybercom::Protonix::Device::Device (String id, String passphrase) {
+Qybercom::Protonix::ProtonixDevice::ProtonixDevice (Qybercom::Protonix::IProtonixDevice* device) {
 	this->_networkConnected = false;
 	this->_protocolConnected = false;
-
-	this->ID(id);
-	this->Passphrase(passphrase);
 }
 
-void Qybercom::Protonix::Device::ID (String id) {
-	this->_id = id;
-}
+//void Qybercom::Protonix::ProtonixDevice::ID (String id) {
+//	this->_id = id;
+//}
+//
+//String Qybercom::Protonix::ProtonixDevice::ID () {
+//	return this->_id;
+//}
+//
+//void Qybercom::Protonix::ProtonixDevice::Passphrase (String passphrase) {
+//	this->_passphrase = passphrase;
+//}
+//
+//String Qybercom::Protonix::ProtonixDevice::Passphrase () {
+//	return this->_passphrase;
+//}
 
-String Qybercom::Protonix::Device::ID () {
-	return this->_id;
-}
-
-void Qybercom::Protonix::Device::Passphrase (String passphrase) {
-	this->_passphrase = passphrase;
-}
-
-String Qybercom::Protonix::Device::Passphrase () {
-	return this->_passphrase;
-}
-
-void Qybercom::Protonix::Device::Network (Qybercom::Protonix::INetwork* network) {
+void Qybercom::Protonix::ProtonixDevice::Network (Qybercom::Protonix::INetwork* network) {
 	this->_network = network;
 }
 
-Qybercom::Protonix::INetwork* Qybercom::Protonix::Device::Network () {
+Qybercom::Protonix::INetwork* Qybercom::Protonix::ProtonixDevice::Network () {
 	return this->_network;
 }
 
-void Qybercom::Protonix::Device::Protocol (Qybercom::Protonix::IProtocol* protocol) {
+void Qybercom::Protonix::ProtonixDevice::Protocol (Qybercom::Protonix::IProtocol* protocol) {
 	this->_protocol = protocol;
 }
 
-Qybercom::Protonix::IProtocol* Qybercom::Protonix::Device::Protocol () {
+Qybercom::Protonix::IProtocol* Qybercom::Protonix::ProtonixDevice::Protocol () {
 	return this->_protocol;
 }
 
-void Qybercom::Protonix::Device::Server (Qybercom::Protonix::URI* uri) {
+void Qybercom::Protonix::ProtonixDevice::Server (Qybercom::Protonix::ProtonixURI* uri) {
 	this->_uri = uri;
 }
 
-Qybercom::Protonix::URI* Qybercom::Protonix::Device::Server () {
+Qybercom::Protonix::ProtonixURI* Qybercom::Protonix::ProtonixDevice::Server () {
 	return this->_uri;
 }
 
-void Qybercom::Protonix::Device::ServerEndpoint (String host, uint port) {
-	this->Server(new Qybercom::Protonix::URI(host, port));
+void Qybercom::Protonix::ProtonixDevice::ServerEndpoint (String host, uint port) {
+	this->Server(new Qybercom::Protonix::ProtonixURI(host, port));
 }
 
-void Qybercom::Protonix::Device::ServerEndpoint (String host, uint port, String path) {
-	this->Server(new Qybercom::Protonix::URI(host, port, path));
+void Qybercom::Protonix::ProtonixDevice::ServerEndpoint (String host, uint port, String path) {
+	this->Server(new Qybercom::Protonix::ProtonixURI(host, port, path));
 }
 
-void Qybercom::Protonix::Device::Pipe (uint tick) {
-	if (this->_networkConnected && this->_protocolConnected) this->_protocol->Pipe();
+void Qybercom::Protonix::ProtonixDevice::Pipe () {
+	/*if (this->_networkConnected && this->_protocolConnected) this->_protocol->Pipe();
 	else {
 		if (!this->_networkConnected || !this->_network->Connected()) {
 			if (!this->_networkConnected) {
@@ -214,17 +290,17 @@ void Qybercom::Protonix::Device::Pipe (uint tick) {
 		}
 	}
 
-	delay(tick);
+	delay(tick);*/
 }
 
-Qybercom::Protonix::Device* Qybercom::Protonix::Device::OnNetworkConnect (Qybercom::Protonix::Device::NetworkConnectCallback callback) {
-	this->_onNetworkConnect = callback;
-
-	return this;
-}
-
-Qybercom::Protonix::Device* Qybercom::Protonix::Device::OnProtocolConnect (Qybercom::Protonix::Device::ProtocolConnectCallback callback) {
-	this->_onProtocolConnect = callback;
-
-	return this;
-}
+//Qybercom::Protonix::ProtonixDevice* Qybercom::Protonix::ProtonixDevice::OnNetworkConnect (Qybercom::Protonix::ProtonixDevice::NetworkConnectCallback callback) {
+//	this->_onNetworkConnect = callback;
+//
+//	return this;
+//}
+//
+//Qybercom::Protonix::ProtonixDevice* Qybercom::Protonix::ProtonixDevice::OnProtocolConnect (Qybercom::Protonix::ProtonixDevice::ProtocolConnectCallback callback) {
+//	this->_onProtocolConnect = callback;
+//
+//	return this;
+//}
