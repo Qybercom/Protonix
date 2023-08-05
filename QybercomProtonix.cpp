@@ -247,21 +247,30 @@ String Networks::NWiFi::AddressIP () {
 
 
 
-Protocols::PWebSocket::PWebSocket () {
+void Protocols::PWebSocket::_input (ProtonixProtocolDTO* dto) {
+	if (dto->IsURL())
+		Serial.println("[PWebSocket::onMessage URL] " + dto->URL());
+
+	if (dto->IsResponse()) {
+		Serial.println("[PWebSocket::onMessage Response] " + dto->Response());
+		this->_device->OnStreamResponse(dto);
+	}
+
+	if (dto->IsEvent()) {
+		Serial.println("[PWebSocket::onMessage Event] " + dto->Event());
+		this->_device->OnStreamEvent(dto);
+	}
+}
+
+void Protocols::PWebSocket::Init (ProtonixDevice* device) {
+	this->_device = device;
 	this->_client.onMessage([&](websockets::WebsocketsMessage message) {
 		Serial.println("[PWebSocket::onMessage] " + message.data());
 
 		ProtonixProtocolDTO* dto = new ProtonixProtocolDTO();
 		dto->Deserialize(message.data());
 
-		if (dto->IsURL())
-			Serial.println("[PWebSocket::onMessage URL] " + dto->URL());
-
-		if (dto->IsResponse())
-			Serial.println("[PWebSocket::onMessage Response] " + dto->Response());
-
-		if (dto->IsEvent())
-			Serial.println("[PWebSocket::onMessage Event] " + dto->Event());
+		this->_input(dto);
 	});
 }
 
@@ -359,6 +368,7 @@ void ProtonixDevice::_pipe () {
 		if (!this->_protocolConnected1) {
 			Serial.println("[protocol:connect]");
 
+			this->_protocol->Init(this);
 			this->_protocol->Connect(this->_uri);
 			this->_protocolConnected1 = true;
 		}
@@ -381,4 +391,12 @@ void ProtonixDevice::Pipe () {
 
 	if (this->_timer->Pipe())
 		this->_pipe();
+}
+
+void ProtonixDevice::OnStreamResponse (ProtonixProtocolDTO* dto) {
+	this->_device->DeviceOnStreamResponse(this, dto->Response());
+}
+
+void ProtonixDevice::OnStreamEvent (ProtonixProtocolDTO* dto) {
+	this->_device->DeviceOnStreamEvent(this, dto->Event());
 }

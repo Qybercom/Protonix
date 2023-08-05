@@ -96,6 +96,8 @@ namespace Qybercom {
 				bool Deserialize(String raw);
 		};
 
+		class ProtonixDevice;
+
 		class INetwork {
 			public:
 				virtual bool Connect();
@@ -115,6 +117,7 @@ namespace Qybercom {
 
 		class IProtocol {
 			public:
+				virtual void Init(ProtonixDevice* device);
 				virtual bool Connect(ProtonixURI* uri);
 				virtual bool Connected();
 				virtual void Pipe();
@@ -145,16 +148,17 @@ namespace Qybercom {
 			class PWebSocket: public IProtocol {
 				private:
 					websockets::WebsocketsClient _client;
+					ProtonixDevice* _device;
 
 				public:
-					PWebSocket();
+					void _input(ProtonixProtocolDTO* dto);
+					void Init(ProtonixDevice* device);
 					bool Connect(ProtonixURI* uri);
 					bool Connected();
 					void Pipe();
 			};
 		}
 
-		class ProtonixDevice;
 		class IProtonixDevice {
 			public:
 				virtual unsigned int DeviceTick();
@@ -163,6 +167,8 @@ namespace Qybercom {
 				virtual void DeviceOnReady(ProtonixDevice* device);
 				virtual void DeviceOnNetworkConnect(ProtonixDevice* device);
 				virtual void DeviceOnProtocolConnect(ProtonixDevice* device);
+				virtual void DeviceOnStreamResponse(ProtonixDevice* device, String url);
+				virtual void DeviceOnStreamEvent(ProtonixDevice* device, String url);
 		};
 
 		// http://tedfelix.com/software/c++-callbacks.html
@@ -187,6 +193,9 @@ namespace Qybercom {
 				void ServerEndpoint(String host, uint port, String path);
 				
 				void Pipe();
+
+				void OnStreamResponse(ProtonixProtocolDTO* dto);
+				void OnStreamEvent(ProtonixProtocolDTO* dto);
 
 				//void Command();
 
