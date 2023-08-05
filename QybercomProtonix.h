@@ -74,7 +74,6 @@ namespace Qybercom {
 
 			public:
 				virtual void DTOPopulate(ProtonixDTO* dto);
-				//virtual JsonObject DTOToJSON();
 				virtual void DTOToJSON(JsonDocument& dto);
 		};
 
@@ -106,7 +105,6 @@ namespace Qybercom {
 					String Passphrase();
 
 					void DTOPopulate(ProtonixDTO* dto);
-					//JsonObject DTOToJSON(JsonDocument& dto);
 					void DTOToJSON(JsonDocument& dto);
 			};
 
@@ -119,7 +117,6 @@ namespace Qybercom {
 					unsigned short Status();
 
 					void DTOPopulate(ProtonixDTO* dto);
-					//JsonObject DTOToJSON(JsonDocument &dto);
 					void DTOToJSON(JsonDocument& dto);
 					unsigned short DTOResponseStatus();
 			};
@@ -133,7 +130,6 @@ namespace Qybercom {
 					String Name();
 
 					void DTOPopulate(ProtonixDTO* dto);
-					//JsonObject DTOToJSON();
 					void DTOToJSON(JsonDocument& dto);
 			};
 		}
@@ -145,6 +141,7 @@ namespace Qybercom {
 				String _event;
 				IProtonixDTO* _dto;
 				JsonObject _data;
+				bool _debug;
 
 			public:
 				ProtonixDTO();
@@ -169,6 +166,9 @@ namespace Qybercom {
 
 				String Serialize();
 				bool Deserialize(String raw);
+
+				void Debug(bool debug);
+				bool Debug();
 		};
 
 		class INetwork {
@@ -267,6 +267,9 @@ namespace Qybercom {
 
 				void ServerEndpoint(String host, uint port);
 				void ServerEndpoint(String host, uint port, String path);
+
+				void Debug(bool debug);
+				bool Debug();
 				
 				void Pipe();
 
@@ -286,6 +289,7 @@ namespace Qybercom {
 				bool _protocolConnected1;
 				bool _protocolConnected2;
 				ProtonixURI* _uri;
+				bool _debug;
 				void _pipe();
 		};
 	}

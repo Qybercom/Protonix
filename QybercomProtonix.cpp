@@ -131,7 +131,7 @@ bool ProtonixTimer::Pipe () {
 
 
 ProtonixDTO::ProtonixDTO () {
-	//this->_dto = DynamicJsonDocument<512>;
+	this->_debug = false;
 }
 
 void ProtonixDTO::URL (String url) {
@@ -227,6 +227,14 @@ bool ProtonixDTO::Deserialize (String raw) {
 		this->_data = dto["data"];
 
 	return true;
+}
+
+void ProtonixDTO::Debug (bool debug) {
+	this->_debug = debug;
+}
+
+bool ProtonixDTO::Debug () {
+	return this->_debug;
 }
 
 
@@ -362,16 +370,22 @@ String Networks::NWiFi::AddressIP () {
 
 
 void Protocols::PWebSocket::_input (ProtonixDTO* dto) {
-	if (dto->IsURL())
-		Serial.println("[PWebSocket::onMessage URL] " + dto->URL());
+	if (dto->IsURL()) {
+		if (dto->Debug())
+			Serial.println("[PWebSocket::onMessage URL] " + dto->URL());
+	}
 
 	if (dto->IsResponse()) {
-		Serial.println("[PWebSocket::onMessage Response] " + dto->Response());
+		if (dto->Debug())
+			Serial.println("[PWebSocket::onMessage Response] " + dto->Response());
+
 		this->_device->OnStreamResponse(dto);
 	}
 
 	if (dto->IsEvent()) {
-		Serial.println("[PWebSocket::onMessage Event] " + dto->Event());
+		if (dto->Debug())
+			Serial.println("[PWebSocket::onMessage Event] " + dto->Event());
+
 		this->_device->OnStreamEvent(dto);
 	}
 }
@@ -379,9 +393,13 @@ void Protocols::PWebSocket::_input (ProtonixDTO* dto) {
 void Protocols::PWebSocket::Init (ProtonixDevice* device) {
 	this->_device = device;
 	this->_client.onMessage([&](websockets::WebsocketsMessage message) {
-		Serial.println("[PWebSocket::onMessage] " + message.data());
+		bool debug = device->Debug();
+
+		if (debug)
+			Serial.println("[PWebSocket::onMessage] " + message.data());
 
 		ProtonixDTO* dto = new ProtonixDTO();
+		dto->Debug(debug);
 		dto->Deserialize(message.data());
 
 		this->_input(dto);
@@ -418,6 +436,7 @@ ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
 	this->_protocolConnected1 = false;
 	this->_protocolConnected2 = false;
 
+	this->Debug(false);
 	this->Device(device);
 	this->_timer = new ProtonixTimer(this->_device->DeviceTick());
 }
@@ -466,10 +485,19 @@ void ProtonixDevice::ServerEndpoint (String host, uint port, String path) {
 	this->Server(new ProtonixURI(host, port, path));
 }
 
+void ProtonixDevice::Debug (bool debug) {
+	this->_debug = debug;
+}
+
+bool ProtonixDevice::Debug () {
+	return this->_debug;
+}
+
 void ProtonixDevice::_pipe () {
 	if (!this->_networkConnected1 || !this->_networkConnected2) {
 		if (!this->_networkConnected1) {
-			Serial.println("[network:connect]");
+			if (this->_debug)
+				Serial.println("[network:connect]");
 
 			this->_network->Connect();
 			this->_networkConnected1 = true;
@@ -477,14 +505,17 @@ void ProtonixDevice::_pipe () {
 
 		if (!this->_network->Connected()) return;
 
-		Serial.println("[network:connected]");
+		if (this->_debug)
+			Serial.println("[network:connected]");
+
 		this->_networkConnected2 = true;
 		this->_device->DeviceOnNetworkConnect(this);
 	}
 
 	if (!this->_protocolConnected1 || !this->_protocolConnected2) {
 		if (!this->_protocolConnected1) {
-			Serial.println("[protocol:connect]");
+			if (this->_debug)
+				Serial.println("[protocol:connect]");
 
 			this->_protocol->Init(this);
 			this->_protocol->Connect(this->_uri);
@@ -493,7 +524,9 @@ void ProtonixDevice::_pipe () {
 
 		if (!this->_protocol->Connected()) return;
 
-		Serial.println("[protocol:connected]");
+		if (this->_debug)
+			Serial.println("[protocol:connected]");
+
 		this->_protocolConnected2 = true;
 		this->_device->DeviceOnProtocolConnect(this);
 
@@ -519,6 +552,7 @@ void ProtonixDevice::Pipe () {
 void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
 	ProtonixDTO* dto = new ProtonixDTO();
 
+	dto->Debug(this->Debug());
 	dto->URL(url);
 	dto->DTO(new DTO::DTORequestAuthorization(
 		this->_device->DeviceID(),
@@ -528,7 +562,8 @@ void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
 	String raw = dto->Serialize();
 	this->_protocol->Send(raw);
 
-	Serial.println("[request] " + url + " ok: " + raw);
+	if (this->_debug)
+		Serial.println("[request] " + url + " ok: " + raw);
 }
 
 void ProtonixDevice::OnStreamResponse (ProtonixDTO* dto) {
