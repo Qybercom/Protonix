@@ -6,6 +6,9 @@
 
 namespace Qybercom {
 	namespace Protonix {
+		class ProtonixDTO;
+		class ProtonixDevice;
+
 		class ProtonixURI {
 			private:
 				String _scheme;
@@ -65,16 +68,86 @@ namespace Qybercom {
 				ProtonixTimerUnit _unit;
 		};
 
-		class ProtonixProtocolDTO {
+		class IProtonixDTO {
+			protected:
+				JsonObject _alloc(unsigned long capacity);
+
+			public:
+				virtual void DTOPopulate(ProtonixDTO* dto);
+				//virtual JsonObject DTOToJSON();
+				virtual void DTOToJSON(JsonDocument& dto);
+		};
+
+		class IProtonixDTORequest : public IProtonixDTO {
+		};
+
+		class IProtonixDTOResponse : public IProtonixDTO {
+			public:
+				virtual unsigned short DTOResponseStatus();
+		};
+
+		class IProtonixDTOEvent : public IProtonixDTO {
+		};
+
+		namespace DTO {
+			class DTORequestAuthorization : public IProtonixDTORequest {
+				private:
+					String _id;
+					String _passphrase;
+
+				public:
+					DTORequestAuthorization();
+					DTORequestAuthorization(String id, String passphrase);
+
+					void ID(String id);
+					String ID();
+
+					void Passphrase(String passphrase);
+					String Passphrase();
+
+					void DTOPopulate(ProtonixDTO* dto);
+					//JsonObject DTOToJSON(JsonDocument& dto);
+					void DTOToJSON(JsonDocument& dto);
+			};
+
+			class DTOResponseAuthorization : public IProtonixDTOResponse {
+				private:
+					unsigned short _status;
+
+				public:
+					void Status(unsigned short status);
+					unsigned short Status();
+
+					void DTOPopulate(ProtonixDTO* dto);
+					//JsonObject DTOToJSON(JsonDocument &dto);
+					void DTOToJSON(JsonDocument& dto);
+					unsigned short DTOResponseStatus();
+			};
+
+			class DTOEventCommand : public IProtonixDTOEvent {
+				private:
+					String _name;
+
+				public:
+					void Name(String name);
+					String Name();
+
+					void DTOPopulate(ProtonixDTO* dto);
+					//JsonObject DTOToJSON();
+					void DTOToJSON(JsonDocument& dto);
+			};
+		}
+
+		class ProtonixDTO {
 			private:
 				String _url;
 				String _response;
 				String _event;
+				IProtonixDTO* _dto;
 				JsonObject _data;
-				StaticJsonDocument<512> _dto;
 
 			public:
-				ProtonixProtocolDTO();
+				ProtonixDTO();
 
 				void URL(String url);
 				String URL();
@@ -85,6 +158,8 @@ namespace Qybercom {
 				void Event(String url);
 				String Event();
 
+				void DTO(IProtonixDTO* dto);
+				IProtonixDTO* DTO();
 				void Data(JsonObject data);
 				JsonObject Data();
 
@@ -95,8 +170,6 @@ namespace Qybercom {
 				String Serialize();
 				bool Deserialize(String raw);
 		};
-
-		class ProtonixDevice;
 
 		class INetwork {
 			public:
@@ -121,6 +194,7 @@ namespace Qybercom {
 				virtual bool Connect(ProtonixURI* uri);
 				virtual bool Connected();
 				virtual void Pipe();
+				virtual void Send(String data);
 		};
 
 		namespace Networks {
@@ -151,11 +225,12 @@ namespace Qybercom {
 					ProtonixDevice* _device;
 
 				public:
-					void _input(ProtonixProtocolDTO* dto);
+					void _input(ProtonixDTO* dto);
 					void Init(ProtonixDevice* device);
 					bool Connect(ProtonixURI* uri);
 					bool Connected();
 					void Pipe();
+					void Send(String data);
 			};
 		}
 
@@ -167,8 +242,9 @@ namespace Qybercom {
 				virtual void DeviceOnReady(ProtonixDevice* device);
 				virtual void DeviceOnNetworkConnect(ProtonixDevice* device);
 				virtual void DeviceOnProtocolConnect(ProtonixDevice* device);
-				virtual void DeviceOnStreamResponse(ProtonixDevice* device, String url);
-				virtual void DeviceOnStreamEvent(ProtonixDevice* device, String url);
+				virtual void DeviceOnStreamResponse(ProtonixDevice* device, ProtonixDTO* dto);
+				virtual void DeviceOnStreamEvent(ProtonixDevice* device, ProtonixDTO* dto);
+				virtual void DeviceOnCommand(ProtonixDevice* device, DTO::DTOEventCommand* command);
 		};
 
 		// http://tedfelix.com/software/c++-callbacks.html
@@ -194,10 +270,10 @@ namespace Qybercom {
 				
 				void Pipe();
 
-				void OnStreamResponse(ProtonixProtocolDTO* dto);
-				void OnStreamEvent(ProtonixProtocolDTO* dto);
+				void OnStreamResponse(ProtonixDTO* dto);
+				void OnStreamEvent(ProtonixDTO* dto);
 
-				//void Command();
+				void RequestStream(String url, IProtonixDTORequest* request);
 
 			private:
 				IProtonixDevice* _device;
