@@ -232,13 +232,8 @@ bool ProtonixDTO::Deserialize (String raw) {
 
 
 JsonObject IProtonixDTO::_alloc(unsigned long capacity) {
-	// allocate the memory for the document
-	//const size_t CAPACITY = capacity * 16;
-	//StaticJsonDocument<CAPACITY> doc;
-	//StaticJsonDocument<200> doc;
 	DynamicJsonDocument doc(1024);
 
-	// create an object
 	return doc.to<JsonObject>();
 }
 
@@ -266,17 +261,8 @@ String DTO::DTORequestAuthorization::Passphrase() {
 }
 
 void DTO::DTORequestAuthorization::DTOToJSON (JsonDocument& dto) {
-	Serial.println("[dto:Data] 1");
-
-	//JsonObject out = this->_alloc(2);
-
 	dto["data"]["id"] = this->_id;
 	dto["data"]["passphrase"] = this->_passphrase;
-
-	Serial.println("[dto:Data] 2");
-	//Serial.println(out);
-
-	//return out;
 }
 
 void DTO::DTORequestAuthorization::DTOPopulate(ProtonixDTO* dto) {
@@ -307,11 +293,7 @@ void DTO::DTOResponseAuthorization::DTOPopulate (ProtonixDTO* dto) {
 }
 
 void DTO::DTOResponseAuthorization::DTOToJSON(JsonDocument& dto) {
-	//JsonObject out = this->_alloc(1);
-
 	dto["data"]["status"] = this->_status;
-
-	//return out;
 }
 
 unsigned short DTO::DTOResponseAuthorization::DTOResponseStatus () {
@@ -336,11 +318,7 @@ void DTO::DTOEventCommand::DTOPopulate (ProtonixDTO* dto) {
 }
 
 void DTO::DTOEventCommand::DTOToJSON(JsonDocument &dto) {
-	//JsonObject out = this->_alloc(1);
-
 	dto["data"]["command"] = this->_name;
-
-	//return out;
 }
 
 
@@ -539,7 +517,6 @@ void ProtonixDevice::Pipe () {
 }
 
 void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
-	Serial.println("[request] " + url);
 	ProtonixDTO* dto = new ProtonixDTO();
 
 	dto->URL(url);
@@ -550,6 +527,7 @@ void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
 
 	String raw = dto->Serialize();
 	this->_protocol->Send(raw);
+
 	Serial.println("[request] " + url + " ok: " + raw);
 }
 
@@ -560,7 +538,7 @@ void ProtonixDevice::OnStreamResponse (ProtonixDTO* dto) {
 void ProtonixDevice::OnStreamEvent (ProtonixDTO* dto) {
 	this->_device->DeviceOnStreamEvent(this, dto);
 
-	if (dto->Event() == "/api/mechanism/command" + this->_device->DeviceID()) {
+	if (dto->Event() == "/api/mechanism/command/" + this->_device->DeviceID()) {
 		DTO::DTOEventCommand* command = new DTO::DTOEventCommand();
 		command->DTOPopulate(dto);
 
