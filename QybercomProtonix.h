@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <ArduinoWebsockets.h>
+#include <ArduinoJson.h>
 
 namespace Qybercom {
 	namespace Protonix {
@@ -44,13 +45,9 @@ namespace Qybercom {
 					MILLISECONDS
 				};
 
-				typedef void(*ProtonixTimerCallback)(ProtonixTimer*);
-
 				ProtonixTimer();
 				ProtonixTimer(unsigned int interval);
 				ProtonixTimer(unsigned int interval, ProtonixTimerUnit unit);
-				ProtonixTimer(unsigned int interval, ProtonixTimerCallback callback);
-				ProtonixTimer(unsigned int interval, ProtonixTimerUnit unit, ProtonixTimerCallback callback);
 
 				unsigned long Previous();
 
@@ -60,15 +57,43 @@ namespace Qybercom {
 				void Unit(ProtonixTimerUnit unit);
 				ProtonixTimerUnit Unit();
 
-				ProtonixTimer* Callback(ProtonixTimerCallback callback);
-
-				void Pipe();
+				bool Pipe();
 
 			private:
 				unsigned long _previous;
 				unsigned int _interval;
 				ProtonixTimerUnit _unit;
-				ProtonixTimerCallback _callback;
+		};
+
+		class ProtonixProtocolDTO {
+			private:
+				String _url;
+				String _response;
+				String _event;
+				JsonObject _data;
+				StaticJsonDocument<512> _dto;
+
+			public:
+				ProtonixProtocolDTO();
+
+				void URL(String url);
+				String URL();
+
+				void Response(String url);
+				String Response();
+
+				void Event(String url);
+				String Event();
+
+				void Data(JsonObject data);
+				JsonObject Data();
+
+				bool IsURL();
+				bool IsResponse();
+				bool IsEvent();
+
+				String Serialize();
+				bool Deserialize(String raw);
 		};
 
 		class INetwork {
@@ -122,6 +147,7 @@ namespace Qybercom {
 					websockets::WebsocketsClient _client;
 
 				public:
+					PWebSocket();
 					bool Connect(ProtonixURI* uri);
 					bool Connected();
 					void Pipe();
@@ -169,11 +195,13 @@ namespace Qybercom {
 				bool _ready;
 				ProtonixTimer* _timer;
 				INetwork* _network;
-				bool _networkConnected;
+				bool _networkConnected1;
+				bool _networkConnected2;
 				IProtocol* _protocol;
-				bool _protocolConnected;
+				bool _protocolConnected1;
+				bool _protocolConnected2;
 				ProtonixURI* _uri;
-				void _pipe(ProtonixTimer* timer);
+				void _pipe();
 		};
 	}
 }

@@ -77,7 +77,6 @@ ProtonixTimer::ProtonixTimer () {
 
 	this->Interval(0);
 	this->Unit(ProtonixTimer::ProtonixTimerUnit::MILLISECONDS);
-	this->Callback([](ProtonixTimer* timer) {});
 }
 
 ProtonixTimer::ProtonixTimer (unsigned int interval) {
@@ -85,7 +84,6 @@ ProtonixTimer::ProtonixTimer (unsigned int interval) {
 
 	this->Interval(interval);
 	this->Unit(ProtonixTimer::ProtonixTimerUnit::MILLISECONDS);
-	this->Callback([](ProtonixTimer* timer) {});
 }
 
 ProtonixTimer::ProtonixTimer (unsigned int interval, ProtonixTimer::ProtonixTimerUnit unit) {
@@ -93,23 +91,6 @@ ProtonixTimer::ProtonixTimer (unsigned int interval, ProtonixTimer::ProtonixTime
 
 	this->Interval(interval);
 	this->Unit(unit);
-	this->Callback([](ProtonixTimer* timer) {});
-}
-
-ProtonixTimer::ProtonixTimer (unsigned int interval, ProtonixTimer::ProtonixTimerCallback callback) {
-	this->_previous = 0;
-
-	this->Interval(interval);
-	this->Unit(ProtonixTimer::ProtonixTimerUnit::MILLISECONDS);
-	this->Callback(callback);
-}
-
-ProtonixTimer::ProtonixTimer (unsigned int interval, ProtonixTimer::ProtonixTimerUnit unit, ProtonixTimer::ProtonixTimerCallback callback) {
-	this->_previous = 0;
-
-	this->Interval(interval);
-	this->Unit(unit);
-	this->Callback(callback);
 }
 
 unsigned long ProtonixTimer::Previous () {
@@ -132,13 +113,7 @@ ProtonixTimer::ProtonixTimerUnit ProtonixTimer::Unit () {
 	return this->_unit;
 }
 
-ProtonixTimer* ProtonixTimer::Callback (ProtonixTimer::ProtonixTimerCallback callback) {
-	this->_callback = callback;
-
-	return this;
-}
-
-void ProtonixTimer::Pipe () {
+bool ProtonixTimer::Pipe () {
 	unsigned long current = 0;
 
 	if (this->_unit == ProtonixTimer::ProtonixTimerUnit::MILLISECONDS)
@@ -149,8 +124,87 @@ void ProtonixTimer::Pipe () {
 
 	long diff = this->_previous - current;
 
-	if (diff < 0 || diff >= this->_interval)
-		this->_callback(this);
+	return diff < 0 || diff >= this->_interval;
+}
+
+
+
+
+ProtonixProtocolDTO::ProtonixProtocolDTO () {
+	//this->_dto = DynamicJsonDocument<512>;
+}
+
+void ProtonixProtocolDTO::URL (String url) {
+	this->_url = url;
+}
+String ProtonixProtocolDTO::URL () {
+	return this->_url;
+}
+
+void ProtonixProtocolDTO::Response (String url) {
+	this->_response = url;
+}
+String ProtonixProtocolDTO::Response () {
+	return this->_response;
+}
+
+void ProtonixProtocolDTO::Event (String url) {
+	this->_event = url;
+}
+String ProtonixProtocolDTO::Event () {
+	return this->_event;
+}
+
+void ProtonixProtocolDTO::Data (JsonObject data) {
+	this->_data = data;
+}
+
+JsonObject ProtonixProtocolDTO::Data () {
+	return this->_data;
+}
+
+bool ProtonixProtocolDTO::IsURL () {
+	return this->_url.length() != 0;
+}
+
+bool ProtonixProtocolDTO::IsResponse () {
+	return this->_response.length() != 0;
+}
+
+bool ProtonixProtocolDTO::IsEvent () {
+	return this->_event.length() != 0;
+}
+
+String ProtonixProtocolDTO::Serialize () {
+	String out;
+	serializeJson(this->_dto, out);
+
+	return out;
+}
+
+bool ProtonixProtocolDTO::Deserialize (String raw) {
+	deserializeJson(this->_dto, raw);
+	JsonObject dto = this->_dto.as<JsonObject>();
+
+	if (dto.containsKey("url")) {
+		const char* url = dto["url"];
+		this->_url = (String)url;
+	}
+
+	if (dto.containsKey("response")) {
+		const char* url = dto["response"];
+		this->_response = (String)url;
+	}
+
+	if (dto.containsKey("event")) {
+		const char* url = dto["event"];
+		this->_event = (String)url;
+	}
+
+	if (dto.containsKey("data"))
+		this->_data = dto["data"];
+
+	return true;
 }
 
 
@@ -193,6 +247,24 @@ String Networks::NWiFi::AddressIP () {
 
 
 
+Protocols::PWebSocket::PWebSocket () {
+	this->_client.onMessage([&](websockets::WebsocketsMessage message) {
+		Serial.println("[PWebSocket::onMessage] " + message.data());
+
+		ProtonixProtocolDTO* dto = new ProtonixProtocolDTO();
+		dto->Deserialize(message.data());
+
+		if (dto->IsURL())
+			Serial.println("[PWebSocket::onMessage URL] " + dto->URL());
+
+		if (dto->IsResponse())
+			Serial.println("[PWebSocket::onMessage Response] " + dto->Response());
+
+		if (dto->IsEvent())
+			Serial.println("[PWebSocket::onMessage Event] " + dto->Event());
+	});
+}
+
 bool Protocols::PWebSocket::Connect (ProtonixURI* uri) {
 	return this->_client.connect(
 		uri->Host(),
@@ -212,68 +284,15 @@ void Protocols::PWebSocket::Pipe() {
 
 
 
-void ProtonixDevice::_pipe (ProtonixTimer* timer) {
-	/*if (!this->_networkConnected) {
-		if (!this->_network->Connected()) return;
-
-		Serial.println("[network:connect]");
-		this->_networkConnected = true;
-		this->_device->DeviceOnNetworkConnect(this);
-	}
-
-	if (!this->_protocolConnected) {
-		if (!this->_protocol->Connected()) return;
-
-		Serial.println("[protocol:connected]");
-		this->_protocolConnected = true;
-		this->_device->DeviceOnProtocolConnect(this);
-	}*/
-	if (!this->_networkConnected || !this->_network->Connected()) {
-		if (!this->_networkConnected) {
-			Serial.println("[network:connect]");
-
-			this->_network->Connect();
-			this->_networkConnected = true;
-		}
-
-		if (!this->_network->Connected()) return;
-
-		Serial.println("[network:connected]");
-		this->_device->DeviceOnNetworkConnect(this);
-	}
-
-	if (!this->_protocolConnected || !this->_protocol->Connected()) {
-		if (!this->_protocolConnected) {
-			Serial.println("[protocol:connect]");
-
-			this->_protocol->Connect(this->_uri);
-			this->_protocolConnected = true;
-		}
-
-		if (!this->_protocol->Connected()) return;
-
-		Serial.println("[protocol:connected]");
-		this->_device->DeviceOnProtocolConnect(this);
-	}
-
-	this->_protocol->Pipe();
-}
-
 ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
 	this->_ready = false;
-	this->_networkConnected = false;
-	this->_protocolConnected = false;
+	this->_networkConnected1 = false;
+	this->_networkConnected2 = false;
+	this->_protocolConnected1 = false;
+	this->_protocolConnected2 = false;
 
 	this->Device(device);
-	/*auto callback = [&](ProtonixTimer* timer) {
-		this->_pipe(timer);
-	};*/
-	this->_timer = new ProtonixTimer(this->_device->DeviceTick(), [](ProtonixTimer* timer) {
-		//callback(timer);
-	});
-	//this->_timer->Callback([](ProtonixTimer * timer) {
-	//	//callback(timer);
-	//});
+	this->_timer = new ProtonixTimer(this->_device->DeviceTick());
 }
 
 void ProtonixDevice::Device (IProtonixDevice* device) {
@@ -320,11 +339,46 @@ void ProtonixDevice::ServerEndpoint (String host, uint port, String path) {
 	this->Server(new ProtonixURI(host, port, path));
 }
 
+void ProtonixDevice::_pipe () {
+	if (!this->_networkConnected1 || !this->_networkConnected2) {
+		if (!this->_networkConnected1) {
+			Serial.println("[network:connect]");
+
+			this->_network->Connect();
+			this->_networkConnected1 = true;
+		}
+
+		if (!this->_network->Connected()) return;
+
+		Serial.println("[network:connected]");
+		this->_networkConnected2 = true;
+		this->_device->DeviceOnNetworkConnect(this);
+	}
+
+	if (!this->_protocolConnected1 || !this->_protocolConnected2) {
+		if (!this->_protocolConnected1) {
+			Serial.println("[protocol:connect]");
+
+			this->_protocol->Connect(this->_uri);
+			this->_protocolConnected1 = true;
+		}
+
+		if (!this->_protocol->Connected()) return;
+
+		Serial.println("[protocol:connected]");
+		this->_protocolConnected2 = true;
+		this->_device->DeviceOnProtocolConnect(this);
+	}
+
+	this->_protocol->Pipe();
+}
+
 void ProtonixDevice::Pipe () {
 	if (!this->_ready) {
 		this->_ready = true;
 		this->_device->DeviceOnReady(this);
 	}
 
-	this->_timer->Pipe();
+	if (this->_timer->Pipe())
+		this->_pipe();
 }
