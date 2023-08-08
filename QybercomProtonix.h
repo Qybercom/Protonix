@@ -69,8 +69,8 @@ namespace Qybercom {
 		};
 
 		class IProtonixDTO {
-			protected:
-				JsonObject _alloc(unsigned long capacity);
+			/*protected:
+				JsonObject _alloc(unsigned long capacity);*/
 
 			public:
 				virtual void DTOPopulate(ProtonixDTO* dto);
@@ -142,6 +142,8 @@ namespace Qybercom {
 				IProtonixDTO* _dto;
 				JsonObject _data;
 				bool _debug;
+				StaticJsonDocument<1024> _buffer;
+				bool _bufferInit;
 
 			public:
 				ProtonixDTO();
@@ -197,6 +199,23 @@ namespace Qybercom {
 				virtual void Send(String data);
 		};
 
+		//class ITransport {
+		//	public:
+		//		virtual bool Connect();
+		//		virtual bool Connected();
+		//		virtual String AddressMAC();
+		//		virtual String AddressIP();
+
+		//		// https://stackoverflow.com/a/12772708/2097055
+		//		// https://stackoverflow.com/a/1755042/2097055
+		//		static void ParseMAC(String mac, uint8_t out[6]) {
+		//			char buffer[18];
+		//			mac.toCharArray(buffer, 18);
+
+		//			sscanf(buffer, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &out[0], &out[1], &out[2], &out[3], &out[4], &out[5]);
+		//		}
+		//};
+
 		namespace Networks {
 			class NWiFi: public INetwork {
 				private:
@@ -234,6 +253,15 @@ namespace Qybercom {
 			};
 		}
 
+		class ProtonixDeviceStatus {
+			private:
+				String _summary;
+
+			public:
+				void Summary(String suymmary);
+				String Summary();
+		};
+
 		class IProtonixDevice {
 			public:
 				virtual unsigned int DeviceTick();
@@ -245,6 +273,7 @@ namespace Qybercom {
 				virtual void DeviceOnStreamResponse(ProtonixDevice* device, ProtonixDTO* dto);
 				virtual void DeviceOnStreamEvent(ProtonixDevice* device, ProtonixDTO* dto);
 				virtual void DeviceOnCommand(ProtonixDevice* device, DTO::DTOEventCommand* command);
+				virtual ProtonixDeviceStatus* DeviceStatus();
 		};
 
 		// http://tedfelix.com/software/c++-callbacks.html
