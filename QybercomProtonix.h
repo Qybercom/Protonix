@@ -312,9 +312,9 @@ namespace Qybercom {
 				virtual void DeviceOnTick(ProtonixDevice* device);
 				virtual void DeviceOnNetworkConnect(ProtonixDevice* device);
 				virtual void DeviceOnProtocolConnect(ProtonixDevice* device);
-				virtual void DeviceOnStreamResponse(ProtonixDevice* device, ProtonixDTO* dto);
-				virtual void DeviceOnStreamEvent(ProtonixDevice* device, ProtonixDTO* dto);
-				virtual void DeviceOnCommand(ProtonixDevice* device, DTO::DTOEventCommand* command);
+				virtual void DeviceOnStreamResponse(ProtonixDevice* device);
+				virtual void DeviceOnStreamEvent(ProtonixDevice* device);
+				virtual void DeviceOnCommand(ProtonixDevice* device);
 				virtual ProtonixDeviceStatus* DeviceStatus();
 		};
 
@@ -346,10 +346,11 @@ namespace Qybercom {
 
 				//void OnStream(String data);
 				void OnStream(unsigned char* data);
-				void OnStreamResponse(ProtonixDTO* dto);
-				void OnStreamEvent(ProtonixDTO* dto);
 
 				void RequestStream(String url, IProtonixDTORequest* request);
+				ProtonixDTO* DTOInput();
+				ProtonixDTO* DTOOutput();
+				DTO::DTOEventCommand* DTOInputEventCommand();
 
 			private:
 				IProtonixDevice* _device;
@@ -362,8 +363,14 @@ namespace Qybercom {
 				bool _protocolConnected1;
 				bool _protocolConnected2;
 				ProtonixURI* _uri;
+				ProtonixDTO* _dtoInput;
+				ProtonixDTO* _dtoOutput;
+				DTO::DTOEventCommand* _dtoInputEventCommand;
 				bool _debug;
 				void _pipe();
+				void _onStreamURL();
+				void _onStreamResponse();
+				void _onStreamEvent();
 		};
 	}
 }

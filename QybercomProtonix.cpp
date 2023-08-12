@@ -562,6 +562,10 @@ ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
 	this->Debug(false);
 	this->Device(device);
 	this->_timer = new ProtonixTimer(this->_device->DeviceTick());
+
+	this->_dtoInput = new ProtonixDTO();
+	this->_dtoOutput = new ProtonixDTO();
+	this->_dtoInputEventCommand = new DTO::DTOEventCommand();
 }
 
 void ProtonixDevice::Device (IProtonixDevice* device) {
@@ -674,13 +678,13 @@ void ProtonixDevice::Pipe () {
 }
 
 void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
-	ProtonixDTO* dto = new ProtonixDTO();
+	//ProtonixDTO* dto = new ProtonixDTO();
 
-	dto->Debug(this->Debug());
-	dto->URL(url);
-	dto->DTO(request);
+	this->_dtoOutput->Debug(this->Debug());
+	this->_dtoOutput->URL(url);
+	this->_dtoOutput->DTO(request);
 
-	String raw = dto->Serialize();
+	String raw = this->_dtoOutput->Serialize();
 	this->_protocol->Send(raw);
 
 	if (this->_debug)
@@ -688,56 +692,62 @@ void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
 }
 
 //void ProtonixDevice::OnStream (String data) {
-void ProtonixDevice::OnStream(unsigned char* data) {
+void ProtonixDevice::OnStream (unsigned char* data) {
 	if (this->_debug)
 		Serial.println("[OnStream] " + String((char*)data));
 
-	return;
+	//return;
 
-	ProtonixDTO* dto = new ProtonixDTO();
-	dto->Debug(this->_debug);
-	//dto->Deserialize(data);
+	//ProtonixDTO* dto = new ProtonixDTO();
+	//this->_dtoInput->Debug(this->_debug);
+	this->_dtoInput->Deserialize(String((char*)data));
 
-	if (dto->IsURL()) {
-		if (dto->Debug())
-			Serial.println("[OnStream URL] " + dto->URL());
-	}
+	if (this->_dtoInput->IsURL())
+		this->_onStreamURL();
 
-	if (dto->IsResponse()) {
-		if (dto->Debug())
-			Serial.println("[OnStream Response] " + dto->Response());
+	if (this->_dtoInput->IsResponse())
+		this->_onStreamResponse();
 
-		this->OnStreamResponse(dto);
-	}
-
-	if (dto->IsEvent()) {
-		if (dto->Debug())
-			Serial.println("[OnStream Event] " + dto->Event());
-
-		this->OnStreamEvent(dto);
-	}
+	if (this->_dtoInput->IsEvent())
+		this->_onStreamEvent();
 }
 
-void ProtonixDevice::OnStreamResponse (ProtonixDTO* dto) {
+void ProtonixDevice::_onStreamURL () {
 	if (this->_debug)
-		Serial.println("[response] " + dto->Response());
-
-	this->_device->DeviceOnStreamResponse(this, dto);
+		Serial.println("[url] " + this->_dtoInput->URL());
 }
 
-void ProtonixDevice::OnStreamEvent (ProtonixDTO* dto) {
+void ProtonixDevice::_onStreamResponse () {
 	if (this->_debug)
-		Serial.println("[event] " + dto->Event());
+		Serial.println("[response] " + this->_dtoInput->Response());
 
-	this->_device->DeviceOnStreamEvent(this, dto);
+	this->_device->DeviceOnStreamResponse(this);
+}
 
-	if (dto->Event() == "/api/mechanism/command/" + this->_device->DeviceID()) {
+void ProtonixDevice::_onStreamEvent () {
+	if (this->_debug)
+		Serial.println("[event] " + this->_dtoInput->Event());
+
+	this->_device->DeviceOnStreamEvent(this);
+
+	if (this->_dtoInput->Event() == "/api/mechanism/command/" + this->_device->DeviceID()) {
 		if (this->_debug)
-			Serial.println("[command] " + dto->Event());
+			Serial.println("[command] " + this->_dtoInput->Event());
 
-		DTO::DTOEventCommand* command = new DTO::DTOEventCommand();
-		command->DTOPopulate(dto);
+		this->_dtoInputEventCommand->DTOPopulate(this->_dtoInput);
 
-		this->_device->DeviceOnCommand(this, command);
+		this->_device->DeviceOnCommand(this);
 	}
+}
+
+ProtonixDTO* ProtonixDevice::DTOInput () {
+	return this->_dtoInput;
+}
+
+ProtonixDTO* ProtonixDevice::DTOOutput() {
+	return this->_dtoOutput;
+}
+
+DTO::DTOEventCommand* ProtonixDevice::DTOInputEventCommand () {
+	return this->_dtoInputEventCommand;
 }
