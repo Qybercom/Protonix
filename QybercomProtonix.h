@@ -253,7 +253,7 @@ namespace Qybercom {
 		};
 
 		namespace Networks {
-			class NWiFi: public INetwork {
+			class NWiFi : public INetwork {
 				private:
 					String _ssid;
 					String _password;
@@ -274,13 +274,27 @@ namespace Qybercom {
 		}
 
 		namespace Protocols {
-			class PWebSocket: public IProtocol {
+			class PWiFiTCP : public IProtocol {
+				private:
+					WiFiClient _client;
+					ProtonixDevice* _device;
+					unsigned char _buffer[1024];
+					unsigned char* _bufferPTR;
+
+				public:
+					void Init(ProtonixDevice* device);
+					bool Connect(ProtonixURI* uri);
+					bool Connected();
+					void Pipe();
+					void Send(String data);
+			};
+
+			class PWebSocket : public IProtocol {
 				private:
 					websockets::WebsocketsClient _client;
 					ProtonixDevice* _device;
 
 				public:
-					void _input(ProtonixDTO* dto);
 					void Init(ProtonixDevice* device);
 					bool Connect(ProtonixURI* uri);
 					bool Connected();
@@ -330,6 +344,8 @@ namespace Qybercom {
 				
 				void Pipe();
 
+				//void OnStream(String data);
+				void OnStream(unsigned char* data);
 				void OnStreamResponse(ProtonixDTO* dto);
 				void OnStreamEvent(ProtonixDTO* dto);
 

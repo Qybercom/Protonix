@@ -486,40 +486,46 @@ String Networks::NWiFi::AddressIP () {
 
 
 
-void Protocols::PWebSocket::_input (ProtonixDTO* dto) {
-	if (dto->IsURL()) {
-		if (dto->Debug())
-			Serial.println("[PWebSocket::onMessage URL] " + dto->URL());
-	}
 
-	if (dto->IsResponse()) {
-		if (dto->Debug())
-			Serial.println("[PWebSocket::onMessage Response] " + dto->Response());
+void Protocols::PWiFiTCP::Init (ProtonixDevice* device) {
+	this->_device = device;
+}
 
-		this->_device->OnStreamResponse(dto);
-	}
+bool Protocols::PWiFiTCP::Connect (ProtonixURI*uri) {
+	this->_client.connect(uri->Host().c_str(), uri->Port());
 
-	if (dto->IsEvent()) {
-		if (dto->Debug())
-			Serial.println("[PWebSocket::onMessage Event] " + dto->Event());
+	return true;
+}
 
-		this->_device->OnStreamEvent(dto);
+bool Protocols::PWiFiTCP::Connected () {
+	return this->_client.connected();
+}
+
+void Protocols::PWiFiTCP::Pipe () {
+	int available = this->_client.available();
+
+	if (available) {
+		//unsigned char _b[1024];
+		this->_bufferPTR = this->_buffer;
+		this->_client.read(this->_bufferPTR, available);
+		//this->_client.flush();
+
+		this->_device->OnStream(this->_buffer);
 	}
 }
+
+void Protocols::PWiFiTCP::Send (String data) {
+	uint8_t* buffer = (uint8_t*)data.c_str();
+
+	this->_client.write(buffer, data.length());
+}
+
+
 
 void Protocols::PWebSocket::Init (ProtonixDevice* device) {
 	this->_device = device;
 	this->_client.onMessage([&](websockets::WebsocketsMessage message) {
-		bool debug = this->_device->Debug();
-
-		if (debug)
-			Serial.println("[PWebSocket::onMessage] " + message.data());
-
-		ProtonixDTO* dto = new ProtonixDTO();
-		dto->Debug(debug);
-		dto->Deserialize(message.data());
-
-		this->_input(dto);
+		//this->_device->OnStream(message.data().c_str());
 	});
 }
 
@@ -679,6 +685,37 @@ void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
 
 	if (this->_debug)
 		Serial.println("[request] " + url + " ok: " + raw);
+}
+
+//void ProtonixDevice::OnStream (String data) {
+void ProtonixDevice::OnStream(unsigned char* data) {
+	if (this->_debug)
+		Serial.println("[OnStream] " + String((char*)data));
+
+	return;
+
+	ProtonixDTO* dto = new ProtonixDTO();
+	dto->Debug(this->_debug);
+	//dto->Deserialize(data);
+
+	if (dto->IsURL()) {
+		if (dto->Debug())
+			Serial.println("[OnStream URL] " + dto->URL());
+	}
+
+	if (dto->IsResponse()) {
+		if (dto->Debug())
+			Serial.println("[OnStream Response] " + dto->Response());
+
+		this->OnStreamResponse(dto);
+	}
+
+	if (dto->IsEvent()) {
+		if (dto->Debug())
+			Serial.println("[OnStream Event] " + dto->Event());
+
+		this->OnStreamEvent(dto);
+	}
 }
 
 void ProtonixDevice::OnStreamResponse (ProtonixDTO* dto) {
