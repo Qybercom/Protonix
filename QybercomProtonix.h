@@ -314,10 +314,10 @@ namespace Qybercom {
 				virtual void DeviceOnTick(ProtonixDevice* device);
 				virtual void DeviceOnNetworkConnect(ProtonixDevice* device);
 				virtual void DeviceOnProtocolConnect(ProtonixDevice* device);
-				virtual void DeviceOnStreamResponse(ProtonixDevice* device);
-				virtual void DeviceOnStreamEvent(ProtonixDevice* device);
-				virtual void DeviceOnAuthorization(ProtonixDevice* device);
-				virtual void DeviceOnCommand(ProtonixDevice* device);
+				virtual void DeviceOnStreamResponse(ProtonixDevice* device, ProtonixDTO* dto);
+				virtual void DeviceOnStreamEvent(ProtonixDevice* device, ProtonixDTO* dto);
+				virtual void DeviceOnAuthorization(ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization);
+				virtual void DeviceOnCommand(ProtonixDevice* device, DTO::DTOEventCommand* command);
 				virtual ProtonixDeviceStatus* DeviceStatus();
 		};
 

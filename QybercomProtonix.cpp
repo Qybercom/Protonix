@@ -731,12 +731,12 @@ void ProtonixDevice::_onStreamResponse () {
 	if (this->_debug)
 		Serial.println("[response] " + this->_dtoInput->Response());
 
-	this->_device->DeviceOnStreamResponse(this);
+	this->_device->DeviceOnStreamResponse(this, this->_dtoInput);
 
 	if (this->_dtoInput->Response() == "/api/authorize/mechanism") {
 		this->_dtoInputResponseAuthorization->DTOPopulate(this->_dtoInput);
 
-		this->_device->DeviceOnAuthorization(this);
+		this->_device->DeviceOnAuthorization(this, this->_dtoInputResponseAuthorization);
 	}
 }
 
@@ -744,12 +744,12 @@ void ProtonixDevice::_onStreamEvent () {
 	if (this->_debug)
 		Serial.println("[event] " + this->_dtoInput->Event());
 
-	this->_device->DeviceOnStreamEvent(this);
+	this->_device->DeviceOnStreamEvent(this, this->_dtoInput);
 
 	if (this->_dtoInput->Event() == "/api/mechanism/command/" + this->_device->DeviceID()) {
 		this->_dtoInputEventCommand->DTOPopulate(this->_dtoInput);
 
-		this->_device->DeviceOnCommand(this);
+		this->_device->DeviceOnCommand(this, this->_dtoInputEventCommand);
 	}
 }
 
