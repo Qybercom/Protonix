@@ -310,6 +310,7 @@ namespace Qybercom {
 				virtual unsigned int DeviceTick();
 				virtual String DeviceID();
 				virtual String DevicePassphrase();
+				virtual bool DeviceAutoStatus();
 				virtual void DeviceOnReady(ProtonixDevice* device);
 				virtual void DeviceOnTick(ProtonixDevice* device);
 				virtual void DeviceOnNetworkConnect(ProtonixDevice* device);
@@ -319,6 +320,19 @@ namespace Qybercom {
 				virtual void DeviceOnAuthorization(ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization);
 				virtual void DeviceOnCommand(ProtonixDevice* device, DTO::DTOEventCommand* command);
 				virtual ProtonixDeviceStatus* DeviceStatus();
+		};
+
+		class ProtonixDeviceBase : public IProtonixDevice {
+			private:
+				bool _debug;
+
+			public:
+				bool DeviceAutoStatus();
+				void DeviceOnNetworkConnect(ProtonixDevice* device);
+				void DeviceOnProtocolConnect(ProtonixDevice* device);
+				void DeviceOnStreamResponse(ProtonixDevice* device, ProtonixDTO* dto);
+				void DeviceOnStreamEvent(ProtonixDevice* device, ProtonixDTO* dto);
+				void DeviceOnAuthorization(ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization);
 		};
 
 		// http://tedfelix.com/software/c++-callbacks.html

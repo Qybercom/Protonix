@@ -243,7 +243,6 @@ bool ProtonixDTO::IsEvent () {
 }
 
 String ProtonixDTO::Serialize () {
-	//String out = "{";
 	this->_bufferOutput = "{";
 	/*StaticJsonDocument<1024> dto;
 
@@ -258,7 +257,7 @@ String ProtonixDTO::Serialize () {
 
 	this->_dto->DTOToJSON(dto);
 
-	serializeJson(dto, out);
+	serializeJson(dto, this->_bufferOutput);
 
 	dto.clear();*/
 
@@ -384,7 +383,6 @@ ProtonixDeviceStatus* DTO::DTORequestDeviceStatus::Status () {
 }
 
 void DTO::DTORequestDeviceStatus::DTOToJSON (JsonDocument& dto) {
-	//Serial.println("!!!");
 	dto["data"].clear();
 	JsonObject nested = dto.createNestedObject("data");
 	/*dto["data"] = nested;
@@ -512,10 +510,8 @@ void Protocols::PWiFiTCP::Pipe () {
 	int available = this->_client.available();
 
 	if (available) {
-		//unsigned char _b[1024];
 		this->_bufferPTR = this->_buffer;
 		this->_client.read(this->_bufferPTR, available);
-		//this->_client.flush();
 
 		this->_device->OnStream(this->_buffer);
 	}
@@ -555,6 +551,35 @@ void Protocols::PWebSocket::Pipe () {
 void Protocols::PWebSocket::Send (String raw) {
 	this->_client.send(raw);
 }
+
+
+
+
+bool ProtonixDeviceBase::DeviceAutoStatus() {
+	return true;
+}
+
+void ProtonixDeviceBase::DeviceOnNetworkConnect (ProtonixDevice* device) {
+	Serial.println("[device] NetworkConnect");
+}
+
+void ProtonixDeviceBase::DeviceOnProtocolConnect (ProtonixDevice* device) {
+	Serial.println("[device] ProtocolConnect");
+}
+
+void ProtonixDeviceBase::DeviceOnStreamResponse (ProtonixDevice* device, ProtonixDTO* dto) {
+	Serial.println("[device] StreamResponse " + dto->Response());
+}
+
+void ProtonixDeviceBase::DeviceOnStreamEvent (ProtonixDevice* device, ProtonixDTO* dto) {
+	Serial.println("[device] StreamEvent " + dto->Event());
+}
+
+void ProtonixDeviceBase::DeviceOnAuthorization (ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization) {
+	Serial.println("[device:authorize] " + String(authorization->Status() == 200 ? "Success" : "Failure"));
+}
+
+
 
 
 
@@ -673,6 +698,9 @@ void ProtonixDevice::_pipe () {
 
 	this->_protocol->Pipe();
 	this->_device->DeviceOnTick(this);
+
+	if (this->_device->DeviceAutoStatus())
+		this->RequestStream("/api/mechanism/status", new DTO::DTORequestDeviceStatus(this->_device->DeviceStatus()));
 }
 
 void ProtonixDevice::Pipe () {
@@ -686,8 +714,6 @@ void ProtonixDevice::Pipe () {
 }
 
 void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
-	//ProtonixDTO* dto = new ProtonixDTO();
-
 	this->_dtoOutput->Debug(this->Debug());
 	this->_dtoOutput->URL(url);
 	this->_dtoOutput->DTO(request);
@@ -699,14 +725,10 @@ void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
 		Serial.println("[request] " + url + " ok: " + raw);
 }
 
-//void ProtonixDevice::OnStream (String data) {
 void ProtonixDevice::OnStream (unsigned char* data) {
 	if (this->_debug)
 		Serial.println("[OnStream] " + String((char*)data));
 
-	//return;
-
-	//ProtonixDTO* dto = new ProtonixDTO();
 	//this->_dtoInput->Debug(this->_debug);
 	this->_dtoInput->Deserialize(String((char*)data));
 
