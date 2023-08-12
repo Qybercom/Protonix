@@ -68,13 +68,46 @@ namespace Qybercom {
 				ProtonixTimerUnit _unit;
 		};
 
-		class IProtonixDTO {
-			/*protected:
-				JsonObject _alloc(unsigned long capacity);*/
+		class ProtonixDeviceSensor {
+			private:
+				String _id;
+				String _value;
+				bool _active;
+				bool _failure;
 
+			public:
+				ProtonixDeviceSensor();
+				ProtonixDeviceSensor(String id);
+
+				void ID(String id);
+				String ID();
+
+				void Value(String value);
+				String Value();
+
+				void Active(bool active);
+				bool Active();
+
+				void Failure(bool failure);
+				bool Failure();
+		};
+
+		class ProtonixDeviceStatus {
+			private:
+				String _summary;
+
+			public:
+				ProtonixDeviceStatus();
+
+				void Summary(String summary);
+				String Summary();
+		};
+
+		class IProtonixDTO {
 			public:
 				virtual void DTOPopulate(ProtonixDTO* dto);
 				virtual void DTOToJSON(JsonDocument& dto);
+				virtual String DTOSerialize();
 		};
 
 		class IProtonixDTORequest : public IProtonixDTO {
@@ -106,6 +139,23 @@ namespace Qybercom {
 
 					void DTOPopulate(ProtonixDTO* dto);
 					void DTOToJSON(JsonDocument& dto);
+					String DTOSerialize();
+			};
+
+			class DTORequestDeviceStatus : public IProtonixDTORequest {
+				private:
+					ProtonixDeviceStatus* _status;
+
+				public:
+					DTORequestDeviceStatus();
+					DTORequestDeviceStatus(ProtonixDeviceStatus* status);
+
+					void Status(ProtonixDeviceStatus* status);
+					ProtonixDeviceStatus* Status();
+
+					void DTOPopulate(ProtonixDTO* dto);
+					void DTOToJSON(JsonDocument& dto);
+					String DTOSerialize();
 			};
 
 			class DTOResponseAuthorization : public IProtonixDTOResponse {
@@ -118,6 +168,7 @@ namespace Qybercom {
 
 					void DTOPopulate(ProtonixDTO* dto);
 					void DTOToJSON(JsonDocument& dto);
+					String DTOSerialize();
 					unsigned short DTOResponseStatus();
 			};
 
@@ -131,6 +182,7 @@ namespace Qybercom {
 
 					void DTOPopulate(ProtonixDTO* dto);
 					void DTOToJSON(JsonDocument& dto);
+					String DTOSerialize();
 			};
 		}
 
@@ -144,6 +196,7 @@ namespace Qybercom {
 				bool _debug;
 				StaticJsonDocument<1024> _buffer;
 				bool _bufferInit;
+				String _bufferOutput;
 
 			public:
 				ProtonixDTO();
@@ -199,23 +252,6 @@ namespace Qybercom {
 				virtual void Send(String data);
 		};
 
-		//class ITransport {
-		//	public:
-		//		virtual bool Connect();
-		//		virtual bool Connected();
-		//		virtual String AddressMAC();
-		//		virtual String AddressIP();
-
-		//		// https://stackoverflow.com/a/12772708/2097055
-		//		// https://stackoverflow.com/a/1755042/2097055
-		//		static void ParseMAC(String mac, uint8_t out[6]) {
-		//			char buffer[18];
-		//			mac.toCharArray(buffer, 18);
-
-		//			sscanf(buffer, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &out[0], &out[1], &out[2], &out[3], &out[4], &out[5]);
-		//		}
-		//};
-
 		namespace Networks {
 			class NWiFi: public INetwork {
 				private:
@@ -253,21 +289,13 @@ namespace Qybercom {
 			};
 		}
 
-		class ProtonixDeviceStatus {
-			private:
-				String _summary;
-
-			public:
-				void Summary(String suymmary);
-				String Summary();
-		};
-
 		class IProtonixDevice {
 			public:
 				virtual unsigned int DeviceTick();
 				virtual String DeviceID();
 				virtual String DevicePassphrase();
 				virtual void DeviceOnReady(ProtonixDevice* device);
+				virtual void DeviceOnTick(ProtonixDevice* device);
 				virtual void DeviceOnNetworkConnect(ProtonixDevice* device);
 				virtual void DeviceOnProtocolConnect(ProtonixDevice* device);
 				virtual void DeviceOnStreamResponse(ProtonixDevice* device, ProtonixDTO* dto);

@@ -122,14 +122,75 @@ bool ProtonixTimer::Pipe () {
 	if (this->_unit == ProtonixTimer::ProtonixTimerUnit::MICROSECONDS)
 		current = micros();
 
-	long diff = this->_previous - current;
+	long diff = current - this->_previous;
+	bool elapsed = diff < 0 || diff >= this->_interval;
 
-	return diff < 0 || diff >= this->_interval;
+	if (elapsed)
+		this->_previous = current;
+
+	return elapsed;
 }
+
+
+
+ProtonixDeviceSensor::ProtonixDeviceSensor () { }
+
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id) {
+	this->ID(id);
+}
+
+void ProtonixDeviceSensor::ID (String id) {
+	this->_id = id;
+}
+
+String ProtonixDeviceSensor::ID () {
+	return this->_id;
+}
+
+void ProtonixDeviceSensor::Value (String value) {
+	this->_value = value;
+}
+
+String ProtonixDeviceSensor::Value () {
+	return this->_value;
+}
+
+void ProtonixDeviceSensor::Active (bool active) {
+	this->_active = active;
+}
+
+bool ProtonixDeviceSensor::Active () {
+	return this->_active;
+}
+
+void ProtonixDeviceSensor::Failure (bool failure) {
+	this->_failure = failure;
+}
+
+bool ProtonixDeviceSensor::Failure () {
+	return this->_failure;
+}
+
+
+
+
+ProtonixDeviceStatus::ProtonixDeviceStatus () { }
+
+void ProtonixDeviceStatus::Summary (String summary) {
+	this->_summary = summary;
+}
+
+String ProtonixDeviceStatus::Summary () {
+	return this->_summary;
+}
+
+
+
 
 
 ProtonixDTO::ProtonixDTO () {
 	this->_debug = false;
+	this->_bufferOutput = "";
 }
 
 void ProtonixDTO::URL (String url) {
@@ -182,8 +243,9 @@ bool ProtonixDTO::IsEvent () {
 }
 
 String ProtonixDTO::Serialize () {
-	String out;
-	StaticJsonDocument<1024> dto;
+	//String out = "{";
+	this->_bufferOutput = "{";
+	/*StaticJsonDocument<1024> dto;
 
 	if (this->IsURL())
 		dto["url"] = this->_url;
@@ -198,24 +260,27 @@ String ProtonixDTO::Serialize () {
 
 	serializeJson(dto, out);
 
-	return out;
+	dto.clear();*/
+
+	if (this->IsURL())
+		this->_bufferOutput += "\"url\":\"" + this->_url + "\"";
+
+	if (this->IsResponse())
+		this->_bufferOutput += "\"response\":\"" + this->_response + "\"";
+
+	if (this->IsEvent())
+		this->_bufferOutput += "\"event\":\"" + this->_event + "\"";
+
+	this->_bufferOutput += ",\"data\":" + this->_dto->DTOSerialize() + "}";
+
+	return this->_bufferOutput;
 }
 
 bool ProtonixDTO::Deserialize (String raw) {
-	//StaticJsonDocument<2048> buffer;
-	//DynamicJsonDocument buffer(2048);
-	/*if (!this->_bufferInit) {
-		DynamicJsonDocument __buffer__(2048);
-		this->_buffer = __buffer__;
-		this->_bufferInit = true;
-	}*/
-
 	DeserializationError err = deserializeJson(this->_buffer, raw);
 	
-	if (err) {
-		Serial.print(F("deserializeJson() failed with code "));
-		Serial.println(err.f_str());
-	}
+	if (err)
+		Serial.println("[dto] json deserialize error: " + String(err.f_str()));
 
 	JsonObject dto = this->_buffer.as<JsonObject>();
 
@@ -250,11 +315,6 @@ bool ProtonixDTO::Debug () {
 
 
 
-//JsonObject IProtonixDTO::_alloc(unsigned long capacity) {
-//	StaticJsonDocument<1024> doc;
-//
-//	return doc.to<JsonObject>();
-//}
 
 DTO::DTORequestAuthorization::DTORequestAuthorization () { }
 
@@ -294,6 +354,44 @@ void DTO::DTORequestAuthorization::DTOPopulate(ProtonixDTO* dto) {
 		this->Passphrase(data["passphrase"]);
 }
 
+String DTO::DTORequestAuthorization::DTOSerialize () {
+	return "{\"id\":\"" + this->_id + "\",\"passphrase\":\"" + this->_passphrase +"\"}";
+}
+
+
+
+DTO::DTORequestDeviceStatus::DTORequestDeviceStatus () {
+	this->Status(new ProtonixDeviceStatus());
+}
+
+DTO::DTORequestDeviceStatus::DTORequestDeviceStatus (ProtonixDeviceStatus* status) {
+	this->Status(status);
+}
+
+void DTO::DTORequestDeviceStatus::Status (ProtonixDeviceStatus* status) {
+	this->_status = status;
+}
+
+ProtonixDeviceStatus* DTO::DTORequestDeviceStatus::Status () {
+	return this->_status;
+}
+
+void DTO::DTORequestDeviceStatus::DTOToJSON (JsonDocument& dto) {
+	//Serial.println("!!!");
+	dto["data"].clear();
+	JsonObject nested = dto.createNestedObject("data");
+	/*dto["data"] = nested;
+	dto["data"]["summary"] = this->_status->Summary();*/
+	nested["summary"] = this->_status->Summary();
+}
+
+void DTO::DTORequestDeviceStatus::DTOPopulate (ProtonixDTO* dto) {
+}
+
+String DTO::DTORequestDeviceStatus::DTOSerialize () {
+	return "{\"summary\":\"" + this->_status->Summary() + "\"}";
+}
+
 
 
 void DTO::DTOResponseAuthorization::Status (unsigned short status) {
@@ -319,6 +417,10 @@ unsigned short DTO::DTOResponseAuthorization::DTOResponseStatus () {
 	return this->_status;
 }
 
+String DTO::DTOResponseAuthorization::DTOSerialize() {
+	return "{\"status\":" + String(this->_status) + "}";
+}
+
 
 
 void DTO::DTOEventCommand::Name (String name) {
@@ -338,6 +440,10 @@ void DTO::DTOEventCommand::DTOPopulate (ProtonixDTO* dto) {
 
 void DTO::DTOEventCommand::DTOToJSON(JsonDocument &dto) {
 	dto["data"]["command"] = this->_name;
+}
+
+String DTO::DTOEventCommand::DTOSerialize() {
+	return "{\"command\":\"" + this->_name + "\"}";
 }
 
 
@@ -548,6 +654,7 @@ void ProtonixDevice::_pipe () {
 	}
 
 	this->_protocol->Pipe();
+	this->_device->DeviceOnTick(this);
 }
 
 void ProtonixDevice::Pipe () {
@@ -565,10 +672,7 @@ void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
 
 	dto->Debug(this->Debug());
 	dto->URL(url);
-	dto->DTO(new DTO::DTORequestAuthorization(
-		this->_device->DeviceID(),
-		this->_device->DevicePassphrase()
-	));
+	dto->DTO(request);
 
 	String raw = dto->Serialize();
 	this->_protocol->Send(raw);
