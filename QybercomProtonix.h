@@ -222,6 +222,8 @@ namespace Qybercom {
 				String Serialize();
 				bool Deserialize(String raw);
 
+				void Reset();
+
 				void Debug(bool debug);
 				bool Debug();
 		};
@@ -314,6 +316,7 @@ namespace Qybercom {
 				virtual void DeviceOnProtocolConnect(ProtonixDevice* device);
 				virtual void DeviceOnStreamResponse(ProtonixDevice* device);
 				virtual void DeviceOnStreamEvent(ProtonixDevice* device);
+				virtual void DeviceOnAuthorization(ProtonixDevice* device);
 				virtual void DeviceOnCommand(ProtonixDevice* device);
 				virtual ProtonixDeviceStatus* DeviceStatus();
 		};
@@ -350,6 +353,7 @@ namespace Qybercom {
 				void RequestStream(String url, IProtonixDTORequest* request);
 				ProtonixDTO* DTOInput();
 				ProtonixDTO* DTOOutput();
+				DTO::DTOResponseAuthorization* DTOInputResponseAuthorization();
 				DTO::DTOEventCommand* DTOInputEventCommand();
 
 			private:
@@ -365,6 +369,7 @@ namespace Qybercom {
 				ProtonixURI* _uri;
 				ProtonixDTO* _dtoInput;
 				ProtonixDTO* _dtoOutput;
+				DTO::DTOResponseAuthorization* _dtoInputResponseAuthorization;
 				DTO::DTOEventCommand* _dtoInputEventCommand;
 				bool _debug;
 				void _pipe();

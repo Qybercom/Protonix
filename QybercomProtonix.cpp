@@ -305,6 +305,13 @@ bool ProtonixDTO::Deserialize (String raw) {
 	return true;
 }
 
+void ProtonixDTO::Reset () {
+	this->_url = "";
+	this->_response = "";
+	this->_event = "";
+	//this->_data = null;
+}
+
 void ProtonixDTO::Debug (bool debug) {
 	this->_debug = debug;
 }
@@ -525,7 +532,7 @@ void Protocols::PWiFiTCP::Send (String data) {
 void Protocols::PWebSocket::Init (ProtonixDevice* device) {
 	this->_device = device;
 	this->_client.onMessage([&](websockets::WebsocketsMessage message) {
-		//this->_device->OnStream(message.data().c_str());
+		this->_device->OnStream((unsigned char*)message.data().c_str());
 	});
 }
 
@@ -565,6 +572,7 @@ ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
 
 	this->_dtoInput = new ProtonixDTO();
 	this->_dtoOutput = new ProtonixDTO();
+	this->_dtoInputResponseAuthorization = new DTO::DTOResponseAuthorization();
 	this->_dtoInputEventCommand = new DTO::DTOEventCommand();
 }
 
@@ -710,6 +718,8 @@ void ProtonixDevice::OnStream (unsigned char* data) {
 
 	if (this->_dtoInput->IsEvent())
 		this->_onStreamEvent();
+
+	this->_dtoInput->Reset();
 }
 
 void ProtonixDevice::_onStreamURL () {
@@ -722,6 +732,12 @@ void ProtonixDevice::_onStreamResponse () {
 		Serial.println("[response] " + this->_dtoInput->Response());
 
 	this->_device->DeviceOnStreamResponse(this);
+
+	if (this->_dtoInput->Response() == "/api/authorize/mechanism") {
+		this->_dtoInputResponseAuthorization->DTOPopulate(this->_dtoInput);
+
+		this->_device->DeviceOnAuthorization(this);
+	}
 }
 
 void ProtonixDevice::_onStreamEvent () {
@@ -731,9 +747,6 @@ void ProtonixDevice::_onStreamEvent () {
 	this->_device->DeviceOnStreamEvent(this);
 
 	if (this->_dtoInput->Event() == "/api/mechanism/command/" + this->_device->DeviceID()) {
-		if (this->_debug)
-			Serial.println("[command] " + this->_dtoInput->Event());
-
 		this->_dtoInputEventCommand->DTOPopulate(this->_dtoInput);
 
 		this->_device->DeviceOnCommand(this);
@@ -746,6 +759,10 @@ ProtonixDTO* ProtonixDevice::DTOInput () {
 
 ProtonixDTO* ProtonixDevice::DTOOutput() {
 	return this->_dtoOutput;
+}
+
+DTO::DTOResponseAuthorization* ProtonixDevice::DTOInputResponseAuthorization () {
+	return this->_dtoInputResponseAuthorization;
 }
 
 DTO::DTOEventCommand* ProtonixDevice::DTOInputEventCommand () {
