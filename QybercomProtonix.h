@@ -323,7 +323,8 @@ namespace Qybercom {
 		};
 
 		class ProtonixDeviceBase : public IProtonixDevice {
-			private:
+			protected:
+				ProtonixDeviceStatus* _status;
 				bool _debug;
 
 			public:
@@ -333,6 +334,7 @@ namespace Qybercom {
 				void DeviceOnStreamResponse(ProtonixDevice* device, ProtonixDTO* dto);
 				void DeviceOnStreamEvent(ProtonixDevice* device, ProtonixDTO* dto);
 				void DeviceOnAuthorization(ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization);
+				ProtonixDeviceStatus* DeviceStatus();
 		};
 
 		// http://tedfelix.com/software/c++-callbacks.html

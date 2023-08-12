@@ -560,23 +560,32 @@ bool ProtonixDeviceBase::DeviceAutoStatus() {
 }
 
 void ProtonixDeviceBase::DeviceOnNetworkConnect (ProtonixDevice* device) {
-	Serial.println("[device] NetworkConnect");
+	if (this->_debug)
+		Serial.println("[device] NetworkConnect");
 }
 
 void ProtonixDeviceBase::DeviceOnProtocolConnect (ProtonixDevice* device) {
-	Serial.println("[device] ProtocolConnect");
+	if (this->_debug)
+		Serial.println("[device] ProtocolConnect");
 }
 
 void ProtonixDeviceBase::DeviceOnStreamResponse (ProtonixDevice* device, ProtonixDTO* dto) {
-	Serial.println("[device] StreamResponse " + dto->Response());
+	if (this->_debug)
+		Serial.println("[device] StreamResponse " + dto->Response());
 }
 
 void ProtonixDeviceBase::DeviceOnStreamEvent (ProtonixDevice* device, ProtonixDTO* dto) {
-	Serial.println("[device] StreamEvent " + dto->Event());
+	if (this->_debug)
+		Serial.println("[device] StreamEvent " + dto->Event());
 }
 
 void ProtonixDeviceBase::DeviceOnAuthorization (ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization) {
-	Serial.println("[device:authorize] " + String(authorization->Status() == 200 ? "Success" : "Failure"));
+	if (this->_debug)
+		Serial.println("[device:authorize] " + String(authorization->Status() == 200 ? "Success" : "Failure"));
+}
+
+ProtonixDeviceStatus* ProtonixDeviceBase::DeviceStatus() {
+	return this->_status;
 }
 
 
