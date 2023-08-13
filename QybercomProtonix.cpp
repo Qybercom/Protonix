@@ -580,6 +580,9 @@ bool Networks::NWiFi::Connect () {
 	uint8_t mac[6] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
 	INetwork::ParseMAC(this->_mac, mac);
 
+	WiFi.disconnect();
+	WiFi.mode(WIFI_STA);
+
 	// https://randomnerdtutorials.com/esp32-set-custom-hostname-arduino/#comment-741757
 	#if defined(ESP32)
 	WiFi.setHostname(this->_hostname.c_str());
@@ -591,8 +594,6 @@ bool Networks::NWiFi::Connect () {
 	#error "This ain't a ESP32 or ESP8266!"
 	#endif
 
-	WiFi.disconnect();
-	WiFi.mode(WIFI_STA);
 	WiFi.begin(this->_ssid, this->_password);
 
 	delay(1000);
