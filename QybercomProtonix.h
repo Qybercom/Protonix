@@ -172,6 +172,20 @@ namespace Qybercom {
 					unsigned short DTOResponseStatus();
 			};
 
+			class DTOResponseMechanismStatus : public IProtonixDTOResponse {
+				private:
+					unsigned short _status;
+
+				public:
+					void Status(unsigned short status);
+					unsigned short Status();
+
+					void DTOPopulate(ProtonixDTO* dto);
+					void DTOToJSON(JsonDocument& dto);
+					String DTOSerialize();
+					unsigned short DTOResponseStatus();
+			};
+
 			class DTOEventCommand : public IProtonixDTOEvent {
 				private:
 					String _name;
@@ -197,6 +211,7 @@ namespace Qybercom {
 				StaticJsonDocument<1024> _buffer;
 				bool _bufferInit;
 				String _bufferOutput;
+				JsonObject _bufferObj;
 
 			public:
 				ProtonixDTO();
@@ -367,9 +382,11 @@ namespace Qybercom {
 				void OnStream(unsigned char* data);
 
 				void RequestStream(String url, IProtonixDTORequest* request);
+				void RequestStreamAuthorize();
 				ProtonixDTO* DTOInput();
 				ProtonixDTO* DTOOutput();
 				DTO::DTOResponseAuthorization* DTOInputResponseAuthorization();
+				DTO::DTOResponseMechanismStatus* DTOInputResponseMechanismStatus();
 				DTO::DTOEventCommand* DTOInputEventCommand();
 
 			private:
@@ -386,6 +403,7 @@ namespace Qybercom {
 				ProtonixDTO* _dtoInput;
 				ProtonixDTO* _dtoOutput;
 				DTO::DTOResponseAuthorization* _dtoInputResponseAuthorization;
+				DTO::DTOResponseMechanismStatus* _dtoInputResponseMechanismStatus;
 				DTO::DTOEventCommand* _dtoInputEventCommand;
 				bool _debug;
 				void _pipe();

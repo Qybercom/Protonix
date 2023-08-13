@@ -1,9 +1,16 @@
 #include <Arduino.h>
 #include <ArduinoWebsockets.h>
-#include <WiFi.h>
-#include <WiFiClient.h>
-#include <esp_wifi.h>
 #include <ArduinoJson.h>
+#include <WiFiClient.h>
+
+#if defined(ESP32)
+#include <WiFi.h>
+#include <esp_wifi.h>
+#elif defined(ESP8266)
+#include <ESP8266WiFi.h>
+#else
+#error "This ain't a ESP32 or ESP8266!"
+#endif
 
 #include "QybercomProtonix.h"
 
@@ -243,23 +250,20 @@ bool ProtonixDTO::IsEvent () {
 }
 
 String ProtonixDTO::Serialize () {
-	this->_bufferOutput = "{";
-	/*StaticJsonDocument<1024> dto;
-
 	if (this->IsURL())
-		dto["url"] = this->_url;
+		this->_buffer["url"] = this->_url;
 
 	if (this->IsResponse())
-		dto["response"] = this->_response;
+		this->_buffer["response"] = this->_response;
 
 	if (this->IsEvent())
-		dto["event"] = this->_event;
+		this->_buffer["event"] = this->_event;
 
-	this->_dto->DTOToJSON(dto);
+	this->_dto->DTOToJSON(this->_buffer);
 
-	serializeJson(dto, this->_bufferOutput);
+	serializeJson(this->_buffer, this->_bufferOutput);
 
-	dto.clear();*/
+	/*this->_bufferOutput = "{";
 
 	if (this->IsURL())
 		this->_bufferOutput += "\"url\":\"" + this->_url + "\"";
@@ -270,7 +274,7 @@ String ProtonixDTO::Serialize () {
 	if (this->IsEvent())
 		this->_bufferOutput += "\"event\":\"" + this->_event + "\"";
 
-	this->_bufferOutput += ",\"data\":" + this->_dto->DTOSerialize() + "}";
+	this->_bufferOutput += ",\"data\":" + this->_dto->DTOSerialize() + "}";*/
 
 	return this->_bufferOutput;
 }
@@ -281,25 +285,25 @@ bool ProtonixDTO::Deserialize (String raw) {
 	if (err)
 		Serial.println("[dto] json deserialize error: " + String(err.f_str()));
 
-	JsonObject dto = this->_buffer.as<JsonObject>();
+	this->_bufferObj = this->_buffer.as<JsonObject>();
 
-	if (dto.containsKey("url")) {
-		const char* url = dto["url"];
-		this->_url = (String)url;
+	if (this->_bufferObj.containsKey("url")) {
+		const char* u = this->_bufferObj["url"];
+		this->_url = (String)u;
 	}
 
-	if (dto.containsKey("response")) {
-		const char* url = dto["response"];
-		this->_response = (String)url;
+	if (this->_bufferObj.containsKey("response")) {
+		const char* r = this->_bufferObj["response"];
+		this->_response = (String)r;
 	}
 
-	if (dto.containsKey("event")) {
-		const char* url = dto["event"];
-		this->_event = (String)url;
+	if (this->_bufferObj.containsKey("event")) {
+		const char* e = this->_bufferObj["event"];
+		this->_event = (String)e;
 	}
 
-	if (dto.containsKey("data"))
-		this->_data = dto["data"];
+	if (this->_bufferObj.containsKey("data"))
+		this->_data = this->_bufferObj["data"];
 
 	return true;
 }
@@ -309,6 +313,9 @@ void ProtonixDTO::Reset () {
 	this->_response = "";
 	this->_event = "";
 	//this->_data = null;
+
+	this->_buffer.clear();
+	this->_bufferOutput = "";
 }
 
 void ProtonixDTO::Debug (bool debug) {
@@ -383,11 +390,12 @@ ProtonixDeviceStatus* DTO::DTORequestDeviceStatus::Status () {
 }
 
 void DTO::DTORequestDeviceStatus::DTOToJSON (JsonDocument& dto) {
-	dto["data"].clear();
-	JsonObject nested = dto.createNestedObject("data");
-	/*dto["data"] = nested;
-	dto["data"]["summary"] = this->_status->Summary();*/
-	nested["summary"] = this->_status->Summary();
+	dto["data"]["summary"] = this->_status->Summary();
+	//dto["data"].clear();
+	//JsonObject nested = dto.createNestedObject("data");
+	///*dto["data"] = nested;
+	//dto["data"]["summary"] = this->_status->Summary();*/
+	//nested["summary"] = this->_status->Summary();
 }
 
 void DTO::DTORequestDeviceStatus::DTOPopulate (ProtonixDTO* dto) {
@@ -414,7 +422,7 @@ void DTO::DTOResponseAuthorization::DTOPopulate (ProtonixDTO* dto) {
 		this->Status(data["status"]);
 }
 
-void DTO::DTOResponseAuthorization::DTOToJSON(JsonDocument& dto) {
+void DTO::DTOResponseAuthorization::DTOToJSON (JsonDocument& dto) {
 	dto["data"]["status"] = this->_status;
 }
 
@@ -422,7 +430,36 @@ unsigned short DTO::DTOResponseAuthorization::DTOResponseStatus () {
 	return this->_status;
 }
 
-String DTO::DTOResponseAuthorization::DTOSerialize() {
+String DTO::DTOResponseAuthorization::DTOSerialize () {
+	return "{\"status\":" + String(this->_status) + "}";
+}
+
+
+
+void DTO::DTOResponseMechanismStatus::Status (unsigned short status) {
+	this->_status = status;
+}
+
+unsigned short DTO::DTOResponseMechanismStatus::Status () {
+	return this->_status;
+}
+
+void DTO::DTOResponseMechanismStatus::DTOPopulate (ProtonixDTO* dto) {
+	JsonObject data = dto->Data();
+
+	if (data.containsKey("status"))
+		this->Status(data["status"]);
+}
+
+void DTO::DTOResponseMechanismStatus::DTOToJSON (JsonDocument& dto) {
+	dto["data"]["status"] = this->_status;
+}
+
+unsigned short DTO::DTOResponseMechanismStatus::DTOResponseStatus () {
+	return this->_status;
+}
+
+String DTO::DTOResponseMechanismStatus::DTOSerialize () {
 	return "{\"status\":" + String(this->_status) + "}";
 }
 
@@ -469,7 +506,13 @@ bool Networks::NWiFi::Connect () {
 	// https://randomnerdtutorials.com/esp32-set-custom-hostname-arduino/#comment-741757
 	WiFi.setHostname(this->_hostname.c_str());
 	WiFi.mode(WIFI_STA);
+	#if defined(ESP32)
 	esp_wifi_set_mac(WIFI_IF_STA, &mac[0]);
+	#elif defined(ESP8266)
+	wifi_set_macaddr(STATION_IF, &mac[0]);
+	#else
+	#error "This ain't a ESP32 or ESP8266!"
+	#endif
 	WiFi.begin(this->_ssid, this->_password);
 
 	return true;
@@ -484,7 +527,13 @@ String Networks::NWiFi::AddressMAC () {
 }
 
 String Networks::NWiFi::AddressIP () {
+	#if defined(ESP32)
 	return String(WiFi.localIP());
+	#elif defined(ESP8266)
+	return WiFi.localIP().toString();
+	#else
+	#error "This ain't a ESP32 or ESP8266!"
+	#endif
 }
 
 
@@ -607,6 +656,7 @@ ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
 	this->_dtoInput = new ProtonixDTO();
 	this->_dtoOutput = new ProtonixDTO();
 	this->_dtoInputResponseAuthorization = new DTO::DTOResponseAuthorization();
+	this->_dtoInputResponseMechanismStatus = new DTO::DTOResponseMechanismStatus();
 	this->_dtoInputEventCommand = new DTO::DTOEventCommand();
 }
 
@@ -699,10 +749,17 @@ void ProtonixDevice::_pipe () {
 		this->_protocolConnected2 = true;
 		this->_device->DeviceOnProtocolConnect(this);
 
-		this->RequestStream("/api/authorize/mechanism", new DTO::DTORequestAuthorization(
-			this->_device->DeviceID(),
-			this->_device->DevicePassphrase()
-		));
+		this->RequestStreamAuthorize();
+	}
+
+	if (!this->_network->Connected() || !this->_protocol->Connected()) {
+		Serial.println("[WARNING] RECONNECT N: " + String(this->_network->Connected()) + " P:" + String(this->_protocol->Connected()));
+
+		this->_networkConnected1 = false;
+		this->_networkConnected2 = false;
+
+		this->_protocolConnected1 = false;
+		this->_protocolConnected2 = false;
 	}
 
 	this->_protocol->Pipe();
@@ -728,10 +785,18 @@ void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
 	this->_dtoOutput->DTO(request);
 
 	String raw = this->_dtoOutput->Serialize();
+	this->_dtoOutput->Reset();
 	this->_protocol->Send(raw);
 
 	if (this->_debug)
 		Serial.println("[request] " + url + " ok: " + raw);
+}
+
+void ProtonixDevice::RequestStreamAuthorize () {
+	this->RequestStream("/api/authorize/mechanism", new DTO::DTORequestAuthorization(
+		this->_device->DeviceID(),
+		this->_device->DevicePassphrase()
+	));
 }
 
 void ProtonixDevice::OnStream (unsigned char* data) {
@@ -769,6 +834,13 @@ void ProtonixDevice::_onStreamResponse () {
 
 		this->_device->DeviceOnAuthorization(this, this->_dtoInputResponseAuthorization);
 	}
+
+	if (this->_dtoInput->Response() == "/api/mechanism/status") {
+		this->_dtoInputResponseMechanismStatus->DTOPopulate(this->_dtoInput);
+
+		if (this->_dtoInputResponseMechanismStatus->Status() != 200)
+			this->RequestStreamAuthorize();
+	}
 }
 
 void ProtonixDevice::_onStreamEvent () {
@@ -794,6 +866,10 @@ ProtonixDTO* ProtonixDevice::DTOOutput() {
 
 DTO::DTOResponseAuthorization* ProtonixDevice::DTOInputResponseAuthorization () {
 	return this->_dtoInputResponseAuthorization;
+}
+
+DTO::DTOResponseMechanismStatus* ProtonixDevice::DTOInputResponseMechanismStatus() {
+	return this->_dtoInputResponseMechanismStatus;
 }
 
 DTO::DTOEventCommand* ProtonixDevice::DTOInputEventCommand () {
