@@ -140,10 +140,53 @@ bool ProtonixTimer::Pipe () {
 
 
 
-ProtonixDeviceSensor::ProtonixDeviceSensor () { }
+ProtonixDeviceSensor::ProtonixDeviceSensor () {
+	this->ID("");
+	this->Value("");
+	this->Active(false);
+	this->Failure(false);
+}
 
 ProtonixDeviceSensor::ProtonixDeviceSensor (String id) {
 	this->ID(id);
+	this->Value("");
+	this->Active(false);
+	this->Failure(false);
+}
+
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id, String value) {
+	this->ID(id);
+	this->Value(value);
+	this->Active(false);
+	this->Failure(false);
+}
+
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id, bool active) {
+	this->ID(id);
+	this->Value("");
+	this->Active(active);
+	this->Failure(false);
+}
+
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id, bool active, bool failure) {
+	this->ID(id);
+	this->Value("");
+	this->Active(active);
+	this->Failure(failure);
+}
+
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id, String value, bool active) {
+	this->ID(id);
+	this->Value(value);
+	this->Active(active);
+	this->Failure(false);
+}
+
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id, String value, bool active, bool failure) {
+	this->ID(id);
+	this->Value(value);
+	this->Active(active);
+	this->Failure(failure);
 }
 
 void ProtonixDeviceSensor::ID (String id) {
@@ -181,7 +224,10 @@ bool ProtonixDeviceSensor::Failure () {
 
 
 
-ProtonixDeviceStatus::ProtonixDeviceStatus () { }
+ProtonixDeviceStatus::ProtonixDeviceStatus () {
+	//this->_sensors = { };
+	this->_sensorCount = 0;
+}
 
 void ProtonixDeviceStatus::Summary (String summary) {
 	this->_summary = summary;
@@ -189,6 +235,25 @@ void ProtonixDeviceStatus::Summary (String summary) {
 
 String ProtonixDeviceStatus::Summary () {
 	return this->_summary;
+}
+
+ProtonixDeviceSensor** ProtonixDeviceStatus::Sensors () {
+	return this->_sensors;
+}
+
+ProtonixDeviceStatus* ProtonixDeviceStatus::SensorAdd (String id) {
+	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id);
+
+	this->_sensors[this->_sensorCount] = sensor;
+	this->_sensorCount++;
+
+	return this;
+}
+
+unsigned int ProtonixDeviceStatus::SensorCount () {
+	//return end(this->_sensors) - begin(this->_sensors);
+	//return sizeof(&this->_sensors) / sizeof(&this->_sensors[0]);
+	return this->_sensorCount;
 }
 
 
@@ -391,11 +456,23 @@ ProtonixDeviceStatus* DTO::DTORequestDeviceStatus::Status () {
 
 void DTO::DTORequestDeviceStatus::DTOToJSON (JsonDocument& dto) {
 	dto["data"]["summary"] = this->_status->Summary();
-	//dto["data"].clear();
-	//JsonObject nested = dto.createNestedObject("data");
-	///*dto["data"] = nested;
-	//dto["data"]["summary"] = this->_status->Summary();*/
-	//nested["summary"] = this->_status->Summary();
+
+	ProtonixDeviceSensor** sensors = this->_status->Sensors();
+	JsonArray sensors_out = dto["data"].createNestedArray("sensors");
+
+	unsigned int i = 0;
+	unsigned int size = this->_status->SensorCount();
+
+	while (i < size) {
+		JsonObject sensor = sensors_out.createNestedObject();
+
+		sensor["id"] = sensors[i]->ID();
+		sensor["value"] = sensors[i]->Value();
+		sensor["active"] = sensors[i]->Active();
+		sensor["failure"] = sensors[i]->Failure();
+
+		i++;
+	}
 }
 
 void DTO::DTORequestDeviceStatus::DTOPopulate (ProtonixDTO* dto) {
@@ -504,22 +581,36 @@ bool Networks::NWiFi::Connect () {
 	INetwork::ParseMAC(this->_mac, mac);
 
 	// https://randomnerdtutorials.com/esp32-set-custom-hostname-arduino/#comment-741757
-	WiFi.setHostname(this->_hostname.c_str());
-	WiFi.mode(WIFI_STA);
 	#if defined(ESP32)
+	WiFi.setHostname(this->_hostname.c_str());
 	esp_wifi_set_mac(WIFI_IF_STA, &mac[0]);
 	#elif defined(ESP8266)
+	WiFi.hostname(this->_hostname.c_str());
 	wifi_set_macaddr(STATION_IF, &mac[0]);
 	#else
 	#error "This ain't a ESP32 or ESP8266!"
 	#endif
+
+	WiFi.disconnect();
+	WiFi.mode(WIFI_STA);
 	WiFi.begin(this->_ssid, this->_password);
+
+	delay(1000);
+	/*
+	WiFi.reconnect();
+	*/
 
 	return true;
 }
 
 bool Networks::NWiFi::Connected () {
 	return WiFi.status() == WL_CONNECTED;
+}
+
+bool Networks::NWiFi::Disconnect () {
+	WiFi.disconnect();
+
+	return true;
 }
 
 String Networks::NWiFi::AddressMAC () {
@@ -704,6 +795,10 @@ void ProtonixDevice::ServerEndpoint (String host, uint port, String path) {
 	this->Server(new ProtonixURI(host, port, path));
 }
 
+bool ProtonixDevice::Connected () {
+	return this->_network->Connected() && this->_protocol->Connected();
+}
+
 void ProtonixDevice::Debug (bool debug) {
 	this->_debug = debug;
 }
@@ -752,8 +847,8 @@ void ProtonixDevice::_pipe () {
 		this->RequestStreamAuthorize();
 	}
 
-	if (!this->_network->Connected() || !this->_protocol->Connected()) {
-		Serial.println("[WARNING] RECONNECT N: " + String(this->_network->Connected()) + " P:" + String(this->_protocol->Connected()));
+	if (!this->Connected()) {
+		Serial.println("[WARNING] RECONNECT N:" + String(this->_network->Connected()) + " P:" + String(this->_protocol->Connected()));
 
 		this->_networkConnected1 = false;
 		this->_networkConnected2 = false;
@@ -780,6 +875,13 @@ void ProtonixDevice::Pipe () {
 }
 
 void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
+	if (!this->Connected()) {
+		if (this->_debug)
+			Serial.println("[WARNING] Device not connected, can not send request");
+
+		return;
+	}
+
 	this->_dtoOutput->Debug(this->Debug());
 	this->_dtoOutput->URL(url);
 	this->_dtoOutput->DTO(request);

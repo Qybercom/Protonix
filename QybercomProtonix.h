@@ -78,6 +78,11 @@ namespace Qybercom {
 			public:
 				ProtonixDeviceSensor();
 				ProtonixDeviceSensor(String id);
+				ProtonixDeviceSensor(String id, String value);
+				ProtonixDeviceSensor(String id, bool active);
+				ProtonixDeviceSensor(String id, bool active, bool failure);
+				ProtonixDeviceSensor(String id, String value, bool active);
+				ProtonixDeviceSensor(String id, String value, bool active, bool failure);
 
 				void ID(String id);
 				String ID();
@@ -95,12 +100,18 @@ namespace Qybercom {
 		class ProtonixDeviceStatus {
 			private:
 				String _summary;
+				ProtonixDeviceSensor* _sensors[8];
+				unsigned int _sensorCount;
 
 			public:
 				ProtonixDeviceStatus();
 
 				void Summary(String summary);
 				String Summary();
+
+				ProtonixDeviceSensor** Sensors();
+				ProtonixDeviceStatus* SensorAdd(String id);
+				unsigned int SensorCount();
 		};
 
 		class IProtonixDTO {
@@ -247,6 +258,7 @@ namespace Qybercom {
 			public:
 				virtual bool Connect();
 				virtual bool Connected();
+				virtual bool Disconnect();
 				virtual String AddressMAC();
 				virtual String AddressIP();
 
@@ -283,6 +295,8 @@ namespace Qybercom {
 					bool Connect();
 
 					bool Connected();
+
+					bool Disconnect();
 
 					String AddressMAC();
 
@@ -373,12 +387,13 @@ namespace Qybercom {
 				void ServerEndpoint(String host, uint port);
 				void ServerEndpoint(String host, uint port, String path);
 
+				bool Connected();
+
 				void Debug(bool debug);
 				bool Debug();
 				
 				void Pipe();
 
-				//void OnStream(String data);
 				void OnStream(unsigned char* data);
 
 				void RequestStream(String url, IProtonixDTORequest* request);
