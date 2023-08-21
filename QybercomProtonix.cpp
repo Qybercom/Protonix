@@ -262,7 +262,7 @@ unsigned int ProtonixDeviceStatus::SensorCount () {
 
 ProtonixDTO::ProtonixDTO () {
 	this->_debug = false;
-	this->_bufferOutput = "";
+	this->_bufferRaw = "";
 }
 
 void ProtonixDTO::URL (String url) {
@@ -275,6 +275,7 @@ String ProtonixDTO::URL () {
 void ProtonixDTO::Response (String url) {
 	this->_response = url;
 }
+
 String ProtonixDTO::Response () {
 	return this->_response;
 }
@@ -282,6 +283,7 @@ String ProtonixDTO::Response () {
 void ProtonixDTO::Event (String url) {
 	this->_event = url;
 }
+
 String ProtonixDTO::Event () {
 	return this->_event;
 }
@@ -314,7 +316,7 @@ bool ProtonixDTO::IsEvent () {
 	return this->_event.length() != 0;
 }
 
-String ProtonixDTO::Serialize () {
+bool ProtonixDTO::Serialize () {
 	if (this->IsURL())
 		this->_buffer["url"] = this->_url;
 
@@ -326,7 +328,7 @@ String ProtonixDTO::Serialize () {
 
 	this->_dto->DTOToJSON(this->_buffer);
 
-	serializeJson(this->_buffer, this->_bufferOutput);
+	return serializeJson(this->_buffer, this->_bufferRaw) != 0;
 
 	/*this->_bufferOutput = "{";
 
@@ -341,14 +343,17 @@ String ProtonixDTO::Serialize () {
 
 	this->_bufferOutput += ",\"data\":" + this->_dto->DTOSerialize() + "}";*/
 
-	return this->_bufferOutput;
+	//return this->_bufferOutput;
 }
 
-bool ProtonixDTO::Deserialize (String raw) {
-	DeserializationError err = deserializeJson(this->_buffer, raw);
+bool ProtonixDTO::Deserialize () {
+	DeserializationError err = deserializeJson(this->_buffer, this->_bufferRaw);
 	
-	if (err)
+	if (err) {
 		Serial.println("[dto] json deserialize error: " + String(err.f_str()));
+
+		return false;
+	}
 
 	this->_bufferObj = this->_buffer.as<JsonObject>();
 
@@ -373,6 +378,18 @@ bool ProtonixDTO::Deserialize (String raw) {
 	return true;
 }
 
+void ProtonixDTO::BufferRaw (String data) {
+	this->_bufferRaw = data;
+}
+
+void ProtonixDTO::BufferRaw(char* data) {
+	this->_bufferRaw = String(data);
+}
+
+String ProtonixDTO::BufferRaw() {
+	return this->_bufferRaw;
+}
+
 void ProtonixDTO::Reset () {
 	this->_url = "";
 	this->_response = "";
@@ -380,7 +397,7 @@ void ProtonixDTO::Reset () {
 	//this->_data = null;
 
 	this->_buffer.clear();
-	this->_bufferOutput = "";
+	this->_bufferRaw = "";
 }
 
 void ProtonixDTO::Debug (bool debug) {
@@ -436,6 +453,13 @@ String DTO::DTORequestAuthorization::DTOSerialize () {
 	return "{\"id\":\"" + this->_id + "\",\"passphrase\":\"" + this->_passphrase +"\"}";
 }
 
+DTO::DTORequestAuthorization* DTO::DTORequestAuthorization::Reset (String id, String passphrase) {
+	this->ID(id);
+	this->Passphrase(passphrase);
+
+	return this;
+}
+
 
 
 DTO::DTORequestDeviceStatus::DTORequestDeviceStatus () {
@@ -482,6 +506,12 @@ String DTO::DTORequestDeviceStatus::DTOSerialize () {
 	return "{\"summary\":\"" + this->_status->Summary() + "\"}";
 }
 
+DTO::DTORequestDeviceStatus* DTO::DTORequestDeviceStatus::Reset (ProtonixDeviceStatus* status) {
+	this->Status(status);
+
+	return this;
+}
+
 
 
 void DTO::DTOResponseAuthorization::Status (unsigned short status) {
@@ -513,30 +543,30 @@ String DTO::DTOResponseAuthorization::DTOSerialize () {
 
 
 
-void DTO::DTOResponseMechanismStatus::Status (unsigned short status) {
+void DTO::DTOResponseDeviceStatus::Status (unsigned short status) {
 	this->_status = status;
 }
 
-unsigned short DTO::DTOResponseMechanismStatus::Status () {
+unsigned short DTO::DTOResponseDeviceStatus::Status () {
 	return this->_status;
 }
 
-void DTO::DTOResponseMechanismStatus::DTOPopulate (ProtonixDTO* dto) {
+void DTO::DTOResponseDeviceStatus::DTOPopulate (ProtonixDTO* dto) {
 	JsonObject data = dto->Data();
 
 	if (data.containsKey("status"))
 		this->Status(data["status"]);
 }
 
-void DTO::DTOResponseMechanismStatus::DTOToJSON (JsonDocument& dto) {
+void DTO::DTOResponseDeviceStatus::DTOToJSON (JsonDocument& dto) {
 	dto["data"]["status"] = this->_status;
 }
 
-unsigned short DTO::DTOResponseMechanismStatus::DTOResponseStatus () {
+unsigned short DTO::DTOResponseDeviceStatus::DTOResponseStatus () {
 	return this->_status;
 }
 
-String DTO::DTOResponseMechanismStatus::DTOSerialize () {
+String DTO::DTOResponseDeviceStatus::DTOSerialize () {
 	return "{\"status\":" + String(this->_status) + "}";
 }
 
@@ -752,9 +782,11 @@ ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
 
 	this->_dtoInput = new ProtonixDTO();
 	this->_dtoOutput = new ProtonixDTO();
-	this->_dtoInputResponseAuthorization = new DTO::DTOResponseAuthorization();
-	this->_dtoInputResponseMechanismStatus = new DTO::DTOResponseMechanismStatus();
-	this->_dtoInputEventCommand = new DTO::DTOEventCommand();
+	this->_dtoRequestAuthorization = new DTO::DTORequestAuthorization();
+	this->_dtoRequestDeviceStatus = new DTO::DTORequestDeviceStatus();
+	this->_dtoResponseAuthorization = new DTO::DTOResponseAuthorization();
+	this->_dtoResponseDeviceStatus = new DTO::DTOResponseDeviceStatus();
+	this->_dtoEventCommand = new DTO::DTOEventCommand();
 }
 
 void ProtonixDevice::Device (IProtonixDevice* device) {
@@ -867,7 +899,7 @@ void ProtonixDevice::_pipe () {
 	this->_device->DeviceOnTick(this);
 
 	if (this->_device->DeviceAutoStatus())
-		this->RequestStream("/api/mechanism/status", new DTO::DTORequestDeviceStatus(this->_device->DeviceStatus()));
+		this->RequestStream("/api/mechanism/status", this->_dtoRequestDeviceStatus->Reset(this->_device->DeviceStatus()));
 }
 
 void ProtonixDevice::Pipe () {
@@ -892,16 +924,23 @@ void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
 	this->_dtoOutput->URL(url);
 	this->_dtoOutput->DTO(request);
 
-	String raw = this->_dtoOutput->Serialize();
-	this->_dtoOutput->Reset();
-	this->_protocol->Send(raw);
+	if (!this->_dtoOutput->Serialize()) {
+		if (this->_debug)
+			Serial.println("[WARNING] Cannot serialize request");
+
+		return;
+	}
+
+	this->_protocol->Send(this->_dtoOutput->BufferRaw());
 
 	if (this->_debug)
-		Serial.println("[request] " + url + " ok: " + raw);
+		Serial.println("[request] " + url + " :: '" + this->_dtoOutput->BufferRaw() + "'");
+	
+	this->_dtoOutput->Reset();
 }
 
 void ProtonixDevice::RequestStreamAuthorize () {
-	this->RequestStream("/api/authorize/mechanism", new DTO::DTORequestAuthorization(
+	this->RequestStream("/api/authorize/mechanism", this->_dtoRequestAuthorization->Reset(
 		this->_device->DeviceID(),
 		this->_device->DevicePassphrase()
 	));
@@ -912,7 +951,8 @@ void ProtonixDevice::OnStream (unsigned char* data) {
 		Serial.println("[OnStream] " + String((char*)data));
 
 	//this->_dtoInput->Debug(this->_debug);
-	this->_dtoInput->Deserialize(String((char*)data));
+	this->_dtoInput->BufferRaw((char*)data);
+	this->_dtoInput->Deserialize();
 
 	if (this->_dtoInput->IsURL())
 		this->_onStreamURL();
@@ -938,15 +978,15 @@ void ProtonixDevice::_onStreamResponse () {
 	this->_device->DeviceOnStreamResponse(this, this->_dtoInput);
 
 	if (this->_dtoInput->Response() == "/api/authorize/mechanism") {
-		this->_dtoInputResponseAuthorization->DTOPopulate(this->_dtoInput);
+		this->_dtoResponseAuthorization->DTOPopulate(this->_dtoInput);
 
-		this->_device->DeviceOnAuthorization(this, this->_dtoInputResponseAuthorization);
+		this->_device->DeviceOnAuthorization(this, this->_dtoResponseAuthorization);
 	}
 
 	if (this->_dtoInput->Response() == "/api/mechanism/status") {
-		this->_dtoInputResponseMechanismStatus->DTOPopulate(this->_dtoInput);
+		this->_dtoResponseDeviceStatus->DTOPopulate(this->_dtoInput);
 
-		if (this->_dtoInputResponseMechanismStatus->Status() != 200)
+		if (this->_dtoResponseDeviceStatus->Status() != 200)
 			this->RequestStreamAuthorize();
 	}
 }
@@ -958,9 +998,9 @@ void ProtonixDevice::_onStreamEvent () {
 	this->_device->DeviceOnStreamEvent(this, this->_dtoInput);
 
 	if (this->_dtoInput->Event() == "/api/mechanism/command/" + this->_device->DeviceID()) {
-		this->_dtoInputEventCommand->DTOPopulate(this->_dtoInput);
+		this->_dtoEventCommand->DTOPopulate(this->_dtoInput);
 
-		this->_device->DeviceOnCommand(this, this->_dtoInputEventCommand);
+		this->_device->DeviceOnCommand(this, this->_dtoEventCommand);
 	}
 }
 
@@ -972,14 +1012,22 @@ ProtonixDTO* ProtonixDevice::DTOOutput() {
 	return this->_dtoOutput;
 }
 
-DTO::DTOResponseAuthorization* ProtonixDevice::DTOInputResponseAuthorization () {
-	return this->_dtoInputResponseAuthorization;
+DTO::DTORequestAuthorization* ProtonixDevice::DTORequestAuthorization() {
+	return this->_dtoRequestAuthorization;
 }
 
-DTO::DTOResponseMechanismStatus* ProtonixDevice::DTOInputResponseMechanismStatus() {
-	return this->_dtoInputResponseMechanismStatus;
+DTO::DTORequestDeviceStatus* ProtonixDevice::DTORequestDeviceStatus() {
+	return this->_dtoRequestDeviceStatus;
 }
 
-DTO::DTOEventCommand* ProtonixDevice::DTOInputEventCommand () {
-	return this->_dtoInputEventCommand;
+DTO::DTOResponseAuthorization* ProtonixDevice::DTOResponseAuthorization () {
+	return this->_dtoResponseAuthorization;
+}
+
+DTO::DTOResponseDeviceStatus* ProtonixDevice::DTOResponseDeviceStatus() {
+	return this->_dtoResponseDeviceStatus;
+}
+
+DTO::DTOEventCommand* ProtonixDevice::DTOEventCommand () {
+	return this->_dtoEventCommand;
 }

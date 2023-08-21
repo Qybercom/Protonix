@@ -151,6 +151,8 @@ namespace Qybercom {
 					void DTOPopulate(ProtonixDTO* dto);
 					void DTOToJSON(JsonDocument& dto);
 					String DTOSerialize();
+
+					DTORequestAuthorization* Reset(String id, String passphrase);
 			};
 
 			class DTORequestDeviceStatus : public IProtonixDTORequest {
@@ -167,6 +169,8 @@ namespace Qybercom {
 					void DTOPopulate(ProtonixDTO* dto);
 					void DTOToJSON(JsonDocument& dto);
 					String DTOSerialize();
+
+					DTORequestDeviceStatus* Reset(ProtonixDeviceStatus* status);
 			};
 
 			class DTOResponseAuthorization : public IProtonixDTOResponse {
@@ -183,7 +187,7 @@ namespace Qybercom {
 					unsigned short DTOResponseStatus();
 			};
 
-			class DTOResponseMechanismStatus : public IProtonixDTOResponse {
+			class DTOResponseDeviceStatus : public IProtonixDTOResponse {
 				private:
 					unsigned short _status;
 
@@ -221,7 +225,7 @@ namespace Qybercom {
 				bool _debug;
 				StaticJsonDocument<1024> _buffer;
 				bool _bufferInit;
-				String _bufferOutput;
+				String _bufferRaw;
 				JsonObject _bufferObj;
 
 			public:
@@ -245,8 +249,12 @@ namespace Qybercom {
 				bool IsResponse();
 				bool IsEvent();
 
-				String Serialize();
-				bool Deserialize(String raw);
+				bool Serialize();
+				bool Deserialize();
+
+				void BufferRaw(String data);
+				void BufferRaw(char* data);
+				String BufferRaw();
 
 				void Reset();
 
@@ -400,9 +408,11 @@ namespace Qybercom {
 				void RequestStreamAuthorize();
 				ProtonixDTO* DTOInput();
 				ProtonixDTO* DTOOutput();
-				DTO::DTOResponseAuthorization* DTOInputResponseAuthorization();
-				DTO::DTOResponseMechanismStatus* DTOInputResponseMechanismStatus();
-				DTO::DTOEventCommand* DTOInputEventCommand();
+				DTO::DTORequestAuthorization* DTORequestAuthorization();
+				DTO::DTORequestDeviceStatus* DTORequestDeviceStatus();
+				DTO::DTOResponseAuthorization* DTOResponseAuthorization();
+				DTO::DTOResponseDeviceStatus* DTOResponseDeviceStatus();
+				DTO::DTOEventCommand* DTOEventCommand();
 
 			private:
 				IProtonixDevice* _device;
@@ -417,9 +427,11 @@ namespace Qybercom {
 				ProtonixURI* _uri;
 				ProtonixDTO* _dtoInput;
 				ProtonixDTO* _dtoOutput;
-				DTO::DTOResponseAuthorization* _dtoInputResponseAuthorization;
-				DTO::DTOResponseMechanismStatus* _dtoInputResponseMechanismStatus;
-				DTO::DTOEventCommand* _dtoInputEventCommand;
+				DTO::DTORequestAuthorization* _dtoRequestAuthorization;
+				DTO::DTORequestDeviceStatus* _dtoRequestDeviceStatus;
+				DTO::DTOResponseAuthorization* _dtoResponseAuthorization;
+				DTO::DTOResponseDeviceStatus* _dtoResponseDeviceStatus;
+				DTO::DTOEventCommand* _dtoEventCommand;
 				bool _debug;
 				void _pipe();
 				void _onStreamURL();
