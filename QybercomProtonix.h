@@ -95,6 +95,8 @@ namespace Qybercom {
 
 				void Failure(bool failure);
 				bool Failure();
+
+				void Reset();
 		};
 
 		class ProtonixDeviceStatus {
@@ -119,8 +121,7 @@ namespace Qybercom {
 		class IProtonixDTO {
 			public:
 				virtual void DTOPopulate(ProtonixDTO* dto);
-				virtual void DTOToJSON(JsonDocument& dto);
-				virtual String DTOSerialize();
+				virtual void DTOSerialize(JsonDocument& dto);
 		};
 
 		class IProtonixDTORequest : public IProtonixDTO {
@@ -151,8 +152,7 @@ namespace Qybercom {
 					String Passphrase();
 
 					void DTOPopulate(ProtonixDTO* dto);
-					void DTOToJSON(JsonDocument& dto);
-					String DTOSerialize();
+					void DTOSerialize(JsonDocument& dto);
 
 					DTORequestAuthorization* Reset(String id, String passphrase);
 			};
@@ -169,8 +169,7 @@ namespace Qybercom {
 					ProtonixDeviceStatus* Status();
 
 					void DTOPopulate(ProtonixDTO* dto);
-					void DTOToJSON(JsonDocument& dto);
-					String DTOSerialize();
+					void DTOSerialize(JsonDocument& dto);
 
 					DTORequestDeviceStatus* Reset(ProtonixDeviceStatus* status);
 			};
@@ -184,8 +183,7 @@ namespace Qybercom {
 					unsigned short Status();
 
 					void DTOPopulate(ProtonixDTO* dto);
-					void DTOToJSON(JsonDocument& dto);
-					String DTOSerialize();
+					void DTOSerialize(JsonDocument& dto);
 					unsigned short DTOResponseStatus();
 			};
 
@@ -198,8 +196,7 @@ namespace Qybercom {
 					unsigned short Status();
 
 					void DTOPopulate(ProtonixDTO* dto);
-					void DTOToJSON(JsonDocument& dto);
-					String DTOSerialize();
+					void DTOSerialize(JsonDocument& dto);
 					unsigned short DTOResponseStatus();
 			};
 
@@ -212,8 +209,7 @@ namespace Qybercom {
 					String Name();
 
 					void DTOPopulate(ProtonixDTO* dto);
-					void DTOToJSON(JsonDocument& dto);
-					String DTOSerialize();
+					void DTOSerialize(JsonDocument& dto);
 			};
 		}
 
@@ -297,19 +293,15 @@ namespace Qybercom {
 					String _ssid;
 					String _password;
 					String _mac;
+					uint8_t _macBuffer[6];
 					String _hostname;
 				
 				public:
 					NWiFi(String ssid, String password, String mac, String hostname);
-
 					bool Connect();
-
 					bool Connected();
-
 					bool Disconnect();
-
 					String AddressMAC();
-
 					String AddressIP();
 			};
 		}

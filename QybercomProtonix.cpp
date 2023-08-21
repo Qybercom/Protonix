@@ -221,6 +221,12 @@ bool ProtonixDeviceSensor::Failure () {
 	return this->_failure;
 }
 
+void ProtonixDeviceSensor::Reset () {
+	this->Value("");
+	this->Active(false);
+	this->Failure(false);
+}
+
 
 
 
@@ -290,24 +296,9 @@ bool ProtonixDTO::Serialize () {
 	if (this->IsEvent())
 		this->_buffer["event"] = this->_event;
 
-	this->_dto->DTOToJSON(this->_buffer);
+	this->_dto->DTOSerialize(this->_buffer);
 
 	return serializeJson(this->_buffer, this->_bufferRaw) != 0;
-
-	/*this->_bufferOutput = "{";
-
-	if (this->IsURL())
-		this->_bufferOutput += "\"url\":\"" + this->_url + "\"";
-
-	if (this->IsResponse())
-		this->_bufferOutput += "\"response\":\"" + this->_response + "\"";
-
-	if (this->IsEvent())
-		this->_bufferOutput += "\"event\":\"" + this->_event + "\"";
-
-	this->_bufferOutput += ",\"data\":" + this->_dto->DTOSerialize() + "}";*/
-
-	//return this->_bufferOutput;
 }
 
 bool ProtonixDTO::Deserialize () {
@@ -394,16 +385,11 @@ void DTO::DTORequestAuthorization::Passphrase (String passphrase) {
 	this->_passphrase = passphrase;
 }
 
-String DTO::DTORequestAuthorization::Passphrase() {
+String DTO::DTORequestAuthorization::Passphrase () {
 	return this->_passphrase;
 }
 
-void DTO::DTORequestAuthorization::DTOToJSON (JsonDocument& dto) {
-	dto["data"]["id"] = this->_id;
-	dto["data"]["passphrase"] = this->_passphrase;
-}
-
-void DTO::DTORequestAuthorization::DTOPopulate(ProtonixDTO* dto) {
+void DTO::DTORequestAuthorization::DTOPopulate (ProtonixDTO* dto) {
 	JsonObject data = dto->Data();
 
 	if (data.containsKey("id"))
@@ -413,8 +399,9 @@ void DTO::DTORequestAuthorization::DTOPopulate(ProtonixDTO* dto) {
 		this->Passphrase(data["passphrase"]);
 }
 
-String DTO::DTORequestAuthorization::DTOSerialize () {
-	return "{\"id\":\"" + this->_id + "\",\"passphrase\":\"" + this->_passphrase +"\"}";
+void DTO::DTORequestAuthorization::DTOSerialize(JsonDocument& dto) {
+	dto["data"]["id"] = this->_id;
+	dto["data"]["passphrase"] = this->_passphrase;
 }
 
 DTO::DTORequestAuthorization* DTO::DTORequestAuthorization::Reset (String id, String passphrase) {
@@ -442,7 +429,10 @@ ProtonixDeviceStatus* DTO::DTORequestDeviceStatus::Status () {
 	return this->_status;
 }
 
-void DTO::DTORequestDeviceStatus::DTOToJSON (JsonDocument& dto) {
+void DTO::DTORequestDeviceStatus::DTOPopulate (ProtonixDTO* dto) {
+}
+
+void DTO::DTORequestDeviceStatus::DTOSerialize (JsonDocument& dto) {
 	dto["data"]["summary"] = this->_status->Summary();
 
 	ProtonixDeviceSensor** sensors = this->_status->Sensors();
@@ -461,13 +451,6 @@ void DTO::DTORequestDeviceStatus::DTOToJSON (JsonDocument& dto) {
 
 		i++;
 	}
-}
-
-void DTO::DTORequestDeviceStatus::DTOPopulate (ProtonixDTO* dto) {
-}
-
-String DTO::DTORequestDeviceStatus::DTOSerialize () {
-	return "{\"summary\":\"" + this->_status->Summary() + "\"}";
 }
 
 DTO::DTORequestDeviceStatus* DTO::DTORequestDeviceStatus::Reset (ProtonixDeviceStatus* status) {
@@ -493,16 +476,12 @@ void DTO::DTOResponseAuthorization::DTOPopulate (ProtonixDTO* dto) {
 		this->Status(data["status"]);
 }
 
-void DTO::DTOResponseAuthorization::DTOToJSON (JsonDocument& dto) {
+void DTO::DTOResponseAuthorization::DTOSerialize (JsonDocument& dto) {
 	dto["data"]["status"] = this->_status;
 }
 
 unsigned short DTO::DTOResponseAuthorization::DTOResponseStatus () {
 	return this->_status;
-}
-
-String DTO::DTOResponseAuthorization::DTOSerialize () {
-	return "{\"status\":" + String(this->_status) + "}";
 }
 
 
@@ -522,16 +501,12 @@ void DTO::DTOResponseDeviceStatus::DTOPopulate (ProtonixDTO* dto) {
 		this->Status(data["status"]);
 }
 
-void DTO::DTOResponseDeviceStatus::DTOToJSON (JsonDocument& dto) {
+void DTO::DTOResponseDeviceStatus::DTOSerialize(JsonDocument& dto) {
 	dto["data"]["status"] = this->_status;
 }
 
 unsigned short DTO::DTOResponseDeviceStatus::DTOResponseStatus () {
 	return this->_status;
-}
-
-String DTO::DTOResponseDeviceStatus::DTOSerialize () {
-	return "{\"status\":" + String(this->_status) + "}";
 }
 
 
@@ -551,12 +526,8 @@ void DTO::DTOEventCommand::DTOPopulate (ProtonixDTO* dto) {
 		this->Name(data["command"]);
 }
 
-void DTO::DTOEventCommand::DTOToJSON(JsonDocument &dto) {
+void DTO::DTOEventCommand::DTOSerialize (JsonDocument &dto) {
 	dto["data"]["command"] = this->_name;
-}
-
-String DTO::DTOEventCommand::DTOSerialize() {
-	return "{\"command\":\"" + this->_name + "\"}";
 }
 
 
@@ -571,23 +542,24 @@ Networks::NWiFi::NWiFi (String ssid, String password, String mac, String hostnam
 }
 
 bool Networks::NWiFi::Connect () {
-	uint8_t mac[6] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
-	INetwork::ParseMAC(this->_mac, mac);
+	//uint8_t mac[6] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
+	INetwork::ParseMAC(this->_mac, this->_macBuffer);
 
 	WiFi.disconnect(true);
 
 	// https://randomnerdtutorials.com/esp32-set-custom-hostname-arduino/#comment-741757
 	#if defined(ESP32)
 	WiFi.setHostname(this->_hostname.c_str());
-	esp_wifi_set_mac(WIFI_IF_STA, &mac[0]);
+	WiFi.mode(WIFI_STA);
+	esp_wifi_set_mac(WIFI_IF_STA, &this->_macBuffer[0]);
 	#elif defined(ESP8266)
 	WiFi.hostname(this->_hostname.c_str());
-	wifi_set_macaddr(STATION_IF, &mac[0]);
+	WiFi.mode(WIFI_STA);
+	wifi_set_macaddr(STATION_IF, &this->_macBuffer[0]);
 	#else
 	#error "This ain't a ESP32 or ESP8266!"
 	#endif
 
-	WiFi.mode(WIFI_STA);
 	WiFi.begin(this->_ssid, this->_password);
 
 	delay(1000);
@@ -702,7 +674,6 @@ void Protocols::PWebSocket::Send (String raw) {
 
 
 ProtonixDeviceStatus::ProtonixDeviceStatus () {
-	//this->_sensors = { };
 	this->_sensorCount = 0;
 }
 
@@ -735,9 +706,7 @@ void ProtonixDeviceStatus::SensorsReset () {
 	unsigned int i = 0;
 
 	while (i < this->_sensorCount) {
-		this->_sensors[i]->Value("");
-		this->_sensors[i]->Active(false);
-		this->_sensors[i]->Failure(false);
+		this->_sensors[i]->Reset();
 
 		i++;
 	}
@@ -1016,13 +985,22 @@ void ProtonixDevice::_pipe () {
 	}
 
 	if (!this->Connected()) {
-		Serial.println("[WARNING] RECONNECT N:" + String(this->_network->Connected()) + " P:" + String(this->_protocol->Connected()));
+		bool onlineN = this->_network->Connected();
+		bool onlineP = this->_protocol->Connected();
 
-		this->_networkConnected1 = false;
-		this->_networkConnected2 = false;
+		Serial.println("[WARNING] RECONNECT N:" + String(onlineN) + " P:" + String(onlineP));
 
-		this->_protocolConnected1 = false;
-		this->_protocolConnected2 = false;
+		if (!onlineN) {
+			this->_networkConnected1 = false;
+			this->_networkConnected2 = false;
+		}
+
+		if (!onlineP) {
+			this->_protocolConnected1 = false;
+			this->_protocolConnected2 = false;
+		}
+
+		return;
 	}
 
 	this->_protocol->Pipe();
@@ -1050,7 +1028,7 @@ void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
 		return;
 	}
 
-	this->_dtoOutput->Debug(this->Debug());
+	this->_dtoOutput->Debug(this->_debug);
 	this->_dtoOutput->URL(url);
 	this->_dtoOutput->DTO(request);
 
