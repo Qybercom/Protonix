@@ -224,42 +224,6 @@ bool ProtonixDeviceSensor::Failure () {
 
 
 
-ProtonixDeviceStatus::ProtonixDeviceStatus () {
-	//this->_sensors = { };
-	this->_sensorCount = 0;
-}
-
-void ProtonixDeviceStatus::Summary (String summary) {
-	this->_summary = summary;
-}
-
-String ProtonixDeviceStatus::Summary () {
-	return this->_summary;
-}
-
-ProtonixDeviceSensor** ProtonixDeviceStatus::Sensors () {
-	return this->_sensors;
-}
-
-ProtonixDeviceStatus* ProtonixDeviceStatus::SensorAdd (String id) {
-	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id);
-
-	this->_sensors[this->_sensorCount] = sensor;
-	this->_sensorCount++;
-
-	return this;
-}
-
-unsigned int ProtonixDeviceStatus::SensorCount () {
-	//return end(this->_sensors) - begin(this->_sensors);
-	//return sizeof(&this->_sensors) / sizeof(&this->_sensors[0]);
-	return this->_sensorCount;
-}
-
-
-
-
-
 ProtonixDTO::ProtonixDTO () {
 	this->_debug = false;
 	this->_bufferRaw = "";
@@ -731,6 +695,123 @@ void Protocols::PWebSocket::Send (String raw) {
 
 
 
+
+
+
+
+
+
+ProtonixDeviceStatus::ProtonixDeviceStatus () {
+	//this->_sensors = { };
+	this->_sensorCount = 0;
+}
+
+void ProtonixDeviceStatus::Summary (String summary) {
+	this->_summary = summary;
+}
+
+String ProtonixDeviceStatus::Summary () {
+	return this->_summary;
+}
+
+ProtonixDeviceSensor** ProtonixDeviceStatus::Sensors () {
+	return this->_sensors;
+}
+
+ProtonixDeviceStatus* ProtonixDeviceStatus::SensorAdd (String id) {
+	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id);
+
+	this->_sensors[this->_sensorCount] = sensor;
+	this->_sensorCount++;
+
+	return this;
+}
+
+unsigned int ProtonixDeviceStatus::SensorCount () {
+	return this->_sensorCount;
+}
+
+void ProtonixDeviceStatus::SensorsReset () {
+	unsigned int i = 0;
+
+	while (i < this->_sensorCount) {
+		this->_sensors[i]->Value("");
+		this->_sensors[i]->Active(false);
+		this->_sensors[i]->Failure(false);
+
+		i++;
+	}
+}
+
+/*
+String ProtonixDeviceStatus::SensorsSummary() {
+}
+*/
+
+void ProtonixDeviceBase::_init () {
+	this->_on = false;
+	this->_cmd = "";
+	this->_status = new ProtonixDeviceStatus();
+	this->_debug = false;
+}
+
+void ProtonixDeviceBase::_init (bool debug) {
+	this->_on = false;
+	this->_cmd = "";
+	this->_status = new ProtonixDeviceStatus();
+	this->_debug = debug;
+}
+
+void ProtonixDeviceBase::_cmdStdOn () {
+	#if defined(ESP32)
+	digitalWrite(2, HIGH);
+	#elif defined(ESP8266)
+	digitalWrite(2, LOW);
+	#else
+	#endif
+}
+
+void ProtonixDeviceBase::_cmdStdOff () {
+	#if defined(ESP32)
+	digitalWrite(2, LOW);
+	#elif defined(ESP8266)
+	digitalWrite(2, HIGH);
+	#else
+	#endif
+}
+
+void ProtonixDeviceBase::_summary (String additional) {
+	this->_summary(additional, false);
+}
+
+void ProtonixDeviceBase::_summary (bool showMemory) {
+	this->_summary("", showMemory);
+}
+
+void ProtonixDeviceBase::_summary (String additional, bool showMemory) {
+	String sensors = "";
+	unsigned int i = 0;
+	unsigned int count = this->_status->SensorCount();
+
+	while (i < count) {
+		sensors += " [s"
+			+ this->_status->Sensors()[i]->ID() + ":"
+			+ this->_status->Sensors()[i]->Value() + ""
+			+ (this->_status->Sensors()[i]->Active() ? ":active" : "")
+			+ (this->_status->Sensors()[i]->Failure() ? ":failure" : "")
+			+ "]";
+
+		i++;
+	}
+
+	this->_status->Summary(
+		"[on:" + String(this->_on ? "yes" : "no") + "] " +
+		sensors +
+		(showMemory ? " [memory:" + String(esp_get_free_heap_size()) + "]" : "") +
+		additional
+	);
+}
+
 bool ProtonixDeviceBase::DeviceAutoStatus() {
 	return true;
 }
@@ -758,6 +839,55 @@ void ProtonixDeviceBase::DeviceOnStreamEvent (ProtonixDevice* device, ProtonixDT
 void ProtonixDeviceBase::DeviceOnAuthorization (ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization) {
 	if (this->_debug)
 		Serial.println("[device:authorize] " + String(authorization->Status() == 200 ? "Success" : "Failure"));
+}
+
+void ProtonixDeviceBase::DeviceOnCommand (ProtonixDevice* device, DTO::DTOEventCommand* command) {
+	this->_cmd = command->Name();
+
+	if (this->_debug)
+		Serial.println("[device:command] " + this->_cmd);
+
+	if (this->_cmd == "std:on") {
+		this->_on = true;
+		this->DeviceOnCommandStdOn(device);
+	}
+
+	if (this->_cmd == "std:off") {
+		this->_on = false;
+		this->DeviceOnCommandStdOff(device);
+	}
+
+	if (this->_cmd.substring(0, 7) == "custom:") {
+		this->DeviceOnCommandCustom(device, this->_cmd.substring(7));
+	}
+
+	unsigned int i = 0;
+	unsigned int count = this->_status->SensorCount();
+	String id = "";
+
+	while (i < count) {
+		id = this->_status->Sensors()[i]->ID();
+
+		if (this->_cmd == "std:sensor:test[" + id + ":value]") {
+			this->_status->Sensors()[i]->Value("true");
+		}
+
+		if (this->_cmd == "std:sensor:test[" + id + ":active]") {
+			this->_status->Sensors()[i]->Active(true);
+		}
+
+		if (this->_cmd == "std:sensor:test[" + id + ":failure]") {
+			this->_status->Sensors()[i]->Failure(true);
+		}
+
+		if (this->_cmd == "std:sensor:reset[" + id + "]") {
+			this->_status->Sensors()[i]->Value("");
+			this->_status->Sensors()[i]->Active(false);
+			this->_status->Sensors()[i]->Failure(false);
+		}
+
+		i++;
+	}
 }
 
 ProtonixDeviceStatus* ProtonixDeviceBase::DeviceStatus() {

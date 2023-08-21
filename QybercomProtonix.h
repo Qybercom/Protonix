@@ -112,6 +112,8 @@ namespace Qybercom {
 				ProtonixDeviceSensor** Sensors();
 				ProtonixDeviceStatus* SensorAdd(String id);
 				unsigned int SensorCount();
+				void SensorsReset();
+				//String SensorsSummary();
 		};
 
 		class IProtonixDTO {
@@ -363,14 +365,33 @@ namespace Qybercom {
 			protected:
 				ProtonixDeviceStatus* _status;
 				bool _debug;
-
+				bool _on;
+				String _cmd;
+				void _init();
+				void _init(bool debug);
+				void _cmdStdOn();
+				void _cmdStdOff();
+				void _summary(String additional);
+				void _summary(bool showMemory);
+				void _summary(String additional, bool showMemory);
+			
 			public:
+				// https://stackoverflow.com/a/16248582/2097055
+				virtual unsigned int DeviceTick() = 0;
+				virtual String DeviceID() = 0;
+				virtual String DevicePassphrase() = 0;
+				virtual void DeviceOnReady(ProtonixDevice* device) = 0;
+				virtual void DeviceOnTick(ProtonixDevice* device) = 0;
 				bool DeviceAutoStatus();
 				void DeviceOnNetworkConnect(ProtonixDevice* device);
 				void DeviceOnProtocolConnect(ProtonixDevice* device);
 				void DeviceOnStreamResponse(ProtonixDevice* device, ProtonixDTO* dto);
 				void DeviceOnStreamEvent(ProtonixDevice* device, ProtonixDTO* dto);
 				void DeviceOnAuthorization(ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization);
+				void DeviceOnCommand(ProtonixDevice* device, DTO::DTOEventCommand* command);
+				virtual void DeviceOnCommandStdOn(ProtonixDevice* device) = 0;
+				virtual void DeviceOnCommandStdOff(ProtonixDevice* device) = 0;
+				virtual void DeviceOnCommandCustom(ProtonixDevice* device, String commandName) = 0;
 				ProtonixDeviceStatus* DeviceStatus();
 		};
 
