@@ -7,7 +7,8 @@
 namespace Qybercom {
 	namespace Protonix {
 		class ProtonixDTO;
-		class ProtonixDevice;
+		class ProtonixDeviceDirect;
+		class ProtonixDeviceSerial;
 
 		class ProtonixURI {
 			private:
@@ -96,13 +97,14 @@ namespace Qybercom {
 				void Failure(bool failure);
 				bool Failure();
 
+				String Summary();
 				void Reset();
 		};
 
 		class ProtonixDeviceStatus {
 			private:
 				String _summary;
-				ProtonixDeviceSensor* _sensors[8];
+				ProtonixDeviceSensor* _sensors[16];
 				unsigned int _sensorCount;
 
 			public:
@@ -112,10 +114,13 @@ namespace Qybercom {
 				String Summary();
 
 				ProtonixDeviceSensor** Sensors();
-				ProtonixDeviceStatus* SensorAdd(String id);
 				unsigned int SensorCount();
-				void SensorsReset();
-				//String SensorsSummary();
+				ProtonixDeviceStatus* SensorAdd(String id);
+				ProtonixDeviceStatus* SensorSet(String id, String value);
+				ProtonixDeviceStatus* SensorSet(String id, String value, bool active);
+				ProtonixDeviceStatus* SensorSet(String id, String value, bool active, bool failure);
+				ProtonixDeviceStatus* SensorReset();
+				ProtonixDeviceStatus* SensorReset(String id);
 		};
 
 		class IProtonixDTO {
@@ -280,7 +285,7 @@ namespace Qybercom {
 
 		class IProtocol {
 			public:
-				virtual void Init(ProtonixDevice* device);
+				virtual void Init(ProtonixDeviceDirect* device);
 				virtual bool Connect(ProtonixURI* uri);
 				virtual bool Connected();
 				virtual void Pipe();
@@ -310,12 +315,12 @@ namespace Qybercom {
 			class PWiFiTCP : public IProtocol {
 				private:
 					WiFiClient _client;
-					ProtonixDevice* _device;
+					ProtonixDeviceDirect* _device;
 					unsigned char _buffer[1024];
 					unsigned char* _bufferPTR;
 
 				public:
-					void Init(ProtonixDevice* device);
+					void Init(ProtonixDeviceDirect* device);
 					bool Connect(ProtonixURI* uri);
 					bool Connected();
 					void Pipe();
@@ -325,10 +330,10 @@ namespace Qybercom {
 			class PWebSocket : public IProtocol {
 				private:
 					websockets::WebsocketsClient _client;
-					ProtonixDevice* _device;
+					ProtonixDeviceDirect* _device;
 
 				public:
-					void Init(ProtonixDevice* device);
+					void Init(ProtonixDeviceDirect* device);
 					bool Connect(ProtonixURI* uri);
 					bool Connected();
 					void Pipe();
@@ -339,98 +344,138 @@ namespace Qybercom {
 		class IProtonixDevice {
 			public:
 				virtual unsigned int DeviceTick();
-				virtual String DeviceID();
-				virtual String DevicePassphrase();
-				virtual bool DeviceAutoStatus();
-				virtual void DeviceOnReady(ProtonixDevice* device);
-				virtual void DeviceOnTick(ProtonixDevice* device);
-				virtual void DeviceOnNetworkConnect(ProtonixDevice* device);
-				virtual void DeviceOnProtocolConnect(ProtonixDevice* device);
-				virtual void DeviceOnStreamResponse(ProtonixDevice* device, ProtonixDTO* dto);
-				virtual void DeviceOnStreamEvent(ProtonixDevice* device, ProtonixDTO* dto);
-				virtual void DeviceOnAuthorization(ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization);
-				virtual void DeviceOnCommand(ProtonixDevice* device, DTO::DTOEventCommand* command);
 				virtual ProtonixDeviceStatus* DeviceStatus();
 		};
 
-		class ProtonixDeviceBase : public IProtonixDevice {
+		class IProtonixDeviceDirect : public IProtonixDevice {
+			public:
+				virtual String DeviceID();
+				virtual String DevicePassphrase();
+				virtual bool DeviceAutoStatus();
+				virtual void DeviceOnReady(ProtonixDeviceDirect* device);
+				virtual void DeviceOnTick(ProtonixDeviceDirect* device);
+				virtual void DeviceOnNetworkConnect(ProtonixDeviceDirect* device);
+				virtual void DeviceOnProtocolConnect(ProtonixDeviceDirect* device);
+				virtual void DeviceOnStreamResponse(ProtonixDeviceDirect* device, ProtonixDTO* dto);
+				virtual void DeviceOnStreamEvent(ProtonixDeviceDirect* device, ProtonixDTO* dto);
+				virtual void DeviceOnAuthorization(ProtonixDeviceDirect* device, DTO::DTOResponseAuthorization* authorization);
+				virtual void DeviceOnCommand(ProtonixDeviceDirect* device, DTO::DTOEventCommand* command);
+		};
+
+		class IProtonixDeviceSerial : public IProtonixDevice {
+			public:
+				virtual void DeviceOnReady(ProtonixDeviceSerial* device);
+				virtual void DeviceOnTick(ProtonixDeviceSerial* device);
+		};
+
+		class ProtonixDeviceCommand {
+			protected:
+				String _name;
+				String _output;
+				void _init(String name);
+
+			public:
+				bool Is(String command);
+				String Name();
+				String Output();
+				virtual bool Serialize();
+				//bool SerialSend();
+		};
+
+		namespace Command {
+			class CInOn : public ProtonixDeviceCommand {
+				public:
+					CInOn();
+					bool Serialize();
+			};
+
+			class CInOff : public ProtonixDeviceCommand {
+				public:
+					CInOff();
+					bool Serialize();
+			};
+
+			class CInCustom : public ProtonixDeviceCommand {
+				private:
+					String _cmd;
+
+				public:
+					CInCustom();
+					String CMD();
+					bool Serialize();
+			};
+
+			class COutSensor : public ProtonixDeviceCommand {
+				private:
+					ProtonixDeviceSensor* _sensor;
+
+				public:
+					COutSensor();
+					COutSensor(String id);
+					ProtonixDeviceSensor* Sensor();
+					bool Serialize();
+			};
+		}
+
+		class ProtonixDeviceBaseDirect : public IProtonixDeviceDirect {
 			protected:
 				ProtonixDeviceStatus* _status;
 				bool _debug;
 				bool _on;
 				String _cmd;
-				void _init();
 				void _init(bool debug);
+				void _init();
 				void _cmdStdOn();
 				void _cmdStdOff();
 				void _summary(String additional);
 				void _summary(bool showMemory);
 				void _summary(String additional, bool showMemory);
+				void _serial();
+				int _serialAvailable;
+				int _serialByteI;
+				char _serialByte;
+				String _serialBuffer;
+				String _serialCommand;
 			
 			public:
 				// https://stackoverflow.com/a/16248582/2097055
 				virtual unsigned int DeviceTick() = 0;
 				virtual String DeviceID() = 0;
 				virtual String DevicePassphrase() = 0;
-				virtual void DeviceOnReady(ProtonixDevice* device) = 0;
-				virtual void DeviceOnTick(ProtonixDevice* device) = 0;
+				virtual void DeviceOnReady(ProtonixDeviceDirect* device) = 0;
+				virtual void DeviceOnTick(ProtonixDeviceDirect* device) = 0;
 				bool DeviceAutoStatus();
-				void DeviceOnNetworkConnect(ProtonixDevice* device);
-				void DeviceOnProtocolConnect(ProtonixDevice* device);
-				void DeviceOnStreamResponse(ProtonixDevice* device, ProtonixDTO* dto);
-				void DeviceOnStreamEvent(ProtonixDevice* device, ProtonixDTO* dto);
-				void DeviceOnAuthorization(ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization);
-				void DeviceOnCommand(ProtonixDevice* device, DTO::DTOEventCommand* command);
-				virtual void DeviceOnCommandStdOn(ProtonixDevice* device) = 0;
-				virtual void DeviceOnCommandStdOff(ProtonixDevice* device) = 0;
-				virtual void DeviceOnCommandCustom(ProtonixDevice* device, String commandName) = 0;
+				void DeviceOnNetworkConnect(ProtonixDeviceDirect* device);
+				void DeviceOnProtocolConnect(ProtonixDeviceDirect* device);
+				void DeviceOnStreamResponse(ProtonixDeviceDirect* device, ProtonixDTO* dto);
+				void DeviceOnStreamEvent(ProtonixDeviceDirect* device, ProtonixDTO* dto);
+				void DeviceOnAuthorization(ProtonixDeviceDirect* device, DTO::DTOResponseAuthorization* authorization);
+				void DeviceOnCommand(ProtonixDeviceDirect* device, DTO::DTOEventCommand* command);
+				virtual void DeviceOnCommandStdOn(ProtonixDeviceDirect* device) = 0;
+				virtual void DeviceOnCommandStdOff(ProtonixDeviceDirect* device) = 0;
+				virtual void DeviceOnCommandCustom(ProtonixDeviceDirect* device, String commandName) = 0;
 				ProtonixDeviceStatus* DeviceStatus();
 		};
 
-		// http://tedfelix.com/software/c++-callbacks.html
-		class ProtonixDevice {
-			public:
-				ProtonixDevice(IProtonixDevice* device);
-
-				void Device(IProtonixDevice* device);
-				IProtonixDevice* Device();
-				ProtonixTimer* Timer();
-
-				void Network(INetwork* network);
-				INetwork* Network();
-
-				void Protocol(IProtocol* protocol);
-				IProtocol* Protocol();
-
-				void Server(ProtonixURI* uri);
-				ProtonixURI* Server();
-
-				void ServerEndpoint(String host, uint port);
-				void ServerEndpoint(String host, uint port, String path);
-
-				bool Connected();
-
-				void Debug(bool debug);
-				bool Debug();
-				
-				void Pipe();
-
-				void OnStream(unsigned char* data);
-
-				void RequestStream(String url, IProtonixDTORequest* request);
-				void RequestStreamAuthorize();
-				ProtonixDTO* DTOInput();
-				ProtonixDTO* DTOOutput();
-				DTO::DTORequestAuthorization* DTORequestAuthorization();
-				DTO::DTORequestDeviceStatus* DTORequestDeviceStatus();
-				DTO::DTOResponseAuthorization* DTOResponseAuthorization();
-				DTO::DTOResponseDeviceStatus* DTOResponseDeviceStatus();
-				DTO::DTOEventCommand* DTOEventCommand();
-
-			private:
-				IProtonixDevice* _device;
+		class ProtonixDeviceGeneric {
+			protected:
+				void _init(bool debug, unsigned int tick);
 				bool _ready;
 				ProtonixTimer* _timer;
+				bool _debug;
+
+			public:
+				bool Ready();
+				ProtonixTimer* Timer();
+				void Debug(bool debug);
+				bool Debug();
+				virtual void Pipe() = 0;
+		};
+
+		// http://tedfelix.com/software/c++-callbacks.html
+		class ProtonixDeviceDirect : public ProtonixDeviceGeneric {
+			private:
+				IProtonixDeviceDirect* _device;
 				INetwork* _network;
 				bool _networkConnected1;
 				bool _networkConnected2;
@@ -445,11 +490,64 @@ namespace Qybercom {
 				DTO::DTOResponseAuthorization* _dtoResponseAuthorization;
 				DTO::DTOResponseDeviceStatus* _dtoResponseDeviceStatus;
 				DTO::DTOEventCommand* _dtoEventCommand;
-				bool _debug;
 				void _pipe();
 				void _onStreamURL();
 				void _onStreamResponse();
 				void _onStreamEvent();
+
+			public:
+				ProtonixDeviceDirect(IProtonixDeviceDirect* device);
+
+				void Device(IProtonixDeviceDirect* device);
+				IProtonixDeviceDirect* Device();
+
+				void Network(INetwork* network);
+				INetwork* Network();
+
+				void Protocol(IProtocol* protocol);
+				IProtocol* Protocol();
+
+				void Server(ProtonixURI* uri);
+				ProtonixURI* Server();
+
+				void ServerEndpoint(String host, uint port);
+				void ServerEndpoint(String host, uint port, String path);
+
+				bool Connected();
+				
+				void Pipe();
+
+				void OnStream(unsigned char* data);
+
+				void RequestStream(String url, IProtonixDTORequest* request);
+				void RequestStreamAuthorize();
+				ProtonixDTO* DTOInput();
+				ProtonixDTO* DTOOutput();
+				DTO::DTORequestAuthorization* DTORequestAuthorization();
+				DTO::DTORequestDeviceStatus* DTORequestDeviceStatus();
+				DTO::DTOResponseAuthorization* DTOResponseAuthorization();
+				DTO::DTOResponseDeviceStatus* DTOResponseDeviceStatus();
+				DTO::DTOEventCommand* DTOEventCommand();
+		};
+
+		class ProtonixDeviceSerial : public ProtonixDeviceGeneric {
+			private:
+				IProtonixDeviceSerial* _device;
+				Command::COutSensor* _cmdOutSensor;
+
+			public:
+				ProtonixDeviceSerial(IProtonixDeviceSerial* device);
+
+				void Device(IProtonixDeviceSerial* device);
+				IProtonixDeviceSerial* Device();
+
+				void Pipe();
+		};
+
+		class ProtonixDevice {
+			public:
+				static ProtonixDeviceDirect* Direct(IProtonixDeviceDirect* device);
+				static ProtonixDeviceSerial* Serial(IProtonixDeviceSerial* device);
 		};
 	}
 }

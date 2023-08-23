@@ -221,6 +221,15 @@ bool ProtonixDeviceSensor::Failure () {
 	return this->_failure;
 }
 
+String ProtonixDeviceSensor::Summary () {
+	return "[s"
+		+ this->_id + ":"
+		+ this->_value + ""
+		+ (this->_active ? ":active" : "")
+		+ (this->_failure ? ":failure" : "")
+		+ "]";
+}
+
 void ProtonixDeviceSensor::Reset () {
 	this->Value("");
 	this->Active(false);
@@ -258,15 +267,15 @@ String ProtonixDTO::Event () {
 	return this->_event;
 }
 
-void ProtonixDTO::DTO(IProtonixDTO* dto) {
+void ProtonixDTO::DTO (IProtonixDTO* dto) {
 	this->_dto = dto;
 }
 
-IProtonixDTO* ProtonixDTO::DTO() {
+IProtonixDTO* ProtonixDTO::DTO () {
 	return this->_dto;
 }
 
-void ProtonixDTO::Data(JsonObject data) {
+void ProtonixDTO::Data (JsonObject data) {
 	this->_data = data;
 }
 
@@ -337,11 +346,11 @@ void ProtonixDTO::BufferRaw (String data) {
 	this->_bufferRaw = data;
 }
 
-void ProtonixDTO::BufferRaw(char* data) {
+void ProtonixDTO::BufferRaw (char* data) {
 	this->_bufferRaw = String(data);
 }
 
-String ProtonixDTO::BufferRaw() {
+String ProtonixDTO::BufferRaw () {
 	return this->_bufferRaw;
 }
 
@@ -399,7 +408,7 @@ void DTO::DTORequestAuthorization::DTOPopulate (ProtonixDTO* dto) {
 		this->Passphrase(data["passphrase"]);
 }
 
-void DTO::DTORequestAuthorization::DTOSerialize(JsonDocument& dto) {
+void DTO::DTORequestAuthorization::DTOSerialize (JsonDocument& dto) {
 	dto["data"]["id"] = this->_id;
 	dto["data"]["passphrase"] = this->_passphrase;
 }
@@ -501,7 +510,7 @@ void DTO::DTOResponseDeviceStatus::DTOPopulate (ProtonixDTO* dto) {
 		this->Status(data["status"]);
 }
 
-void DTO::DTOResponseDeviceStatus::DTOSerialize(JsonDocument& dto) {
+void DTO::DTOResponseDeviceStatus::DTOSerialize (JsonDocument& dto) {
 	dto["data"]["status"] = this->_status;
 }
 
@@ -604,7 +613,7 @@ String Networks::NWiFi::AddressIP () {
 
 
 
-void Protocols::PWiFiTCP::Init (ProtonixDevice* device) {
+void Protocols::PWiFiTCP::Init (ProtonixDeviceDirect* device) {
 	this->_device = device;
 }
 
@@ -637,7 +646,7 @@ void Protocols::PWiFiTCP::Send (String data) {
 
 
 
-void Protocols::PWebSocket::Init (ProtonixDevice* device) {
+void Protocols::PWebSocket::Init (ProtonixDeviceDirect* device) {
 	this->_device = device;
 	this->_client.onMessage([&](websockets::WebsocketsMessage message) {
 		this->_device->OnStream((unsigned char*)message.data().c_str());
@@ -689,6 +698,10 @@ ProtonixDeviceSensor** ProtonixDeviceStatus::Sensors () {
 	return this->_sensors;
 }
 
+unsigned int ProtonixDeviceStatus::SensorCount () {
+	return this->_sensorCount;
+}
+
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorAdd (String id) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id);
 
@@ -698,40 +711,247 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorAdd (String id) {
 	return this;
 }
 
-unsigned int ProtonixDeviceStatus::SensorCount () {
-	return this->_sensorCount;
-}
-
-void ProtonixDeviceStatus::SensorsReset () {
+ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet (String id, String value) {
 	unsigned int i = 0;
 
 	while (i < this->_sensorCount) {
-		this->_sensors[i]->Reset();
+		if (id == "" || this->_sensors[i]->ID() == id) {
+			this->_sensors[i]->Value(value);
+		}
 
 		i++;
 	}
+
+	return this;
+}
+
+ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet (String id, String value, bool active) {
+	unsigned int i = 0;
+
+	while (i < this->_sensorCount) {
+		if (id == "" || this->_sensors[i]->ID() == id) {
+			this->_sensors[i]->Value(value);
+			this->_sensors[i]->Active(active);
+		}
+
+		i++;
+	}
+
+	return this;
+}
+
+ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet (String id, String value, bool active, bool failure) {
+	unsigned int i = 0;
+
+	while (i < this->_sensorCount) {
+		if (id == "" || this->_sensors[i]->ID() == id) {
+			this->_sensors[i]->Value(value);
+			this->_sensors[i]->Active(active);
+			this->_sensors[i]->Failure(failure);
+		}
+
+		i++;
+	}
+
+	return this;
+}
+
+ProtonixDeviceStatus* ProtonixDeviceStatus::SensorReset (String id) {
+	unsigned int i = 0;
+
+	while (i < this->_sensorCount) {
+		if (id == "" || this->_sensors[i]->ID() == id)
+			this->_sensors[i]->Reset();
+
+		i++;
+	}
+
+	return this;
+}
+
+ProtonixDeviceStatus* ProtonixDeviceStatus::SensorReset () {
+	return this->SensorReset("");
+}
+
+
+
+
+
+void ProtonixDeviceCommand::_init (String name) {
+	this->_name = name;
+	this->_output = "";
+}
+
+bool ProtonixDeviceCommand::Is (String name) {
+	return this->_name == name;
+}
+
+String ProtonixDeviceCommand::Name () {
+	return this->_name;
+}
+
+String ProtonixDeviceCommand::Output () {
+	return this->_output;
 }
 
 /*
-String ProtonixDeviceStatus::SensorsSummary() {
-}
-*/
+bool ProtonixDeviceCommand::SerialSend () {
+	if (!this->Serialize()) {
+		// error
 
-void ProtonixDeviceBase::_init () {
-	this->_on = false;
-	this->_cmd = "";
-	this->_status = new ProtonixDeviceStatus();
-	this->_debug = false;
+		return false;
+	}
+
+
+}*/
+
+
+
+
+Command::CInOn::CInOn () {
+	this->_init("on");
 }
 
-void ProtonixDeviceBase::_init (bool debug) {
+bool Command::CInOn::Serialize () {
+	return true;
+}
+
+
+
+
+Command::CInOff::CInOff () {
+	this->_init("off");
+}
+
+bool Command::CInOff::Serialize () {
+	return true;
+}
+
+
+
+
+Command::CInCustom::CInCustom () {
+	this->_init("custom");
+}
+
+String Command::CInCustom::CMD () {
+	return this->_cmd;
+}
+
+bool Command::CInCustom::Serialize () {
+	return true;
+}
+
+
+
+
+Command::COutSensor::COutSensor () {
+	this->_init("sensor");
+	this->_sensor = new ProtonixDeviceSensor();
+}
+
+Command::COutSensor::COutSensor (String id) {
+	this->_init("sensor");
+	this->_sensor = new ProtonixDeviceSensor(id);
+}
+
+ProtonixDeviceSensor* Command::COutSensor::Sensor () {
+	return this->_sensor;
+}
+
+bool Command::COutSensor::Serialize () {
+	this->_output = this->_name
+		+ ":" + this->_sensor->Value()
+		+ ":" + String(this->_sensor->Active())
+		+ ":" + String(this->_sensor->Failure());
+
+	return true;
+}
+
+
+
+
+
+void ProtonixDeviceBaseDirect::_init (bool debug) {
 	this->_on = false;
 	this->_cmd = "";
 	this->_status = new ProtonixDeviceStatus();
 	this->_debug = debug;
+	this->_serialAvailable = 0;
+	this->_serialBuffer = "";
+	this->_serialCommand = "";
 }
 
-void ProtonixDeviceBase::_cmdStdOn () {
+void ProtonixDeviceBaseDirect::_init () {
+	this->_init(false);
+}
+
+void ProtonixDeviceBaseDirect::_serial () {
+	this->_serialAvailable = Serial.available();
+	this->_serialByteI = 0;
+	this->_serialBuffer = "";
+
+	while (this->_serialByteI < this->_serialAvailable) {
+		this->_serialByte = Serial.read();
+
+		if (this->_serialByte == '\n') {
+			/*bufferCmd = "";
+			bufferID = "";
+			bufferValue = "";
+			idSet = false;
+			cmdSet = false;*/
+			break;
+		}
+
+		//if (!cmdSet) {
+		//	if (b == ':') {
+		//		/*Serial.print("[debug-cmd-");
+		//		Serial.print(bufferCmd);
+		//		Serial.println("]");*/
+		//		/*cmdSet = true;
+		//		bufferID = "";*/
+		//	}
+		//	else {
+		//		bufferCmd += b;
+		//	}
+		//}
+		//else {
+		//	if (bufferCmd == "status") {
+		//		if (!idSet) {
+		//			if (b == '=') {
+		//				/*Serial.print("[debug-id-");
+		//				Serial.print(bufferID);
+		//				Serial.println("]");*/
+		//				/*idSet = true;
+		//				bufferValue = "";*/
+		//			}
+		//			else {
+		//				/*bufferID += b;*/
+		//			}
+		//		}
+		//		else {
+		//			if (b == ';') {
+		//				/*Serial.print("[debug-value-");
+		//				Serial.print(bufferValue);
+		//				Serial.println("]");*/
+		//				/*this->_sensor(bufferID, bufferValue);
+		//				bufferID = "";
+		//				bufferValue = "";
+		//				idSet = false;*/
+		//			}
+		//			else {
+		//				/*bufferValue += b;*/
+		//			}
+		//		}
+		//	}
+		//}
+
+		this->_serialBuffer += this->_serialByte;
+		this->_serialByteI++;
+	}
+}
+
+void ProtonixDeviceBaseDirect::_cmdStdOn () {
 	#if defined(ESP32)
 	digitalWrite(2, HIGH);
 	#elif defined(ESP8266)
@@ -740,7 +960,7 @@ void ProtonixDeviceBase::_cmdStdOn () {
 	#endif
 }
 
-void ProtonixDeviceBase::_cmdStdOff () {
+void ProtonixDeviceBaseDirect::_cmdStdOff () {
 	#if defined(ESP32)
 	digitalWrite(2, LOW);
 	#elif defined(ESP8266)
@@ -749,26 +969,21 @@ void ProtonixDeviceBase::_cmdStdOff () {
 	#endif
 }
 
-void ProtonixDeviceBase::_summary (String additional) {
+void ProtonixDeviceBaseDirect::_summary (String additional) {
 	this->_summary(additional, false);
 }
 
-void ProtonixDeviceBase::_summary (bool showMemory) {
+void ProtonixDeviceBaseDirect::_summary (bool showMemory) {
 	this->_summary("", showMemory);
 }
 
-void ProtonixDeviceBase::_summary (String additional, bool showMemory) {
+void ProtonixDeviceBaseDirect::_summary (String additional, bool showMemory) {
 	String sensors = "";
 	unsigned int i = 0;
 	unsigned int count = this->_status->SensorCount();
 
 	while (i < count) {
-		sensors += " [s"
-			+ this->_status->Sensors()[i]->ID() + ":"
-			+ this->_status->Sensors()[i]->Value() + ""
-			+ (this->_status->Sensors()[i]->Active() ? ":active" : "")
-			+ (this->_status->Sensors()[i]->Failure() ? ":failure" : "")
-			+ "]";
+		sensors += this->_status->Sensors()[i]->Summary();
 
 		i++;
 	}
@@ -781,36 +996,36 @@ void ProtonixDeviceBase::_summary (String additional, bool showMemory) {
 	);
 }
 
-bool ProtonixDeviceBase::DeviceAutoStatus() {
+bool ProtonixDeviceBaseDirect::DeviceAutoStatus() {
 	return true;
 }
 
-void ProtonixDeviceBase::DeviceOnNetworkConnect (ProtonixDevice* device) {
+void ProtonixDeviceBaseDirect::DeviceOnNetworkConnect (ProtonixDeviceDirect* device) {
 	if (this->_debug)
 		Serial.println("[device] NetworkConnect");
 }
 
-void ProtonixDeviceBase::DeviceOnProtocolConnect (ProtonixDevice* device) {
+void ProtonixDeviceBaseDirect::DeviceOnProtocolConnect (ProtonixDeviceDirect* device) {
 	if (this->_debug)
 		Serial.println("[device] ProtocolConnect");
 }
 
-void ProtonixDeviceBase::DeviceOnStreamResponse (ProtonixDevice* device, ProtonixDTO* dto) {
+void ProtonixDeviceBaseDirect::DeviceOnStreamResponse (ProtonixDeviceDirect* device, ProtonixDTO* dto) {
 	if (this->_debug)
 		Serial.println("[device] StreamResponse " + dto->Response());
 }
 
-void ProtonixDeviceBase::DeviceOnStreamEvent (ProtonixDevice* device, ProtonixDTO* dto) {
+void ProtonixDeviceBaseDirect::DeviceOnStreamEvent (ProtonixDeviceDirect* device, ProtonixDTO* dto) {
 	if (this->_debug)
 		Serial.println("[device] StreamEvent " + dto->Event());
 }
 
-void ProtonixDeviceBase::DeviceOnAuthorization (ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization) {
+void ProtonixDeviceBaseDirect::DeviceOnAuthorization (ProtonixDeviceDirect* device, DTO::DTOResponseAuthorization* authorization) {
 	if (this->_debug)
 		Serial.println("[device:authorize] " + String(authorization->Status() == 200 ? "Success" : "Failure"));
 }
 
-void ProtonixDeviceBase::DeviceOnCommand (ProtonixDevice* device, DTO::DTOEventCommand* command) {
+void ProtonixDeviceBaseDirect::DeviceOnCommand (ProtonixDeviceDirect* device, DTO::DTOEventCommand* command) {
 	this->_cmd = command->Name();
 
 	if (this->_debug)
@@ -859,25 +1074,42 @@ void ProtonixDeviceBase::DeviceOnCommand (ProtonixDevice* device, DTO::DTOEventC
 	}
 }
 
-ProtonixDeviceStatus* ProtonixDeviceBase::DeviceStatus() {
+ProtonixDeviceStatus* ProtonixDeviceBaseDirect::DeviceStatus() {
 	return this->_status;
 }
 
 
 
 
-
-
-ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
+void ProtonixDeviceGeneric::_init (bool debug, unsigned int tick) {
 	this->_ready = false;
+	this->_timer = new ProtonixTimer(tick);
+	this->Debug(debug);
+}
+
+ProtonixTimer* ProtonixDeviceGeneric::Timer () {
+	return this->_timer;
+}
+
+void ProtonixDeviceGeneric::Debug(bool debug) {
+	this->_debug = debug;
+}
+
+bool ProtonixDeviceGeneric::Debug() {
+	return this->_debug;
+}
+
+
+
+
+ProtonixDeviceDirect::ProtonixDeviceDirect (IProtonixDeviceDirect* device) {
+	this->Device(device);
+	this->_init(false, this->_device->DeviceTick());
+
 	this->_networkConnected1 = false;
 	this->_networkConnected2 = false;
 	this->_protocolConnected1 = false;
 	this->_protocolConnected2 = false;
-
-	this->Debug(false);
-	this->Device(device);
-	this->_timer = new ProtonixTimer(this->_device->DeviceTick());
 
 	this->_dtoInput = new ProtonixDTO();
 	this->_dtoOutput = new ProtonixDTO();
@@ -888,63 +1120,51 @@ ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
 	this->_dtoEventCommand = new DTO::DTOEventCommand();
 }
 
-void ProtonixDevice::Device (IProtonixDevice* device) {
+void ProtonixDeviceDirect::Device (IProtonixDeviceDirect* device) {
 	this->_device = device;
 }
 
-IProtonixDevice* ProtonixDevice::Device () {
+IProtonixDeviceDirect* ProtonixDeviceDirect::Device () {
 	return this->_device;
 }
 
-ProtonixTimer* ProtonixDevice::Timer () {
-	return this->_timer;
-}
-
-void ProtonixDevice::Network (INetwork* network) {
+void ProtonixDeviceDirect::Network (INetwork* network) {
 	this->_network = network;
 }
 
-INetwork* ProtonixDevice::Network () {
+INetwork* ProtonixDeviceDirect::Network () {
 	return this->_network;
 }
 
-void ProtonixDevice::Protocol (IProtocol* protocol) {
+void ProtonixDeviceDirect::Protocol (IProtocol* protocol) {
 	this->_protocol = protocol;
 }
 
-IProtocol* ProtonixDevice::Protocol () {
+IProtocol* ProtonixDeviceDirect::Protocol () {
 	return this->_protocol;
 }
 
-void ProtonixDevice::Server (ProtonixURI* uri) {
+void ProtonixDeviceDirect::Server (ProtonixURI* uri) {
 	this->_uri = uri;
 }
 
-ProtonixURI* ProtonixDevice::Server () {
+ProtonixURI* ProtonixDeviceDirect::Server () {
 	return this->_uri;
 }
 
-void ProtonixDevice::ServerEndpoint (String host, uint port) {
+void ProtonixDeviceDirect::ServerEndpoint (String host, uint port) {
 	this->Server(new ProtonixURI(host, port));
 }
 
-void ProtonixDevice::ServerEndpoint (String host, uint port, String path) {
+void ProtonixDeviceDirect::ServerEndpoint (String host, uint port, String path) {
 	this->Server(new ProtonixURI(host, port, path));
 }
 
-bool ProtonixDevice::Connected () {
+bool ProtonixDeviceDirect::Connected () {
 	return this->_network->Connected() && this->_protocol->Connected();
 }
 
-void ProtonixDevice::Debug (bool debug) {
-	this->_debug = debug;
-}
-
-bool ProtonixDevice::Debug () {
-	return this->_debug;
-}
-
-void ProtonixDevice::_pipe () {
+void ProtonixDeviceDirect::_pipe () {
 	if (!this->_networkConnected1 || !this->_networkConnected2) {
 		if (!this->_networkConnected1) {
 			if (this->_debug)
@@ -1010,7 +1230,7 @@ void ProtonixDevice::_pipe () {
 		this->RequestStream("/api/mechanism/status", this->_dtoRequestDeviceStatus->Reset(this->_device->DeviceStatus()));
 }
 
-void ProtonixDevice::Pipe () {
+void ProtonixDeviceDirect::Pipe () {
 	if (!this->_ready) {
 		this->_ready = true;
 		this->_device->DeviceOnReady(this);
@@ -1020,7 +1240,7 @@ void ProtonixDevice::Pipe () {
 		this->_pipe();
 }
 
-void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
+void ProtonixDeviceDirect::RequestStream (String url, IProtonixDTORequest* request) {
 	if (!this->Connected()) {
 		if (this->_debug)
 			Serial.println("[WARNING] Device not connected, can not send request");
@@ -1047,14 +1267,14 @@ void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
 	this->_dtoOutput->Reset();
 }
 
-void ProtonixDevice::RequestStreamAuthorize () {
+void ProtonixDeviceDirect::RequestStreamAuthorize () {
 	this->RequestStream("/api/authorize/mechanism", this->_dtoRequestAuthorization->Reset(
 		this->_device->DeviceID(),
 		this->_device->DevicePassphrase()
 	));
 }
 
-void ProtonixDevice::OnStream (unsigned char* data) {
+void ProtonixDeviceDirect::OnStream (unsigned char* data) {
 	if (this->_debug)
 		Serial.println("[OnStream] " + String((char*)data));
 
@@ -1074,12 +1294,12 @@ void ProtonixDevice::OnStream (unsigned char* data) {
 	this->_dtoInput->Reset();
 }
 
-void ProtonixDevice::_onStreamURL () {
+void ProtonixDeviceDirect::_onStreamURL () {
 	if (this->_debug)
 		Serial.println("[url] " + this->_dtoInput->URL());
 }
 
-void ProtonixDevice::_onStreamResponse () {
+void ProtonixDeviceDirect::_onStreamResponse () {
 	if (this->_debug)
 		Serial.println("[response] " + this->_dtoInput->Response());
 
@@ -1099,7 +1319,7 @@ void ProtonixDevice::_onStreamResponse () {
 	}
 }
 
-void ProtonixDevice::_onStreamEvent () {
+void ProtonixDeviceDirect::_onStreamEvent () {
 	if (this->_debug)
 		Serial.println("[event] " + this->_dtoInput->Event());
 
@@ -1112,30 +1332,65 @@ void ProtonixDevice::_onStreamEvent () {
 	}
 }
 
-ProtonixDTO* ProtonixDevice::DTOInput () {
+ProtonixDTO* ProtonixDeviceDirect::DTOInput () {
 	return this->_dtoInput;
 }
 
-ProtonixDTO* ProtonixDevice::DTOOutput() {
+ProtonixDTO* ProtonixDeviceDirect::DTOOutput() {
 	return this->_dtoOutput;
 }
 
-DTO::DTORequestAuthorization* ProtonixDevice::DTORequestAuthorization() {
+DTO::DTORequestAuthorization* ProtonixDeviceDirect::DTORequestAuthorization() {
 	return this->_dtoRequestAuthorization;
 }
 
-DTO::DTORequestDeviceStatus* ProtonixDevice::DTORequestDeviceStatus() {
+DTO::DTORequestDeviceStatus* ProtonixDeviceDirect::DTORequestDeviceStatus() {
 	return this->_dtoRequestDeviceStatus;
 }
 
-DTO::DTOResponseAuthorization* ProtonixDevice::DTOResponseAuthorization () {
+DTO::DTOResponseAuthorization* ProtonixDeviceDirect::DTOResponseAuthorization () {
 	return this->_dtoResponseAuthorization;
 }
 
-DTO::DTOResponseDeviceStatus* ProtonixDevice::DTOResponseDeviceStatus() {
+DTO::DTOResponseDeviceStatus* ProtonixDeviceDirect::DTOResponseDeviceStatus() {
 	return this->_dtoResponseDeviceStatus;
 }
 
-DTO::DTOEventCommand* ProtonixDevice::DTOEventCommand () {
+DTO::DTOEventCommand* ProtonixDeviceDirect::DTOEventCommand () {
 	return this->_dtoEventCommand;
+}
+
+
+
+
+
+
+
+
+
+
+
+ProtonixDeviceSerial::ProtonixDeviceSerial (IProtonixDeviceSerial* device) {
+	this->Device(device);
+	this->_init(false, this->_device->DeviceTick());
+
+	this->_cmdOutSensor = new Command::COutSensor();
+}
+
+void ProtonixDeviceSerial::Device (IProtonixDeviceSerial* device) {
+	this->_device = device;
+}
+
+IProtonixDeviceSerial* ProtonixDeviceSerial::Device () {
+	return this->_device;
+}
+
+void ProtonixDeviceSerial::Pipe () {
+	if (!this->_ready) {
+		this->_ready = true;
+		this->_device->DeviceOnReady(this);
+	}
+
+	/*if (this->_timer->Pipe())
+		this->_pipe();*/
 }
