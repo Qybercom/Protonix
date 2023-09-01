@@ -13,14 +13,14 @@ using namespace Qybercom::Protonix;
 
 SoftwareSerial __port__ = SoftwareSerial(0, 0);
 
-void ProtonixDevicePort::_init(String name, unsigned short pinTX, unsigned short pinRX, unsigned int speed, unsigned short timeout) {
+void ProtonixDevicePort::_init(String name, unsigned short pinRX, unsigned short pinTX, unsigned int speed, unsigned short timeout) {
 	this->_serial = false;
 
-	this->_pinTX = pinTX;
 	this->_pinRX = pinRX;
+	this->_pinTX = pinTX;
 
 	#if !defined(ESP32) && !defined(ESP8266)
-	__port__ = SoftwareSerial(this->_pinTX, this->_pinRX);
+	__port__ = SoftwareSerial(this->_pinRX, this->_pinTX);
 	this->_port = &__port__;
 	#endif
 	
@@ -36,16 +36,16 @@ void ProtonixDevicePort::_init(String name, unsigned short pinTX, unsigned short
 	// TODO: CStdReboot
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned short pinTX, unsigned short pinRX) {
-	this->_init(name, pinTX, pinRX, 9600, 7);
+ProtonixDevicePort::ProtonixDevicePort(String name, unsigned short pinRX, unsigned short pinTX) {
+	this->_init(name, pinRX, pinTX, 9600, 7);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned short pinTX, unsigned short pinRX, unsigned int speed) {
-	this->_init(name, pinTX, pinRX, speed, 7);
+ProtonixDevicePort::ProtonixDevicePort(String name, unsigned short pinRX, unsigned short pinTX, unsigned int speed) {
+	this->_init(name, pinRX, pinTX, speed, 7);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned short pinTX, unsigned short pinRX, unsigned int speed, unsigned short timeout) {
-	this->_init(name, pinTX, pinRX, speed, timeout);
+ProtonixDevicePort::ProtonixDevicePort(String name, unsigned short pinRX, unsigned short pinTX, unsigned int speed, unsigned short timeout) {
+	this->_init(name, pinRX, pinTX, speed, timeout);
 }
 
 ProtonixDevicePort::ProtonixDevicePort(String name) {
@@ -68,12 +68,12 @@ String ProtonixDevicePort::Name() {
 	return this->_name;
 }
 
-unsigned int ProtonixDevicePort::PinTX() {
-	return this->_pinTX;
-}
-
 unsigned int ProtonixDevicePort::PinRX() {
 	return this->_pinRX;
+}
+
+unsigned int ProtonixDevicePort::PinTX() {
+	return this->_pinTX;
 }
 
 unsigned int ProtonixDevicePort::Speed() {

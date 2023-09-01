@@ -17,25 +17,25 @@ namespace Qybercom {
 				SoftwareSerial* _port;
 				#endif
 				String _name;
-				unsigned short _pinTX;
 				unsigned short _pinRX;
+				unsigned short _pinTX;
 				unsigned int _speed;
 				unsigned short _timeout;
 				bool _serial;
 				String _cmdBuffer;
 				IProtonixCommand* _cmds[4];
-				void _init(String name, unsigned short pinTX, unsigned short pinRX, unsigned int speed, unsigned short timeout);
+				void _init(String name, unsigned short pinRX, unsigned short pinTX, unsigned int speed, unsigned short timeout);
 
 			public:
-				ProtonixDevicePort(String name, unsigned short pinTX, unsigned short pinRX);
-				ProtonixDevicePort(String name, unsigned short pinTX, unsigned short pinRX, unsigned int speed);
-				ProtonixDevicePort(String name, unsigned short pinTX, unsigned short pinRX, unsigned int speed, unsigned short timeout);
+				ProtonixDevicePort(String name, unsigned short pinRX, unsigned short pinTX);
+				ProtonixDevicePort(String name, unsigned short pinRX, unsigned short pinTX, unsigned int speed);
+				ProtonixDevicePort(String name, unsigned short pinRX, unsigned short pinTX, unsigned int speed, unsigned short timeout);
 				ProtonixDevicePort(String name);
 
 				void Name(String name);
 				String Name();
-				unsigned int PinTX();
 				unsigned int PinRX();
+				unsigned int PinTX();
 				unsigned int Speed();
 				void Timeout(unsigned short timeout);
 				unsigned short Timeout();
