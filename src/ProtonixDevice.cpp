@@ -118,6 +118,10 @@ ProtonixDevice* ProtonixDevice::Port(String name, unsigned short pinTX, unsigned
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed));
 }
 
+ProtonixDevice* ProtonixDevice::Port(String name) {
+	return this->Port(new ProtonixDevicePort(name));
+}
+
 void ProtonixDevice::Pipe() {
 	unsigned int i = 0;
 

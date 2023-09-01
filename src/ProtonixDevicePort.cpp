@@ -14,6 +14,8 @@ using namespace Qybercom::Protonix;
 SoftwareSerial __port__ = SoftwareSerial(0, 0);
 
 void ProtonixDevicePort::_init(String name, unsigned short pinTX, unsigned short pinRX, unsigned int speed, unsigned short timeout) {
+	this->_serial = false;
+
 	this->_pinTX = pinTX;
 	this->_pinRX = pinRX;
 
@@ -31,6 +33,7 @@ void ProtonixDevicePort::_init(String name, unsigned short pinTX, unsigned short
 	this->_cmds[1] = new Command::CStdOff();
 	this->_cmds[3] = new Command::CStdSensor();
 	this->_cmds[2] = new Command::CCustom();
+	// TODO: CStdReboot
 }
 
 ProtonixDevicePort::ProtonixDevicePort(String name, unsigned short pinTX, unsigned short pinRX) {
@@ -43,6 +46,18 @@ ProtonixDevicePort::ProtonixDevicePort(String name, unsigned short pinTX, unsign
 
 ProtonixDevicePort::ProtonixDevicePort(String name, unsigned short pinTX, unsigned short pinRX, unsigned int speed, unsigned short timeout) {
 	this->_init(name, pinTX, pinRX, speed, timeout);
+}
+
+ProtonixDevicePort::ProtonixDevicePort(String name) {
+	this->_serial = true;
+
+	this->Name(name);
+
+	this->_cmds[0] = new Command::CStdOn();
+	this->_cmds[1] = new Command::CStdOff();
+	this->_cmds[3] = new Command::CStdSensor();
+	this->_cmds[2] = new Command::CCustom();
+	// TODO: CStdReboot
 }
 
 void ProtonixDevicePort::Name(String name) {
@@ -74,36 +89,34 @@ unsigned short ProtonixDevicePort::Timeout() {
 }
 
 void ProtonixDevicePort::Init(ProtonixDevice* device) {
-	#if defined(ESP32) || defined(ESP8266)
-	this->_port.begin(this->_speed, SWSERIAL_8N1, this->_pinRX, this->_pinTX, false);
-	this->_port.setTimeout(device->Tick());
-	#else
-	this->_port->begin(this->_speed);
-	this->_port->setTimeout(device->Tick());
-	#endif
+	unsigned int tick = device->Tick();
+
+	if (this->_serial) Serial.setTimeout(tick);
+	else {
+		#if defined(ESP32) || defined(ESP8266)
+		this->_port.begin(this->_speed, SWSERIAL_8N1, this->_pinRX, this->_pinTX, false);
+		this->_port.setTimeout(tick);
+		#else
+		this->_port->begin(this->_speed);
+		this->_port->setTimeout(tick);
+		#endif
+	}
 }
 
-/*void ProtonixDevicePort::_cmd(ProtonixDevice* device) {
-	int i = 0;
-
-	while (i < 4) {
-		if (this->_cmds[i]->CommandIs(device, this, this->_cmdBuffer)) {
-			this->_cmdID = i;
-			this->_cmds[this->_cmdID]->CommandRecognized(device, this);
-		}
-
-		i++;
-	}
-}*/
-
 void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
-	#if defined(ESP32) || defined(ESP8266)
-		String s = this->_port.readStringUntil('\n');
-	#else
-		String s = this->_port->readStringUntil('\n');
-	#endif
+	String s = "";
+	if (this->_serial) s = Serial.readStringUntil('\n');
+	else {
+		#if defined(ESP32) || defined(ESP8266)
+			s = this->_port.readStringUntil('\n');
+		#else
+			s = this->_port->readStringUntil('\n');
+		#endif
+	}
 
 	s.trim();
+
+	//Serial.println("[debug] " + s);
 
 	int i = 0;
 
@@ -114,68 +127,6 @@ void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 
 		i++;
 	}
-	/*
-	return;
-
-	#if defined(ESP32) || defined(ESP8266)
-	int available = this->_port.available();
-	#else
-	int available = this->_port->available();
-	#endif
-	int i = 0;
-
-	while (i < available) {
-		#if defined(ESP32) || defined(ESP8266)
-		char b = this->_port.read();
-		#else
-		char b = this->_port->read();
-		#endif
-		Serial.println("[debug] serial: '" + String(b) + "'");
-
-		if (b == '\r') {
-			i++;
-			continue;
-		}
-
-		if (b == '\n') {
-			if (this->_cmdID == -1)
-				this->_cmd(device);
-
-			if (this->_cmdID != -1)
-				device->OnSerial(this, this->_cmds[this->_cmdID]);
-
-			this->_cmdBuffer = "";
-			this->_cmdID = -1;
-		}
-		else {
-			if (this->_cmdID == -1) {
-				if (b == ':') {
-					if (this->_cmdBuffer == "std" || this->_cmdBuffer == "custom") {
-						this->_cmdBuffer += b;
-					}
-					else {
-						this->_cmd(device);
-					}
-				}
-				else {
-					this->_cmdBuffer += b;
-				}
-			}
-			else {
-				this->_cmds[this->_cmdID]->CommandParse(device, this, b);
-			}
-		}
-
-		i++;
-	}
-
-	if (this->_cmdBuffer.length() > 32) {
-		Serial.print("[WARNING] Serial cmdBuffer overflow");
-		Serial.println(this->_cmdBuffer);
-
-		this->_cmdBuffer = "";
-		this->_cmdID = -1;
-	}*/
 }
 
 bool ProtonixDevicePort::Send(IProtonixCommand* command) {
@@ -185,13 +136,18 @@ bool ProtonixDevicePort::Send(IProtonixCommand* command) {
 		return false;
 	}
 
-	#if defined(ESP32) || defined(ESP8266)
-	this->_port.println(command->CommandOutput());
-	#else
-	this->_port->println(command->CommandOutput());
-	#endif
+	String output = command->CommandOutput();
 
-	delay(this->_timeout);
+	if (this->_serial) Serial.println(output);
+	else {
+		#if defined(ESP32) || defined(ESP8266)
+		this->_port.println(output);
+		#else
+		this->_port->println(output);
+		#endif
+	}
+
+	//delay(this->_timeout);
 
 	return true;
 }

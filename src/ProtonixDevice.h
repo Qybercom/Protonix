@@ -61,6 +61,7 @@ namespace Qybercom {
 				ProtonixDevice* Port(ProtonixDevicePort* port);
 				ProtonixDevice* Port(String name, unsigned short pinTX, unsigned short pinRX);
 				ProtonixDevice* Port(String name, unsigned short pinTX, unsigned short pinRX, unsigned int speed);
+				ProtonixDevice* Port(String name);
 
 				void Pipe();
 
