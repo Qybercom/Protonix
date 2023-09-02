@@ -11,7 +11,9 @@
 
 using namespace Qybercom::Protonix;
 
+#if !defined(ESP32) && !defined(ESP8266)
 SoftwareSerial __port__ = SoftwareSerial(0, 0);
+#endif
 
 void ProtonixDevicePort::_init(String name, unsigned short pinRX, unsigned short pinTX, unsigned int speed, unsigned short timeout) {
 	this->_serial = false;

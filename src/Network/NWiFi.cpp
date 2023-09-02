@@ -36,9 +36,9 @@ bool Network::NWiFi::Connect() {
 		WiFi.mode(WIFI_STA);
 		esp_wifi_set_mac(WIFI_IF_STA, &this->_macBuffer[0]);
 	#elif defined(ESP8266)
-		WiFi.hostname(this->_hostname.c_str());
 		WiFi.mode(WIFI_STA);
 		wifi_set_macaddr(STATION_IF, &this->_macBuffer[0]);
+		WiFi.setHostname(this->_hostname.c_str());
 	#else
 	#endif
 
