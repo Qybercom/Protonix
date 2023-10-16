@@ -20,6 +20,8 @@ namespace Qybercom {
 
 				public:
 					CCustom();
+					CCustom(String cmd);
+					void CMD(String cmd);
 					String CMD();
 					bool CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name);
 					bool CommandSerialize();

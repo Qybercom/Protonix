@@ -80,11 +80,17 @@ bool Command::CStdSensor::CommandRecognize(ProtonixDevice* device, ProtonixDevic
 }
 
 bool Command::CStdSensor::CommandSerialize() {
-	this->_output = this->_name
-		+ ":" + this->_sensor->ID()
-		+ ";" + this->_sensor->Value()
-		+ ";" + String(this->_sensor->Active() ? "1" : "0")
-		+ ";" + String(this->_sensor->Failure() ? "1" : "0");
+	this->_output = "";
+	this->_output += this->_name;
+	this->_output += ":";
+	this->_output += this->_sensor->ID();
+	this->_output += ";";
+	this->_output += this->_sensor->Value();
+	this->_output += ";";
+	this->_output += String(this->_sensor->Active() ? "1" : "0");
+	this->_output += ";";
+	this->_output += String(this->_sensor->Failure() ? "1" : "0");
+	//Serial.println(this->_output);
 
 	return true;
 }

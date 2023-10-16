@@ -18,6 +18,15 @@ Command::CCustom::CCustom() {
 	this->_init("custom");
 }
 
+Command::CCustom::CCustom(String cmd) {
+	this->_init("custom");
+	this->CMD(cmd);
+}
+
+void Command::CCustom::CMD(String cmd) {
+	this->_cmd = cmd;
+}
+
 String Command::CCustom::CMD() {
 	return this->_cmd;
 }

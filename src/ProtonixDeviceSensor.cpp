@@ -25,20 +25,6 @@ ProtonixDeviceSensor::ProtonixDeviceSensor(String id, String value) {
 	this->Failure(false);
 }
 
-ProtonixDeviceSensor::ProtonixDeviceSensor(String id, bool active) {
-	this->ID(id);
-	this->Value("");
-	this->Active(active);
-	this->Failure(false);
-}
-
-ProtonixDeviceSensor::ProtonixDeviceSensor(String id, bool active, bool failure) {
-	this->ID(id);
-	this->Value("");
-	this->Active(active);
-	this->Failure(failure);
-}
-
 ProtonixDeviceSensor::ProtonixDeviceSensor(String id, String value, bool active) {
 	this->ID(id);
 	this->Value(value);
@@ -49,6 +35,20 @@ ProtonixDeviceSensor::ProtonixDeviceSensor(String id, String value, bool active)
 ProtonixDeviceSensor::ProtonixDeviceSensor(String id, String value, bool active, bool failure) {
 	this->ID(id);
 	this->Value(value);
+	this->Active(active);
+	this->Failure(failure);
+}
+
+ProtonixDeviceSensor::ProtonixDeviceSensor(String id, bool active) {
+	this->ID(id);
+	this->Value("");
+	this->Active(active);
+	this->Failure(false);
+}
+
+ProtonixDeviceSensor::ProtonixDeviceSensor(String id, bool active, bool failure) {
+	this->ID(id);
+	this->Value("");
 	this->Active(active);
 	this->Failure(failure);
 }

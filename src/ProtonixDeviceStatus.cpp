@@ -88,6 +88,35 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, String value, b
 	return this;
 }
 
+ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, bool active) {
+	unsigned int i = 0;
+
+	while (i < this->_sensorCount) {
+		if (id == "" || this->_sensors[i]->ID() == id) {
+			this->_sensors[i]->Active(active);
+		}
+
+		i++;
+	}
+
+	return this;
+}
+
+ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, bool active, bool failure) {
+	unsigned int i = 0;
+
+	while (i < this->_sensorCount) {
+		if (id == "" || this->_sensors[i]->ID() == id) {
+			this->_sensors[i]->Active(active);
+			this->_sensors[i]->Failure(failure);
+		}
+
+		i++;
+	}
+
+	return this;
+}
+
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(ProtonixDeviceSensor* sensor) {
 	return this->SensorSet(
 		sensor->ID(),

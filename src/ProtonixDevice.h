@@ -11,6 +11,7 @@
 #include "ProtonixTimer.h"
 #include "ProtonixDeviceStatus.h"
 #include "ProtonixDevicePort.h"
+#include "ProtonixDeviceSensor.h"
 
 namespace Qybercom {
 	namespace Protonix {
@@ -59,14 +60,22 @@ namespace Qybercom {
 				int FreeRAM();
 
 				ProtonixDevice* Port(ProtonixDevicePort* port);
-				ProtonixDevice* Port(String name, unsigned short pinTX, unsigned short pinRX);
-				ProtonixDevice* Port(String name, unsigned short pinTX, unsigned short pinRX, unsigned int speed);
+				ProtonixDevice* Port(String name, unsigned int pinTX, unsigned int pinRX);
+				ProtonixDevice* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed);
+				ProtonixDevice* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout);
 				ProtonixDevice* Port(String name);
 
 				void Pipe();
 
 				void OnSerial(ProtonixDevicePort* port, IProtonixCommand* command);
 				bool SerialCommand(String port, IProtonixCommand* command);
+				bool SerialCommandCustom(String port, String cmd);
+				bool SerialCommandSensor(String port, ProtonixDeviceSensor* sensor);
+				bool SerialCommandSensor(String port, String id, String value);
+				bool SerialCommandSensor(String port, String id, String value, bool active);
+				bool SerialCommandSensor(String port, String id, String value, bool active, bool failure);
+				bool SerialCommandSensor(String port, String id, bool active);
+				bool SerialCommandSensor(String port, String id, bool active, bool failure);
 				bool SerialStatus(String port);
 
 				#if defined(ESP32) || defined(ESP8266)

@@ -15,10 +15,10 @@ namespace Qybercom {
 				ProtonixDeviceSensor();
 				ProtonixDeviceSensor(String id);
 				ProtonixDeviceSensor(String id, String value);
-				ProtonixDeviceSensor(String id, bool active);
-				ProtonixDeviceSensor(String id, bool active, bool failure);
 				ProtonixDeviceSensor(String id, String value, bool active);
 				ProtonixDeviceSensor(String id, String value, bool active, bool failure);
+				ProtonixDeviceSensor(String id, bool active);
+				ProtonixDeviceSensor(String id, bool active, bool failure);
 
 				void ID(String id);
 				String ID();

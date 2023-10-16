@@ -7,6 +7,7 @@
 #include "ProtonixTimer.h"
 
 #include "Command/CStdSensor.h"
+#include "Command/CCustom.h"
 
 #if defined(ESP32) || defined(ESP8266)
 #include "DTO/DTORequestAuthorization.h"
@@ -110,12 +111,16 @@ ProtonixDevice* ProtonixDevice::Port(ProtonixDevicePort* port) {
 	return this;
 }
 
-ProtonixDevice* ProtonixDevice::Port(String name, unsigned short pinTX, unsigned short pinRX) {
+ProtonixDevice* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX) {
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX));
 }
 
-ProtonixDevice* ProtonixDevice::Port(String name, unsigned short pinTX, unsigned short pinRX, unsigned int speed) {
+ProtonixDevice* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed) {
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed));
+}
+
+ProtonixDevice* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout) {
+	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed, timeout));
 }
 
 ProtonixDevice* ProtonixDevice::Port(String name) {
@@ -239,18 +244,90 @@ bool ProtonixDevice::SerialCommand(String port, IProtonixCommand* command) {
 	return ok;
 }
 
+bool ProtonixDevice::SerialCommandCustom(String port, String command) {
+	Command::CCustom* cmd = new Command::CCustom(command);
+
+	bool ok = this->SerialCommand(port, cmd);
+
+	delete cmd;
+	cmd = nullptr;
+
+	return ok;
+}
+
+bool ProtonixDevice::SerialCommandSensor(String port, ProtonixDeviceSensor* sensor) {
+	Command::CStdSensor* cmd = new Command::CStdSensor(sensor);
+
+	bool ok = this->SerialCommand(port, cmd);
+
+	delete cmd;
+	cmd = nullptr;
+
+	return ok;
+}
+
+bool ProtonixDevice::SerialCommandSensor(String port, String id, String value) {
+	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value);
+	
+	bool ok = this->SerialCommandSensor(port, sensor);
+	
+	delete sensor;
+	sensor = nullptr;
+
+	return ok;
+}
+
+bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, bool active) {
+	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value, active);
+	
+	bool ok = this->SerialCommandSensor(port, sensor);
+	
+	delete sensor;
+	sensor = nullptr;
+
+	return ok;
+}
+
+bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, bool active, bool failure) {
+	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value, active, failure);
+	
+	bool ok = this->SerialCommandSensor(port, sensor);
+	
+	delete sensor;
+	sensor = nullptr;
+
+	return ok;
+}
+
+bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active) {
+	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, active);
+	
+	bool ok = this->SerialCommandSensor(port, sensor);
+	
+	delete sensor;
+	sensor = nullptr;
+
+	return ok;
+}
+
+bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active, bool failure) {
+	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, active, failure);
+	
+	bool ok = this->SerialCommandSensor(port, sensor);
+	
+	delete sensor;
+	sensor = nullptr;
+
+	return ok;
+}
+
 bool ProtonixDevice::SerialStatus(String port) {
 	unsigned count = this->_status->SensorCount();
 	unsigned int i = 0;
 	bool ok = true;
 
 	while (i < count) {
-		Command::CStdSensor* cmd = new Command::CStdSensor(this->_status->Sensors()[i]);
-
-		ok &= this->SerialCommand(port, cmd);
-
-		delete cmd;
-		cmd = nullptr;
+		this->SerialCommandSensor(port, this->_status->Sensors()[i]);
 
 		i++;
 	}

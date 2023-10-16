@@ -15,7 +15,7 @@ using namespace Qybercom::Protonix;
 SoftwareSerial __port__ = SoftwareSerial(0, 0);
 #endif
 
-void ProtonixDevicePort::_init(String name, unsigned short pinRX, unsigned short pinTX, unsigned int speed, unsigned short timeout) {
+void ProtonixDevicePort::_init(String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, unsigned int timeout) {
 	this->_serial = false;
 
 	this->_pinRX = pinRX;
@@ -38,15 +38,15 @@ void ProtonixDevicePort::_init(String name, unsigned short pinRX, unsigned short
 	// TODO: CStdReboot
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned short pinRX, unsigned short pinTX) {
+ProtonixDevicePort::ProtonixDevicePort(String name, unsigned int pinRX, unsigned int pinTX) {
 	this->_init(name, pinRX, pinTX, 9600, 7);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned short pinRX, unsigned short pinTX, unsigned int speed) {
+ProtonixDevicePort::ProtonixDevicePort(String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed) {
 	this->_init(name, pinRX, pinTX, speed, 7);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned short pinRX, unsigned short pinTX, unsigned int speed, unsigned short timeout) {
+ProtonixDevicePort::ProtonixDevicePort(String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, unsigned int timeout) {
 	this->_init(name, pinRX, pinTX, speed, timeout);
 }
 
@@ -118,8 +118,6 @@ void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 
 	s.trim();
 
-	//Serial.println("[debug] " + s);
-
 	int i = 0;
 
 	while (i < 4) {
@@ -149,7 +147,7 @@ bool ProtonixDevicePort::Send(IProtonixCommand* command) {
 		#endif
 	}
 
-	//delay(this->_timeout);
+	delay(this->_timeout);
 
 	return true;
 }

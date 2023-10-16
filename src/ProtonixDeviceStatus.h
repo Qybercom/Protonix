@@ -28,6 +28,8 @@ namespace Qybercom {
 				ProtonixDeviceStatus* SensorSet(String id, String value);
 				ProtonixDeviceStatus* SensorSet(String id, String value, bool active);
 				ProtonixDeviceStatus* SensorSet(String id, String value, bool active, bool failure);
+				ProtonixDeviceStatus* SensorSet(String id, bool active);
+				ProtonixDeviceStatus* SensorSet(String id, bool active, bool failure);
 				ProtonixDeviceStatus* SensorSet(ProtonixDeviceSensor* sensor);
 				ProtonixDeviceStatus* SensorReset();
 				ProtonixDeviceStatus* SensorReset(String id);
