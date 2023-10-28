@@ -40,6 +40,7 @@ namespace Qybercom {
 				ProtonixDTO* _dtoInput;
 				ProtonixDTO* _dtoOutput;
 				
+				void _pipeNetwork();
 				void _onStreamURL();
 				void _onStreamResponse();
 				void _onStreamEvent();

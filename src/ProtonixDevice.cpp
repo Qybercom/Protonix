@@ -127,22 +127,7 @@ ProtonixDevice* ProtonixDevice::Port(String name) {
 	return this->Port(new ProtonixDevicePort(name));
 }
 
-void ProtonixDevice::Pipe() {
-	unsigned int i = 0;
-
-	if (!this->_ready) {
-		this->_ready = true;
-
-		i = 0;
-		while (i < this->_portCount) {
-			this->_ports[i]->Init(this);
-
-			i++;
-		}
-
-		this->_device->DeviceOnReady(this);
-	}
-
+void ProtonixDevice::_pipeNetwork() {
 	#if defined(ESP32) || defined(ESP8266)
 	if (!this->_networkConnected1 || !this->_networkConnected2) {
 		if (!this->_networkConnected1) {
@@ -201,11 +186,30 @@ void ProtonixDevice::Pipe() {
 			this->_protocolConnected2 = false;
 		}
 
-		//return;
+		return;
 	}
-
+	
 	this->_protocol->Pipe();
 	#endif
+}
+
+void ProtonixDevice::Pipe() {
+	unsigned int i = 0;
+
+	if (!this->_ready) {
+		this->_ready = true;
+
+		i = 0;
+		while (i < this->_portCount) {
+			this->_ports[i]->Init(this);
+
+			i++;
+		}
+
+		this->_device->DeviceOnReady(this);
+	}
+	
+	this->_pipeNetwork();
 
 	i = 0;
 

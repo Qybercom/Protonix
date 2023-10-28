@@ -54,14 +54,21 @@ bool Network::NWiFi::Connect() {
 	return true;
 }
 
+unsigned int __NWiFi_status = 0;
+
 bool Network::NWiFi::Connected() {
 	#if defined(ESP32) || defined(ESP8266)
-	if (WiFi.status() != WL_CONNECTED) {
+	unsigned int status = WiFi.status();
+	bool connected = status == WL_CONNECTED;
+	
+	if (!connected && status != __NWiFi_status) {
 		Serial.print("[WARNING] WiFi status: ");
-		Serial.println(WiFi.status());
+		Serial.println(status);
 	}
+	
+	__NWiFi_status = status;
 
-	return WiFi.status() == WL_CONNECTED;
+	return connected;
 	#else
 	return false;
 	#endif
