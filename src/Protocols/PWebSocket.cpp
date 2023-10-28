@@ -44,7 +44,8 @@ bool Protocol::PWebSocket::Connected() {
 
 void Protocol::PWebSocket::Pipe() {
 	#if defined(ESP32) || defined(ESP8266)
-	this->_client.poll();
+	if (this->Connected())
+		this->_client.poll();
 	#endif
 }
 

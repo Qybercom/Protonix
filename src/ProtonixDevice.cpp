@@ -201,7 +201,7 @@ void ProtonixDevice::Pipe() {
 			this->_protocolConnected2 = false;
 		}
 
-		return;
+		//return;
 	}
 
 	this->_protocol->Pipe();
