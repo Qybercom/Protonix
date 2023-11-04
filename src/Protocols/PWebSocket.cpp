@@ -13,10 +13,9 @@ using namespace Qybercom::Protonix;
 
 
 void Protocol::PWebSocket::Init(ProtonixDevice* device) {
-	Serial.println("[debug:wifi] memory:init:" + String(device->FreeRAM()));
 	this->_device = device;
 
-#if defined(ESP32) || defined(ESP8266)
+	#if defined(ESP32) || defined(ESP8266)
 	// https://github.com/gilmaimon/ArduinoWebsockets/issues/75#issuecomment-635420749
 	//this->_client = {};
 	if (!this->_init) {
@@ -30,7 +29,6 @@ void Protocol::PWebSocket::Init(ProtonixDevice* device) {
 
 bool Protocol::PWebSocket::Connect(ProtonixURI* uri) {
 	#if defined(ESP32) || defined(ESP8266)
-	Serial.println("[debug:wifi] memory:connect:" + String(this->_device->FreeRAM()));
 	return this->_client.connect(
 		uri->Host(),
 		uri->Port(),
