@@ -9,6 +9,7 @@
 #include "ProtonixURI.h"
 #include "ProtonixDTO.h"
 #include "ProtonixTimer.h"
+#include "ProtonixAction.h"
 #include "ProtonixDeviceStatus.h"
 #include "ProtonixDevicePort.h"
 #include "ProtonixDeviceSensor.h"
@@ -28,6 +29,13 @@ namespace Qybercom {
 
 				unsigned int _portCount;
 				ProtonixDevicePort* _ports[4];
+
+				ProtonixAction* _actionList[64];
+				String _actionBacklog[256];
+				int _actionCursorList;
+				int _actionCursorBacklog;
+				int _actionCursorCurrent;
+				void _pipeActions();
 
 				#if defined(ESP32) || defined(ESP8266)
 				IProtonixNetwork* _network;
@@ -65,6 +73,17 @@ namespace Qybercom {
 				ProtonixDevice* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed);
 				ProtonixDevice* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout);
 				ProtonixDevice* Port(String name);
+
+				// https://stackoverflow.com/a/120916/2097055
+				ProtonixAction* Action(String name);
+				bool ActionRegister(ProtonixAction* action);
+				bool ActionRegister(String name);
+				bool ActionRegister(String name, unsigned int interval);
+				bool ActionRegister(String name, unsigned int interval, int stepEnd);
+				bool ActionRegister(String name, unsigned int interval, int stepBegin, int stepEnd);
+				bool ActionRegister(String name, unsigned int interval, int stepBegin, int stepEnd, int step);
+				bool ActionTrigger(String name);
+				void ActionReset();
 
 				void Pipe();
 

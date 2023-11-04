@@ -5,6 +5,7 @@
 #include "ProtonixDevice.h"
 #include "ProtonixDeviceStatus.h"
 #include "ProtonixTimer.h"
+#include "ProtonixAction.h"
 
 #include "Command/CStdSensor.h"
 #include "Command/CCustom.h"
@@ -24,6 +25,9 @@ ProtonixDevice::ProtonixDevice(IProtonixDevice* device) {
 	this->_status = new ProtonixDeviceStatus();
 	this->_ready = false;
 	this->_portCount = 0;
+	this->_actionCursorList = 0;
+	this->_actionCursorBacklog = 0;
+	this->_actionCursorCurrent = 0;
 	this->Device(device);
 	this->Debug(false);
 
@@ -127,6 +131,78 @@ ProtonixDevice* ProtonixDevice::Port(String name) {
 	return this->Port(new ProtonixDevicePort(name));
 }
 
+ProtonixAction* ProtonixDevice::Action(String name) {
+	int i = 0;
+
+	while (i < this->_actionCursorList) {
+		if (this->_actionList[i]->Name() == name)
+			return this->_actionList[i];
+
+		i++;
+	}
+
+	return nullptr;
+}
+
+bool ProtonixDevice::ActionRegister(ProtonixAction* action) {
+	if (this->_actionCursorList == 64) return false;
+
+	this->_actionList[this->_actionCursorList] = action;
+	this->_actionCursorList++;
+
+	return true;
+}
+
+bool ProtonixDevice::ActionRegister(String name) {
+	return this->ActionRegister(new ProtonixAction(name));
+}
+
+bool ProtonixDevice::ActionRegister(String name, unsigned int interval) {
+	return this->ActionRegister(new ProtonixAction(name, interval));
+}
+
+bool ProtonixDevice::ActionRegister(String name, unsigned int interval, int stepEnd) {
+	return this->ActionRegister(new ProtonixAction(name, interval, stepEnd));
+}
+
+bool ProtonixDevice::ActionRegister(String name, unsigned int interval, int stepBegin, int stepEnd) {
+	return this->ActionRegister(new ProtonixAction(name, interval, stepBegin, stepEnd));
+}
+
+bool ProtonixDevice::ActionRegister(String name, unsigned int interval, int stepBegin, int stepEnd, int step) {
+	return this->ActionRegister(new ProtonixAction(name, interval, stepBegin, stepEnd, step));
+}
+
+bool ProtonixDevice::ActionTrigger(String name) {
+	if (this->_actionCursorBacklog == 256) return false;
+
+	this->_actionBacklog[this->_actionCursorBacklog] = name;
+	this->_actionCursorBacklog++;
+
+	return true;
+}
+
+void ProtonixDevice::ActionReset() {
+	int i = 0;
+
+	i = 0;
+	while (i < this->_actionCursorBacklog) {
+		this->_actionBacklog[i] = "";
+
+		i++;
+	}
+
+	i = 0;
+	while (i < this->_actionCursorList) {
+		this->_actionList[i]->Reset();
+
+		i++;
+	}
+
+	this->_actionCursorBacklog = 0;
+	this->_actionCursorCurrent = 0;
+}
+
 void ProtonixDevice::_pipeNetwork() {
 	#if defined(ESP32) || defined(ESP8266)
 	if (!this->_networkConnected1 || !this->_networkConnected2) {
@@ -193,6 +269,44 @@ void ProtonixDevice::_pipeNetwork() {
 	#endif
 }
 
+void ProtonixDevice::_pipeActions() {
+	if (this->_actionBacklog[this->_actionCursorCurrent] == "") {
+		this->_actionCursorCurrent++;
+
+		if (this->_actionCursorCurrent == 64)
+			this->_actionCursorCurrent = 0;
+
+		return;
+	}
+
+	int i = 0;
+	bool finished = true;
+
+	while (i < this->_actionCursorList) {
+		if (this->_actionList[i]->Name() == this->_actionBacklog[this->_actionCursorCurrent]) {
+			if (this->_actionList[i]->PipeStart()) {
+				this->_device->DeviceOnAction(this, this->_actionList[i]);
+
+				this->_actionList[i]->PipeEnd();
+			}
+
+			if (this->_actionList[i]->Completed()) {
+				this->_actionBacklog[this->_actionCursorCurrent] = "";
+				this->_actionCursorCurrent++;
+
+				this->_actionList[i]->Reset();
+			}
+
+			finished = false;
+		}
+
+		i++;
+	}
+
+	if (finished)
+		this->_actionCursorCurrent = 0;
+}
+
 void ProtonixDevice::Pipe() {
 	unsigned int i = 0;
 
@@ -228,6 +342,8 @@ void ProtonixDevice::Pipe() {
 			#endif
 		}
 	}
+
+	this->_pipeActions();
 }
 
 void ProtonixDevice::OnSerial(ProtonixDevicePort* port, IProtonixCommand* command) {

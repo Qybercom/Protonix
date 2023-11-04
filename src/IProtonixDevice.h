@@ -5,6 +5,7 @@
 #include "IProtonixCommand.h"
 #include "ProtonixDevice.h"
 #include "ProtonixDevicePort.h"
+#include "ProtonixAction.h"
 
 #if defined(ESP32) || defined(ESP8266)
 #include "ProtonixDTO.h"
@@ -21,8 +22,9 @@ namespace Qybercom {
 				virtual void DeviceOnReady(ProtonixDevice* device);
 				virtual void DeviceOnTick(ProtonixDevice* device);
 				virtual void DeviceOnSerialCommand(ProtonixDevice* device, ProtonixDevicePort* port, IProtonixCommand* command);
+				virtual void DeviceOnAction(ProtonixDevice* device, ProtonixAction* action);
 				virtual bool DeviceAutoStatus();
-
+				
 				#if defined(ESP32) || defined(ESP8266)
 				virtual String DevicePassphrase();
 				virtual void DeviceOnNetworkConnect(ProtonixDevice* device);

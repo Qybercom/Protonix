@@ -17,9 +17,8 @@ namespace Qybercom {
 				private:
 					#if defined(ESP32) || defined(ESP8266)
 					websockets::WebsocketsClient _client;
-					#else
-					bool _client;
 					#endif
+					bool _init;
 					ProtonixDevice* _device;
 
 				public:

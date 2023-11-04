@@ -21,8 +21,6 @@ namespace Qybercom {
 				private:
 					#if defined(ESP32) || defined(ESP8266)
 					WiFiClient _client;
-					#else
-					bool _client;
 					#endif
 					ProtonixDevice* _device;
 					unsigned char _buffer[1024];

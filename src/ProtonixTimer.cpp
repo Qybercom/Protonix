@@ -62,3 +62,7 @@ bool ProtonixTimer::Pipe() {
 
 	return elapsed;
 }
+
+void ProtonixTimer::Reset() {
+	this->_previous = 0;
+}

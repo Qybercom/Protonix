@@ -25,6 +25,8 @@ namespace Qybercom {
 
 				bool Pipe();
 
+				void Reset();
+
 			private:
 				unsigned long _previous;
 				unsigned int _interval;
