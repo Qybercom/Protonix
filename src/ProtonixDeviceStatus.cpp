@@ -142,3 +142,29 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorReset(String id) {
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorReset() {
 	return this->SensorReset("");
 }
+
+ProtonixDeviceSensor* ProtonixDeviceStatus::Sensor(String id) {
+	unsigned int i = 0;
+
+	while (i < this->_sensorCount) {
+		if (this->_sensors[i]->ID() == id)
+			return this->_sensors[i];
+
+		i++;
+	}
+
+	return nullptr;
+}
+
+ProtonixDeviceSensor* ProtonixDeviceStatus::Sensor(int i) {
+	unsigned int j = 0;
+
+	while (j < this->_sensorCount) {
+		if (j == i)
+			return this->_sensors[j];
+
+		j++;
+	}
+
+	return nullptr;
+}

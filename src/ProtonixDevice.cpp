@@ -145,7 +145,7 @@ ProtonixAction* ProtonixDevice::Action(String name) {
 }
 
 bool ProtonixDevice::ActionRegister(ProtonixAction* action) {
-	if (this->_actionCursorList == 64) return false;
+	if (this->_actionCursorList == PROTONIX_LIMIT_ACTION_LIST) return false;
 
 	this->_actionList[this->_actionCursorList] = action;
 	this->_actionCursorList++;
@@ -174,7 +174,7 @@ bool ProtonixDevice::ActionRegister(String name, unsigned int interval, int step
 }
 
 bool ProtonixDevice::ActionTrigger(String name) {
-	if (this->_actionCursorBacklog == 256) return false;
+	if (this->_actionCursorBacklog == PROTONIX_LIMIT_ACTION_BACKLOG) return false;
 
 	this->_actionBacklog[this->_actionCursorBacklog] = name;
 	this->_actionCursorBacklog++;
@@ -203,8 +203,8 @@ void ProtonixDevice::ActionReset() {
 	this->_actionCursorCurrent = 0;
 }
 
+#if defined(ESP32) || defined(ESP8266)
 void ProtonixDevice::_pipeNetwork() {
-	#if defined(ESP32) || defined(ESP8266)
 	if (!this->_networkConnected1 || !this->_networkConnected2) {
 		if (!this->_networkConnected1) {
 			if (this->_debug)
@@ -266,14 +266,14 @@ void ProtonixDevice::_pipeNetwork() {
 	}
 	
 	this->_protocol->Pipe();
-	#endif
 }
+#endif
 
 void ProtonixDevice::_pipeActions() {
 	if (this->_actionBacklog[this->_actionCursorCurrent] == "") {
 		this->_actionCursorCurrent++;
 
-		if (this->_actionCursorCurrent == 64)
+		if (this->_actionCursorCurrent == PROTONIX_LIMIT_ACTION_BACKLOG)
 			this->_actionCursorCurrent = 0;
 
 		return;
@@ -303,8 +303,10 @@ void ProtonixDevice::_pipeActions() {
 		i++;
 	}
 
-	if (finished)
+	if (finished) {
+		this->_actionCursorBacklog = 0;
 		this->_actionCursorCurrent = 0;
+	}
 }
 
 void ProtonixDevice::Pipe() {
@@ -323,7 +325,9 @@ void ProtonixDevice::Pipe() {
 		this->_device->DeviceOnReady(this);
 	}
 	
+	#if defined(ESP32) || defined(ESP8266)
 	this->_pipeNetwork();
+	#endif
 
 	i = 0;
 

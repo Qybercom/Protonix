@@ -14,6 +14,16 @@
 #include "ProtonixDevicePort.h"
 #include "ProtonixDeviceSensor.h"
 
+#if defined(ESP32) || defined(ESP8266)
+#define PROTONIX_LIMIT_ACTION_LIST 64
+#define PROTONIX_LIMIT_ACTION_BACKLOG 256
+#define PROTONIX_LIMIT_PORT 8
+#else
+#define PROTONIX_LIMIT_ACTION_LIST 8
+#define PROTONIX_LIMIT_ACTION_BACKLOG 32
+#define PROTONIX_LIMIT_PORT 4
+#endif
+
 namespace Qybercom {
 	namespace Protonix {
 		class IProtonixDevice;
@@ -28,10 +38,10 @@ namespace Qybercom {
 				bool _debug;
 
 				unsigned int _portCount;
-				ProtonixDevicePort* _ports[4];
+				ProtonixDevicePort* _ports[PROTONIX_LIMIT_PORT];
 
-				ProtonixAction* _actionList[64];
-				String _actionBacklog[256];
+				ProtonixAction* _actionList[PROTONIX_LIMIT_ACTION_LIST];
+				String _actionBacklog[PROTONIX_LIMIT_ACTION_BACKLOG];
 				int _actionCursorList;
 				int _actionCursorBacklog;
 				int _actionCursorCurrent;

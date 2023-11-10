@@ -33,6 +33,8 @@ namespace Qybercom {
 				ProtonixDeviceStatus* SensorSet(ProtonixDeviceSensor* sensor);
 				ProtonixDeviceStatus* SensorReset();
 				ProtonixDeviceStatus* SensorReset(String id);
+				ProtonixDeviceSensor* Sensor(String id);
+				ProtonixDeviceSensor* Sensor(int i);
 		};
 	}
 }

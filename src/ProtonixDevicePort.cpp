@@ -106,27 +106,42 @@ void ProtonixDevicePort::Init(ProtonixDevice* device) {
 }
 
 void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
-	String s = "";
-	if (this->_serial) s = Serial.readStringUntil('\n');
+	//String s = "";
+	int b = 0;
+	//if (this->_serial) s = Serial.readStringUntil('\n');
+	if (this->_serial) b = Serial.read();
 	else {
 		#if defined(ESP32) || defined(ESP8266)
-			s = this->_port.readStringUntil('\n');
+			//s = this->_port.readStringUntil('\n');
+			b = this->_port.read();
 		#else
-			s = this->_port->readStringUntil('\n');
+			//s = this->_port->readStringUntil('\n');
+			b = this->_port->read();
 		#endif
 	}
 
-	s.trim();
+	//s.trim();
+	if (b == -1) return;
+	
+	char bc = (char)b;
+	if (bc != '\n') {
+		this->_cmdBuffer = this->_cmdBuffer + bc;
+		//Serial.println("[debug] port " + this->_cmdBuffer);
+		return;
+	}
 
 	int i = 0;
 
 	while (i < 4) {
-		if (this->_cmds[i]->CommandRecognize(device, this, s)) {
+		//if (this->_cmds[i]->CommandRecognize(device, this, s)) {
+		if (this->_cmds[i]->CommandRecognize(device, this, this->_cmdBuffer)) {
 			device->OnSerial(this, this->_cmds[i]);
 		}
 
 		i++;
 	}
+	
+	this->_cmdBuffer = "";
 }
 
 bool ProtonixDevicePort::Send(IProtonixCommand* command) {
