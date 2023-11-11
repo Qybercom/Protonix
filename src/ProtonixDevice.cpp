@@ -497,29 +497,21 @@ bool ProtonixDevice::Connected() {
 }
 
 void ProtonixDevice::RequestStream(String url, IProtonixDTORequest* request) {
-	if (!this->Connected()) {
-		if (this->_debug)
-			Serial.println("[WARNING] Device not connected, can not send request");
-
-		return;
+	String error = "";
+	
+	if (this->Connected()) {
+		this->_dtoOutput->Debug(this->_debug);
+		this->_dtoOutput->URL(url);
+		this->_dtoOutput->DTO(request);
+		
+		if (this->_dtoOutput->Serialize()) this->_protocol->Send(this->_dtoOutput->BufferRaw());
+		else error = "Cannot serialize request";
 	}
-
-	this->_dtoOutput->Debug(this->_debug);
-	this->_dtoOutput->URL(url);
-	this->_dtoOutput->DTO(request);
-
-	if (!this->_dtoOutput->Serialize()) {
-		if (this->_debug)
-			Serial.println("[WARNING] Cannot serialize request");
-
-		return;
-	}
-
-	this->_protocol->Send(this->_dtoOutput->BufferRaw());
-
-	if (this->_debug)
-		Serial.println("[request] " + url + " :: '" + this->_dtoOutput->BufferRaw() + "'");
-
+	else error = "Device not connected, can not send request";
+	
+	if (this->_debug && error != "")
+		Serial.println("[WARNING] " + error);
+	
 	delete request;
 	request = nullptr;
 

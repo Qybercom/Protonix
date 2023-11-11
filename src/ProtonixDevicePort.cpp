@@ -106,6 +106,9 @@ void ProtonixDevicePort::Init(ProtonixDevice* device) {
 }
 
 void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
+	if (this->_cmdBuffer.length() >= 256)
+		this->_cmdBuffer = "";
+	
 	//String s = "";
 	int b = 0;
 	//if (this->_serial) s = Serial.readStringUntil('\n');
