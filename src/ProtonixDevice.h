@@ -78,12 +78,27 @@ namespace Qybercom {
 				bool Debug();
 				int FreeRAM();
 
-				ProtonixDevice* Port(ProtonixDevicePort* port);
-				ProtonixDevice* Port(String name, unsigned int pinTX, unsigned int pinRX);
-				ProtonixDevice* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed);
-				ProtonixDevice* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout);
-				ProtonixDevice* Port(String name);
-
+				ProtonixDevicePort* Port(String name);
+				ProtonixDevicePort* Port(ProtonixDevicePort* port);
+				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX);
+				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, bool blocking);
+				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, bool blocking, bool observable);
+				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed);
+				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, bool blocking);
+				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, bool blocking, bool observable);
+				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout);
+				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout, bool blocking);
+				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout, bool blocking, bool observable);
+				ProtonixDevicePort* PortDefault();
+				ProtonixDevicePort* PortDefault(bool blocking);
+				ProtonixDevicePort* PortDefault(bool blocking, bool observable);
+				ProtonixDevicePort* PortDefault(unsigned int speed);
+				ProtonixDevicePort* PortDefault(unsigned int speed, bool blocking);
+				ProtonixDevicePort* PortDefault(unsigned int speed, bool blocking, bool observable);
+				ProtonixDevicePort* PortDefault(unsigned int speed, unsigned int timeout);
+				ProtonixDevicePort* PortDefault(unsigned int speed, unsigned int timeout, bool blocking);
+				ProtonixDevicePort* PortDefault(unsigned int speed, unsigned int timeout, bool blocking, bool observable);
+				
 				// https://stackoverflow.com/a/120916/2097055
 				ProtonixAction* Action(String name);
 				bool ActionRegister(ProtonixAction* action);

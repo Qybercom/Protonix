@@ -156,7 +156,7 @@ ProtonixDeviceSensor* ProtonixDeviceStatus::Sensor(String id) {
 	return nullptr;
 }
 
-ProtonixDeviceSensor* ProtonixDeviceStatus::Sensor(int i) {
+ProtonixDeviceSensor* ProtonixDeviceStatus::Sensor(unsigned int i) {
 	unsigned int j = 0;
 
 	while (j < this->_sensorCount) {

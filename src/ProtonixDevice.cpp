@@ -108,27 +108,96 @@ int ProtonixDevice::FreeRAM() {
 	#endif
 }
 
-ProtonixDevice* ProtonixDevice::Port(ProtonixDevicePort* port) {
+ProtonixDevicePort* ProtonixDevice::Port(String name) {
+	unsigned int i = 0;
+
+	while (i < this->_portCount) {
+		if (name == this->_ports[i]->Name())
+			return this->_ports[i];
+		
+		i++;
+	}
+	
+	return nullptr;
+}
+
+ProtonixDevicePort* ProtonixDevice::Port(ProtonixDevicePort* port) {
 	this->_ports[this->_portCount] = port;
 	this->_portCount++;
 
-	return this;
+	return port;
 }
 
-ProtonixDevice* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX) {
+ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX) {
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX));
 }
 
-ProtonixDevice* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed) {
+ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, bool blocking) {
+	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, blocking));
+}
+
+ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, bool blocking, bool observable) {
+	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, blocking, observable));
+}
+
+ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed) {
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed));
 }
 
-ProtonixDevice* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout) {
+ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, bool blocking) {
+	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed, blocking));
+}
+
+ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, bool blocking, bool observable) {
+	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed, blocking, observable));
+}
+
+ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout) {
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed, timeout));
 }
 
-ProtonixDevice* ProtonixDevice::Port(String name) {
-	return this->Port(new ProtonixDevicePort(name));
+ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout, bool blocking) {
+	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed, timeout, blocking));
+}
+
+ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout, bool blocking, bool observable) {
+	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed, timeout, blocking, observable));
+}
+
+ProtonixDevicePort* ProtonixDevice::PortDefault() {
+	return this->Port(new ProtonixDevicePort());
+}
+
+ProtonixDevicePort* ProtonixDevice::PortDefault(bool blocking) {
+	return this->Port(new ProtonixDevicePort(blocking));
+}
+
+ProtonixDevicePort* ProtonixDevice::PortDefault(bool blocking, bool observable) {
+	return this->Port(new ProtonixDevicePort(blocking, observable));
+}
+
+ProtonixDevicePort* ProtonixDevice::PortDefault(unsigned int speed) {
+	return this->Port(new ProtonixDevicePort(speed));
+}
+
+ProtonixDevicePort* ProtonixDevice::PortDefault(unsigned int speed, bool blocking) {
+	return this->Port(new ProtonixDevicePort(speed, blocking));
+}
+
+ProtonixDevicePort* ProtonixDevice::PortDefault(unsigned int speed, bool blocking, bool observable) {
+	return this->Port(new ProtonixDevicePort(speed, blocking, observable));
+}
+
+ProtonixDevicePort* ProtonixDevice::PortDefault(unsigned int speed, unsigned int timeout) {
+	return this->Port(new ProtonixDevicePort(speed, timeout));
+}
+
+ProtonixDevicePort* ProtonixDevice::PortDefault(unsigned int speed, unsigned int timeout, bool blocking) {
+	return this->Port(new ProtonixDevicePort(speed, timeout, blocking));
+}
+
+ProtonixDevicePort* ProtonixDevice::PortDefault(unsigned int speed, unsigned int timeout, bool blocking, bool observable) {
+	return this->Port(new ProtonixDevicePort(speed, timeout, blocking, observable));
 }
 
 ProtonixAction* ProtonixDevice::Action(String name) {
