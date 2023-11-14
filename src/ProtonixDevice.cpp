@@ -339,17 +339,17 @@ void ProtonixDevice::_pipeNetwork() {
 #endif
 
 void ProtonixDevice::_pipeActions() {
+	if (this->_actionCursorCurrent == PROTONIX_LIMIT_ACTION_BACKLOG)
+		this->_actionCursorCurrent = 0;
+
 	if (this->_actionBacklog[this->_actionCursorCurrent] == "") {
 		this->_actionCursorCurrent++;
-
-		if (this->_actionCursorCurrent == PROTONIX_LIMIT_ACTION_BACKLOG)
-			this->_actionCursorCurrent = 0;
 
 		return;
 	}
 
 	int i = 0;
-	bool finished = true;
+	//bool finished = true;
 
 	while (i < this->_actionCursorList) {
 		if (this->_actionList[i]->Name() == this->_actionBacklog[this->_actionCursorCurrent]) {
@@ -366,16 +366,18 @@ void ProtonixDevice::_pipeActions() {
 				this->_actionList[i]->Reset();
 			}
 
-			finished = false;
+			//finished = false;
 		}
 
 		i++;
 	}
-
+	
+	/*
 	if (finished) {
 		this->_actionCursorBacklog = 0;
 		this->_actionCursorCurrent = 0;
 	}
+	*/
 }
 
 void ProtonixDevice::Pipe() {

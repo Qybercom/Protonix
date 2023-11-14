@@ -225,6 +225,7 @@ void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 
 	while (i < 4) {
 		if (this->_cmds[i]->CommandRecognize(device, this, this->_blocking ? s : this->_cmdBuffer)) {
+			//::Serial.println(this->_blocking ? s : this->_cmdBuffer);
 			device->OnSerial(this, this->_cmds[i]);
 		}
 
@@ -253,6 +254,7 @@ bool ProtonixDevicePort::Send(IProtonixCommand* command) {
 	}
 
 	//delay(this->_timeout);
+	//delay(7);
 
 	return true;
 }
