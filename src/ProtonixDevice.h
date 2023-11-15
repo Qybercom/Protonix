@@ -19,9 +19,9 @@
 #define PROTONIX_LIMIT_ACTION_BACKLOG 256
 #define PROTONIX_LIMIT_PORT 8
 #else
-#define PROTONIX_LIMIT_ACTION_LIST 8
-#define PROTONIX_LIMIT_ACTION_BACKLOG 32
-#define PROTONIX_LIMIT_PORT 4
+#define PROTONIX_LIMIT_ACTION_LIST 2
+#define PROTONIX_LIMIT_ACTION_BACKLOG 8
+#define PROTONIX_LIMIT_PORT 2
 #endif
 
 namespace Qybercom {
@@ -76,7 +76,7 @@ namespace Qybercom {
 				unsigned int Tick();
 				void Debug(bool debug);
 				bool Debug();
-				int FreeRAM();
+				static int FreeRAM();
 
 				ProtonixDevicePort* Port(String name);
 				ProtonixDevicePort* Port(ProtonixDevicePort* port);

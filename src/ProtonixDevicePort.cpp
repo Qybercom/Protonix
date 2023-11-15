@@ -34,6 +34,8 @@ void ProtonixDevicePort::_init(bool serial, String name, unsigned int pinRX, uns
 	this->_port = &__port__;
 	#endif
 	
+	this->_lenActive = false;
+	
 	this->_cmds[0] = new Command::CStdOn();
 	this->_cmds[1] = new Command::CStdOff();
 	this->_cmds[3] = new Command::CStdSensor();
@@ -241,7 +243,7 @@ void ProtonixDevicePort::Init(ProtonixDevice* device) {
 void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 	if (!this->_observable) return;
 	
-	if (this->_cmdBuffer.length() >= 256)
+	if (this->_cmdBuffer.length() >= 128)
 		this->_cmdBuffer = "";
 	
 	String s = "";
@@ -266,25 +268,36 @@ void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 		if (b == -1) return;
 		char bc = (char)b;
 		
-		if (bc != '\n') {
-			if (bc == '\r') {}
-			else this->_cmdBuffer = this->_cmdBuffer + bc;
+		if (bc == '\n') this->_lenActive = false;
+		else {
+			if (bc == '\r') this->_lenActive = true;
+			else {
+				if (this->_lenActive) this->_lenBuffer += bc;
+				else this->_cmdBuffer += bc;
+			}
+			
 			return;
 		}
 	}
 
 	int i = 0;
+	String lenBuffer = this->_blocking ? s : String(this->_cmdBuffer.length());
 
 	while (i < 4) {
-		//::Serial.println(this->_blocking ? s : this->_cmdBuffer);
-		if (this->_cmds[i]->CommandRecognize(device, this, this->_blocking ? s : this->_cmdBuffer)) {
-			device->OnSerial(this, this->_cmds[i]);
+		if (lenBuffer != this->_lenBuffer) {
+			//::Serial.println("[WARNING] Message corrupted: e:" + this->_lenBuffer + " a:" + lenBuffer);
+		}
+		else {
+			if (this->_cmds[i]->CommandRecognize(device, this, this->_blocking ? s : this->_cmdBuffer)) {
+				device->OnSerial(this, this->_cmds[i]);
+			}
 		}
 
 		i++;
 	}
 	
 	this->_cmdBuffer = "";
+	this->_lenBuffer = "";
 }
 
 bool ProtonixDevicePort::Send(IProtonixCommand* command) {
@@ -293,14 +306,12 @@ bool ProtonixDevicePort::Send(IProtonixCommand* command) {
 
 		return false;
 	}
-
-	String output = command->CommandOutput();
-
-	/*
+	
+	String output = command->CommandOutput();//String(.c_str());
 	if (output == "") return false;
-	int len = output.length();
-	::Serial.println(len);
-	*/
+	
+	output += '\r';
+	output += String(output.length());
 
 	if (this->_serial) ::Serial.println(output);
 	else {
@@ -310,9 +321,6 @@ bool ProtonixDevicePort::Send(IProtonixCommand* command) {
 		this->_port->println(output);
 		#endif
 	}
-
-	//delay(this->_timeout);
-	//delay(7);
 
 	return true;
 }
