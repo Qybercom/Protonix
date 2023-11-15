@@ -27,7 +27,9 @@ namespace Qybercom {
 				bool _observable;
 				String _cmdBuffer;
 				IProtonixCommand* _cmds[4];
+				//byte 
 				void _init(bool serial, String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, unsigned int timeout, bool blocking, bool observable);
+				byte _crc8(String data);
 
 			public:
 				ProtonixDevicePort(String name, unsigned int pinRX, unsigned int pinTX);

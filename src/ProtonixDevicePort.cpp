@@ -41,6 +41,57 @@ void ProtonixDevicePort::_init(bool serial, String name, unsigned int pinRX, uns
 	// TODO: CStdReboot
 }
 
+byte ProtonixDevicePort::_crc8(String data) {
+	/*byte crc = 0;
+	byte buffer;
+
+	int size = data.length();
+	int i = 0;
+	int j = 8;
+
+	while (i < size) {
+		buffer = (byte)data[i];
+		j = 0;
+
+		while (j > 0) {
+			crc = ((crc ^ buffer) & 1) ? (crc >> 1) ^ 0x8C : (crc >> 1);
+			buffer >>= 1;
+
+			j--;
+		}
+
+		i++;
+	}
+
+	return crc;
+	*/
+	int start = 0;
+	int cnt = data.length();
+
+	unsigned char i, j;
+	unsigned temp, temp2, flag;
+
+	temp = 0xFFFF;
+
+	for (i = start; i < cnt; i++) {
+		temp = temp ^ data[i];
+
+		for (j = 1; j <= 8; j++) {
+			flag = temp & 0x0001;
+			temp = temp >> 1;
+			if (flag)
+				temp = temp ^ 0xA001;
+		}
+	}
+
+	/* Reverse byte order. */
+	temp2 = temp >> 8;
+	temp = (temp << 8) | temp2;
+	temp &= 0xFFFF;
+
+	return (byte)temp;
+}
+
 ProtonixDevicePort::ProtonixDevicePort(String name, unsigned int pinRX, unsigned int pinTX) {
 	this->_init(false, name, pinRX, pinTX, 9600, 1000, false, true);
 }
@@ -216,7 +267,8 @@ void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 		char bc = (char)b;
 		
 		if (bc != '\n') {
-			this->_cmdBuffer = this->_cmdBuffer + bc;
+			if (bc == '\r') {}
+			else this->_cmdBuffer = this->_cmdBuffer + bc;
 			return;
 		}
 	}
@@ -224,8 +276,8 @@ void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 	int i = 0;
 
 	while (i < 4) {
+		//::Serial.println(this->_blocking ? s : this->_cmdBuffer);
 		if (this->_cmds[i]->CommandRecognize(device, this, this->_blocking ? s : this->_cmdBuffer)) {
-			//::Serial.println(this->_blocking ? s : this->_cmdBuffer);
 			device->OnSerial(this, this->_cmds[i]);
 		}
 
@@ -243,6 +295,12 @@ bool ProtonixDevicePort::Send(IProtonixCommand* command) {
 	}
 
 	String output = command->CommandOutput();
+
+	/*
+	if (output == "") return false;
+	int len = output.length();
+	::Serial.println(len);
+	*/
 
 	if (this->_serial) ::Serial.println(output);
 	else {
