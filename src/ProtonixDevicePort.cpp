@@ -281,19 +281,20 @@ void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 	}
 
 	int i = 0;
-	String lenBuffer = this->_blocking ? s : String(this->_cmdBuffer.length());
+	String lenBuffer = String(this->_blocking ? s.length() + 1 : this->_cmdBuffer.length() + 1);
+	//::Serial.println("[debug] " + this->_cmdBuffer);
 
-	while (i < 4) {
-		if (lenBuffer != this->_lenBuffer) {
-			//::Serial.println("[WARNING] Message corrupted: e:" + this->_lenBuffer + " a:" + lenBuffer);
-		}
-		else {
+	if (lenBuffer != this->_lenBuffer) {
+		//::Serial.println("[WARNING] Message corrupted: e:" + this->_lenBuffer + " a:" + lenBuffer);
+	}
+	else {
+		while (i < 4) {
 			if (this->_cmds[i]->CommandRecognize(device, this, this->_blocking ? s : this->_cmdBuffer)) {
 				device->OnSerial(this, this->_cmds[i]);
 			}
+	
+			i++;
 		}
-
-		i++;
 	}
 	
 	this->_cmdBuffer = "";
