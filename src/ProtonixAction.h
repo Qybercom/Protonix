@@ -47,6 +47,7 @@ namespace Qybercom {
 				bool Completed();
 
 				bool PipeStart();
+				bool Pipe();
 				void PipeEnd();
 
 				void Reset();

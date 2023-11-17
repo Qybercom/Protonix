@@ -8,6 +8,7 @@ using namespace Qybercom::Protonix;
 
 
 void ProtonixAction::_init(String name, unsigned int interval, int stepBegin, int stepEnd, int step) {
+	this->_completed = false;
 	this->_timer = new ProtonixTimer(interval);
 
 	this->Name(name);
@@ -18,7 +19,6 @@ void ProtonixAction::_init(String name, unsigned int interval, int stepBegin, in
 
 	this->_stepDirection = this->_stepBegin <= this->_stepEnd ? 1 : -1;
 	this->_cursor = this->_stepBegin;
-	this->_completed = false;
 }
 
 ProtonixAction::ProtonixAction(String name) {
@@ -93,15 +93,19 @@ bool ProtonixAction::PipeStart() {
 	return this->_timer->Pipe();
 }
 
-void ProtonixAction::PipeEnd() {
-	this->_cursor += (this->_stepDirection * this->_step);
-
+bool ProtonixAction::Pipe () {
 	bool completed = false;
 	if (this->_stepDirection ==  1) completed = (this->_cursor > this->_stepEnd);
 	if (this->_stepDirection == -1) completed = (this->_cursor < this->_stepEnd);
 	
 	if (completed)
 		this->_completed = true;
+	
+	return !this->_completed;
+}
+
+void ProtonixAction::PipeEnd() {
+	this->_cursor += (this->_stepDirection * this->_step);
 }
 
 void ProtonixAction::Reset() {
