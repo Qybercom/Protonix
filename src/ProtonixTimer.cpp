@@ -56,7 +56,7 @@ bool ProtonixTimer::Pipe() {
 
 	long diff = current - this->_previous;
 	bool elapsed = diff < 0 || diff >= this->_interval;
-	//bool elapsed = diff > this->_interval;
+	//bool elapsed = diff >= this->_interval;
 
 	if (elapsed)
 		this->_previous = current;

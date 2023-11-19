@@ -354,10 +354,11 @@ void ProtonixDevice::_pipeActions() {
 	while (i < this->_actionCursorList) {
 		if (this->_actionList[i]->Name() == this->_actionBacklog[this->_actionCursorCurrent]) {
 			if (this->_actionList[i]->PipeStart()) {
-				if (this->_actionList[i]->Pipe())
+				if (this->_actionList[i]->Pipe()) {
 					this->_device->DeviceOnAction(this, this->_actionList[i]);
 
-				this->_actionList[i]->PipeEnd();
+					this->_actionList[i]->PipeEnd();
+				}
 			}
 
 			if (this->_actionList[i]->Completed()) {
