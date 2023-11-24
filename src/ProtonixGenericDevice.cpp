@@ -90,6 +90,8 @@ void ProtonixGenericDevice::DeviceOnStreamResponse(ProtonixDevice* device, Proto
 }
 
 void ProtonixGenericDevice::DeviceOnStreamResponseAuthorization(ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization) {
+	// TODO: re-auth if failure
+	
 	if (this->_debug)
 		Serial.println("[device:authorize] " + String(authorization->Status() == 200 ? "Success" : "Failure"));
 }

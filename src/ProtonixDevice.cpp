@@ -274,6 +274,8 @@ void ProtonixDevice::ActionReset() {
 
 #if defined(ESP32) || defined(ESP8266)
 void ProtonixDevice::_pipeNetwork() {
+	if (this->_network == nullptr || this->_protocol == nullptr) return;
+	
 	if (!this->_networkConnected1 || !this->_networkConnected2) {
 		if (!this->_networkConnected1) {
 			if (this->_debug)
@@ -566,7 +568,11 @@ void ProtonixDevice::ServerEndpoint(String host, unsigned int port, String path)
 }
 
 bool ProtonixDevice::Connected() {
-	return this->_network->Connected() && this->_protocol->Connected();
+	return true
+		&& this->_network != nullptr
+		&& this->_protocol != nullptr
+		&& this->_network->Connected()
+		&& this->_protocol->Connected();
 }
 
 void ProtonixDevice::RequestStream(String url, IProtonixDTORequest* request) {
