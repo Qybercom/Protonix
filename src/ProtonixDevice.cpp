@@ -255,7 +255,7 @@ void ProtonixDevice::ActionReset() {
 	int i = 0;
 
 	i = 0;
-	while (i < this->_actionCursorBacklog) {
+	while (i < PROTONIX_LIMIT_ACTION_BACKLOG) { //this->_actionCursorBacklog) {
 		this->_actionBacklog[i] = "";
 
 		i++;
