@@ -12,12 +12,16 @@ namespace Qybercom {
 				String _summary;
 				ProtonixDeviceSensor* _sensors[16];
 				unsigned int _sensorCount;
+				String _state;
 
 			public:
 				ProtonixDeviceStatus();
 
 				void On(bool on);
 				bool On();
+
+				void State(String state);
+				String State();
 
 				void Summary(String summary);
 				String Summary();
@@ -28,8 +32,11 @@ namespace Qybercom {
 				ProtonixDeviceStatus* SensorSet(String id, String value);
 				ProtonixDeviceStatus* SensorSet(String id, String value, bool active);
 				ProtonixDeviceStatus* SensorSet(String id, String value, bool active, bool failure);
+				ProtonixDeviceStatus* SensorSet(String id, String value, bool active, bool failure, String state);
 				ProtonixDeviceStatus* SensorSet(String id, bool active);
 				ProtonixDeviceStatus* SensorSet(String id, bool active, bool failure);
+				ProtonixDeviceStatus* SensorSet(String id, bool active, bool failure, String state);
+				ProtonixDeviceStatus* SensorSet(String id, String value, String state);
 				ProtonixDeviceStatus* SensorSet(ProtonixDeviceSensor* sensor);
 				ProtonixDeviceStatus* SensorReset();
 				ProtonixDeviceStatus* SensorReset(String id);

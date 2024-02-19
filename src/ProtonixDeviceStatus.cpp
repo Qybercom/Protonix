@@ -18,6 +18,14 @@ bool ProtonixDeviceStatus::On() {
 	return this->_on;
 }
 
+void ProtonixDeviceStatus::State(String state) {
+	this->_state = state;
+}
+
+String ProtonixDeviceStatus::State() {
+	return this->_state;
+}
+
 void ProtonixDeviceStatus::Summary(String summary) {
 	this->_summary = summary;
 }
@@ -88,6 +96,23 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, String value, b
 	return this;
 }
 
+ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, String value, bool active, bool failure, String state) {
+	unsigned int i = 0;
+
+	while (i < this->_sensorCount) {
+		if (id == "" || this->_sensors[i]->ID() == id) {
+			this->_sensors[i]->Value(value);
+			this->_sensors[i]->Active(active);
+			this->_sensors[i]->Failure(failure);
+			this->_sensors[i]->State(state);
+		}
+
+		i++;
+	}
+
+	return this;
+}
+
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, bool active) {
 	unsigned int i = 0;
 
@@ -117,12 +142,44 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, bool active, bo
 	return this;
 }
 
+ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, bool active, bool failure, String state) {
+	unsigned int i = 0;
+
+	while (i < this->_sensorCount) {
+		if (id == "" || this->_sensors[i]->ID() == id) {
+			this->_sensors[i]->Active(active);
+			this->_sensors[i]->Failure(failure);
+			this->_sensors[i]->State(state);
+		}
+
+		i++;
+	}
+
+	return this;
+}
+
+ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, String value, String state) {
+	unsigned int i = 0;
+
+	while (i < this->_sensorCount) {
+		if (id == "" || this->_sensors[i]->ID() == id) {
+			this->_sensors[i]->Value(value);
+			this->_sensors[i]->State(state);
+		}
+
+		i++;
+	}
+
+	return this;
+}
+
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(ProtonixDeviceSensor* sensor) {
 	return this->SensorSet(
 		sensor->ID(),
 		sensor->Value(),
 		sensor->Active(),
-		sensor->Failure()
+		sensor->Failure(),
+		sensor->State()
 	);
 }
 

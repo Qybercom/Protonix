@@ -10,6 +10,7 @@ namespace Qybercom {
 				String _value;
 				bool _active;
 				bool _failure;
+				String _state;
 
 			public:
 				ProtonixDeviceSensor();
@@ -17,8 +18,11 @@ namespace Qybercom {
 				ProtonixDeviceSensor(String id, String value);
 				ProtonixDeviceSensor(String id, String value, bool active);
 				ProtonixDeviceSensor(String id, String value, bool active, bool failure);
+				ProtonixDeviceSensor(String id, String value, bool active, bool failure, String state);
 				ProtonixDeviceSensor(String id, bool active);
 				ProtonixDeviceSensor(String id, bool active, bool failure);
+				ProtonixDeviceSensor(String id, bool active, bool failure, String state);
+				ProtonixDeviceSensor(String id, String value, String state);
 
 				void ID(String id);
 				String ID();
@@ -31,6 +35,9 @@ namespace Qybercom {
 
 				void Failure(bool failure);
 				bool Failure();
+
+				void State(String state);
+				String State();
 
 				String Summary();
 				void Reset();

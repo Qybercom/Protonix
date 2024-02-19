@@ -30,6 +30,7 @@ void DTO::DTORequestDeviceStatus::DTOPopulate(ProtonixDTO* dto) {
 }
 
 void DTO::DTORequestDeviceStatus::DTOSerialize(JsonDocument& dto) {
+	dto["data"]["state"] = this->_status->State();
 	dto["data"]["summary"] = this->_status->Summary();
 
 	ProtonixDeviceSensor** sensors = this->_status->Sensors();
@@ -45,6 +46,7 @@ void DTO::DTORequestDeviceStatus::DTOSerialize(JsonDocument& dto) {
 		sensor["value"] = sensors[i]->Value();
 		sensor["active"] = sensors[i]->Active();
 		sensor["failure"] = sensors[i]->Failure();
+		sensor["state"] = sensors[i]->State();
 
 		i++;
 	}
