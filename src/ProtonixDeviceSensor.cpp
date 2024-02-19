@@ -130,6 +130,7 @@ String ProtonixDeviceSensor::Summary() {
 		+ this->_value + ""
 		+ (this->_active ? ":active" : "")
 		+ (this->_failure ? ":failure" : "")
+		+ (this->_state == "" ? "" : ":" + this->_state)
 		+ "]";
 }
 
