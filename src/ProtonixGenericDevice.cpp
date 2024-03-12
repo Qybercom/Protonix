@@ -7,6 +7,7 @@
 
 #include "Command/CStdOn.h"
 #include "Command/CStdOff.h"
+#include "Command/CStdReboot.h"
 #include "Command/CStdSensor.h"
 #include "Command/CCustom.h"
 
@@ -29,8 +30,9 @@ void ProtonixGenericDevice::_init(bool debug) {
 
 	this->_cmds[0] = new Command::CStdOn();
 	this->_cmds[1] = new Command::CStdOff();
+	this->_cmds[2] = new Command::CStdReboot();
 	this->_cmds[3] = new Command::CStdSensor();
-	this->_cmds[2] = new Command::CCustom();
+	this->_cmds[4] = new Command::CCustom();
 
 	#if defined(ESP32) || defined(ESP8266)
 		pinMode(2, OUTPUT);

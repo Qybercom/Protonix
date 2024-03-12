@@ -90,19 +90,9 @@ bool Command::CStdSensor::CommandSerialize() {
 	this->_output += String(this->_sensor->Active() ? "1" : "0");
 	this->_output += ";";
 	this->_output += String(this->_sensor->Failure() ? "1" : "0");
-	//Serial.println(this->_output);
 
 	return true;
 }
-
-/*
-void Command::CStdSensor::CommandRecognized(ProtonixDevice* device, ProtonixDevicePort* port) {
-}
-
-bool Command::CStdSensor::CommandParse(ProtonixDevice* device, ProtonixDevicePort* port, char b) {
-	return true;
-}
-*/
 
 void Command::CStdSensor::CommandReset() {
 	this->_output = "";

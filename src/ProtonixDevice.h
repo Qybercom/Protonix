@@ -77,6 +77,7 @@ namespace Qybercom {
 				void Debug(bool debug);
 				bool Debug();
 				static int FreeRAM();
+				static void Reboot();
 
 				ProtonixDevicePort* Port(String name);
 				ProtonixDevicePort* Port(ProtonixDevicePort* port);

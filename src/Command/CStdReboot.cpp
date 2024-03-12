@@ -8,32 +8,32 @@
 #include "../DTO/DTOEventCommand.h"
 #endif
 
-#include "CStdOn.h"
+#include "CStdReboot.h"
 
 using namespace Qybercom::Protonix;
 
 
 
-Command::CStdOn::CStdOn() {
-	this->_init("std:on");
+Command::CStdReboot::CStdReboot() {
+	this->_init("std:reboot");
 }
 
-bool Command::CStdOn::CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name) {
+bool Command::CStdReboot::CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name) {
 	return this->_name == name;
 }
 
-bool Command::CStdOn::CommandSerialize() {
+bool Command::CStdReboot::CommandSerialize() {
 	this->_output = this->_name;
 
 	return true;
 }
 
-void Command::CStdOn::CommandReset() {
+void Command::CStdReboot::CommandReset() {
 	this->_output = "";
 }
 
 #if defined(ESP32) || defined(ESP8266)
-void Command::CStdOn::CommandFromDTO(DTO::DTOEventCommand* dto) {
+void Command::CStdReboot::CommandFromDTO(DTO::DTOEventCommand* dto) {
 
 }
 #endif

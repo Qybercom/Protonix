@@ -40,6 +40,11 @@ ProtonixDevice::ProtonixDevice(IProtonixDevice* device) {
 	this->_dtoInput = new ProtonixDTO();
 	this->_dtoOutput = new ProtonixDTO();
 	#endif
+
+	#if defined(AVR)
+	pinMode(4, OUTPUT);
+	digitalWrite(4, HIGH);
+	#endif
 }
 
 void ProtonixDevice::Device(IProtonixDevice* device) {
@@ -105,6 +110,15 @@ int ProtonixDevice::FreeRAM() {
 		return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
 	#else
 		return 0;
+	#endif
+}
+
+void ProtonixDevice::Reboot() {
+	#if defined(ESP32) || defined(ESP8266)
+		ESP.restart();
+	#elif defined(AVR)
+		digitalWrite(4, LOW);
+	#else
 	#endif
 }
 

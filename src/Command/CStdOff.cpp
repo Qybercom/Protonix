@@ -28,15 +28,6 @@ bool Command::CStdOff::CommandSerialize() {
 	return true;
 }
 
-/*
-void Command::CStdOff::CommandRecognized(ProtonixDevice* device, ProtonixDevicePort* port) {
-}
-
-bool Command::CStdOff::CommandParse(ProtonixDevice* device, ProtonixDevicePort* port, char b) {
-	return true;
-}
-*/
-
 void Command::CStdOff::CommandReset() {
 	this->_output = "";
 }

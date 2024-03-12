@@ -7,6 +7,7 @@
 
 #include "Command/CStdOn.h"
 #include "Command/CStdOff.h"
+#include "Command/CStdReboot.h"
 #include "Command/CStdSensor.h"
 #include "Command/CCustom.h"
 

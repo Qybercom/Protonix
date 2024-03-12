@@ -6,6 +6,7 @@
 
 #include "Command/CStdOn.h"
 #include "Command/CStdOff.h"
+#include "Command/CStdReboot.h"
 #include "Command/CStdSensor.h"
 #include "Command/CCustom.h"
 
@@ -38,9 +39,9 @@ void ProtonixDevicePort::_init(bool serial, String name, unsigned int pinRX, uns
 	
 	this->_cmds[0] = new Command::CStdOn();
 	this->_cmds[1] = new Command::CStdOff();
+	this->_cmds[2] = new Command::CStdReboot();
 	this->_cmds[3] = new Command::CStdSensor();
-	this->_cmds[2] = new Command::CCustom();
-	// TODO: CStdReboot
+	this->_cmds[4] = new Command::CCustom();
 }
 
 byte ProtonixDevicePort::_crc8(String data) {
