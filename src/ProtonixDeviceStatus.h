@@ -4,13 +4,19 @@
 
 #include "ProtonixDeviceSensor.h"
 
+#if defined(ESP32) || defined(ESP8266)
+#define PROTONIX_LIMIT_SENSORS 256
+#else
+#define PROTONIX_LIMIT_SENSORS 16
+#endif
+
 namespace Qybercom {
 	namespace Protonix {
 		class ProtonixDeviceStatus {
 			private:
 				bool _on;
 				String _summary;
-				ProtonixDeviceSensor* _sensors[16];
+				ProtonixDeviceSensor* _sensors[PROTONIX_LIMIT_SENSORS];
 				unsigned int _sensorCount;
 				String _state;
 
