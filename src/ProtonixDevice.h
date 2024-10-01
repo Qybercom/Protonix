@@ -120,8 +120,11 @@ namespace Qybercom {
 				bool SerialCommandSensor(String port, String id, String value);
 				bool SerialCommandSensor(String port, String id, String value, bool active);
 				bool SerialCommandSensor(String port, String id, String value, bool active, bool failure);
+				bool SerialCommandSensor(String port, String id, String value, bool active, bool failure, String state);
 				bool SerialCommandSensor(String port, String id, bool active);
 				bool SerialCommandSensor(String port, String id, bool active, bool failure);
+				bool SerialCommandSensor(String port, String id, bool active, bool failure, String state);
+				bool SerialCommandSensor(String port, String id, String value, String state);
 				bool SerialStatus(String port);
 
 				#if defined(ESP32) || defined(ESP8266)

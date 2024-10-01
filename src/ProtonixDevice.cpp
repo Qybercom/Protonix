@@ -513,6 +513,17 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, b
 	return ok;
 }
 
+bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, bool active, bool failure, String state) {
+	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value, active, failure, state);
+	
+	bool ok = this->SerialCommandSensor(port, sensor);
+	
+	delete sensor;
+	sensor = nullptr;
+
+	return ok;
+}
+
 bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, active);
 	
@@ -526,6 +537,28 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active) {
 
 bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active, bool failure) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, active, failure);
+	
+	bool ok = this->SerialCommandSensor(port, sensor);
+	
+	delete sensor;
+	sensor = nullptr;
+
+	return ok;
+}
+
+bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active, bool failure, String state) {
+	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, active, failure, state);
+	
+	bool ok = this->SerialCommandSensor(port, sensor);
+	
+	delete sensor;
+	sensor = nullptr;
+
+	return ok;
+}
+
+bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, String state) {
+	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value, state);
 	
 	bool ok = this->SerialCommandSensor(port, sensor);
 	
