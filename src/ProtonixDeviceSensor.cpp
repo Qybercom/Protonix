@@ -138,4 +138,5 @@ void ProtonixDeviceSensor::Reset() {
 	this->Value("");
 	this->Active(false);
 	this->Failure(false);
+	this->State("");
 }

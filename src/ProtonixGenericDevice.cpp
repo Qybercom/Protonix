@@ -111,7 +111,7 @@ void ProtonixGenericDevice::DeviceOnStreamEventCommand(ProtonixDevice* device, D
 
 	unsigned int i = 0;
 
-	while (i < 4) {
+	while (i < 5) {
 		this->_cmds[i]->CommandReset();
 		this->_cmds[i]->CommandFromDTO(command);
 

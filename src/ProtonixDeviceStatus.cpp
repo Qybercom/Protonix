@@ -6,8 +6,17 @@ using namespace Qybercom::Protonix;
 
 
 ProtonixDeviceStatus::ProtonixDeviceStatus() {
+	this->_firmware = "";
 	this->_on = true;
 	this->_sensorCount = 0;
+}
+
+void ProtonixDeviceStatus::Firmware(String firmware) {
+	this->_firmware = firmware;
+}
+
+String ProtonixDeviceStatus::Firmware() {
+	return this->_firmware;
 }
 
 void ProtonixDeviceStatus::On(bool on) {

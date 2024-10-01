@@ -316,10 +316,11 @@ void ProtonixDevice::_pipeNetwork() {
 
 			this->_protocol->Init(this);
 			this->_protocol->Connect(this->_uri);
-			this->_protocolConnected1 = true;
 		}
 
 		if (!this->_protocol->Connected()) return;
+
+		this->_protocolConnected1 = true;
 
 		if (this->_debug)
 			Serial.println("[protocol:connected]");

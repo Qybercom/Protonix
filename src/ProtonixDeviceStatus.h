@@ -8,6 +8,7 @@ namespace Qybercom {
 	namespace Protonix {
 		class ProtonixDeviceStatus {
 			private:
+				String _firmware;
 				bool _on;
 				String _summary;
 				ProtonixDeviceSensor* _sensors[16];
@@ -16,6 +17,9 @@ namespace Qybercom {
 
 			public:
 				ProtonixDeviceStatus();
+
+				void Firmware(String firmware);
+				String Firmware();
 
 				void On(bool on);
 				bool On();

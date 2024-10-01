@@ -32,9 +32,6 @@ String Command::CCustom::CMD() {
 }
 
 bool Command::CCustom::CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name) {
-	if (port == nullptr)
-		return (this->_name + ":" + this->_cmd) == name;
-
 	String n = name.substring(0, 7);
 	if (n != "custom:") return false;
 
