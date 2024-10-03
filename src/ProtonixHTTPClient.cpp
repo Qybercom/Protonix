@@ -24,6 +24,18 @@ String ProtonixHTTPHeader::SerializeRequest() {
 	return this->_name + ": " + this->_value + "\r\n";
 }
 
+ProtonixHTTPHeader* ProtonixHTTPHeader::FromResponse(String header) {
+	int posValue = header.indexOf(':');
+
+    String name = header.substring(0, posValue);
+    name.trim();
+
+    String value = header.substring(posValue + 1);
+    value.trim();
+
+    return new ProtonixHTTPHeader(name, value);
+}
+
 
 
 ProtonixHTTPFrame::ProtonixHTTPFrame() {
@@ -31,6 +43,8 @@ ProtonixHTTPFrame::ProtonixHTTPFrame() {
     this->_method = "GET";
 	this->_uri = new ProtonixURI();
 	this->_headerCurrent = 0;
+
+    this->Debug(false);
 }
 
 ProtonixHTTPFrame::ProtonixHTTPFrame(String uri) {
@@ -39,6 +53,7 @@ ProtonixHTTPFrame::ProtonixHTTPFrame(String uri) {
 	this->_uri = new ProtonixURI(uri);
 	this->_headerCurrent = 0;
 
+    this->Debug(false);
     this->HeaderAdd("Host", this->_uri->Host());
 }
 
@@ -48,7 +63,18 @@ ProtonixHTTPFrame::ProtonixHTTPFrame(String method, String uri) {
 	this->_uri = new ProtonixURI(uri);
 	this->_headerCurrent = 0;
 
+    this->Debug(false);
     this->HeaderAdd("Host", this->_uri->Host());
+}
+
+ProtonixHTTPFrame* ProtonixHTTPFrame::Debug(bool debug) {
+    this->_debug = debug;
+
+    return this;
+}
+
+bool ProtonixHTTPFrame::Debug() {
+    return this->_debug;
 }
 
 ProtonixHTTPFrame* ProtonixHTTPFrame::Version(String version) {
@@ -134,7 +160,10 @@ String ProtonixHTTPFrame::SerializeRequest() {
 }
 
 ProtonixHTTPFrame* ProtonixHTTPFrame::UnserializeResponse(String response) {
-	Serial.println("[debug] ProrotnixHTTPFrame::UnserializeResponse " + response);
+	if (this->_debug) {
+        Serial.println("[debug] ProrotnixHTTPFrame::UnserializeResponse:");
+        Serial.println(response);
+    }
 
     String buffer = "";
     int posHead = response.indexOf("\r\n");
@@ -158,12 +187,16 @@ ProtonixHTTPFrame* ProtonixHTTPFrame::UnserializeResponse(String response) {
             int posBody = (posHeaders == -1 ? posHead + 2 : posHeaders + 4);
 
             if (posHeaders == -1) {
-            	Serial.println("[debug] ProtonixHTTPFrame::UnserializeResponse: No response headers");
+              	if (this->_debug)
+            		Serial.println("[debug] ProtonixHTTPFrame::UnserializeResponse: No response headers");
             }
             else {
             	String bufferHeaders = buffer.substring(0, posBody - 2);
-                Serial.println("[debug] headers");
-                Serial.println(bufferHeaders);
+
+                if (this->_debug) {
+	                Serial.println("[debug] headers");
+	                Serial.println(bufferHeaders);
+                }
 
 				int posHeader = 0;
 				int posHeaderPrev = 0;
@@ -175,7 +208,9 @@ ProtonixHTTPFrame* ProtonixHTTPFrame::UnserializeResponse(String response) {
 
                     if (posHeader != -1) {
 						bufferHeader = bufferHeaders.substring(posHeaderPrev, posHeader);
-                        Serial.println("[debug] header: `" + bufferHeader + "`");
+
+                        this->HeaderAdd(ProtonixHTTPHeader::FromResponse(bufferHeader));
+
                         posHeaderPrev = posHeader + 2;
                         currentHeader++;
                     }
@@ -183,7 +218,8 @@ ProtonixHTTPFrame* ProtonixHTTPFrame::UnserializeResponse(String response) {
             }
 
             if (posBody == -1) {
-            	Serial.println("[debug] ProtonixHTTPFrame::UnserializeResponse: No response body");
+            	if (this->_debug)
+            		Serial.println("[debug] ProtonixHTTPFrame::UnserializeResponse: No response body");
             }
             else {
             	this->Body(buffer.substring(posBody));
@@ -219,6 +255,17 @@ ProtonixHTTPClient::ProtonixHTTPClient() {
     this->_request = nullptr;
     this->_response = nullptr;
     this->_timeoutResponse = 20;
+    this->Debug(false);
+}
+
+ProtonixHTTPClient* ProtonixHTTPClient::Debug(bool debug) {
+    this->_debug = debug;
+
+    return this;
+}
+
+bool ProtonixHTTPClient::Debug() {
+    return this->_debug;
 }
 
 ProtonixHTTPClient* ProtonixHTTPClient::Request(ProtonixHTTPFrame* request) {
@@ -260,7 +307,11 @@ bool ProtonixHTTPClient::Send() {
 
     if (this->_connected) {
     	String request = this->_request->SerializeRequest();
-        Serial.println("[debug] ProtonixHTTPClient::Send Request: " + request);
+
+        if (this->_debug) {
+        	Serial.println("[debug] ProtonixHTTPClient::Send Request:");
+        	Serial.println(request);
+        }
 
     	ok = this->_client.write(request.c_str());
         this->_client.flush();
@@ -287,6 +338,7 @@ bool ProtonixHTTPClient::Receive() {
     }
 
     this->_response = new ProtonixHTTPFrame(); // TODO: add support of handling the requested URL
+    this->_response->Debug(this->_debug);
     this->_response->UnserializeResponse(response);
 
 	return true;

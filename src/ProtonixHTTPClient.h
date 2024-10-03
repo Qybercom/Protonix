@@ -17,6 +17,7 @@ namespace Qybercom {
                 String Name();
                 String Value();
                 String SerializeRequest();
+                static ProtonixHTTPHeader* FromResponse(String header);
         };
 
         class ProtonixHTTPFrame {
@@ -28,11 +29,15 @@ namespace Qybercom {
                 ProtonixHTTPHeader* _headers[PROTONIX_LIMIT_HEADER_LIST];
                 unsigned short _headerCurrent;
                 String _body;
+                bool _debug;
 
             public:
               	ProtonixHTTPFrame();
               	ProtonixHTTPFrame(String uri);
               	ProtonixHTTPFrame(String method, String uri);
+
+                ProtonixHTTPFrame* Debug(bool debug);
+                bool Debug();
 
                 ProtonixHTTPFrame* Version(String version);
                 String Version();
@@ -67,10 +72,15 @@ namespace Qybercom {
                 ProtonixHTTPFrame* _response;
                 bool _connected;
                 unsigned short _timeoutResponse;
+                bool _debug;
 
             public:
                 //ProtonixHTTPClient(Client& client);
                 ProtonixHTTPClient();
+
+                ProtonixHTTPClient* Debug(bool debug);
+                bool Debug();
+
                 ProtonixHTTPClient* Request(ProtonixHTTPFrame* request);
                 ProtonixHTTPFrame* Response();
                 bool Send();
