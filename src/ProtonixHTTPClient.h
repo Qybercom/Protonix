@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <Client.h>
+#include <WiFiClient.h>
 
 #define PROTONIX_LIMIT_HEADER_LIST 32
 

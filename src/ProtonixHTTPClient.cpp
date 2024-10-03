@@ -254,7 +254,7 @@ ProtonixHTTPClient::ProtonixHTTPClient() {
 	this->_connected = false;
     this->_request = nullptr;
     this->_response = nullptr;
-    this->_timeoutResponse = 20;
+    this->_timeoutResponse = 40;
     this->Debug(false);
 }
 
@@ -292,16 +292,20 @@ bool ProtonixHTTPClient::Send() {
 	}
 
     if (!this->_client.connected()) {
-    	this->_connected = this->_client.connect(
-        	this->_request->URI()->Host(),
-        	this->_request->URI()->PortConnection()
-        );
+    	String host = this->_request->URI()->Host();
+        unsigned int port = this->_request->URI()->PortConnection();
+
+    	if (this->_debug)
+        	Serial.println("[debug] ProtonixHTTPClient::Send Connect `" + host + "`:`" + port + "`");
+
+    	this->_connected = this->_client.connect(host, port);
 
     	if (this->_connected) {
-			Serial.println("[debug] ProtonixHTTPClient::Send Connected");
+        	if (this->_debug)
+				Serial.println("[debug] ProtonixHTTPClient::Send Connected");
     	}
         else {
-			Serial.println("[debug] ProtonixHTTPClient::Send FAILURE");
+			Serial.println("[WARNING] ProtonixHTTPClient::Send: can not send request");
     	}
     }
 

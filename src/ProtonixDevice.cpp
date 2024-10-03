@@ -16,6 +16,8 @@
 #include "Command/CCustom.h"
 
 #if defined(ESP32) || defined(ESP8266)
+#include "ProtonixHTTPClient.h"
+
 #include "DTO/DTORequestAuthorization.h"
 #include "DTO/DTOResponseAuthorization.h"
 #include "DTO/DTOResponseDeviceStatus.h"
@@ -630,6 +632,10 @@ void ProtonixDevice::ServerEndpoint(String host, unsigned int port, String path)
 	this->Server(new ProtonixURI(host, port, path));
 }
 
+void ProtonixDevice::ServerBaseURI(String uri) {
+	this->_serverBaseURI = uri;
+}
+
 bool ProtonixDevice::Connected() {
 	return true
 		&& this->_network != nullptr
@@ -743,6 +749,36 @@ ProtonixDTO* ProtonixDevice::DTOInput() {
 
 ProtonixDTO* ProtonixDevice::DTOOutput() {
 	return this->_dtoOutput;
+}
+
+bool ProtonixDevice::FirmwareUpdateOTA(void(*onProgress)(int, int)) {
+	ProtonixHTTPClient* http = new ProtonixHTTPClient();
+    http->Debug(this->_debug);
+
+	ProtonixHTTPFrame* request = new ProtonixHTTPFrame("GET", this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID());
+    request->Debug(this->_debug);
+
+    http->Request(request);
+
+	bool ok = http->Send();
+
+    if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not connect to HTTP server for meta");
+    else {
+		ok = http->Receive();
+
+        if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: ca not receive response from HTTP server for meta");
+        else {
+			Serial.println("[debug] http recv " + String(ok) + ": `" + http->Response()->Version() + "` `" + http->Response()->Status() + "` `" + http->Response()->Body() + "`");
+        }
+    }
+
+    delete request;
+    request = nullptr;
+
+    delete http;
+    http = nullptr;
+
+    return ok;
 }
 
 bool ProtonixDevice::FirmwareUpdate(String firmware, void(*onProgress)(int, int)) {

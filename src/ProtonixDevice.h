@@ -40,6 +40,7 @@ namespace Qybercom {
 				ProtonixDeviceStatus* _status;
 				bool _ready;
 				bool _debug;
+                String _serverBaseURI;
 
 				unsigned int _portCount;
 				ProtonixDevicePort* _ports[PROTONIX_LIMIT_PORT];
@@ -143,12 +144,14 @@ namespace Qybercom {
 				ProtonixURI* Server();
 				void ServerEndpoint(String host, unsigned int port);
 				void ServerEndpoint(String host, unsigned int port, String path);
+                void ServerBaseURI(String uri);
 				bool Connected();
 				void OnStream(unsigned char* data);
 				void RequestStream(String url, IProtonixDTORequest* request);
 				void RequestStreamAuthorize();
 				ProtonixDTO* DTOInput();
 				ProtonixDTO* DTOOutput();
+                bool FirmwareUpdateOTA(void(*onProgress)(int, int) = nullptr);
                 bool FirmwareUpdate(String firmware, void(*onProgress)(int, int) = nullptr);
 				#endif
 		};
