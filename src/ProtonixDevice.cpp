@@ -1,6 +1,11 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 
+#if defined(ESP8266)
+#include <StreamString.h>
+#include <flash_hal.h>
+#endif
+
 #include "IProtonixDevice.h"
 #include "ProtonixDevice.h"
 #include "ProtonixDeviceStatus.h"
@@ -108,6 +113,16 @@ int ProtonixDevice::FreeRAM() {
 		//int __heap_start, * __brkval;
 
 		return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
+	#else
+		return 0;
+	#endif
+}
+
+int ProtonixDevice::FreeFlash() {
+	#if defined(ESP32) || defined(ESP8266)
+		return ESP.getFreeSketchSpace();
+	#elif defined(AVR)
+		return 0;
 	#else
 		return 0;
 	#endif
@@ -730,4 +745,56 @@ ProtonixDTO* ProtonixDevice::DTOOutput() {
 	return this->_dtoOutput;
 }
 
+bool ProtonixDevice::FirmwareUpdate(String firmware, void(*onProgress)(int, int)) {
+	StreamString stream = StreamString(firmware);
+    StreamString error;
+
+    String md5 = "TESTMD5";
+    unsigned int size = stream.available();
+    int cmd = U_FLASH; // U_FS
+    bool result = false;
+
+    Serial.println("[debug] stream: " + String(size));
+    Serial.println("[debug] flash: " + String(ProtonixDevice::FreeFlash()));
+
+    if (onProgress)
+    	Update.onProgress(onProgress);
+
+    if (!Update.begin(size, cmd)) this->_updateError("begin", error);
+    else {
+      	Serial.println("[debug] FirmwareUpdate begin");
+
+    	if (onProgress)
+    		onProgress(0, size);
+
+        // TODO: think of necessarity
+    	//if (!Update.setMD5(md5.c_str()))
+      		//this->_updateError("md5", error);
+
+        if (Update.writeStream(stream) != size) this->_updateError("writeStream", error);
+        else {
+        	Serial.println("[debug] FirmwareUpdate writeStream");
+
+    		if (onProgress)
+    			onProgress(size, size);
+
+            if (!Update.end()) this->_updateError("end", error);
+            else {
+        		Serial.println("[debug] FirmwareUpdate end");
+
+                result = true;
+        	}
+        }
+	}
+
+    //delete stream;
+    //stream = nullptr;
+
+    return result;
+}
+
+void ProtonixDevice::_updateError(String step, StreamString &error) {
+    Update.printError(error);
+    Serial.println("[WARNING] FirmwareUpdate error (" + step + "): " + String(error.c_str()));
+}
 #endif

@@ -19,7 +19,8 @@ String DTO::DTOEventCommand::Name() {
 void DTO::DTOEventCommand::DTOPopulate(ProtonixDTO* dto) {
 	JsonObject data = dto->Data();
 
-	if (data.containsKey("command"))
+	//if (data.containsKey("command"))
+	if (data["command"].is<const char*>())
 		this->Name(data["command"]);
 }
 

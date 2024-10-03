@@ -34,10 +34,12 @@ String DTO::DTORequestAuthorization::Passphrase() {
 void DTO::DTORequestAuthorization::DTOPopulate(ProtonixDTO* dto) {
 	JsonObject data = dto->Data();
 
-	if (data.containsKey("id"))
+	//if (data.containsKey("id"))
+	if (data["id"].is<const char*>())
 		this->ID(data["id"]);
 
-	if (data.containsKey("passphrase"))
+	//if (data.containsKey("passphrase"))
+	if (data["passphrase"].is<const char*>())
 		this->Passphrase(data["passphrase"]);
 }
 

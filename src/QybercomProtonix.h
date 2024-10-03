@@ -12,6 +12,7 @@
 #include "Command/CCustom.h"
 
 #if defined(ESP32) || defined(ESP8266)
+#include "ProtonixHTTPClient.h"
 #include "Network/NWiFi.h"
 #include "Protocols/PWiFiTCP.h"
 #include "Protocols/PWebSocket.h"

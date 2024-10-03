@@ -19,6 +19,9 @@ Command::CStdReboot::CStdReboot() {
 }
 
 bool Command::CStdReboot::CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name) {
+	(void)device;
+    (void)port;
+
 	return this->_name == name;
 }
 
@@ -34,6 +37,6 @@ void Command::CStdReboot::CommandReset() {
 
 #if defined(ESP32) || defined(ESP8266)
 void Command::CStdReboot::CommandFromDTO(DTO::DTOEventCommand* dto) {
-
+	(void)dto;
 }
 #endif

@@ -230,6 +230,8 @@ bool ProtonixDevicePort::Observable() {
 }
 
 void ProtonixDevicePort::Init(ProtonixDevice* device) {
+	(void)device;
+
 	#if defined(ESP32) || defined(ESP8266)
 	this->_port.begin(this->_speed, SWSERIAL_8N1, this->_pinRX, this->_pinTX, false);
 	#else

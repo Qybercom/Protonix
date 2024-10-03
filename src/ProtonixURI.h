@@ -12,8 +12,12 @@ namespace Qybercom {
 				String _host;
 				unsigned int _port;
 				String _path;
+				String _query;
+				String _fragment;
 
 			public:
+				ProtonixURI();
+				ProtonixURI(String uri);
 				ProtonixURI(String host, unsigned int port);
 				ProtonixURI(String host, unsigned int port, String path);
 
@@ -31,9 +35,19 @@ namespace Qybercom {
 
 				void Port(unsigned int port);
 				unsigned int Port();
+                unsigned int PortConnection();
 
 				void Path(String path);
 				String Path();
+
+				void Query(String query);
+				String Query();
+				String Query(bool includePath);
+
+				void Fragment(String fragment);
+				String Fragment();
+
+                String URI();
 		};
 	}
 }

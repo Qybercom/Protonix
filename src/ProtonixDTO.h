@@ -17,7 +17,8 @@ namespace Qybercom {
 				IProtonixDTO* _dto;
 				JsonObject _data;
 				bool _debug;
-				StaticJsonDocument<2048> _buffer;
+				//StaticJsonDocument<2048> _buffer;
+				JsonDocument _buffer;
 				bool _bufferInit;
 				String _bufferRaw;
 				JsonObject _bufferObj;

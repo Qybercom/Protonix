@@ -19,6 +19,9 @@ Command::CStdOff::CStdOff() {
 }
 
 bool Command::CStdOff::CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name) {
+	(void)device;
+    (void)port;
+
 	return this->_name == name;
 }
 
@@ -34,6 +37,6 @@ void Command::CStdOff::CommandReset() {
 
 #if defined(ESP32) || defined(ESP8266)
 void Command::CStdOff::CommandFromDTO(DTO::DTOEventCommand* dto) {
-
+	(void)dto;
 }
 #endif

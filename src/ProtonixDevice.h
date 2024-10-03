@@ -2,6 +2,10 @@
 
 #include <Arduino.h>
 
+#if defined(ESP8266)
+#include <StreamString.h>
+#endif
+
 #include "IProtonixNetwork.h"
 #include "IProtonixProtocol.h"
 #include "IProtonixDevice.h"
@@ -62,6 +66,8 @@ namespace Qybercom {
 				void _onStreamURL();
 				void _onStreamResponse();
 				void _onStreamEvent();
+
+                void _updateError(String step, StreamString &error);
 				#endif
 
 			public:
@@ -77,6 +83,7 @@ namespace Qybercom {
 				void Debug(bool debug);
 				bool Debug();
 				static int FreeRAM();
+                static int FreeFlash();
 				static void Reboot();
 
 				ProtonixDevicePort* Port(String name);
@@ -142,6 +149,7 @@ namespace Qybercom {
 				void RequestStreamAuthorize();
 				ProtonixDTO* DTOInput();
 				ProtonixDTO* DTOOutput();
+                bool FirmwareUpdate(String firmware, void(*onProgress)(int, int) = nullptr);
 				#endif
 		};
 	}

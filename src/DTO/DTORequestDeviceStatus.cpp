@@ -27,6 +27,7 @@ ProtonixDeviceStatus* DTO::DTORequestDeviceStatus::Status() {
 }
 
 void DTO::DTORequestDeviceStatus::DTOPopulate(ProtonixDTO* dto) {
+	(void)dto;
 }
 
 void DTO::DTORequestDeviceStatus::DTOSerialize(JsonDocument& dto) {
@@ -36,13 +37,15 @@ void DTO::DTORequestDeviceStatus::DTOSerialize(JsonDocument& dto) {
 	dto["data"]["summary"] = this->_status->Summary();
 
 	ProtonixDeviceSensor** sensors = this->_status->Sensors();
-	JsonArray sensors_out = dto["data"].createNestedArray("sensors");
+	//JsonArray sensors_out = dto["data"].createNestedArray("sensors");
+	JsonArray sensors_out = dto["data"]["sensors"].to<JsonArray>();
 
 	unsigned int i = 0;
 	unsigned int size = this->_status->SensorCount();
 
 	while (i < size) {
-		JsonObject sensor = sensors_out.createNestedObject();
+		//JsonObject sensor = sensors_out.createNestedObject();
+		JsonObject sensor = sensors_out.add<JsonObject>();
 
 		sensor["id"] = sensors[i]->ID();
 		sensor["value"] = sensors[i]->Value();

@@ -77,21 +77,29 @@ bool ProtonixGenericDevice::DeviceAutoStatus() {
 
 #if defined(ESP32) || defined(ESP8266)
 void ProtonixGenericDevice::DeviceOnNetworkConnect(ProtonixDevice* device) {
+	(void)device;
+
 	if (this->_debug)
 		Serial.println("[device] NetworkConnect");
 }
 
 void ProtonixGenericDevice::DeviceOnProtocolConnect(ProtonixDevice* device) {
+	(void)device;
+
 	if (this->_debug)
 		Serial.println("[device] ProtocolConnect");
 }
 
 void ProtonixGenericDevice::DeviceOnStreamResponse(ProtonixDevice* device, ProtonixDTO* dto) {
+	(void)device;
+
 	if (this->_debug)
 		Serial.println("[device] StreamResponse " + dto->Response());
 }
 
 void ProtonixGenericDevice::DeviceOnStreamResponseAuthorization(ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization) {
+	(void)device;
+
 	// TODO: re-auth if failure
 	
 	if (this->_debug)
@@ -99,6 +107,8 @@ void ProtonixGenericDevice::DeviceOnStreamResponseAuthorization(ProtonixDevice* 
 }
 
 void ProtonixGenericDevice::DeviceOnStreamEvent(ProtonixDevice* device, ProtonixDTO* dto) {
+	(void)device;
+
 	if (this->_debug)
 		Serial.println("[device] StreamEvent " + dto->Event());
 }

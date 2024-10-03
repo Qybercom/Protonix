@@ -19,7 +19,8 @@ unsigned short DTO::DTOResponseDeviceStatus::Status() {
 void DTO::DTOResponseDeviceStatus::DTOPopulate(ProtonixDTO* dto) {
 	JsonObject data = dto->Data();
 
-	if (data.containsKey("status"))
+	//if (data.containsKey("status"))
+	if (data["status"].is<unsigned short>())
 		this->Status(data["status"]);
 }
 

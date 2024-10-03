@@ -89,23 +89,15 @@ bool ProtonixDTO::Deserialize() {
 
 	this->_bufferObj = this->_buffer.as<JsonObject>();
 
-	if (this->_bufferObj.containsKey("url")) {
-		const char* u = this->_bufferObj["url"];
-		this->_url = (String)u;
-	}
+	const char* u = this->_bufferObj["url"];
+	const char* r = this->_bufferObj["response"];
+	const char* e = this->_bufferObj["event"];
+    JsonObject d = this->_bufferObj["data"];
 
-	if (this->_bufferObj.containsKey("response")) {
-		const char* r = this->_bufferObj["response"];
-		this->_response = (String)r;
-	}
-
-	if (this->_bufferObj.containsKey("event")) {
-		const char* e = this->_bufferObj["event"];
-		this->_event = (String)e;
-	}
-
-	if (this->_bufferObj.containsKey("data"))
-		this->_data = this->_bufferObj["data"];
+	if (u) this->_url = (String)u;
+	if (r) this->_response = (String)r;
+    if (e) this->_event = (String)e;
+	if (d) this->_data = d;
 
 	return true;
 }

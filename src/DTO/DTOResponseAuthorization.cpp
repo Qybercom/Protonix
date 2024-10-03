@@ -19,7 +19,8 @@ unsigned short DTO::DTOResponseAuthorization::Status() {
 void DTO::DTOResponseAuthorization::DTOPopulate(ProtonixDTO* dto) {
 	JsonObject data = dto->Data();
 
-	if (data.containsKey("status"))
+	//if (data.containsKey("status"))
+	if (data["status"].is<unsigned short>())
 		this->Status(data["status"]);
 }
 
