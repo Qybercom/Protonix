@@ -1,8 +1,11 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 
-#if defined(ESP8266)
+#if defined(ESP32) || defined(ESP8266)
 #include <StreamString.h>
+#endif
+
+#if defined(ESP8266)
 #include <flash_hal.h>
 #endif
 
@@ -11,6 +14,7 @@
 #include "ProtonixDeviceStatus.h"
 #include "ProtonixTimer.h"
 #include "ProtonixAction.h"
+#include "ProtonixMemory.h"
 
 #include "Command/CStdSensor.h"
 #include "Command/CCustom.h"
@@ -27,6 +31,96 @@
 
 using namespace Qybercom::Protonix;
 
+ProtonixRegistry::ProtonixRegistry(ProtonixMemory* memory) {
+	this->_memory = memory;
+	this->_bufferRaw = "";
+    this->_bufferLoaded = false;
+}
+
+bool ProtonixRegistry::_bufferLoad() {
+	if (this->_bufferLoaded) {
+    	Serial.println("[debug] eeprom loaded: `" + this->_bufferRaw + "`");
+    	return true;
+    }
+
+    const unsigned int size = PROTONIX_MEMORY_EEPROM_SIZE - PROTONIX_REGISTRY_START;
+
+	//char raw[size];
+    //const char raw[this->_bufferRaw.length()] = this->_bufferRaw.c_str();
+    char raw[size];
+    this->_memory->EEPROMGet(PROTONIX_REGISTRY_START, raw);
+    this->_bufferRaw = String(raw);
+    this->_bufferRaw.trim();
+
+    Serial.println("[debug] eeprom ready: `" + this->_bufferRaw + "`");
+
+    //if (this->_bufferRaw == "")
+        //this->_bufferRaw = "{}";
+
+    DeserializationError err = deserializeJson(this->_buffer, this->_bufferRaw);
+
+	if (err) {
+		Serial.println("[WARNING] ProtonixRegistry: json deserialize error: " + String(err.f_str()));
+
+		//return false;
+        this->_bufferRaw = "{}";
+        deserializeJson(this->_buffer, this->_bufferRaw);
+	}
+
+	this->_bufferObj = this->_buffer.as<JsonObject>();
+    this->_bufferLoaded = true;
+
+    return true;
+}
+/*
+template<typename T>
+T ProtonixRegistry::Get(String key, T defaultValue) {
+	if (!this->_bufferLoad()) return nullptr;
+
+    T value = this->_bufferObj[key].as<T>();
+
+    return value == nullptr ? defaultValue : value;
+}
+
+template<typename T>
+bool ProtonixRegistry::Set(String key, T value) {
+	return this->Set(key, value, false);
+}
+
+template<typename T>
+bool ProtonixRegistry::Set(String key, T value, bool commit) {
+    if (!this->_bufferLoad()) return false;
+
+    this->_bufferObj[key] = value;
+
+    return commit ? this->Commit() : true;
+}
+*/
+bool ProtonixRegistry::Commit() {
+	if (serializeJson(this->_buffer, this->_bufferRaw) == 0) {
+		Serial.println("[WARNING] ProtonixRegistry: json serialize error");
+
+        return false;
+    }
+
+    const unsigned int size = PROTONIX_MEMORY_EEPROM_SIZE - PROTONIX_REGISTRY_START;
+	unsigned int sizeActual = this->_bufferRaw.length();
+	char raw[size];
+    unsigned int i = 0;
+
+    while (i < size) {
+    	raw[i] = i < sizeActual ? this->_bufferRaw[i] : ' ';
+
+        i++;
+    }
+
+    this->_memory->EEPROMSet(PROTONIX_REGISTRY_START, raw);
+
+    return this->_memory->EEPROMCommit();
+}
+
+
+
 ProtonixDevice::ProtonixDevice(IProtonixDevice* device) {
 	this->_timer = new ProtonixTimer();
 	this->_status = new ProtonixDeviceStatus();
@@ -37,6 +131,10 @@ ProtonixDevice::ProtonixDevice(IProtonixDevice* device) {
 	this->_actionCursorCurrent = 0;
 	this->Device(device);
 	this->Debug(false);
+
+    this->_memory = new ProtonixMemory();
+    this->_memory->EEPROMBegin();
+    this->_registry = new ProtonixRegistry(this->_memory);
 
 	#if defined(ESP32) || defined(ESP8266)
 	this->_networkConnected1 = false;
@@ -100,6 +198,14 @@ void ProtonixDevice::Debug(bool debug) {
 
 bool ProtonixDevice::Debug() {
 	return this->_debug;
+}
+
+ProtonixMemory* ProtonixDevice::Memory() {
+	return this->_memory;
+}
+
+ProtonixRegistry* ProtonixDevice::Registry() {
+	return this->_registry;
 }
 
 extern int __heap_start, * __brkval;
@@ -751,11 +857,74 @@ ProtonixDTO* ProtonixDevice::DTOOutput() {
 	return this->_dtoOutput;
 }
 
+/*bool _onUpdateOTABatch(String) {
+
+}*/
+
 bool ProtonixDevice::FirmwareUpdateOTA(void(*onProgress)(int, int)) {
-	ProtonixHTTPClient* http = new ProtonixHTTPClient();
+	ProtonixHTTPClient* http = ProtonixHTTPClient::OverWiFi();
     http->Debug(this->_debug);
 
+    ProtonixHTTPFrame* request = new ProtonixHTTPFrame("GET", this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID());
+    http->Request(request);
+
+    bool ok = http->Send();
+
+    if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not connect to HTTP server for meta");
+    else {
+        Serial.println("[ota:http] sent");
+
+        ok = http->ReceiveHeaders();
+
+        if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not receive HTTP headers");
+        else {
+            Serial.println("[ota:http] receiveHeaders");
+
+            ok = this->_memory->FlashFirmwareBegin(http->Response()->LengthExpected());
+
+            if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not begin firmware flashing sequence");
+            else {
+                Serial.println("[ota:flash] begin");
+
+                int i = 1;
+                unsigned int bufferSize = this->_memory->FlashBufferSize();
+
+                while (http->ReceiveAvailable()) {
+                    String batch = http->ReceiveBody(bufferSize);
+
+                    //Serial.println("[ota:http] receiveBody " + String(i));// + ": " + batch);
+
+                    ok = this->_memory->FlashWrite(batch);
+
+                    if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: flash write failed at step " + String(i));
+                    else {
+                        //Serial.println("[ota:flash] write " + String(i));// + ": " + batch);
+                    }
+
+                    i++;
+                }
+
+                ok = this->_memory->FlashEnd();
+
+                if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not end flashing sequence");
+                else {
+                    Serial.println("[ota:flash] end");
+                }
+            }
+        }
+    }
+
+    return ok;
+}
+
+/*
+bool ProtonixDevice::FirmwareUpdateOTA(void(*onProgress)(int, int)) {
+	ProtonixHTTPClient* http = ProtonixHTTPClient::OverWiFi();
+    http->Debug(this->_debug);
+    //http->TimeoutResponse(5000);
+
 	ProtonixHTTPFrame* request = new ProtonixHTTPFrame("GET", this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID());
+    //ProtonixHTTPFrame* request = new ProtonixHTTPFrame("GET", "http://arduino.evolutex.ru/cdn/mechanism-15-esp8266.ino.bin");
     request->Debug(this->_debug);
 
     http->Request(request);
@@ -766,9 +935,16 @@ bool ProtonixDevice::FirmwareUpdateOTA(void(*onProgress)(int, int)) {
     else {
 		ok = http->Receive();
 
-        if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: ca not receive response from HTTP server for meta");
+        if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not receive response from HTTP server for meta");
         else {
-			Serial.println("[debug] http recv " + String(ok) + ": `" + http->Response()->Version() + "` `" + http->Response()->Status() + "` `" + http->Response()->Body() + "`");
+			//Serial.println("[debug] http recv " + String(ok) + ": `" + http->Response()->Version() + "` `" + http->Response()->Status() + "` `" + http->Response()->Body() + "`");
+            if (http->Response()->Status() != "200 OK") Serial.println("[WARNING] FirmwareUpdateOTA failed: can not find suitable firmware image on the HTTP server");
+            else {
+            	/*String firmware = http->Response()->Body();
+
+                ok = this->FirmwareUpdate(firmware, onProgress);*
+                ok = this->FirmwareUpdate(*http, onProgress);
+            }
         }
     }
 
@@ -780,16 +956,25 @@ bool ProtonixDevice::FirmwareUpdateOTA(void(*onProgress)(int, int)) {
 
     return ok;
 }
+*/
 
+/*
 bool ProtonixDevice::FirmwareUpdate(String firmware, void(*onProgress)(int, int)) {
-	StreamString stream = StreamString(firmware);
+}
+*
+ */
+
+/*
+bool ProtonixDevice::FirmwareUpdate(Stream& stream, void(*onProgress)(int, int)) {
+	//StreamString stream = StreamString(firmware);
     StreamString error;
 
-    String md5 = "TESTMD5";
+    //String md5 = "TESTMD5";
     unsigned int size = stream.available();
     int cmd = U_FLASH; // U_FS
     bool result = false;
 
+    //Serial.println("[debug] firmware: " + String(firmware.length()));
     Serial.println("[debug] stream: " + String(size));
     Serial.println("[debug] flash: " + String(ProtonixDevice::FreeFlash()));
 
@@ -833,4 +1018,5 @@ void ProtonixDevice::_updateError(String step, StreamString &error) {
     Update.printError(error);
     Serial.println("[WARNING] FirmwareUpdate error (" + step + "): " + String(error.c_str()));
 }
+*/
 #endif

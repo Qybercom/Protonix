@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Protonix.h"
+
 #include <Arduino.h>
 
 #include "ProtonixDevice.h"
