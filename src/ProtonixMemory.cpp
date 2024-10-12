@@ -74,27 +74,35 @@ bool ProtonixMemory::FlashFirmwareBegin(size_t size) {
 	 * https://github.com/esp8266/Arduino/issues/1017#issuecomment-200605576
 	 */
 	int boot_mode = (GPI >> 16) & 0xf;
+    Serial.println("[debug:flash] 1");
 	if (boot_mode == 1) {
         return false;
     }
 
+	Serial.println("[debug:flash] 2");
 	if (size == 0) return false;
+    Serial.println("[debug:flash] 3");
 	if (!ESP.checkFlashConfig(false)) return false;
+    Serial.println("[debug:flash] 4");
 
 	//size of current sketch rounded to a sector
 	size_t currentSketchSize = ProtonixMemory::FlashSectorSize(this->FlashFirmwareSize());
 	//size of the update rounded to a sector
+    Serial.println("[debug:flash] 5");
 	size_t roundedSize = ProtonixMemory::FlashSectorSize(size);
+    Serial.println("[debug:flash] 6");
 
     //address of the end of the space available for sketch and update
     uintptr_t updateEndAddress = FS_start - 0x40200000; // TODO: define by platform and selected layout!!!
-    uintptr_t updateStartAddress = (updateEndAddress > roundedSize) ? (updateEndAddress - roundedSize) : 0;
+    uintptr_t updateStartAddress = 0x01000;//0x110000;//0x41000;//(updateEndAddress > roundedSize) ? (updateEndAddress - roundedSize) : 0;
 
+	Serial.println("[debug:flash] 7");
     //make sure that the size of both sketches is less than the total space (updateEndAddress)
     if (updateStartAddress < currentSketchSize) {
-    	return false;
+    	//return false;
     }
 
+	Serial.println("[debug:flash] 8");
 	//initialize
 	this->_flashAddressStart = updateStartAddress;
 	this->_flashAddressCurrent = updateStartAddress;
@@ -103,6 +111,7 @@ bool ProtonixMemory::FlashFirmwareBegin(size_t size) {
 	//this->_flashBuffer = new uint8_t[this->_flashBufferSize];
 
     this->_flashBegin = true;
+    Serial.println("[debug:flash] 9");
 
 	return true;
     #elif defined(ESP32)

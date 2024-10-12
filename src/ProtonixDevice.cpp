@@ -9,6 +9,13 @@
 #include <flash_hal.h>
 #endif
 
+#if defined(ESP8266)
+#include <ESP8266HTTPClient.h>
+#include <ESP8266httpUpdate.h>
+#elif defined(ESP32)
+#include <ESP32httpUpdate.h>
+#endif
+
 #include "IProtonixDevice.h"
 #include "ProtonixDevice.h"
 #include "ProtonixDeviceStatus.h"
@@ -861,6 +868,22 @@ ProtonixDTO* ProtonixDevice::DTOOutput() {
 
 }*/
 
+bool ProtonixDevice::FirmwareUpdateOTA() {
+	#if defined(ESP32)
+    	t_httpUpdate_return out = ESPhttpUpdate.update(this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID() + "?platform=esp32");
+
+    	return out == HTTP_UPDATE_OK;
+	#elif defined(ESP8266)
+		WiFiClient client;
+    	t_httpUpdate_return out = ESPhttpUpdate.update(client, this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID() + "?platform=esp8266");
+
+    	return out == HTTP_UPDATE_OK;
+    #else
+		return false;
+    #endif
+}
+
+/*
 bool ProtonixDevice::FirmwareUpdateOTA(void(*onProgress)(int, int)) {
 	ProtonixHTTPClient* http = ProtonixHTTPClient::OverWiFi();
     http->Debug(this->_debug);
@@ -916,6 +939,7 @@ bool ProtonixDevice::FirmwareUpdateOTA(void(*onProgress)(int, int)) {
 
     return ok;
 }
+*/
 
 /*
 bool ProtonixDevice::FirmwareUpdateOTA(void(*onProgress)(int, int)) {

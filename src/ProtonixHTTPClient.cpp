@@ -484,7 +484,7 @@ bool ProtonixHTTPClient::Receive() {
 
 bool ProtonixHTTPClient::ReceiveHeaders() {
 	if (!this->_connected) return false;
-    //delay(this->_timeoutResponse);
+    delay(this->_timeoutResponse);
 
     if (this->_debug)
 		Serial.println("[debug] HTTP response headers 1");
@@ -519,7 +519,8 @@ bool ProtonixHTTPClient::ReceiveHeaders() {
     if (this->_debug)
 		Serial.println("[debug] HTTP response headers 3");
 
-    delay(5); // need for correct buffering
+    //delay(5); // need for correct buffering
+    delay(this->_timeoutResponse);
 
     return received;
 }
