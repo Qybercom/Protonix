@@ -18,7 +18,7 @@ namespace Qybercom {
 		class ProtonixGenericDevice : public IProtonixDevice {
 			protected:
 				bool _debug;
-				IProtonixCommand* _cmds[5];
+				IProtonixCommand* _cmds[6];
 				void _init();
 				void _init(bool debug);
 

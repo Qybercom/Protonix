@@ -1,12 +1,12 @@
 #pragma once
 
 #include <Arduino.h>
-#include <ArduinoJson.h>
 
 #if defined(ESP32) || defined(ESP8266)
 #include <StreamString.h>
 #endif
 
+#include "IProtonixHardware.h"
 #include "IProtonixNetwork.h"
 #include "IProtonixProtocol.h"
 #include "IProtonixDevice.h"
@@ -16,77 +16,26 @@
 #include "ProtonixTimer.h"
 #include "ProtonixAction.h"
 #include "ProtonixMemory.h"
+#include "ProtonixRegistry.h"
 #include "ProtonixDeviceStatus.h"
 #include "ProtonixDevicePort.h"
 #include "ProtonixDeviceSensor.h"
 
 #if defined(ESP32) || defined(ESP8266)
+#define PROTONIX_LIMIT_HARDWARE 32
 #define PROTONIX_LIMIT_ACTION_LIST 64
 #define PROTONIX_LIMIT_ACTION_BACKLOG 256
 #define PROTONIX_LIMIT_PORT 8
 #else
+#define PROTONIX_LIMIT_HARDWARE 8
 #define PROTONIX_LIMIT_ACTION_LIST 8
 #define PROTONIX_LIMIT_ACTION_BACKLOG 16
 #define PROTONIX_LIMIT_PORT 4
 #endif
 
-#define PROTONIX_REGISTRY_START 0x0128
-
 namespace Qybercom {
 	namespace Protonix {
 		class IProtonixDevice;
-
-        class ProtonixRegistry {
-        	private:
-                ProtonixMemory* _memory;
-				JsonDocument _buffer;
-				String _bufferRaw;
-				JsonObject _bufferObj;
-                bool _bufferLoaded;
-                bool _bufferLoad();
-
-            public:
-            	ProtonixRegistry(ProtonixMemory* memory);
-
-                /*
-				template<typename T>
-                T Get(String key, T defaultValue);
-
-				template<typename T>
-                bool Set(String key, T value);
-
-				template<typename T>
-                bool Set(String key, T value, bool commit);
-                */
-
-				template<typename T>
-				T Get(String key, T defaultValue) {
-					if (!this->_bufferLoad()) return nullptr;
-
-				    T value = this->_bufferObj[key].as<T>();
-
-				    return value == nullptr ? defaultValue : value;
-				}
-
-				template<typename T>
-				bool Set(String key, T value) {
-					return this->Set(key, value, false);
-				}
-
-				template<typename T>
-				bool Set(String key, T value, bool commit) {
-				    if (!this->_bufferLoad()) return false;
-
-				    this->_bufferObj[key] = value;
-
-				    return commit ? this->Commit() : true;
-				}
-
-				//template<typename T>
-                //bool SetDefault(String key, T &value);
-
-                bool Commit();
-        };
 
 		// http://tedfelix.com/software/c++-callbacks.html
 		class ProtonixDevice {
@@ -99,6 +48,9 @@ namespace Qybercom {
                 ProtonixMemory* _memory;
                 ProtonixRegistry* _registry;
                 String _serverBaseURI;
+
+				unsigned int _hardwareCount;
+				IProtonixHardware* _hardware[PROTONIX_LIMIT_HARDWARE];
 
 				unsigned int _portCount;
 				ProtonixDevicePort* _ports[PROTONIX_LIMIT_PORT];
@@ -146,6 +98,9 @@ namespace Qybercom {
 				static int FreeRAM();
                 static int FreeFlash();
 				static void Reboot();
+
+				IProtonixHardware* Hardware(String id);
+				ProtonixDevice* Hardware(String id, IProtonixHardware* hardware);
 
 				ProtonixDevicePort* Port(String name);
 				ProtonixDevicePort* Port(ProtonixDevicePort* port);

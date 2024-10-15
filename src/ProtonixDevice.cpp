@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <SPI.h>
 #include <SoftwareSerial.h>
 
 #if defined(ESP32) || defined(ESP8266)
@@ -23,6 +24,8 @@
 #include "ProtonixAction.h"
 #include "ProtonixMemory.h"
 
+#include "Hardware/HReaderMFRC.h"
+
 #include "Command/CStdSensor.h"
 #include "Command/CCustom.h"
 
@@ -37,94 +40,6 @@
 #endif
 
 using namespace Qybercom::Protonix;
-
-ProtonixRegistry::ProtonixRegistry(ProtonixMemory* memory) {
-	this->_memory = memory;
-	this->_bufferRaw = "";
-    this->_bufferLoaded = false;
-}
-
-bool ProtonixRegistry::_bufferLoad() {
-	if (this->_bufferLoaded) {
-    	Serial.println("[debug] eeprom loaded: `" + this->_bufferRaw + "`");
-    	return true;
-    }
-
-    const unsigned int size = PROTONIX_MEMORY_EEPROM_SIZE - PROTONIX_REGISTRY_START;
-
-	//char raw[size];
-    //const char raw[this->_bufferRaw.length()] = this->_bufferRaw.c_str();
-    char raw[size];
-    this->_memory->EEPROMGet(PROTONIX_REGISTRY_START, raw);
-    this->_bufferRaw = String(raw);
-    this->_bufferRaw.trim();
-
-    Serial.println("[debug] eeprom ready: `" + this->_bufferRaw + "`");
-
-    //if (this->_bufferRaw == "")
-        //this->_bufferRaw = "{}";
-
-    DeserializationError err = deserializeJson(this->_buffer, this->_bufferRaw);
-
-	if (err) {
-		Serial.println("[WARNING] ProtonixRegistry: json deserialize error: " + String(err.f_str()));
-
-		//return false;
-        this->_bufferRaw = "{}";
-        deserializeJson(this->_buffer, this->_bufferRaw);
-	}
-
-	this->_bufferObj = this->_buffer.as<JsonObject>();
-    this->_bufferLoaded = true;
-
-    return true;
-}
-/*
-template<typename T>
-T ProtonixRegistry::Get(String key, T defaultValue) {
-	if (!this->_bufferLoad()) return nullptr;
-
-    T value = this->_bufferObj[key].as<T>();
-
-    return value == nullptr ? defaultValue : value;
-}
-
-template<typename T>
-bool ProtonixRegistry::Set(String key, T value) {
-	return this->Set(key, value, false);
-}
-
-template<typename T>
-bool ProtonixRegistry::Set(String key, T value, bool commit) {
-    if (!this->_bufferLoad()) return false;
-
-    this->_bufferObj[key] = value;
-
-    return commit ? this->Commit() : true;
-}
-*/
-bool ProtonixRegistry::Commit() {
-	if (serializeJson(this->_buffer, this->_bufferRaw) == 0) {
-		Serial.println("[WARNING] ProtonixRegistry: json serialize error");
-
-        return false;
-    }
-
-    const unsigned int size = PROTONIX_MEMORY_EEPROM_SIZE - PROTONIX_REGISTRY_START;
-	unsigned int sizeActual = this->_bufferRaw.length();
-	char raw[size];
-    unsigned int i = 0;
-
-    while (i < size) {
-    	raw[i] = i < sizeActual ? this->_bufferRaw[i] : ' ';
-
-        i++;
-    }
-
-    this->_memory->EEPROMSet(PROTONIX_REGISTRY_START, raw);
-
-    return this->_memory->EEPROMCommit();
-}
 
 
 
@@ -142,6 +57,7 @@ ProtonixDevice::ProtonixDevice(IProtonixDevice* device) {
     this->_memory = new ProtonixMemory();
     this->_memory->EEPROMBegin();
     this->_registry = new ProtonixRegistry(this->_memory);
+    this->_registry->Debug(this->_debug); // TODO: runtime switch for every debuggable component
 
 	#if defined(ESP32) || defined(ESP8266)
 	this->_networkConnected1 = false;
@@ -250,6 +166,28 @@ void ProtonixDevice::Reboot() {
 		digitalWrite(4, LOW);
 	#else
 	#endif
+}
+
+IProtonixHardware* ProtonixDevice::Hardware(String id) {
+	unsigned int i = 0;
+
+	while (i < this->_hardwareCount) {
+		if (id == this->_hardware[i]->HardwareID())
+			return this->_hardware[i];
+
+		i++;
+	}
+
+	return nullptr;
+}
+
+ProtonixDevice* ProtonixDevice::Hardware(String id, IProtonixHardware* hardware) {
+	hardware->HardwareID(id);
+
+    this->_hardware[this->_hardwareCount] = hardware;
+	this->_hardwareCount++;
+
+	return this;
 }
 
 ProtonixDevicePort* ProtonixDevice::Port(String name) {
@@ -542,12 +480,36 @@ void ProtonixDevice::Pipe() {
 			i++;
 		}
 
+        i = 0;
+        while (i < this->_hardwareCount) {
+            this->_hardware[i]->HardwareInitPre();
+
+            i++;
+        }
+
+        SPI.begin();
+
+        i = 0;
+        while (i < this->_hardwareCount) {
+            this->_hardware[i]->HardwareInitPost();
+
+            i++;
+        }
+
 		this->_device->DeviceOnReady(this);
 	}
 	
 	#if defined(ESP32) || defined(ESP8266)
 	this->_pipeNetwork();
 	#endif
+
+	i = 0;
+
+	while (i < this->_hardwareCount) {
+		this->_hardware[i]->HardwarePipe();
+
+		i++;
+	}
 
 	i = 0;
 

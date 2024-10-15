@@ -47,7 +47,6 @@ bool Command::CStdSensor::CommandRecognize(ProtonixDevice* device, ProtonixDevic
 
 	String id = "";
 	String val = "";
-
 	
 	while (i < l) {
 		if (!setID) {

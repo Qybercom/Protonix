@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 #include "ProtonixDeviceStatus.h"
 #include "ProtonixDeviceSensor.h"
 
