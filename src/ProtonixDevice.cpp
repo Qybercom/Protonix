@@ -482,7 +482,7 @@ void ProtonixDevice::Pipe() {
 
         i = 0;
         while (i < this->_hardwareCount) {
-            this->_hardware[i]->HardwareInitPre();
+            this->_hardware[i]->HardwareInitPre(this);
 
             i++;
         }
@@ -491,7 +491,7 @@ void ProtonixDevice::Pipe() {
 
         i = 0;
         while (i < this->_hardwareCount) {
-            this->_hardware[i]->HardwareInitPost();
+            this->_hardware[i]->HardwareInitPost(this);
 
             i++;
         }
@@ -506,7 +506,7 @@ void ProtonixDevice::Pipe() {
 	i = 0;
 
 	while (i < this->_hardwareCount) {
-		this->_hardware[i]->HardwarePipe();
+		this->_hardware[i]->HardwarePipe(this);
 
 		i++;
 	}

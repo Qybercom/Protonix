@@ -2,17 +2,17 @@
 
 #include <Arduino.h>
 
+#include "ProtonixDevice.h"
+
 namespace Qybercom {
 	namespace Protonix {
+        class ProtonixDevice;
+
 		class IProtonixHardware {
         	protected:
                 String _id;
 
 			public:
-                enum class Type {
-                	SPI
-                };
-
                 IProtonixHardware* HardwareID(String id) {
                 	this->_id = id;
 
@@ -23,15 +23,10 @@ namespace Qybercom {
                 	return this->_id;
                 }
 
-				virtual Type HardwareType();
+				virtual void HardwareInitPre(ProtonixDevice* device);
+				virtual void HardwareInitPost(ProtonixDevice* device);
 
-				virtual void HardwareInitPre();
-				virtual void HardwareInitPost();
-
-                virtual void HardwarePipe();
-
-            protected:
-            	Type _type;
+                virtual void HardwarePipe(ProtonixDevice* device);
 		};
 	}
 }

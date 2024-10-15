@@ -5,6 +5,7 @@
 #include <MFRC522.h>
 
 #include "../IProtonixHardware.h"
+#include "../ProtonixDevice.h"
 
 #include "HReaderMFRC.h"
 
@@ -56,20 +57,22 @@ String Hardware::HReaderMFRC::CardSerial() {
 	return this->_cardSerial;
 }
 
-IProtonixHardware::Type Hardware::HReaderMFRC::HardwareType() {
-	return IProtonixHardware::Type::SPI;
-}
+void Hardware::HReaderMFRC::HardwareInitPre(ProtonixDevice* device) {
+	(void)device;
 
-void Hardware::HReaderMFRC::HardwareInitPre() {
 	pinMode(this->_pinSS, OUTPUT);
 	digitalWrite(this->_pinSS, HIGH);
 }
 
-void Hardware::HReaderMFRC::HardwareInitPost() {
+void Hardware::HReaderMFRC::HardwareInitPost(ProtonixDevice* device) {
+	(void)device;
+
 	this->_reader.PCD_Init(this->_pinSS, this->_pinRST);
 }
 
-void Hardware::HReaderMFRC::HardwarePipe() {
+void Hardware::HReaderMFRC::HardwarePipe(ProtonixDevice* device) {
+	(void)device;
+
 	this->_reader.PCD_Init();
 	this->_cardSerial = "";
 

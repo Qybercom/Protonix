@@ -36,6 +36,7 @@
 namespace Qybercom {
 	namespace Protonix {
 		class IProtonixDevice;
+		class IProtonixHardware;
 
 		// http://tedfelix.com/software/c++-callbacks.html
 		class ProtonixDevice {

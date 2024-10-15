@@ -1,7 +1,10 @@
+#pragma once
+
 #include <Arduino.h>
 #include <MFRC522.h>
 
 #include "../IProtonixHardware.h"
+#include "../ProtonixDevice.h"
 
 namespace Qybercom {
 	namespace Protonix {
@@ -27,10 +30,9 @@ namespace Qybercom {
 
                     String CardSerial();
 
-	                IProtonixHardware::Type HardwareType();
-					void HardwareInitPre();
-					void HardwareInitPost();
-                    void HardwarePipe();
+					void HardwareInitPre(ProtonixDevice* device);
+					void HardwareInitPost(ProtonixDevice* device);
+                    void HardwarePipe(ProtonixDevice* device);
 			};
         }
 	}

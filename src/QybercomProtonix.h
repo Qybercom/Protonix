@@ -7,7 +7,16 @@
 #include "ProtonixDevice.h"
 #include "ProtonixGenericDevice.h"
 
+#include "Hardware/HPlayerMP3.h"
 #include "Hardware/HReaderMFRC.h"
+#include "Hardware/HRelay.h"
+#include "Hardware/HSensorHall.h"
+#include "Hardware/HSensorMicrophone.h"
+#include "Hardware/HSensorPhotoResistor.h"
+#include "Hardware/HSensorTouch.h"
+#include "Hardware/HSensorTrigger.h"
+#include "Hardware/HVisualiserLEDMatrix.h"
+#include "Hardware/HVisualiserLEDRibbon.h"
 
 #include "Command/CStdOn.h"
 #include "Command/CStdOff.h"
