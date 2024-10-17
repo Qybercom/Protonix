@@ -481,7 +481,7 @@ void ProtonixDevice::Pipe() {
 			i++;
 		}
 
-        i = 0;
+        /*i = 0;
         while (i < this->_hardwareCount) {
             this->_hardware[i]->HardwareInitPre(this);
 
@@ -495,7 +495,7 @@ void ProtonixDevice::Pipe() {
             this->_hardware[i]->HardwareInitPost(this);
 
             i++;
-        }
+        }*/
 
 		this->_device->DeviceOnReady(this);
 	}

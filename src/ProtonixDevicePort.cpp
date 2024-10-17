@@ -7,6 +7,7 @@
 #include "Command/CStdOn.h"
 #include "Command/CStdOff.h"
 #include "Command/CStdReboot.h"
+#include "Command/CStdRegistry.h"
 #include "Command/CStdSensor.h"
 #include "Command/CCustom.h"
 
@@ -43,8 +44,9 @@ void ProtonixDevicePort::_init(bool serial, String name, unsigned int pinRX, uns
 	this->_cmds[0] = new Command::CStdOn();
 	this->_cmds[1] = new Command::CStdOff();
 	this->_cmds[2] = new Command::CStdReboot();
-	this->_cmds[3] = new Command::CStdSensor();
-	this->_cmds[4] = new Command::CCustom();
+	this->_cmds[3] = new Command::CStdRegistry();
+	this->_cmds[4] = new Command::CStdSensor();
+	this->_cmds[5] = new Command::CCustom();
 }
 
 byte ProtonixDevicePort::_crc8(String data) {
@@ -269,6 +271,7 @@ void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 		#endif
 	}
 
+	//::Serial.println("[debug] " + String(s));
 	if (this->_blocking) s.trim();
 	else {
 		if (b == -1) return;
@@ -288,13 +291,14 @@ void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 
 	int i = 0;
 	String lenBuffer = String(this->_blocking ? s.length() + 1 : this->_cmdBuffer.length() + 1);
-	//::Serial.println("[debug] " + this->_cmdBuffer);
 
 	if (lenBuffer != this->_lenBuffer) {
 		//::Serial.println("[WARNING] Message corrupted: e:" + this->_lenBuffer + " a:" + lenBuffer);
 	}
 	else {
-		while (i < 4) {
+        //::Serial.println("[debug] cmd " + String(s));
+
+		while (i < 6) {
 			if (this->_cmds[i]->CommandRecognize(device, this, this->_blocking ? s : this->_cmdBuffer)) {
 				device->OnSerial(this, this->_cmds[i]);
 			}
