@@ -48,6 +48,7 @@ ProtonixDevice::ProtonixDevice(IProtonixDevice* device) {
 	this->_status = new ProtonixDeviceStatus();
 	this->_ready = false;
 	this->_portCount = 0;
+    this->_hardwareCount = 0;
 	this->_actionCursorList = 0;
 	this->_actionCursorBacklog = 0;
 	this->_actionCursorCurrent = 0;
