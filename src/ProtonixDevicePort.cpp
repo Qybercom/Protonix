@@ -34,6 +34,9 @@ void ProtonixDevicePort::_init(bool serial, String name, unsigned int pinRX, uns
 	__port__ = SoftwareSerial(this->_pinRX, this->_pinTX);
 	this->_port = &__port__;
 	#endif
+
+	this->_cmdBuffer = "";
+	this->_lenBuffer = "";
 	
 	this->_lenActive = false;
 	
