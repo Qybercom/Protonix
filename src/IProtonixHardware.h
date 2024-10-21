@@ -23,10 +23,10 @@ namespace Qybercom {
                 	return this->_id;
                 }
 
-				virtual void HardwareInitPre(ProtonixDevice* device);
-				virtual void HardwareInitPost(ProtonixDevice* device);
+				virtual void HardwareInitPre(ProtonixDevice* device) = 0;
+				virtual void HardwareInitPost(ProtonixDevice* device) = 0;
 
-                virtual void HardwarePipe(ProtonixDevice* device);
+                virtual void HardwarePipe(ProtonixDevice* device) = 0;
 		};
 	}
 }
