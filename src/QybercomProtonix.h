@@ -18,12 +18,13 @@
 #include "Hardware/HVisualiserLEDMatrix.h"
 #include "Hardware/HVisualiserLEDRibbon.h"
 
-#include "Command/CStdOn.h"
+#include "Command/CCustom.h"
+#include "Command/CStdFirmware.h"
 #include "Command/CStdOff.h"
+#include "Command/CStdOn.h"
 #include "Command/CStdReboot.h"
 #include "Command/CStdRegistry.h"
 #include "Command/CStdSensor.h"
-#include "Command/CCustom.h"
 
 #if defined(ESP32) || defined(ESP8266)
 #include "ProtonixHTTPClient.h"

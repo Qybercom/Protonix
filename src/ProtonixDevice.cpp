@@ -525,7 +525,7 @@ void ProtonixDevice::Pipe() {
 
 		if (this->_device->DeviceAutoStatus()) {
 			#if defined(ESP32) || defined(ESP8266)
-			this->RequestStream("/api/mechanism/status", new DTO::DTORequestDeviceStatus(this->_status));
+			this->RequestStream("/api/mechanism/status", new DTO::DTORequestDeviceStatus(this->_status, this->_registry->Raw()));
 			#endif
 		}
 	}
@@ -831,14 +831,17 @@ ProtonixDTO* ProtonixDevice::DTOOutput() {
 
 }*/
 
-bool ProtonixDevice::FirmwareUpdateOTA() {
+bool ProtonixDevice::FirmwareUpdateOTA(String version) {
+	String url = this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID() + "?platform=";
+    String ver = version == "" ? "" : String("&version=" + version);
+
 	#if defined(ESP32)
-    	t_httpUpdate_return out = ESPhttpUpdate.update(this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID() + "?platform=esp32");
+    	t_httpUpdate_return out = ESPhttpUpdate.update(url + "esp32" + ver);
 
     	return out == HTTP_UPDATE_OK;
 	#elif defined(ESP8266)
 		WiFiClient client;
-    	t_httpUpdate_return out = ESPhttpUpdate.update(client, this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID() + "?platform=esp8266");
+    	t_httpUpdate_return out = ESPhttpUpdate.update(client, url + "esp8266" + ver);
 
     	return out == HTTP_UPDATE_OK;
     #else

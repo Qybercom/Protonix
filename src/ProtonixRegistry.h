@@ -47,6 +47,8 @@ namespace Qybercom {
 				template<typename T>
 				bool Set(String key, T value, bool commit);*/
 
+                String Raw();
+
 				String GetRaw(String key, String defaultValue);
 				bool SetRaw(String key, String value, bool commit);
 

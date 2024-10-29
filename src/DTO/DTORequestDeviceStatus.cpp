@@ -14,8 +14,9 @@ DTO::DTORequestDeviceStatus::DTORequestDeviceStatus() {
 	this->Status(new ProtonixDeviceStatus());
 }
 
-DTO::DTORequestDeviceStatus::DTORequestDeviceStatus(ProtonixDeviceStatus* status) {
+DTO::DTORequestDeviceStatus::DTORequestDeviceStatus(ProtonixDeviceStatus* status, String registry) {
 	this->Status(status);
+    this->Registry(registry);
 }
 
 void DTO::DTORequestDeviceStatus::Status(ProtonixDeviceStatus* status) {
@@ -26,12 +27,21 @@ ProtonixDeviceStatus* DTO::DTORequestDeviceStatus::Status() {
 	return this->_status;
 }
 
+void DTO::DTORequestDeviceStatus::Registry(String registry) {
+	this->_registry = registry;
+}
+
+String DTO::DTORequestDeviceStatus::Registry() {
+	return this->_registry;
+}
+
 void DTO::DTORequestDeviceStatus::DTOPopulate(ProtonixDTO* dto) {
 	(void)dto;
 }
 
 void DTO::DTORequestDeviceStatus::DTOSerialize(JsonDocument& dto) {
 	dto["data"]["firmware"] = this->_status->Firmware();
+	dto["data"]["registry"] = this->_registry;
 	dto["data"]["state"] = this->_status->State();
 	dto["data"]["enabled"] = this->_status->On();
 	dto["data"]["summary"] = this->_status->Summary();

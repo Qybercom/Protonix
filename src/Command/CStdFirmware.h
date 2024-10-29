@@ -13,19 +13,23 @@
 namespace Qybercom {
 	namespace Protonix {
 		namespace Command {
-			class CStdRegistry : public ProtonixGenericCommand {
+			class CStdFirmware : public ProtonixGenericCommand {
 				private:
-                    String _key;
-                    String _value;
+                    String _action;
+                    String _version;
 
                 public:
-                	CStdRegistry();
+                	CStdFirmware();
 
-                    CStdRegistry* Key(String key);
-                    String Key();
+                    CStdFirmware* Action(String action);
+                    String Action();
 
-                    CStdRegistry* Value(String value);
-                    String Value();
+                    bool ActionUpdate();
+
+                    CStdFirmware* Version(String version);
+                    String Version();
+
+                    bool VersionLatest();
 
                     bool CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name);
 					bool CommandSerialize();

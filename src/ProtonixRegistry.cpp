@@ -104,6 +104,10 @@ bool ProtonixRegistry::Set(String key, T value, bool commit) {
 
     return commit ? this->Commit() : true;
 }*/
+String ProtonixRegistry::Raw() {
+	return this->_bufferRaw;
+}
+
 String ProtonixRegistry::GetRaw(String key, String defaultValue) {
 	if (!this->_bufferLoad()) return defaultValue;
 

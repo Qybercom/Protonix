@@ -167,7 +167,7 @@ namespace Qybercom {
 				void RequestStreamAuthorize();
 				ProtonixDTO* DTOInput();
 				ProtonixDTO* DTOOutput();
-                bool FirmwareUpdateOTA();
+                bool FirmwareUpdateOTA(String version = "");
                 //bool FirmwareUpdateOTA(void(*onProgress)(int, int) = nullptr);
                 //bool FirmwareUpdate(String firmware, void(*onProgress)(int, int) = nullptr);
 				//bool FirmwareUpdate(Stream& stream, void(*onProgress)(int, int) = nullptr);

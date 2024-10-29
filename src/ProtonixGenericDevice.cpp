@@ -5,12 +5,13 @@
 #include "ProtonixDevice.h"
 #include "ProtonixDevicePort.h"
 
-#include "Command/CStdOn.h"
-#include "Command/CStdOff.h"
-#include "Command/CStdReboot.h"
-#include "Command/CStdSensor.h"
-#include "Command/CStdRegistry.h"
 #include "Command/CCustom.h"
+#include "Command/CStdFirmware.h"
+#include "Command/CStdOff.h"
+#include "Command/CStdOn.h"
+#include "Command/CStdReboot.h"
+#include "Command/CStdRegistry.h"
+#include "Command/CStdSensor.h"
 
 #if defined(ESP32) || defined(ESP8266)
 #include "ProtonixDTO.h"
@@ -29,12 +30,13 @@ void ProtonixGenericDevice::_init() {
 void ProtonixGenericDevice::_init(bool debug) {
 	this->_debug = debug;
 
-	this->_cmds[0] = new Command::CStdOn();
-	this->_cmds[1] = new Command::CStdOff();
-	this->_cmds[2] = new Command::CStdReboot();
-	this->_cmds[3] = new Command::CStdSensor();
-	this->_cmds[4] = new Command::CStdRegistry();
-	this->_cmds[5] = new Command::CCustom();
+	this->_cmds[0] = new Command::CCustom();
+	this->_cmds[1] = new Command::CStdFirmware();
+	this->_cmds[2] = new Command::CStdOff();
+	this->_cmds[3] = new Command::CStdOn();
+	this->_cmds[4] = new Command::CStdReboot();
+	this->_cmds[5] = new Command::CStdRegistry();
+	this->_cmds[6] = new Command::CStdSensor();
 
 	#if defined(ESP32) || defined(ESP8266)
 		pinMode(2, OUTPUT);
@@ -123,7 +125,7 @@ void ProtonixGenericDevice::DeviceOnStreamEventCommand(ProtonixDevice* device, D
 
 	unsigned int i = 0;
 
-	while (i < 6) {
+	while (i < 7) {
 		this->_cmds[i]->CommandReset();
 		this->_cmds[i]->CommandFromDTO(command);
 

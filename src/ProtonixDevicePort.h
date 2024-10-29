@@ -28,7 +28,7 @@ namespace Qybercom {
 				String _cmdBuffer;
 				String _lenBuffer;
 				bool _lenActive;
-				IProtonixCommand* _cmds[5];
+				IProtonixCommand* _cmds[7];
 				//byte 
 				void _init(bool serial, String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, unsigned int timeout, bool blocking, bool observable);
 				byte _crc8(String data);
