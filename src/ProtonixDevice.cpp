@@ -74,6 +74,13 @@ ProtonixDevice::ProtonixDevice(IProtonixDevice* device) {
 	pinMode(4, OUTPUT);
 	digitalWrite(4, HIGH);
 	#endif
+
+    int i = 0;
+    while (i < PROTONIX_LIMIT_ACTION_BACKLOG) {
+        this->_actionBacklog[i] = "";
+
+        i++;
+    }
 }
 
 void ProtonixDevice::Device(IProtonixDevice* device) {
@@ -297,7 +304,7 @@ ProtonixAction* ProtonixDevice::Action(String name) {
 }
 
 bool ProtonixDevice::ActionRegister(ProtonixAction* action) {
-	if (this->_actionCursorList == PROTONIX_LIMIT_ACTION_LIST) return false;
+    if (this->_actionCursorList == PROTONIX_LIMIT_ACTION_LIST) return false;
 
 	this->_actionList[this->_actionCursorList] = action;
 	this->_actionCursorList++;
@@ -326,7 +333,7 @@ bool ProtonixDevice::ActionRegister(String name, unsigned int interval, int step
 }
 
 bool ProtonixDevice::ActionTrigger(String name) {
-	if (this->_actionCursorBacklog == PROTONIX_LIMIT_ACTION_BACKLOG) return false;
+    if (this->_actionCursorBacklog == PROTONIX_LIMIT_ACTION_BACKLOG) return false;
 
 	this->_actionBacklog[this->_actionCursorBacklog] = name;
 	this->_actionCursorBacklog++;
@@ -428,7 +435,9 @@ void ProtonixDevice::_pipeActions() {
 	if (this->_actionCursorCurrent == PROTONIX_LIMIT_ACTION_BACKLOG)
 		this->_actionCursorCurrent = 0;
 
-	if (this->_actionBacklog[this->_actionCursorCurrent] == "") {
+    //Serial.println("!!! " + String(this->_actionCursorCurrent));
+
+    if (this->_actionBacklog[this->_actionCursorCurrent] == "") {
 		this->_actionCursorCurrent++;
 
 		return;

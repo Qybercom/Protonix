@@ -41,7 +41,7 @@ void DTO::DTORequestDeviceStatus::DTOPopulate(ProtonixDTO* dto) {
 
 void DTO::DTORequestDeviceStatus::DTOSerialize(JsonDocument& dto) {
 	dto["data"]["firmware"] = this->_status->Firmware();
-	dto["data"]["registry"] = this->_registry;
+	//dto["data"]["registry"] = this->_registry;
 	dto["data"]["state"] = this->_status->State();
 	dto["data"]["enabled"] = this->_status->On();
 	dto["data"]["summary"] = this->_status->Summary();
