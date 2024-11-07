@@ -142,13 +142,13 @@ int ProtonixRegistry::GetIntervalMax(String key, int defaultValue) {
     return val == "" ? defaultValue : val.toInt();
 }
 
-float ProtonixRegistry::GetIntervalMin(String key, float defaultValue) {
+float ProtonixRegistry::GetIntervalMin_f(String key, float defaultValue) {
     String val = this->_tuple(key, true);
 
     return val == "" ? defaultValue : val.toFloat();
 }
 
-float ProtonixRegistry::GetIntervalMax(String key, float defaultValue) {
+float ProtonixRegistry::GetIntervalMax_f(String key, float defaultValue) {
     String val = this->_tuple(key, false);
 
     return val == "" ? defaultValue : val.toFloat();

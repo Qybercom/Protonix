@@ -56,8 +56,8 @@ namespace Qybercom {
 
                 int GetIntervalMin(String key, int defaultValue);
                 int GetIntervalMax(String key, int defaultValue);
-                float GetIntervalMin(String key, float defaultValue);
-                float GetIntervalMax(String key, float defaultValue);
+                float GetIntervalMin_f(String key, float defaultValue);
+                float GetIntervalMax_f(String key, float defaultValue);
 
                 bool Commit();
         };
