@@ -1,7 +1,10 @@
 #include <Arduino.h>
 #include <Client.h>
-#include <WiFiClient.h>
+
+#if defined(ESP32) || defined(ESP8266)
 #include <StreamString.h>
+#include <WiFiClient.h>
+#endif
 
 #include "ProtonixURI.h"
 #include "ProtonixHTTPClient.h"
@@ -676,9 +679,11 @@ unsigned short ProtonixHTTPClient::TimeoutResponse() {
 	return this->_timeoutResponse;
 }
 
+#if defined(ESP32) || defined(ESP8266)
 ProtonixHTTPClient* ProtonixHTTPClient::OverWiFi() {
 	return new ProtonixHTTPClient(new WiFiClient());
 }
+#endif
 
 /*
 ProtonixHTTPClient* ProtonixHTTPClient::OverWiFi() {

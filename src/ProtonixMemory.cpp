@@ -40,16 +40,26 @@ int ProtonixMemory::RAMFree() {
 
 
 void ProtonixMemory::EEPROMBegin() {
+    #if defined(ESP32) || defined(ESP8266)
     EEPROM.begin(PROTONIX_MEMORY_EEPROM_SIZE);
+    #endif
+
     this->_eepromReady = true;
 }
 
 bool ProtonixMemory::EEPROMCommit() {
+    #if defined(ESP32) || defined(ESP8266)
     return this->_eepromReady ? EEPROM.commit() : false;
+    #else
+    return this->_eepromReady;
+    #endif
 }
 
 void ProtonixMemory::EEPROMEnd() {
+    #if defined(ESP32) || defined(ESP8266)
     EEPROM.end();
+    #endif
+
     this->_eepromReady = false;
 }
 

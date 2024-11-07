@@ -2,8 +2,11 @@
 
 #include <Arduino.h>
 #include <Client.h>
-#include <WiFiClient.h>
+
+#if defined(ESP32) || defined(ESP8266)
 #include <StreamString.h>
+#include <WiFiClient.h>
+#endif
 
 #define PROTONIX_LIMIT_HEADER_LIST 32
 
@@ -121,8 +124,10 @@ namespace Qybercom {
                 size_t readBytes(uint8_t *buffer, size_t length) override;
                 int peek() override;*/
 
+                #if defined(ESP32) || defined(ESP8266)
                 // https://forum.arduino.cc/t/using-esp32-with-ethernetclient-to-make-a-request-using-httpclient/1041648/7
             	static ProtonixHTTPClient* OverWiFi();
+                #endif
 
                 ~ProtonixHTTPClient();
         };
