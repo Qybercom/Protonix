@@ -35,7 +35,7 @@ namespace Qybercom {
 
 				void Port(unsigned int port);
 				unsigned int Port();
-                unsigned int PortConnection();
+				unsigned int PortConnection();
 
 				void Path(String path);
 				String Path();
@@ -47,7 +47,7 @@ namespace Qybercom {
 				void Fragment(String fragment);
 				String Fragment();
 
-                String URI();
+				String URI();
 		};
 	}
 }

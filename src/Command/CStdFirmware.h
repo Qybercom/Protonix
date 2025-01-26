@@ -15,23 +15,23 @@ namespace Qybercom {
 		namespace Command {
 			class CStdFirmware : public ProtonixGenericCommand {
 				private:
-                    String _action;
-                    String _version;
+					String _action;
+					String _version;
 
-                public:
-                	CStdFirmware();
+				public:
+					CStdFirmware();
 
-                    CStdFirmware* Action(String action);
-                    String Action();
+					CStdFirmware* Action(String action);
+					String Action();
 
-                    bool ActionUpdate();
+					bool ActionUpdate();
 
-                    CStdFirmware* Version(String version);
-                    String Version();
+					CStdFirmware* Version(String version);
+					String Version();
 
-                    bool VersionLatest();
+					bool VersionLatest();
 
-                    bool CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name);
+					bool CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name);
 					bool CommandSerialize();
 					void CommandReset();
 					#if defined(ESP32) || defined(ESP8266)

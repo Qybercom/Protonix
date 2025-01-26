@@ -92,11 +92,11 @@ bool ProtonixDTO::Deserialize() {
 	const char* u = this->_bufferObj["url"];
 	const char* r = this->_bufferObj["response"];
 	const char* e = this->_bufferObj["event"];
-    JsonObject d = this->_bufferObj["data"];
+	JsonObject d = this->_bufferObj["data"];
 
 	if (u) this->_url = (String)u;
 	if (r) this->_response = (String)r;
-    if (e) this->_event = (String)e;
+	if (e) this->_event = (String)e;
 	if (d) this->_data = d;
 
 	return true;

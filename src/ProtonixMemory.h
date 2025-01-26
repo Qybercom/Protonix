@@ -11,9 +11,9 @@
 #include "eboot_command.h"
 
 extern "C" {
-    #include "c_types.h"
-    #include "spi_flash.h"
-    #include "user_interface.h"
+	#include "c_types.h"
+	#include "spi_flash.h"
+	#include "user_interface.h"
 }
 
 #include <flash_hal.h> // not "flash_hal.h": can use hijacked MOCK version
@@ -32,55 +32,55 @@ extern "C" {
 namespace Qybercom {
 	namespace Protonix {
 		class ProtonixMemory {
-        	private:
-                static int _ramFree();
+			private:
+				static int _ramFree();
 
-                bool _eepromReady;
+				bool _eepromReady;
 
-                bool _flashBegin;
-                bool _flashVerified;
-                uint8_t* _flashBuffer;
-                unsigned int _flashBufferSize;
-                unsigned int _flashFirmwareSize;
-                unsigned int _flashAddressStart;
-                unsigned int _flashAddressCurrent;
+				bool _flashBegin;
+				bool _flashVerified;
+				uint8_t* _flashBuffer;
+				unsigned int _flashBufferSize;
+				unsigned int _flashFirmwareSize;
+				unsigned int _flashAddressStart;
+				unsigned int _flashAddressCurrent;
 
-            public:
-            	ProtonixMemory();
-
-
-                int RAMFree();
+			public:
+				ProtonixMemory();
 
 
-                void EEPROMBegin();
+				int RAMFree();
+
+
+				void EEPROMBegin();
 
 				template<typename T>
 				T &EEPROMGet(int const address, T &data) {
-                    if (!this->_eepromReady)
-                    	this->EEPROMBegin();
+					if (!this->_eepromReady)
+						this->EEPROMBegin();
 
-                	return EEPROM.get(address, data);
+					return EEPROM.get(address, data);
 				}
 
 				template<typename T>
 				const T &EEPROMSet(int const address, const T &data) {
-                	if (!this->_eepromReady)
-                    	this->EEPROMBegin();
+					if (!this->_eepromReady)
+						this->EEPROMBegin();
 
-                	return EEPROM.put(address, data);
+					return EEPROM.put(address, data);
 				}
 
 				template<typename T>
 				const T &EEPROMSet(int const address, const T &data, bool commit) {
-                	if (!this->_eepromReady)
-                    	this->EEPROMBegin();
+					if (!this->_eepromReady)
+						this->EEPROMBegin();
 
-                	T out = EEPROM.put(address, data);
+					T out = EEPROM.put(address, data);
 
-                    if (commit)
-                    	this->EEPROMCommit();
+					if (commit)
+						this->EEPROMCommit();
 
-                    return out;
+					return out;
 				}
 
 				bool EEPROMCommit();
@@ -88,24 +88,24 @@ namespace Qybercom {
 				void EEPROMEnd();
 
 
-                int FlashFree();
+				int FlashFree();
 
-                bool FlashFirmwareBegin(size_t size);
-                bool FlashFileSystemBegin(size_t size);
-                bool FlashWrite(String batch);
-                unsigned int FlashSize();
-                unsigned int FlashBufferSize();
-                unsigned int FlashFirmwareSize();
+				bool FlashFirmwareBegin(size_t size);
+				bool FlashFileSystemBegin(size_t size);
+				bool FlashWrite(String batch);
+				unsigned int FlashSize();
+				unsigned int FlashBufferSize();
+				unsigned int FlashFirmwareSize();
 				#if defined(ESP8266)
-                static unsigned int FlashSectorSize(size_t size);
-                static unsigned int FlashBufferSizeExpected();
-                #endif
-                bool FlashEnd();
+				static unsigned int FlashSectorSize(size_t size);
+				static unsigned int FlashBufferSizeExpected();
+				#endif
+				bool FlashEnd();
 
 				#if defined(ESP8266)
-                static void EBootCommand(uint32_t addressStart, uint32_t addressEnd, size_t size);
-                static void EBootCommandRead();
-                #endif
+				static void EBootCommand(uint32_t addressStart, uint32_t addressEnd, size_t size);
+				static void EBootCommandRead();
+				#endif
 		};
 	}
 }

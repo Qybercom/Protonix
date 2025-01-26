@@ -13,30 +13,30 @@
 namespace Qybercom {
 	namespace Protonix {
 		class ProtonixRegistry {
-        	private:
-                ProtonixMemory* _memory;
+			private:
+				ProtonixMemory* _memory;
 				JsonDocument _buffer;
 				String _bufferRaw;
 				JsonObject _bufferObj;
-                bool _bufferLoaded;
-                bool _bufferLoad();
-                String _tuple(String key, bool min);
-                bool _debug;
+				bool _bufferLoaded;
+				bool _bufferLoad();
+				String _tuple(String key, bool min);
+				bool _debug;
 
-            public:
-        		enum class ValueType {
-            		BOOLEAN,
-            		INTEGER,
-                	FLOAT,
-                	STRING,
-                	INTEGER_INTERVAL,
-                	FLOAT_INTERVAL
-        		};
+			public:
+				enum class ValueType {
+					BOOLEAN,
+					INTEGER,
+					FLOAT,
+					STRING,
+					INTEGER_INTERVAL,
+					FLOAT_INTERVAL
+				};
 
-            	ProtonixRegistry(ProtonixMemory* memory);
+				ProtonixRegistry(ProtonixMemory* memory);
 
-                ProtonixRegistry* Debug(bool debug);
-                bool Debug();
+				ProtonixRegistry* Debug(bool debug);
+				bool Debug();
 
 				/*template<typename T>
 				T Get(String key, T defaultValue);*/
@@ -47,19 +47,19 @@ namespace Qybercom {
 				template<typename T>
 				bool Set(String key, T value, bool commit);*/
 
-                String Raw();
+				String Raw();
 
 				String GetRaw(String key, String defaultValue);
 				bool SetRaw(String key, String value, bool commit);
 
-                //bool Set(Command::CStdRegistry* cmd, bool commit);
+				//bool Set(Command::CStdRegistry* cmd, bool commit);
 
-                int GetIntervalMin(String key, int defaultValue);
-                int GetIntervalMax(String key, int defaultValue);
-                float GetIntervalMin_f(String key, float defaultValue);
-                float GetIntervalMax_f(String key, float defaultValue);
+				int GetIntervalMin(String key, int defaultValue);
+				int GetIntervalMax(String key, int defaultValue);
+				float GetIntervalMin_f(String key, float defaultValue);
+				float GetIntervalMax_f(String key, float defaultValue);
 
-                bool Commit();
-        };
+				bool Commit();
+		};
 	}
 }

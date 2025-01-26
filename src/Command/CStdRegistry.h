@@ -15,19 +15,19 @@ namespace Qybercom {
 		namespace Command {
 			class CStdRegistry : public ProtonixGenericCommand {
 				private:
-                    String _key;
-                    String _value;
+					String _key;
+					String _value;
 
-                public:
-                	CStdRegistry();
+				public:
+					CStdRegistry();
 
-                    CStdRegistry* Key(String key);
-                    String Key();
+					CStdRegistry* Key(String key);
+					String Key();
 
-                    CStdRegistry* Value(String value);
-                    String Value();
+					CStdRegistry* Value(String value);
+					String Value();
 
-                    bool CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name);
+					bool CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name);
 					bool CommandSerialize();
 					void CommandReset();
 					#if defined(ESP32) || defined(ESP8266)

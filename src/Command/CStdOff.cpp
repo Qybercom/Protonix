@@ -20,7 +20,7 @@ Command::CStdOff::CStdOff() {
 
 bool Command::CStdOff::CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name) {
 	(void)device;
-    (void)port;
+	(void)port;
 
 	return this->_name == name;
 }

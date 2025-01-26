@@ -45,20 +45,21 @@ using namespace Qybercom::Protonix;
 
 ProtonixDevice::ProtonixDevice(IProtonixDevice* device) {
 	this->_timer = new ProtonixTimer();
+	this->_timerNetwork = new ProtonixTimer(1000); // TODO: refactor for custom reconnect interval
 	this->_status = new ProtonixDeviceStatus();
 	this->_ready = false;
 	this->_portCount = 0;
-    this->_hardwareCount = 0;
+	this->_hardwareCount = 0;
 	this->_actionCursorList = 0;
 	this->_actionCursorBacklog = 0;
 	this->_actionCursorCurrent = 0;
 	this->Device(device);
 	this->Debug(false);
 
-    this->_memory = new ProtonixMemory();
-    this->_memory->EEPROMBegin();
-    this->_registry = new ProtonixRegistry(this->_memory);
-    this->_registry->Debug(this->_debug); // TODO: runtime switch for every debuggable component
+	this->_memory = new ProtonixMemory();
+	this->_memory->EEPROMBegin();
+	this->_registry = new ProtonixRegistry(this->_memory);
+	this->_registry->Debug(this->_debug); // TODO: runtime switch for every debuggable component
 
 	#if defined(ESP32) || defined(ESP8266)
 	this->_networkConnected1 = false;
@@ -75,12 +76,12 @@ ProtonixDevice::ProtonixDevice(IProtonixDevice* device) {
 	digitalWrite(4, HIGH);
 	#endif
 
-    int i = 0;
-    while (i < PROTONIX_LIMIT_ACTION_BACKLOG) {
-        this->_actionBacklog[i] = "";
+	int i = 0;
+	while (i < PROTONIX_LIMIT_ACTION_BACKLOG) {
+		this->_actionBacklog[i] = "";
 
-        i++;
-    }
+		i++;
+	}
 }
 
 void ProtonixDevice::Device(IProtonixDevice* device) {
@@ -96,14 +97,18 @@ ProtonixTimer* ProtonixDevice::Timer() {
 	return this->_timer;
 }
 
+ProtonixTimer* ProtonixDevice::TimerNetwork() {
+	return this->_timerNetwork;
+}
+
 ProtonixDeviceStatus* ProtonixDevice::Status() {
 	return this->_status;
 }
 
 void ProtonixDevice::Summary(String additional) {
-    String state = this->_status->State();
+	String state = this->_status->State();
 	String summary = "[on:" + String(this->_status->On() ? "yes" : "no") + "]"
-                    + (state == "" ? "" : " [state:" + state + "]");
+					+ (state == "" ? "" : " [state:" + state + "]");
 
 	unsigned int i = 0;
 	unsigned int count = this->_status->SensorCount();
@@ -194,7 +199,7 @@ IProtonixHardware* ProtonixDevice::Hardware(String id) {
 ProtonixDevice* ProtonixDevice::Hardware(String id, IProtonixHardware* hardware) {
 	hardware->HardwareID(id);
 
-    this->_hardware[this->_hardwareCount] = hardware;
+	this->_hardware[this->_hardwareCount] = hardware;
 	this->_hardwareCount++;
 
 	return this;
@@ -206,10 +211,10 @@ ProtonixDevicePort* ProtonixDevice::Port(String name) {
 	while (i < this->_portCount) {
 		if (name == this->_ports[i]->Name())
 			return this->_ports[i];
-		
+
 		i++;
 	}
-	
+
 	return nullptr;
 }
 
@@ -306,7 +311,7 @@ ProtonixAction* ProtonixDevice::Action(String name) {
 }
 
 bool ProtonixDevice::ActionRegister(ProtonixAction* action) {
-    if (this->_actionCursorList == PROTONIX_LIMIT_ACTION_LIST) return false;
+	if (this->_actionCursorList == PROTONIX_LIMIT_ACTION_LIST) return false;
 
 	this->_actionList[this->_actionCursorList] = action;
 	this->_actionCursorList++;
@@ -335,7 +340,7 @@ bool ProtonixDevice::ActionRegister(String name, unsigned int interval, int step
 }
 
 bool ProtonixDevice::ActionTrigger(String name) {
-    if (this->_actionCursorBacklog == PROTONIX_LIMIT_ACTION_BACKLOG) return false;
+	if (this->_actionCursorBacklog == PROTONIX_LIMIT_ACTION_BACKLOG) return false;
 
 	this->_actionBacklog[this->_actionCursorBacklog] = name;
 	this->_actionCursorBacklog++;
@@ -367,68 +372,86 @@ void ProtonixDevice::ActionReset() {
 #if defined(ESP32) || defined(ESP8266)
 void ProtonixDevice::_pipeNetwork() {
 	if (this->_network == nullptr || this->_protocol == nullptr) return;
+		
+	if (!this->Connected())
+		this->_timerNetwork->Enabled(true);
 	
-	if (!this->_networkConnected1 || !this->_networkConnected2) {
-		if (!this->_networkConnected1) {
+	if (this->_timerNetwork->Pipe()) {
+		if (!this->_networkConnected1 || !this->_networkConnected2) {
+			if (!this->_networkConnected1) {
+				if (this->_debug)
+					Serial.println("[network:connect 1]");
+
+				this->_network->Connect();
+
+				if (this->_debug)
+					Serial.println("[network:connect 2]");
+
+				this->_networkConnected1 = true;
+			}
+
+			if (!this->_network->Connected()) return;
+
 			if (this->_debug)
-				Serial.println("[network:connect]");
+				Serial.println("[network:connected]");
 
-			this->_network->Connect();
-			this->_networkConnected1 = true;
+			this->_networkConnected2 = true;
+
+			this->_device->DeviceOnNetworkConnect(this);
 		}
 
-		if (!this->_network->Connected()) return;
+		if (!this->_protocolConnected1 || !this->_protocolConnected2) {
+			if (!this->_protocolConnected1) {
+				if (this->_debug)
+					Serial.println("[protocol:connect 1]");
 
-		if (this->_debug)
-			Serial.println("[network:connected]");
+				this->_protocol->Init(this);
 
-		this->_networkConnected2 = true;
+				if (this->_debug)
+					Serial.println("[protocol:connect 2]");
 
-		this->_device->DeviceOnNetworkConnect(this);
-	}
+				this->_protocol->Connect(this->_uri);
 
-	if (!this->_protocolConnected1 || !this->_protocolConnected2) {
-		if (!this->_protocolConnected1) {
+				if (this->_debug)
+					Serial.println("[protocol:connect 3]");
+			}
+
+			if (!this->_protocol->Connected()) return;
+
+			this->_protocolConnected1 = true;
+
 			if (this->_debug)
-				Serial.println("[protocol:connect]");
+				Serial.println("[protocol:connected]");
 
-			this->_protocol->Init(this);
-			this->_protocol->Connect(this->_uri);
+			this->_protocolConnected2 = true;
+
+			this->_device->DeviceOnProtocolConnect(this);
+
+			this->RequestStreamAuthorize();
 		}
 
-		if (!this->_protocol->Connected()) return;
+		if (!this->Connected()) {
+			bool onlineN = this->_network->Connected();
+			bool onlineP = this->_protocol->Connected();
 
-		this->_protocolConnected1 = true;
+			Serial.println("[WARNING] RECONNECT N:" + String(onlineN) + " P:" + String(onlineP));
 
-		if (this->_debug)
-			Serial.println("[protocol:connected]");
+			if (!onlineN) {
+				this->_networkConnected1 = false;
+				this->_networkConnected2 = false;
+			}
 
-		this->_protocolConnected2 = true;
+			if (!onlineP) {
+				this->_protocolConnected1 = false;
+				this->_protocolConnected2 = false;
+			}
 
-		this->_device->DeviceOnProtocolConnect(this);
+			return;
+		}
 
-		this->RequestStreamAuthorize();
+		this->_timerNetwork->Enabled(false);
 	}
 
-	if (!this->Connected()) {
-		bool onlineN = this->_network->Connected();
-		bool onlineP = this->_protocol->Connected();
-
-		Serial.println("[WARNING] RECONNECT N:" + String(onlineN) + " P:" + String(onlineP));
-
-		if (!onlineN) {
-			this->_networkConnected1 = false;
-			this->_networkConnected2 = false;
-		}
-
-		if (!onlineP) {
-			this->_protocolConnected1 = false;
-			this->_protocolConnected2 = false;
-		}
-
-		return;
-	}
-	
 	this->_protocol->Pipe();
 }
 #endif
@@ -437,9 +460,9 @@ void ProtonixDevice::_pipeActions() {
 	if (this->_actionCursorCurrent == PROTONIX_LIMIT_ACTION_BACKLOG)
 		this->_actionCursorCurrent = 0;
 
-    //Serial.println("!!! " + String(this->_actionCursorCurrent));
+	//Serial.println("!!! " + String(this->_actionCursorCurrent));
 
-    if (this->_actionBacklog[this->_actionCursorCurrent] == "") {
+	if (this->_actionBacklog[this->_actionCursorCurrent] == "") {
 		this->_actionCursorCurrent++;
 
 		return;
@@ -470,7 +493,7 @@ void ProtonixDevice::_pipeActions() {
 
 		i++;
 	}
-	
+
 	/*
 	if (finished) {
 		this->_actionCursorBacklog = 0;
@@ -492,25 +515,25 @@ void ProtonixDevice::Pipe() {
 			i++;
 		}
 
-        /*i = 0;
-        while (i < this->_hardwareCount) {
-            this->_hardware[i]->HardwareInitPre(this);
+		/*i = 0;
+		while (i < this->_hardwareCount) {
+			this->_hardware[i]->HardwareInitPre(this);
 
-            i++;
-        }
+			i++;
+		}
 
-        SPI.begin();
+		SPI.begin();
 
-        i = 0;
-        while (i < this->_hardwareCount) {
-            this->_hardware[i]->HardwareInitPost(this);
+		i = 0;
+		while (i < this->_hardwareCount) {
+			this->_hardware[i]->HardwareInitPost(this);
 
-            i++;
-        }*/
+			i++;
+		}*/
 
 		this->_device->DeviceOnReady(this);
 	}
-	
+
 	#if defined(ESP32) || defined(ESP8266)
 	this->_pipeNetwork();
 	#endif
@@ -586,9 +609,9 @@ bool ProtonixDevice::SerialCommandSensor(String port, ProtonixDeviceSensor* sens
 
 bool ProtonixDevice::SerialCommandSensor(String port, String id, String value) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value);
-	
+
 	bool ok = this->SerialCommandSensor(port, sensor);
-	
+
 	delete sensor;
 	sensor = nullptr;
 
@@ -597,9 +620,9 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, String value) {
 
 bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, bool active) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value, active);
-	
+
 	bool ok = this->SerialCommandSensor(port, sensor);
-	
+
 	delete sensor;
 	sensor = nullptr;
 
@@ -608,9 +631,9 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, b
 
 bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, bool active, bool failure) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value, active, failure);
-	
+
 	bool ok = this->SerialCommandSensor(port, sensor);
-	
+
 	delete sensor;
 	sensor = nullptr;
 
@@ -619,9 +642,9 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, b
 
 bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, bool active, bool failure, String state) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value, active, failure, state);
-	
+
 	bool ok = this->SerialCommandSensor(port, sensor);
-	
+
 	delete sensor;
 	sensor = nullptr;
 
@@ -630,9 +653,9 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, b
 
 bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, active);
-	
+
 	bool ok = this->SerialCommandSensor(port, sensor);
-	
+
 	delete sensor;
 	sensor = nullptr;
 
@@ -641,9 +664,9 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active) {
 
 bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active, bool failure) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, active, failure);
-	
+
 	bool ok = this->SerialCommandSensor(port, sensor);
-	
+
 	delete sensor;
 	sensor = nullptr;
 
@@ -652,9 +675,9 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active, bo
 
 bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active, bool failure, String state) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, active, failure, state);
-	
+
 	bool ok = this->SerialCommandSensor(port, sensor);
-	
+
 	delete sensor;
 	sensor = nullptr;
 
@@ -663,9 +686,9 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active, bo
 
 bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, String state) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value, state);
-	
+
 	bool ok = this->SerialCommandSensor(port, sensor);
-	
+
 	delete sensor;
 	sensor = nullptr;
 
@@ -733,20 +756,20 @@ bool ProtonixDevice::Connected() {
 
 void ProtonixDevice::RequestStream(String url, IProtonixDTORequest* request) {
 	String error = "";
-	
+
 	if (this->Connected()) {
 		this->_dtoOutput->Debug(this->_debug);
 		this->_dtoOutput->URL(url);
 		this->_dtoOutput->DTO(request);
-		
+
 		if (this->_dtoOutput->Serialize()) this->_protocol->Send(this->_dtoOutput->BufferRaw());
 		else error = "Cannot serialize request";
 	}
 	else error = "Device not connected, can not send request";
-	
+
 	if (this->_debug && error != "")
 		Serial.println("[WARNING] " + error);
-	
+
 	delete request;
 	request = nullptr;
 
@@ -844,118 +867,118 @@ ProtonixDTO* ProtonixDevice::DTOOutput() {
 
 bool ProtonixDevice::FirmwareUpdateOTA(String version) {
 	String url = this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID() + "?platform=";
-    String ver = version == "" ? "" : String("&version=" + version);
+	String ver = version == "" ? "" : String("&version=" + version);
 
 	#if defined(ESP32)
-    	t_httpUpdate_return out = ESPhttpUpdate.update(url + "esp32" + ver);
+		t_httpUpdate_return out = ESPhttpUpdate.update(url + "esp32" + ver);
 
-    	return out == HTTP_UPDATE_OK;
+		return out == HTTP_UPDATE_OK;
 	#elif defined(ESP8266)
 		WiFiClient client;
-    	t_httpUpdate_return out = ESPhttpUpdate.update(client, url + "esp8266" + ver);
+		t_httpUpdate_return out = ESPhttpUpdate.update(client, url + "esp8266" + ver);
 
-    	return out == HTTP_UPDATE_OK;
-    #else
+		return out == HTTP_UPDATE_OK;
+	#else
 		return false;
-    #endif
+	#endif
 }
 
 /*
 bool ProtonixDevice::FirmwareUpdateOTA(void(*onProgress)(int, int)) {
 	ProtonixHTTPClient* http = ProtonixHTTPClient::OverWiFi();
-    http->Debug(this->_debug);
+	http->Debug(this->_debug);
 
-    ProtonixHTTPFrame* request = new ProtonixHTTPFrame("GET", this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID());
-    http->Request(request);
+	ProtonixHTTPFrame* request = new ProtonixHTTPFrame("GET", this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID());
+	http->Request(request);
 
-    bool ok = http->Send();
+	bool ok = http->Send();
 
-    if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not connect to HTTP server for meta");
-    else {
-        Serial.println("[ota:http] sent");
+	if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not connect to HTTP server for meta");
+	else {
+		Serial.println("[ota:http] sent");
 
-        ok = http->ReceiveHeaders();
+		ok = http->ReceiveHeaders();
 
-        if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not receive HTTP headers");
-        else {
-            Serial.println("[ota:http] receiveHeaders");
+		if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not receive HTTP headers");
+		else {
+			Serial.println("[ota:http] receiveHeaders");
 
-            ok = this->_memory->FlashFirmwareBegin(http->Response()->LengthExpected());
+			ok = this->_memory->FlashFirmwareBegin(http->Response()->LengthExpected());
 
-            if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not begin firmware flashing sequence");
-            else {
-                Serial.println("[ota:flash] begin");
+			if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not begin firmware flashing sequence");
+			else {
+				Serial.println("[ota:flash] begin");
 
-                int i = 1;
-                unsigned int bufferSize = this->_memory->FlashBufferSize();
+				int i = 1;
+				unsigned int bufferSize = this->_memory->FlashBufferSize();
 
-                while (http->ReceiveAvailable()) {
-                    String batch = http->ReceiveBody(bufferSize);
+				while (http->ReceiveAvailable()) {
+					String batch = http->ReceiveBody(bufferSize);
 
-                    //Serial.println("[ota:http] receiveBody " + String(i));// + ": " + batch);
+					//Serial.println("[ota:http] receiveBody " + String(i));// + ": " + batch);
 
-                    ok = this->_memory->FlashWrite(batch);
+					ok = this->_memory->FlashWrite(batch);
 
-                    if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: flash write failed at step " + String(i));
-                    else {
-                        //Serial.println("[ota:flash] write " + String(i));// + ": " + batch);
-                    }
+					if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: flash write failed at step " + String(i));
+					else {
+						//Serial.println("[ota:flash] write " + String(i));// + ": " + batch);
+					}
 
-                    i++;
-                }
+					i++;
+				}
 
-                ok = this->_memory->FlashEnd();
+				ok = this->_memory->FlashEnd();
 
-                if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not end flashing sequence");
-                else {
-                    Serial.println("[ota:flash] end");
-                }
-            }
-        }
-    }
+				if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not end flashing sequence");
+				else {
+					Serial.println("[ota:flash] end");
+				}
+			}
+		}
+	}
 
-    return ok;
+	return ok;
 }
 */
 
 /*
 bool ProtonixDevice::FirmwareUpdateOTA(void(*onProgress)(int, int)) {
 	ProtonixHTTPClient* http = ProtonixHTTPClient::OverWiFi();
-    http->Debug(this->_debug);
-    //http->TimeoutResponse(5000);
+	http->Debug(this->_debug);
+	//http->TimeoutResponse(5000);
 
 	ProtonixHTTPFrame* request = new ProtonixHTTPFrame("GET", this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID());
-    //ProtonixHTTPFrame* request = new ProtonixHTTPFrame("GET", "http://arduino.evolutex.ru/cdn/mechanism-15-esp8266.ino.bin");
-    request->Debug(this->_debug);
+	//ProtonixHTTPFrame* request = new ProtonixHTTPFrame("GET", "http://arduino.evolutex.ru/cdn/mechanism-15-esp8266.ino.bin");
+	request->Debug(this->_debug);
 
-    http->Request(request);
+	http->Request(request);
 
 	bool ok = http->Send();
 
-    if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not connect to HTTP server for meta");
-    else {
+	if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not connect to HTTP server for meta");
+	else {
 		ok = http->Receive();
 
-        if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not receive response from HTTP server for meta");
-        else {
+		if (!ok) Serial.println("[WARNING] FirmwareUpdateOTA failed: can not receive response from HTTP server for meta");
+		else {
 			//Serial.println("[debug] http recv " + String(ok) + ": `" + http->Response()->Version() + "` `" + http->Response()->Status() + "` `" + http->Response()->Body() + "`");
-            if (http->Response()->Status() != "200 OK") Serial.println("[WARNING] FirmwareUpdateOTA failed: can not find suitable firmware image on the HTTP server");
-            else {
-            	/*String firmware = http->Response()->Body();
+			if (http->Response()->Status() != "200 OK") Serial.println("[WARNING] FirmwareUpdateOTA failed: can not find suitable firmware image on the HTTP server");
+			else {
+				/*String firmware = http->Response()->Body();
 
-                ok = this->FirmwareUpdate(firmware, onProgress);*
-                ok = this->FirmwareUpdate(*http, onProgress);
-            }
-        }
-    }
+				ok = this->FirmwareUpdate(firmware, onProgress);*
+				ok = this->FirmwareUpdate(*http, onProgress);
+			}
+		}
+	}
 
-    delete request;
-    request = nullptr;
+	delete request;
+	request = nullptr;
 
-    delete http;
-    http = nullptr;
+	delete http;
+	http = nullptr;
 
-    return ok;
+	return ok;
 }
 */
 
@@ -968,56 +991,56 @@ bool ProtonixDevice::FirmwareUpdate(String firmware, void(*onProgress)(int, int)
 /*
 bool ProtonixDevice::FirmwareUpdate(Stream& stream, void(*onProgress)(int, int)) {
 	//StreamString stream = StreamString(firmware);
-    StreamString error;
+	StreamString error;
 
-    //String md5 = "TESTMD5";
-    unsigned int size = stream.available();
-    int cmd = U_FLASH; // U_FS
-    bool result = false;
+	//String md5 = "TESTMD5";
+	unsigned int size = stream.available();
+	int cmd = U_FLASH; // U_FS
+	bool result = false;
 
-    //Serial.println("[debug] firmware: " + String(firmware.length()));
-    Serial.println("[debug] stream: " + String(size));
-    Serial.println("[debug] flash: " + String(ProtonixDevice::FreeFlash()));
+	//Serial.println("[debug] firmware: " + String(firmware.length()));
+	Serial.println("[debug] stream: " + String(size));
+	Serial.println("[debug] flash: " + String(ProtonixDevice::FreeFlash()));
 
-    if (onProgress)
-    	Update.onProgress(onProgress);
+	if (onProgress)
+		Update.onProgress(onProgress);
 
-    if (!Update.begin(size, cmd)) this->_updateError("begin", error);
-    else {
-      	Serial.println("[debug] FirmwareUpdate begin");
+	if (!Update.begin(size, cmd)) this->_updateError("begin", error);
+	else {
+	  	Serial.println("[debug] FirmwareUpdate begin");
 
-    	if (onProgress)
-    		onProgress(0, size);
+		if (onProgress)
+			onProgress(0, size);
 
-        // TODO: think of necessarity
-    	//if (!Update.setMD5(md5.c_str()))
-      		//this->_updateError("md5", error);
+		// TODO: think of necessarity
+		//if (!Update.setMD5(md5.c_str()))
+	  		//this->_updateError("md5", error);
 
-        if (Update.writeStream(stream) != size) this->_updateError("writeStream", error);
-        else {
-        	Serial.println("[debug] FirmwareUpdate writeStream");
+		if (Update.writeStream(stream) != size) this->_updateError("writeStream", error);
+		else {
+			Serial.println("[debug] FirmwareUpdate writeStream");
 
-    		if (onProgress)
-    			onProgress(size, size);
+			if (onProgress)
+				onProgress(size, size);
 
-            if (!Update.end()) this->_updateError("end", error);
-            else {
-        		Serial.println("[debug] FirmwareUpdate end");
+			if (!Update.end()) this->_updateError("end", error);
+			else {
+				Serial.println("[debug] FirmwareUpdate end");
 
-                result = true;
-        	}
-        }
+				result = true;
+			}
+		}
 	}
 
-    //delete stream;
-    //stream = nullptr;
+	//delete stream;
+	//stream = nullptr;
 
-    return result;
+	return result;
 }
 
 void ProtonixDevice::_updateError(String step, StreamString &error) {
-    Update.printError(error);
-    Serial.println("[WARNING] FirmwareUpdate error (" + step + "): " + String(error.c_str()));
+	Update.printError(error);
+	Serial.println("[WARNING] FirmwareUpdate error (" + step + "): " + String(error.c_str()));
 }
 */
 #endif

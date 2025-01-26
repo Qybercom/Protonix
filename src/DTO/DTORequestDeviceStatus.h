@@ -13,7 +13,7 @@ namespace Qybercom {
 			class DTORequestDeviceStatus : public IProtonixDTORequest {
 				private:
 					ProtonixDeviceStatus* _status;
-                    String _registry;
+					String _registry;
 
 				public:
 					DTORequestDeviceStatus();

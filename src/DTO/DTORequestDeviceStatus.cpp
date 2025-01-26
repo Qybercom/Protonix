@@ -16,7 +16,7 @@ DTO::DTORequestDeviceStatus::DTORequestDeviceStatus() {
 
 DTO::DTORequestDeviceStatus::DTORequestDeviceStatus(ProtonixDeviceStatus* status, String registry) {
 	this->Status(status);
-    this->Registry(registry);
+	this->Registry(registry);
 }
 
 void DTO::DTORequestDeviceStatus::Status(ProtonixDeviceStatus* status) {

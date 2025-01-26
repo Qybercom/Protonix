@@ -8,7 +8,7 @@ using namespace Qybercom::Protonix;
 
 Hardware::HRelay::HRelay(unsigned short pin, bool inverted) {
 	this->_pin = pin;
-    this->_inverted = inverted;
+	this->_inverted = inverted;
 }
 
 void Hardware::HRelay::Open() {
@@ -28,7 +28,7 @@ void Hardware::HRelay::HardwareInitPost(ProtonixDevice* device) {
 
 	pinMode(this->_pin, OUTPUT);
 
-    this->Close();
+	this->Close();
 }
 
 void Hardware::HRelay::HardwarePipe(ProtonixDevice* device) {

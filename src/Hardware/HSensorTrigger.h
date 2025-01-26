@@ -7,16 +7,16 @@
 
 namespace Qybercom {
 	namespace Protonix {
-        namespace Hardware {
+		namespace Hardware {
 			class HSensorTrigger : public IProtonixHardware {
-                private:
+				private:
 
 
-	            public:
+				public:
 					void HardwareInitPre(ProtonixDevice* device);
 					void HardwareInitPost(ProtonixDevice* device);
-                    void HardwarePipe(ProtonixDevice* device);
+					void HardwarePipe(ProtonixDevice* device);
 			};
-        }
+		}
 	}
 }

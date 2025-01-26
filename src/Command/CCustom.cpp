@@ -33,7 +33,7 @@ String Command::CCustom::CMD() {
 
 bool Command::CCustom::CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name) {
 	(void)device;
-    (void)port;
+	(void)port;
 
 	String n = name.substring(0, 7);
 	if (n != "custom:") return false;

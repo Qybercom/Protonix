@@ -19,7 +19,7 @@ SoftwareSerial __port__ = SoftwareSerial(0, 0);
 #endif
 
 void ProtonixDevicePort::_init(bool serial, String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, unsigned int timeout, bool blocking, bool observable) {
-    this->_started = false;
+	this->_started = false;
 	this->_serial = serial;
 
 	this->_pinRX = pinRX;
@@ -42,15 +42,15 @@ void ProtonixDevicePort::_init(bool serial, String name, unsigned int pinRX, uns
 	
 	this->_lenActive = false;
 
-    #if defined(ESP32) || defined(ESP8266)
+	#if defined(ESP32) || defined(ESP8266)
 	this->_cmds[0] = new Command::CCustom();
 	this->_cmds[1] = new Command::CStdFirmware();
 	this->_cmds[2] = new Command::CStdOff();
 	this->_cmds[3] = new Command::CStdOn();
 	this->_cmds[4] = new Command::CStdReboot();
 	this->_cmds[5] = new Command::CStdRegistry();
-    #endif
-    this->_cmds[6] = new Command::CStdSensor();
+	#endif
+	this->_cmds[6] = new Command::CStdSensor();
 }
 
 byte ProtonixDevicePort::_crc8(String data) {
@@ -300,7 +300,7 @@ void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 		::Serial.println("[WARNING] Message corrupted: e:" + this->_lenBuffer + " a:" + lenBuffer);
 	}
 	else {
-        //::Serial.println("[debug] cmd " + String(s));
+		//::Serial.println("[debug] cmd " + String(s));
 
 		while (i < 7) {
 			if (this->_cmds[i] != nullptr && this->_cmds[i]->CommandRecognize(device, this, this->_blocking ? s : this->_cmdBuffer)) {

@@ -6,27 +6,27 @@
 
 namespace Qybercom {
 	namespace Protonix {
-        class ProtonixDevice;
+		class ProtonixDevice;
 
 		class IProtonixHardware {
-        	protected:
-                String _id;
+			protected:
+				String _id;
 
 			public:
-                IProtonixHardware* HardwareID(String id) {
-                	this->_id = id;
+				IProtonixHardware* HardwareID(String id) {
+					this->_id = id;
 
-                    return this;
-                }
+					return this;
+				}
 
-                String HardwareID() {
-                	return this->_id;
-                }
+				String HardwareID() {
+					return this->_id;
+				}
 
 				virtual void HardwareInitPre(ProtonixDevice* device) = 0;
 				virtual void HardwareInitPost(ProtonixDevice* device) = 0;
 
-                virtual void HardwarePipe(ProtonixDevice* device) = 0;
+				virtual void HardwarePipe(ProtonixDevice* device) = 0;
 		};
 	}
 }

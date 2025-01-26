@@ -20,7 +20,7 @@ Command::CStdFirmware::CStdFirmware() {
 Command::CStdFirmware* Command::CStdFirmware::Action(String action) {
 	this->_action = action;
 
-    return this;
+	return this;
 }
 
 String Command::CStdFirmware::Action() {
@@ -34,7 +34,7 @@ bool Command::CStdFirmware::ActionUpdate() {
 Command::CStdFirmware* Command::CStdFirmware::Version(String version) {
 	this->_version = version;
 
-    return this;
+	return this;
 }
 
 String Command::CStdFirmware::Version() {
@@ -73,10 +73,10 @@ bool Command::CStdFirmware::CommandRecognize(ProtonixDevice* device, ProtonixDev
 		i++;
 	}
 
-    this->Action(action);
-    this->Version(version);
+	this->Action(action);
+	this->Version(version);
 
-    return true;
+	return true;
 }
 
 bool Command::CStdFirmware::CommandSerialize() {

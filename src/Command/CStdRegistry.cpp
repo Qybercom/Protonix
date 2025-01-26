@@ -20,7 +20,7 @@ Command::CStdRegistry::CStdRegistry() {
 Command::CStdRegistry* Command::CStdRegistry::Key(String key) {
 	this->_key = key;
 
-    return this;
+	return this;
 }
 
 String Command::CStdRegistry::Key() {
@@ -30,7 +30,7 @@ String Command::CStdRegistry::Key() {
 Command::CStdRegistry* Command::CStdRegistry::Value(String value) {
 	this->_value = value;
 
-    return this;
+	return this;
 }
 
 String Command::CStdRegistry::Value() {
@@ -65,9 +65,9 @@ bool Command::CStdRegistry::CommandRecognize(ProtonixDevice* device, ProtonixDev
 		i++;
 	}
 
-    this->Value(value);
+	this->Value(value);
 
-    return true;
+	return true;
 }
 
 bool Command::CStdRegistry::CommandSerialize() {

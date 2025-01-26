@@ -35,7 +35,7 @@ ProtonixDeviceSensor* Command::CStdSensor::Sensor() {
 
 bool Command::CStdSensor::CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name) {
 	(void)device;
-    (void)port;
+	(void)port;
 
 	String n = name.substring(0, 10);
 	if (n != this->_name) return false;

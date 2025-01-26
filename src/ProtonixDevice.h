@@ -43,12 +43,13 @@ namespace Qybercom {
 			private:
 				IProtonixDevice* _device;
 				ProtonixTimer* _timer;
+				ProtonixTimer* _timerNetwork;
 				ProtonixDeviceStatus* _status;
 				bool _ready;
 				bool _debug;
-                ProtonixMemory* _memory;
-                ProtonixRegistry* _registry;
-                String _serverBaseURI;
+				ProtonixMemory* _memory;
+				ProtonixRegistry* _registry;
+				String _serverBaseURI;
 
 				unsigned int _hardwareCount;
 				IProtonixHardware* _hardware[PROTONIX_LIMIT_HARDWARE];
@@ -79,7 +80,7 @@ namespace Qybercom {
 				void _onStreamResponse();
 				void _onStreamEvent();
 
-                //void _updateError(String step, StreamString &error);
+				//void _updateError(String step, StreamString &error);
 				#endif
 
 			public:
@@ -88,16 +89,17 @@ namespace Qybercom {
 				void Device(IProtonixDevice* device);
 				IProtonixDevice* Device();
 				ProtonixTimer* Timer();
+				ProtonixTimer* TimerNetwork();
 				ProtonixDeviceStatus* Status();
 				void Summary(String additional);
 				bool Ready();
 				unsigned int Tick();
 				void Debug(bool debug);
 				bool Debug();
-                ProtonixMemory* Memory();
-                ProtonixRegistry* Registry();
+				ProtonixMemory* Memory();
+				ProtonixRegistry* Registry();
 				static int FreeRAM();
-                static int FreeFlash();
+				static int FreeFlash();
 				static void Reboot();
 
 				IProtonixHardware* Hardware(String id);
@@ -160,16 +162,16 @@ namespace Qybercom {
 				ProtonixURI* Server();
 				void ServerEndpoint(String host, unsigned int port);
 				void ServerEndpoint(String host, unsigned int port, String path);
-                void ServerBaseURI(String uri);
+				void ServerBaseURI(String uri);
 				bool Connected();
 				void OnStream(unsigned char* data);
 				void RequestStream(String url, IProtonixDTORequest* request);
 				void RequestStreamAuthorize();
 				ProtonixDTO* DTOInput();
 				ProtonixDTO* DTOOutput();
-                bool FirmwareUpdateOTA(String version = "");
-                //bool FirmwareUpdateOTA(void(*onProgress)(int, int) = nullptr);
-                //bool FirmwareUpdate(String firmware, void(*onProgress)(int, int) = nullptr);
+				bool FirmwareUpdateOTA(String version = "");
+				//bool FirmwareUpdateOTA(void(*onProgress)(int, int) = nullptr);
+				//bool FirmwareUpdate(String firmware, void(*onProgress)(int, int) = nullptr);
 				//bool FirmwareUpdate(Stream& stream, void(*onProgress)(int, int) = nullptr);
 				#endif
 		};

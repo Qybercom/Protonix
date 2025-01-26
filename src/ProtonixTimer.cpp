@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 #include "ProtonixTimer.h"
 
 using namespace Qybercom::Protonix;
@@ -5,6 +7,7 @@ using namespace Qybercom::Protonix;
 
 
 ProtonixTimer::ProtonixTimer() {
+	this->_enabled = true;
 	this->_previous = 0;
 
 	this->Interval(0);
@@ -12,6 +15,7 @@ ProtonixTimer::ProtonixTimer() {
 }
 
 ProtonixTimer::ProtonixTimer(unsigned int interval) {
+	this->_enabled = true;
 	this->_previous = 0;
 
 	this->Interval(interval);
@@ -19,6 +23,7 @@ ProtonixTimer::ProtonixTimer(unsigned int interval) {
 }
 
 ProtonixTimer::ProtonixTimer(unsigned int interval, ProtonixTimer::ProtonixTimerUnit unit) {
+	this->_enabled = true;
 	this->_previous = 0;
 
 	this->Interval(interval);
@@ -45,6 +50,14 @@ ProtonixTimer::ProtonixTimerUnit ProtonixTimer::Unit() {
 	return this->_unit;
 }
 
+void ProtonixTimer::Enabled(bool enabled) {
+	this->_enabled = enabled;
+}
+
+bool ProtonixTimer::Enabled() {
+	return this->_enabled;
+}
+
 bool ProtonixTimer::Pipe() {
 	unsigned long current = 0;
 
@@ -61,7 +74,7 @@ bool ProtonixTimer::Pipe() {
 	if (elapsed)
 		this->_previous = current;
 
-	return elapsed;
+	return this->_enabled ? elapsed : false;
 }
 
 void ProtonixTimer::Reset() {

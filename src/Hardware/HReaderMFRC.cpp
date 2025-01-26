@@ -13,13 +13,13 @@ using namespace Qybercom::Protonix;
 
 Hardware::HReaderMFRC::HReaderMFRC(int pinSS, int pinRST) {
 	this->PinSS(pinSS);
-    this->PinRST(pinRST);
+	this->PinRST(pinRST);
 }
 
 Hardware::HReaderMFRC* Hardware::HReaderMFRC::PinSS(int pinSS) {
 	this->_pinSS = pinSS;
 
-    return this;
+	return this;
 }
 
 int Hardware::HReaderMFRC::PinSS() {
@@ -29,7 +29,7 @@ int Hardware::HReaderMFRC::PinSS() {
 Hardware::HReaderMFRC* Hardware::HReaderMFRC::PinRST(int pinRST) {
 	this->_pinRST = pinRST;
 
-    return this;
+	return this;
 }
 
 int Hardware::HReaderMFRC::PinRST() {
@@ -43,14 +43,14 @@ byte Hardware::HReaderMFRC::AntennaGain() {
 String Hardware::HReaderMFRC::Version() {
 	byte v = this->_reader.PCD_ReadRegister(MFRC522::PCD_Register::VersionReg);
 
-    if (v == 0x88) return "(clone)";
-    if (v == 0x90) return "v0.0";
-    if (v == 0x91) return "v1.0";
-    if (v == 0x92) return "v2.0";
-    if (v == 0x12) return "counterfeit chip";
-    if ((v == 0x00) || (v == 0xFF)) return "(err)";
+	if (v == 0x88) return "(clone)";
+	if (v == 0x90) return "v0.0";
+	if (v == 0x91) return "v1.0";
+	if (v == 0x92) return "v2.0";
+	if (v == 0x12) return "counterfeit chip";
+	if ((v == 0x00) || (v == 0xFF)) return "(err)";
 
-    return "(unknown)";
+	return "(unknown)";
 }
 
 String Hardware::HReaderMFRC::CardSerial() {

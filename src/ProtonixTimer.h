@@ -23,11 +23,15 @@ namespace Qybercom {
 				void Unit(ProtonixTimerUnit unit);
 				ProtonixTimerUnit Unit();
 
+				void Enabled(bool enabled);
+				bool Enabled();
+
 				bool Pipe();
 
 				void Reset();
 
 			private:
+				bool _enabled;
 				unsigned long _previous;
 				unsigned int _interval;
 				ProtonixTimerUnit _unit;

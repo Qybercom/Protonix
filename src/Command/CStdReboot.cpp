@@ -20,7 +20,7 @@ Command::CStdReboot::CStdReboot() {
 
 bool Command::CStdReboot::CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name) {
 	(void)device;
-    (void)port;
+	(void)port;
 
 	return this->_name == name;
 }
