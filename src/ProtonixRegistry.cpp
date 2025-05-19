@@ -190,7 +190,7 @@ ProtonixRegistryList ProtonixRegistry::GetList(String key, String defaultValue) 
 	int j = 0;
 	char c;
 
-	while (i < length) {
+	while (i < length && j < 20) {
 		c = raw.charAt(i);
 
 		if (c == ';') j++;
@@ -208,6 +208,20 @@ ProtonixRegistryList ProtonixRegistry::GetList(String key, String defaultValue) 
 	}
 
 	return list;
+}
+
+bool ProtonixRegistry::GetListItemExists(String key, String value) {
+	ProtonixRegistryList list = this->GetList(key, "");
+
+	unsigned short i = 0;
+
+	while (i < 20) {
+		if (list.items[i] == value) return true;
+
+		i++;
+	}
+
+	return false;
 }
 
 bool ProtonixRegistry::SetList(String key, String value, bool commit) {
