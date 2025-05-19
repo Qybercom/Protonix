@@ -10,6 +10,9 @@ using namespace Qybercom::Protonix;
 ProtonixDeviceStatus::ProtonixDeviceStatus() {
 	this->_firmware = "";
 	this->_on = true;
+	this->_state = "";
+	this->_uptime = "";
+	this->_summary = "";
 	this->_sensorCount = 0;
 }
 
@@ -35,6 +38,14 @@ void ProtonixDeviceStatus::State(String state) {
 
 String ProtonixDeviceStatus::State() {
 	return this->_state;
+}
+
+void ProtonixDeviceStatus::Uptime(String uptime) {
+	this->_uptime = uptime;
+}
+
+String ProtonixDeviceStatus::Uptime() {
+	return this->_uptime;
 }
 
 void ProtonixDeviceStatus::Summary(String summary) {

@@ -42,8 +42,9 @@ namespace Qybercom {
 		class ProtonixDevice {
 			private:
 				IProtonixDevice* _device;
-				ProtonixTimer* _timer;
+				ProtonixTimer* _timerTick;
 				ProtonixTimer* _timerNetwork;
+				ProtonixTimer* _timerUptime;
 				ProtonixDeviceStatus* _status;
 				bool _ready;
 				bool _debug;
@@ -88,8 +89,9 @@ namespace Qybercom {
 				
 				void Device(IProtonixDevice* device);
 				IProtonixDevice* Device();
-				ProtonixTimer* Timer();
+				ProtonixTimer* TimerTick();
 				ProtonixTimer* TimerNetwork();
+				ProtonixTimer* TimerUptime();
 				ProtonixDeviceStatus* Status();
 				void Summary(String additional);
 				bool Ready();
@@ -156,8 +158,10 @@ namespace Qybercom {
 				#if defined(ESP32) || defined(ESP8266)
 				void Network(IProtonixNetwork* network);
 				IProtonixNetwork* Network();
+				bool NetworkConnected();
 				void Protocol(IProtonixProtocol* protocol);
 				IProtonixProtocol* Protocol();
+				bool ProtocolConnected();
 				void Server(ProtonixURI* uri);
 				ProtonixURI* Server();
 				void ServerEndpoint(String host, unsigned int port);

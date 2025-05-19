@@ -28,6 +28,10 @@ void DTO::DTOResponseDeviceStatus::DTOSerialize(JsonDocument& dto) {
 	dto["data"]["status"] = this->_status;
 }
 
+String DTO::DTOResponseDeviceStatus::DTOSerializeFilter(String raw) {
+	return raw;
+}
+
 unsigned short DTO::DTOResponseDeviceStatus::DTOResponseStatus() {
 	return this->_status;
 }

@@ -5,13 +5,20 @@
 
 #include "ProtonixMemory.h"
 
-//#include "Command/CStdRegistry.h"
-
-//#define PROTONIX_REGISTRY_START 0x0128
 #define PROTONIX_REGISTRY_START 0
 
 namespace Qybercom {
 	namespace Protonix {
+		struct ProtonixRegistryColor {
+			int r;
+			int g;
+			int b;
+		};
+
+		struct ProtonixRegistryList {
+			String items[20];
+		};
+
 		class ProtonixRegistry {
 			private:
 				ProtonixMemory* _memory;
@@ -29,6 +36,7 @@ namespace Qybercom {
 					INTEGER,
 					FLOAT,
 					STRING,
+					COLOR,
 					INTEGER_INTERVAL,
 					FLOAT_INTERVAL
 				};
@@ -38,21 +46,24 @@ namespace Qybercom {
 				ProtonixRegistry* Debug(bool debug);
 				bool Debug();
 
-				/*template<typename T>
-				T Get(String key, T defaultValue);*/
-
-				/*template<typename T>
-				bool Set(String key, T value);
-
-				template<typename T>
-				bool Set(String key, T value, bool commit);*/
-
 				String Raw();
 
 				String GetRaw(String key, String defaultValue);
 				bool SetRaw(String key, String value, bool commit);
 
-				//bool Set(Command::CStdRegistry* cmd, bool commit);
+				int GetInt(String key, int defaultValue);
+				bool SetInt(String key, int value, bool commit);
+
+				float GetFloat(String key, float defaultValue);
+				bool SetFloat(String key, float value, bool commit);
+
+				ProtonixRegistryColor GetColor(String key, String defaultValue);
+				bool SetColor(String key, String value, bool commit);
+				bool SetColor(String key, ProtonixRegistryColor &color, bool commit);
+
+				ProtonixRegistryList GetList(String key, String defaultValue);
+				bool SetList(String key, String value, bool commit);
+				bool SetList(String key, ProtonixRegistryList &list, bool commit);
 
 				int GetIntervalMin(String key, int defaultValue);
 				int GetIntervalMax(String key, int defaultValue);

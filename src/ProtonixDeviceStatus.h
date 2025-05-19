@@ -16,10 +16,11 @@ namespace Qybercom {
 			private:
 				String _firmware;
 				bool _on;
+				String _state;
+				String _uptime;
 				String _summary;
 				ProtonixDeviceSensor* _sensors[PROTONIX_LIMIT_SENSORS];
 				unsigned int _sensorCount;
-				String _state;
 
 			public:
 				ProtonixDeviceStatus();
@@ -32,6 +33,9 @@ namespace Qybercom {
 
 				void State(String state);
 				String State();
+
+				void Uptime(String uptime);
+				String Uptime();
 
 				void Summary(String summary);
 				String Summary();

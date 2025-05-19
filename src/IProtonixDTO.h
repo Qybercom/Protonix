@@ -13,6 +13,7 @@ namespace Qybercom {
 			public:
 				virtual void DTOPopulate(ProtonixDTO* dto);
 				virtual void DTOSerialize(JsonDocument& dto);
+				virtual String DTOSerializeFilter(String raw);
 				virtual ~IProtonixDTO() {};
 		};
 

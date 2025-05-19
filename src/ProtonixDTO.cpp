@@ -8,8 +8,8 @@ using namespace Qybercom::Protonix;
 
 
 ProtonixDTO::ProtonixDTO() {
-	this->_debug = false;
 	this->_bufferRaw = "";
+	this->_debug = false;
 }
 
 void ProtonixDTO::URL(String url) {
@@ -75,7 +75,11 @@ bool ProtonixDTO::Serialize() {
 
 	this->_dto->DTOSerialize(this->_buffer);
 
-	return serializeJson(this->_buffer, this->_bufferRaw) != 0;
+	bool ok = serializeJson(this->_buffer, this->_bufferRaw) != 0;
+
+	this->_bufferRaw = this->_dto->DTOSerializeFilter(this->_bufferRaw);
+
+	return ok;
 }
 
 bool ProtonixDTO::Deserialize() {

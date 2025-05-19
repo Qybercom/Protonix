@@ -9,6 +9,7 @@ using namespace Qybercom::Protonix;
 ProtonixTimer::ProtonixTimer() {
 	this->_enabled = true;
 	this->_previous = 0;
+	this->_overflows = 0;
 
 	this->Interval(0);
 	this->Unit(ProtonixTimer::ProtonixTimerUnit::MILLISECONDS);
@@ -32,6 +33,48 @@ ProtonixTimer::ProtonixTimer(unsigned int interval, ProtonixTimer::ProtonixTimer
 
 unsigned long ProtonixTimer::Previous() {
 	return this->_previous;
+}
+
+unsigned long long ProtonixTimer::TotalMilliseconds() {
+	return this->_totalMS;
+}
+
+unsigned long long ProtonixTimer::TotalSeconds() {
+	return this->_totalS;
+}
+
+unsigned int ProtonixTimer::RunDays() {
+	return this->_totalS / 86400;
+}
+
+unsigned int ProtonixTimer::RunHours() {
+	return (this->_totalS % 86400) / 3600;
+}
+
+unsigned int ProtonixTimer::RunMinutes() {
+	return (this->_totalS % 3600) / 60;
+}
+
+unsigned int ProtonixTimer::RunSeconds() {
+	return this->_totalS % 60;
+}
+
+unsigned int ProtonixTimer::RunMilliseconds() {
+	return this->_totalMS % 1000;
+}
+
+String ProtonixTimer::RunTime() {
+	unsigned int h = this->RunHours();
+	unsigned int m = this->RunMinutes();
+	unsigned int s = this->RunSeconds();
+	unsigned int ms = this->RunMilliseconds();
+
+	return ""
+		+ String(this->RunDays()) + String(":")
+		+ String(h < 10 ? "0" : "") + String(h) + String(":")
+		+ String(m < 10 ? "0" : "") + String(m) + String(":")
+		+ String(s < 10 ? "0" : "") + String(s) + String(":")
+		+ String(ms < 10 ? "00" : String(ms < 100 ? "0" : "")) + String(ms);
 }
 
 void ProtonixTimer::Interval(int interval) {
@@ -68,8 +111,15 @@ bool ProtonixTimer::Pipe() {
 		current = micros();
 
 	long diff = current - this->_previous;
+
+	if (diff < 0)
+		this->_overflows++;
+
 	bool elapsed = diff < 0 || diff >= this->_interval;
 	//bool elapsed = diff >= this->_interval;
+
+	this->_totalMS = (unsigned long long)this->_overflows * TIMER_MAX + current;
+	this->_totalS = this->_totalMS / 1000;
 
 	if (elapsed)
 		this->_previous = current;

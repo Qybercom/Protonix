@@ -44,8 +44,9 @@ using namespace Qybercom::Protonix;
 
 
 ProtonixDevice::ProtonixDevice(IProtonixDevice* device) {
-	this->_timer = new ProtonixTimer();
+	this->_timerTick = new ProtonixTimer();
 	this->_timerNetwork = new ProtonixTimer(1000); // TODO: refactor for custom reconnect interval
+	this->_timerUptime = new ProtonixTimer();
 	this->_status = new ProtonixDeviceStatus();
 	this->_ready = false;
 	this->_portCount = 0;
@@ -86,19 +87,23 @@ ProtonixDevice::ProtonixDevice(IProtonixDevice* device) {
 
 void ProtonixDevice::Device(IProtonixDevice* device) {
 	this->_device = device;
-	this->_timer->Interval(this->_device->DeviceTick());
+	this->_timerTick->Interval(this->_device->DeviceTick());
 }
 
 IProtonixDevice* ProtonixDevice::Device() {
 	return this->_device;
 }
 
-ProtonixTimer* ProtonixDevice::Timer() {
-	return this->_timer;
+ProtonixTimer* ProtonixDevice::TimerTick() {
+	return this->_timerTick;
 }
 
 ProtonixTimer* ProtonixDevice::TimerNetwork() {
 	return this->_timerNetwork;
+}
+
+ProtonixTimer* ProtonixDevice::TimerUptime() {
+	return this->_timerUptime;
 }
 
 ProtonixDeviceStatus* ProtonixDevice::Status() {
@@ -107,8 +112,10 @@ ProtonixDeviceStatus* ProtonixDevice::Status() {
 
 void ProtonixDevice::Summary(String additional) {
 	String state = this->_status->State();
-	String summary = "[on:" + String(this->_status->On() ? "yes" : "no") + "]"
-					+ (state == "" ? "" : " [state:" + state + "]");
+	String summary = ""
+		+ String("[on:") + String(this->_status->On() ? "yes" : "no") + String("] ")
+		+ String("[uptime:") + String(this->_status->Uptime()) + String("] ")
+		+ String(state == "" ? "" : "[state:" + state + "]");
 
 	unsigned int i = 0;
 	unsigned int count = this->_status->SensorCount();
@@ -503,6 +510,9 @@ void ProtonixDevice::_pipeActions() {
 }
 
 void ProtonixDevice::Pipe() {
+	this->_timerUptime->Pipe();
+	this->_status->Uptime(this->_timerUptime->RunTime());
+
 	unsigned int i = 0;
 
 	if (!this->_ready) {
@@ -554,7 +564,7 @@ void ProtonixDevice::Pipe() {
 		i++;
 	}
 
-	if (this->_timer->Pipe()) {
+	if (this->_timerTick->Pipe()) {
 		this->_device->DeviceOnTick(this);
 
 		if (this->_device->DeviceAutoStatus()) {
@@ -718,12 +728,20 @@ IProtonixNetwork* ProtonixDevice::Network() {
 	return this->_network;
 }
 
+bool ProtonixDevice::NetworkConnected() {
+	return this->_networkConnected1 && this->_networkConnected2;
+}
+
 void ProtonixDevice::Protocol(IProtonixProtocol* protocol) {
 	this->_protocol = protocol;
 }
 
 IProtonixProtocol* ProtonixDevice::Protocol() {
 	return this->_protocol;
+}
+
+bool ProtonixDevice::ProtocolConnected() {
+	return this->_protocolConnected1 && this->_protocolConnected2;
 }
 
 void ProtonixDevice::Server(ProtonixURI* uri) {
@@ -964,9 +982,9 @@ bool ProtonixDevice::FirmwareUpdateOTA(void(*onProgress)(int, int)) {
 			//Serial.println("[debug] http recv " + String(ok) + ": `" + http->Response()->Version() + "` `" + http->Response()->Status() + "` `" + http->Response()->Body() + "`");
 			if (http->Response()->Status() != "200 OK") Serial.println("[WARNING] FirmwareUpdateOTA failed: can not find suitable firmware image on the HTTP server");
 			else {
-				/*String firmware = http->Response()->Body();
+				*String firmware = http->Response()->Body(); // comment begin
 
-				ok = this->FirmwareUpdate(firmware, onProgress);*
+				ok = this->FirmwareUpdate(firmware, onProgress);* // comment end
 				ok = this->FirmwareUpdate(*http, onProgress);
 			}
 		}

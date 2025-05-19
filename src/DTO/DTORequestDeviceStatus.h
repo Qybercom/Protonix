@@ -14,6 +14,7 @@ namespace Qybercom {
 				private:
 					ProtonixDeviceStatus* _status;
 					String _registry;
+					bool _trailing;
 
 				public:
 					DTORequestDeviceStatus();
@@ -27,6 +28,7 @@ namespace Qybercom {
 
 					void DTOPopulate(ProtonixDTO* dto);
 					void DTOSerialize(JsonDocument& dto);
+					String DTOSerializeFilter(String raw);
 
 					DTORequestDeviceStatus* Reset(ProtonixDeviceStatus* status);
 			};

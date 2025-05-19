@@ -28,6 +28,10 @@ void DTO::DTOResponseAuthorization::DTOSerialize(JsonDocument& dto) {
 	dto["data"]["status"] = this->_status;
 }
 
+String DTO::DTOResponseAuthorization::DTOSerializeFilter(String raw) {
+	return raw;
+}
+
 unsigned short DTO::DTOResponseAuthorization::DTOResponseStatus() {
 	return this->_status;
 }

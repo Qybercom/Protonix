@@ -27,3 +27,7 @@ void DTO::DTOEventCommand::DTOPopulate(ProtonixDTO* dto) {
 void DTO::DTOEventCommand::DTOSerialize(JsonDocument& dto) {
 	dto["data"]["command"] = this->_name;
 }
+
+String DTO::DTOEventCommand::DTOSerializeFilter(String raw) {
+	return raw;
+}

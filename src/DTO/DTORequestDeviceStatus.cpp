@@ -12,11 +12,16 @@ using namespace Qybercom::Protonix;
 
 DTO::DTORequestDeviceStatus::DTORequestDeviceStatus() {
 	this->Status(new ProtonixDeviceStatus());
+	this->Registry("");
+
+	this->_trailing = false;
 }
 
 DTO::DTORequestDeviceStatus::DTORequestDeviceStatus(ProtonixDeviceStatus* status, String registry) {
 	this->Status(status);
 	this->Registry(registry);
+
+	this->_trailing = false;
 }
 
 void DTO::DTORequestDeviceStatus::Status(ProtonixDeviceStatus* status) {
@@ -41,9 +46,9 @@ void DTO::DTORequestDeviceStatus::DTOPopulate(ProtonixDTO* dto) {
 
 void DTO::DTORequestDeviceStatus::DTOSerialize(JsonDocument& dto) {
 	dto["data"]["firmware"] = this->_status->Firmware();
-	//dto["data"]["registry"] = this->_registry;
-	dto["data"]["state"] = this->_status->State();
 	dto["data"]["enabled"] = this->_status->On();
+	dto["data"]["state"] = this->_status->State();
+	dto["data"]["uptime"] = this->_status->Uptime();
 	dto["data"]["summary"] = this->_status->Summary();
 
 	ProtonixDeviceSensor** sensors = this->_status->Sensors();
@@ -65,6 +70,12 @@ void DTO::DTORequestDeviceStatus::DTOSerialize(JsonDocument& dto) {
 
 		i++;
 	}
+
+	dto["data"]["registry"] = String(this->_registry + "");
+}
+
+String DTO::DTORequestDeviceStatus::DTOSerializeFilter(String raw) {
+	return raw;
 }
 
 DTO::DTORequestDeviceStatus* DTO::DTORequestDeviceStatus::Reset(ProtonixDeviceStatus* status) {

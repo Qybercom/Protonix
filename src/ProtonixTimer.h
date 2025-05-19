@@ -4,6 +4,8 @@
 
 namespace Qybercom {
 	namespace Protonix {
+		#define TIMER_MAX 4294967296ULL
+
 		class ProtonixTimer {
 			public:
 				enum class ProtonixTimerUnit {
@@ -16,6 +18,15 @@ namespace Qybercom {
 				ProtonixTimer(unsigned int interval, ProtonixTimerUnit unit);
 
 				unsigned long Previous();
+
+				unsigned long long TotalMilliseconds();
+				unsigned long long TotalSeconds();
+				unsigned int RunDays();
+				unsigned int RunHours();
+				unsigned int RunMinutes();
+				unsigned int RunSeconds();
+				unsigned int RunMilliseconds();
+				String RunTime();
 
 				void Interval(int interval);
 				unsigned int Interval();
@@ -35,6 +46,9 @@ namespace Qybercom {
 				unsigned long _previous;
 				unsigned int _interval;
 				ProtonixTimerUnit _unit;
+				volatile unsigned long _overflows;
+				unsigned long long _totalMS;
+				unsigned long long _totalS;
 		};
 	}
 }

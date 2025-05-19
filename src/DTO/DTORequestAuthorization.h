@@ -26,6 +26,7 @@ namespace Qybercom {
 
 					void DTOPopulate(ProtonixDTO* dto);
 					void DTOSerialize(JsonDocument& dto);
+					String DTOSerializeFilter(String raw);
 
 					DTORequestAuthorization* Reset(String id, String passphrase);
 			};

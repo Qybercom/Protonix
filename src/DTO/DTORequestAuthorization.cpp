@@ -48,6 +48,10 @@ void DTO::DTORequestAuthorization::DTOSerialize(JsonDocument& dto) {
 	dto["data"]["passphrase"] = this->_passphrase;
 }
 
+String DTO::DTORequestAuthorization::DTOSerializeFilter(String raw) {
+	return raw;
+}
+
 DTO::DTORequestAuthorization* DTO::DTORequestAuthorization::Reset(String id, String passphrase) {
 	this->ID(id);
 	this->Passphrase(passphrase);
