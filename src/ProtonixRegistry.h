@@ -63,6 +63,7 @@ namespace Qybercom {
 
 				ProtonixRegistryList GetList(String key, String defaultValue);
 				bool GetListItemExists(String key, String value);
+				short GetListItemIndex(String key, String value);
 				bool SetList(String key, String value, bool commit);
 				bool SetList(String key, ProtonixRegistryList &list, bool commit);
 

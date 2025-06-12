@@ -5,24 +5,24 @@
 
 using namespace Qybercom::Protonix;
 
-ProtonixRegistry::ProtonixRegistry(ProtonixMemory* memory) {
+ProtonixRegistry::ProtonixRegistry (ProtonixMemory* memory) {
 	this->_memory = memory;
 	this->_bufferRaw = "";
 	this->_bufferLoaded = false;
 	this->_debug = false;
 }
 
-ProtonixRegistry* ProtonixRegistry::Debug(bool debug) {
+ProtonixRegistry* ProtonixRegistry::Debug (bool debug) {
 	this->_debug = debug;
 
 	return this;
 }
 
-bool ProtonixRegistry::Debug() {
+bool ProtonixRegistry::Debug () {
 	return this->_debug;
 }
 
-bool ProtonixRegistry::_bufferLoad() {
+bool ProtonixRegistry::_bufferLoad () {
 	if (this->_bufferLoaded) {
 		if (this->_debug)
 			Serial.println("[debug] eeprom loaded: `" + this->_bufferRaw + "`");
@@ -64,7 +64,7 @@ bool ProtonixRegistry::_bufferLoad() {
 	return true;
 }
 
-String ProtonixRegistry::_tuple(String key, bool min) {
+String ProtonixRegistry::_tuple (String key, bool min) {
 	String value = this->GetRaw(key, "");
 	String out = "";
 	bool delimeter = false;
@@ -87,11 +87,11 @@ String ProtonixRegistry::_tuple(String key, bool min) {
 	return out;
 }
 
-String ProtonixRegistry::Raw() {
+String ProtonixRegistry::Raw () {
 	return this->_bufferRaw;
 }
 
-String ProtonixRegistry::GetRaw(String key, String defaultValue) {
+String ProtonixRegistry::GetRaw (String key, String defaultValue) {
 	if (!this->_bufferLoad()) return defaultValue;
 
 	String value = this->_bufferObj[key].as<String>();
@@ -99,7 +99,7 @@ String ProtonixRegistry::GetRaw(String key, String defaultValue) {
 	return this->_bufferObj[key] == nullptr ? defaultValue : value;
 }
 
-bool ProtonixRegistry::SetRaw(String key, String value, bool commit) {
+bool ProtonixRegistry::SetRaw (String key, String value, bool commit) {
 	if (!this->_bufferLoad()) return false;
 
 	this->_bufferObj[key] = value;
@@ -107,47 +107,47 @@ bool ProtonixRegistry::SetRaw(String key, String value, bool commit) {
 	return commit ? this->Commit() : true;
 }
 
-int ProtonixRegistry::GetInt(String key, int defaultValue) {
+int ProtonixRegistry::GetInt (String key, int defaultValue) {
 	return this->_bufferLoad() ? this->GetRaw(key, String(defaultValue)).toInt() : defaultValue;
 }
 
-bool ProtonixRegistry::SetInt(String key, int value, bool commit) {
+bool ProtonixRegistry::SetInt (String key, int value, bool commit) {
 	return this->SetRaw(key, String(value), commit);
 }
 
-float ProtonixRegistry::GetFloat(String key, float defaultValue) {
+float ProtonixRegistry::GetFloat (String key, float defaultValue) {
 	return this->_bufferLoad() ? this->GetRaw(key, String(defaultValue)).toFloat() : defaultValue;
 }
 
-bool ProtonixRegistry::SetFloat(String key, float value, bool commit) {
+bool ProtonixRegistry::SetFloat (String key, float value, bool commit) {
 	return this->SetRaw(key, String(value), commit);
 }
 
-int ProtonixRegistry::GetIntervalMin(String key, int defaultValue) {
+int ProtonixRegistry::GetIntervalMin (String key, int defaultValue) {
 	String val = this->_tuple(key, true);
 
 	return val == "" ? defaultValue : val.toInt();
 }
 
-int ProtonixRegistry::GetIntervalMax(String key, int defaultValue) {
+int ProtonixRegistry::GetIntervalMax (String key, int defaultValue) {
 	String val = this->_tuple(key, false);
 
 	return val == "" ? defaultValue : val.toInt();
 }
 
-float ProtonixRegistry::GetIntervalMin_f(String key, float defaultValue) {
+float ProtonixRegistry::GetIntervalMin_f (String key, float defaultValue) {
 	String val = this->_tuple(key, true);
 
 	return val == "" ? defaultValue : val.toFloat();
 }
 
-float ProtonixRegistry::GetIntervalMax_f(String key, float defaultValue) {
+float ProtonixRegistry::GetIntervalMax_f (String key, float defaultValue) {
 	String val = this->_tuple(key, false);
 
 	return val == "" ? defaultValue : val.toFloat();
 }
 
-ProtonixRegistryColor ProtonixRegistry::GetColor(String key, String defaultValue) {
+ProtonixRegistryColor ProtonixRegistry::GetColor (String key, String defaultValue) {
 	ProtonixRegistryColor color;
 	String raw = this->_bufferLoad() ? this->GetRaw(key, String(defaultValue)) : defaultValue;
 
@@ -173,15 +173,15 @@ ProtonixRegistryColor ProtonixRegistry::GetColor(String key, String defaultValue
 	return color;
 }
 
-bool ProtonixRegistry::SetColor(String key, String value, bool commit) {
+bool ProtonixRegistry::SetColor (String key, String value, bool commit) {
 	return this->SetRaw(key, String(value), commit);
 }
 
-bool ProtonixRegistry::SetColor(String key, ProtonixRegistryColor &color, bool commit) {
+bool ProtonixRegistry::SetColor (String key, ProtonixRegistryColor &color, bool commit) {
 	return this->SetRaw(key, String(String(color.r) + String(',') + String(color.g) + String(',') + String(color.b)), commit);
 }
 
-ProtonixRegistryList ProtonixRegistry::GetList(String key, String defaultValue) {
+ProtonixRegistryList ProtonixRegistry::GetList (String key, String defaultValue) {
 	ProtonixRegistryList list;
 	String raw = this->_bufferLoad() ? this->GetRaw(key, String(defaultValue)) : defaultValue;
 
@@ -210,7 +210,7 @@ ProtonixRegistryList ProtonixRegistry::GetList(String key, String defaultValue) 
 	return list;
 }
 
-bool ProtonixRegistry::GetListItemExists(String key, String value) {
+bool ProtonixRegistry::GetListItemExists (String key, String value) {
 	ProtonixRegistryList list = this->GetList(key, "");
 
 	unsigned short i = 0;
@@ -224,11 +224,25 @@ bool ProtonixRegistry::GetListItemExists(String key, String value) {
 	return false;
 }
 
-bool ProtonixRegistry::SetList(String key, String value, bool commit) {
+short ProtonixRegistry::GetListItemIndex (String key, String value) {
+	ProtonixRegistryList list = this->GetList(key, "");
+
+	unsigned short i = 0;
+
+	while (i < 20) {
+		if (list.items[i] == value) return i;
+
+		i++;
+	}
+
+	return -1;
+}
+
+bool ProtonixRegistry::SetList (String key, String value, bool commit) {
 	return this->SetRaw(key, String(value), commit);
 }
 
-bool ProtonixRegistry::SetList(String key, ProtonixRegistryList &list, bool commit) {
+bool ProtonixRegistry::SetList (String key, ProtonixRegistryList &list, bool commit) {
 	String raw = "";
 	int i = 0;
 	bool begin = true;
@@ -245,7 +259,7 @@ bool ProtonixRegistry::SetList(String key, ProtonixRegistryList &list, bool comm
 	return this->SetRaw(key, String(raw), commit);
 }
 
-bool ProtonixRegistry::Commit() {
+bool ProtonixRegistry::Commit () {
 	if (serializeJson(this->_buffer, this->_bufferRaw) == 0) {
 		Serial.println("[WARNING] ProtonixRegistry: json serialize error");
 
