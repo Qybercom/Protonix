@@ -84,6 +84,14 @@ namespace Qybercom {
 				//void _updateError(String step, StreamString &error);
 				#endif
 
+				#if defined(ESP32)
+				TaskHandle_t _dedicatedHandleCore0 = nullptr;
+				TaskHandle_t _dedicatedHandleCore1 = nullptr;
+
+				void _dedicateTask (TaskHandle_t* handle, unsigned short core, unsigned short priority = 1);
+				static void _dedicatedTask (void* param);
+				#endif
+
 			public:
 				ProtonixDevice(IProtonixDevice* device);
 				
@@ -177,6 +185,11 @@ namespace Qybercom {
 				//bool FirmwareUpdateOTA(void(*onProgress)(int, int) = nullptr);
 				//bool FirmwareUpdate(String firmware, void(*onProgress)(int, int) = nullptr);
 				//bool FirmwareUpdate(Stream& stream, void(*onProgress)(int, int) = nullptr);
+				#endif
+
+				#if defined(ESP32)
+				void DedicateTaskCore0();
+				void DedicateTaskCore1();
 				#endif
 		};
 	}

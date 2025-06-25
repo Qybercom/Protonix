@@ -20,6 +20,7 @@ namespace Qybercom {
 				virtual String DeviceID();
 				virtual unsigned int DeviceTick();
 				virtual void DeviceOnReady(ProtonixDevice* device);
+				virtual void DeviceOnLoop(ProtonixDevice* device);
 				virtual void DeviceOnTick(ProtonixDevice* device);
 				virtual void DeviceOnSerialCommand(ProtonixDevice* device, ProtonixDevicePort* port, IProtonixCommand* command);
 				virtual void DeviceOnAction(ProtonixDevice* device, ProtonixAction* action);
@@ -33,6 +34,10 @@ namespace Qybercom {
 				virtual void DeviceOnStreamResponseAuthorization(ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization);
 				virtual void DeviceOnStreamEvent(ProtonixDevice* device, ProtonixDTO* dto);
 				virtual void DeviceOnStreamEventCommand(ProtonixDevice* device, DTO::DTOEventCommand* command);
+				#endif
+
+				#if defined(ESP32)
+				virtual void DeviceOnDedicatedTask(unsigned short core);
 				#endif
 		};
 	}

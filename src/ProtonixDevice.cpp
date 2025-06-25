@@ -564,6 +564,8 @@ void ProtonixDevice::Pipe() {
 		i++;
 	}
 
+	this->_device->DeviceOnLoop(this);
+
 	if (this->_timerTick->Pipe()) {
 		this->_device->DeviceOnTick(this);
 
@@ -1061,4 +1063,33 @@ void ProtonixDevice::_updateError(String step, StreamString &error) {
 	Serial.println("[WARNING] FirmwareUpdate error (" + step + "): " + String(error.c_str()));
 }
 */
+#endif
+
+#if defined(ESP32)
+void ProtonixDevice::_dedicateTask (TaskHandle_t* handle, unsigned short core, unsigned short priority) {
+	xTaskCreatePinnedToCore(ProtonixDevice::_dedicatedTask, "DedicatedTask", 4096, this, priority, handle, core);
+}
+
+void ProtonixDevice::_dedicatedTask (void* param) {
+	ProtonixDevice* device = (ProtonixDevice*)param;
+	bool run = true;
+
+	while (run) {
+		device->_device->DeviceOnDedicatedTask(xPortGetCoreID());
+
+		vTaskDelay(10 / portTICK_PERIOD_MS);
+	}
+
+	vTaskDelete(NULL);
+}
+
+void ProtonixDevice::DedicateTaskCore0 () {
+	if (_dedicatedHandleCore0 == nullptr)
+		this->_dedicateTask(&_dedicatedHandleCore0, 0);
+}
+
+void ProtonixDevice::DedicateTaskCore1 () {
+	if (_dedicatedHandleCore1 == nullptr)
+		this->_dedicateTask(&_dedicatedHandleCore1, 1);
+}
 #endif
