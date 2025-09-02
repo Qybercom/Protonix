@@ -1,8 +1,11 @@
 #pragma once
 
-#include "Protonix.h"
-
 #include <Arduino.h>
+
+#include "Common/List.hpp"
+#include "Common/Utils.hpp"
+
+#include "Protonix.h"
 
 #include "ProtonixDevice.h"
 #include "ProtonixGenericDevice.h"
@@ -27,8 +30,8 @@
 #include "Command/CStdSensor.h"
 
 #if defined(ESP32) || defined(ESP8266)
-#include "ProtonixHTTPClient.h"
 #include "Network/NWiFi.h"
 #include "Protocols/PWiFiTCP.h"
 #include "Protocols/PWebSocket.h"
+#include "ProtonixHTTPClient.h"
 #endif

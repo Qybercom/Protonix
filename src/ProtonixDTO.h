@@ -24,37 +24,38 @@ namespace Qybercom {
 				JsonObject _bufferObj;
 
 			public:
-				ProtonixDTO();
+				ProtonixDTO ();
 
-				void URL(String url);
-				String URL();
+				void URL (String url);
+				String URL ();
 
-				void Response(String url);
-				String Response();
+				void Response (String url);
+				String Response ();
 
-				void Event(String url);
-				String Event();
+				void Event (String url);
+				String Event ();
 
-				void DTO(IProtonixDTO* dto);
-				IProtonixDTO* DTO();
-				void Data(JsonObject data);
-				JsonObject Data();
+				void DTO (IProtonixDTO* dto);
+				IProtonixDTO* DTO ();
 
-				bool IsURL();
-				bool IsResponse();
-				bool IsEvent();
+				void Data (JsonObject data);
+				JsonObject Data ();
 
-				bool Serialize();
-				bool Deserialize();
+				bool IsURL ();
+				bool IsResponse ();
+				bool IsEvent ();
 
-				void BufferRaw(String data);
-				void BufferRaw(char* data);
-				String BufferRaw();
+				bool Serialize ();
+				bool Deserialize ();
 
-				void Reset();
+				void BufferRaw (String data);
+				//void BufferRaw(char* data);
+				String BufferRaw ();
 
-				void Debug(bool debug);
-				bool Debug();
+				void Reset ();
+
+				void Debug (bool debug);
+				bool Debug ();
 		};
 	}
 }

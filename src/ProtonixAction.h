@@ -16,41 +16,45 @@ namespace Qybercom {
 				int _stepDirection;
 				int _cursor;
 				bool _completed;
+				bool _infinite;
 
-				void _init(String name, unsigned int interval, int stepBegin, int stepEnd, int step);
+				void _init (String name, unsigned int interval, int stepBegin, int stepEnd, int step);
 
 			public:
-				ProtonixAction(String name);
-				ProtonixAction(String name, unsigned int interval);
-				ProtonixAction(String name, unsigned int interval, int stepEnd);
-				ProtonixAction(String name, unsigned int interval, int stepBegin, int stepEnd);
-				ProtonixAction(String name, unsigned int interval, int stepBegin, int stepEnd, int step);
+				ProtonixAction (String name);
+				ProtonixAction (String name, unsigned int interval);
+				ProtonixAction (String name, unsigned int interval, int stepEnd);
+				ProtonixAction (String name, unsigned int interval, int stepBegin, int stepEnd);
+				ProtonixAction (String name, unsigned int interval, int stepBegin, int stepEnd, int step);
 
-				ProtonixTimer* Timer();
+				ProtonixTimer* Timer ();
 
-				void Name(String name);
-				String Name();
-				
-				void Step(int step);
-				int Step();
+				void Name (String name);
+				String Name ();
 
-				void StepBegin(int step);
-				int StepBegin();
+				void Step (int step);
+				int Step ();
 
-				void StepEnd(int step);
-				int StepEnd();
+				void StepBegin (int step);
+				int StepBegin ();
 
-				int StepDirection();
+				void StepEnd (int step);
+				int StepEnd ();
 
-				int Cursor();
+				int StepDirection ();
 
-				bool Completed();
+				int Cursor ();
 
-				bool PipeStart();
-				bool Pipe();
-				void PipeEnd();
+				bool Completed ();
 
-				void Reset();
+				bool Infinite ();
+				ProtonixAction* Infinite (bool infinite);
+
+				bool PipeStart ();
+				bool Pipe ();
+				void PipeEnd ();
+
+				void Reset ();
 		};
 	}
 }

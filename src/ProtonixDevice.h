@@ -75,7 +75,8 @@ namespace Qybercom {
 				ProtonixURI* _uri;
 				ProtonixDTO* _dtoInput;
 				ProtonixDTO* _dtoOutput;
-				
+				bool _authorized;
+
 				void _pipeNetwork();
 				void _onStreamURL();
 				void _onStreamResponse();
@@ -93,75 +94,75 @@ namespace Qybercom {
 				#endif
 
 			public:
-				ProtonixDevice(IProtonixDevice* device);
-				
-				void Device(IProtonixDevice* device);
-				IProtonixDevice* Device();
-				ProtonixTimer* TimerTick();
-				ProtonixTimer* TimerNetwork();
-				ProtonixTimer* TimerUptime();
-				ProtonixDeviceStatus* Status();
-				void Summary(String additional);
-				bool Ready();
-				unsigned int Tick();
-				void Debug(bool debug);
-				bool Debug();
-				ProtonixMemory* Memory();
-				ProtonixRegistry* Registry();
-				static int FreeRAM();
-				static int FreeFlash();
-				static void Reboot();
+				ProtonixDevice (IProtonixDevice* device);
 
-				IProtonixHardware* Hardware(String id);
-				ProtonixDevice* Hardware(String id, IProtonixHardware* hardware);
+				void Device (IProtonixDevice* device);
+				IProtonixDevice* Device ();
+				ProtonixTimer* TimerTick ();
+				ProtonixTimer* TimerNetwork ();
+				ProtonixTimer* TimerUptime ();
+				ProtonixDeviceStatus* Status ();
+				void Summary (String additional);
+				bool Ready ();
+				unsigned int Tick ();
+				void Debug (bool debug);
+				bool Debug ();
+				ProtonixMemory* Memory ();
+				ProtonixRegistry* Registry ();
+				static int FreeRAM ();
+				static int FreeFlash ();
+				static void Reboot ();
 
-				ProtonixDevicePort* Port(String name);
-				ProtonixDevicePort* Port(ProtonixDevicePort* port);
-				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX);
-				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, bool blocking);
-				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, bool blocking, bool observable);
-				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed);
-				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, bool blocking);
-				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, bool blocking, bool observable);
-				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout);
-				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout, bool blocking);
-				ProtonixDevicePort* Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout, bool blocking, bool observable);
-				ProtonixDevicePort* PortDefault();
-				ProtonixDevicePort* PortDefault(bool blocking);
-				ProtonixDevicePort* PortDefault(bool blocking, bool observable);
-				ProtonixDevicePort* PortDefault(unsigned int speed);
-				ProtonixDevicePort* PortDefault(unsigned int speed, bool blocking);
-				ProtonixDevicePort* PortDefault(unsigned int speed, bool blocking, bool observable);
-				ProtonixDevicePort* PortDefault(unsigned int speed, unsigned int timeout);
-				ProtonixDevicePort* PortDefault(unsigned int speed, unsigned int timeout, bool blocking);
-				ProtonixDevicePort* PortDefault(unsigned int speed, unsigned int timeout, bool blocking, bool observable);
-				
+				IProtonixHardware* Hardware (String id);
+				ProtonixDevice* Hardware (String id, IProtonixHardware* hardware);
+
+				ProtonixDevicePort* Port (String name);
+				ProtonixDevicePort* Port (ProtonixDevicePort* port);
+				ProtonixDevicePort* Port (String name, unsigned int pinTX, unsigned int pinRX);
+				ProtonixDevicePort* Port (String name, unsigned int pinTX, unsigned int pinRX, bool blocking);
+				ProtonixDevicePort* Port (String name, unsigned int pinTX, unsigned int pinRX, bool blocking, bool observable);
+				ProtonixDevicePort* Port (String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed);
+				ProtonixDevicePort* Port (String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, bool blocking);
+				ProtonixDevicePort* Port (String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, bool blocking, bool observable);
+				ProtonixDevicePort* Port (String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout);
+				ProtonixDevicePort* Port (String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout, bool blocking);
+				ProtonixDevicePort* Port (String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout, bool blocking, bool observable);
+				ProtonixDevicePort* PortDefault ();
+				ProtonixDevicePort* PortDefault (bool blocking);
+				ProtonixDevicePort* PortDefault (bool blocking, bool observable);
+				ProtonixDevicePort* PortDefault (unsigned int speed);
+				ProtonixDevicePort* PortDefault (unsigned int speed, bool blocking);
+				ProtonixDevicePort* PortDefault (unsigned int speed, bool blocking, bool observable);
+				ProtonixDevicePort* PortDefault (unsigned int speed, unsigned int timeout);
+				ProtonixDevicePort* PortDefault (unsigned int speed, unsigned int timeout, bool blocking);
+				ProtonixDevicePort* PortDefault (unsigned int speed, unsigned int timeout, bool blocking, bool observable);
+
 				// https://stackoverflow.com/a/120916/2097055
-				ProtonixAction* Action(String name);
-				bool ActionRegister(ProtonixAction* action);
-				bool ActionRegister(String name);
-				bool ActionRegister(String name, unsigned int interval);
-				bool ActionRegister(String name, unsigned int interval, int stepEnd);
-				bool ActionRegister(String name, unsigned int interval, int stepBegin, int stepEnd);
-				bool ActionRegister(String name, unsigned int interval, int stepBegin, int stepEnd, int step);
-				bool ActionTrigger(String name);
-				void ActionReset();
+				ProtonixAction* Action (String name);
+				bool ActionRegister (ProtonixAction* action);
+				bool ActionRegister (String name);
+				bool ActionRegister (String name, unsigned int interval);
+				bool ActionRegister (String name, unsigned int interval, int stepEnd);
+				bool ActionRegister (String name, unsigned int interval, int stepBegin, int stepEnd);
+				bool ActionRegister (String name, unsigned int interval, int stepBegin, int stepEnd, int step);
+				bool ActionTrigger (String name);
+				void ActionReset ();
 
-				void Pipe();
+				void Pipe ();
 
-				void OnSerial(ProtonixDevicePort* port, IProtonixCommand* command);
-				bool SerialCommand(String port, IProtonixCommand* command);
-				bool SerialCommandCustom(String port, String cmd);
-				bool SerialCommandSensor(String port, ProtonixDeviceSensor* sensor);
-				bool SerialCommandSensor(String port, String id, String value);
-				bool SerialCommandSensor(String port, String id, String value, bool active);
-				bool SerialCommandSensor(String port, String id, String value, bool active, bool failure);
-				bool SerialCommandSensor(String port, String id, String value, bool active, bool failure, String state);
-				bool SerialCommandSensor(String port, String id, bool active);
-				bool SerialCommandSensor(String port, String id, bool active, bool failure);
-				bool SerialCommandSensor(String port, String id, bool active, bool failure, String state);
-				bool SerialCommandSensor(String port, String id, String value, String state);
-				bool SerialStatus(String port);
+				void OnSerial (ProtonixDevicePort* port, IProtonixCommand* command);
+				bool SerialCommand (String port, IProtonixCommand* command);
+				bool SerialCommandCustom (String port, String cmd);
+				bool SerialCommandSensor (String port, ProtonixDeviceSensor* sensor);
+				bool SerialCommandSensor (String port, String id, String value);
+				bool SerialCommandSensor (String port, String id, String value, bool active);
+				bool SerialCommandSensor (String port, String id, String value, bool active, bool failure);
+				bool SerialCommandSensor (String port, String id, String value, bool active, bool failure, String state);
+				bool SerialCommandSensor (String port, String id, bool active);
+				bool SerialCommandSensor (String port, String id, bool active, bool failure);
+				bool SerialCommandSensor (String port, String id, bool active, bool failure, String state);
+				bool SerialCommandSensor (String port, String id, String value, String state);
+				bool SerialStatus (String port);
 
 				#if defined(ESP32) || defined(ESP8266)
 				void Network(IProtonixNetwork* network);

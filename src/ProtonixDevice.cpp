@@ -17,6 +17,8 @@
 #include <ESP32httpUpdate.h>
 #endif
 
+#include "Common/Utils.hpp"
+
 #include "IProtonixDevice.h"
 #include "ProtonixDevice.h"
 #include "ProtonixDeviceStatus.h"
@@ -39,11 +41,11 @@
 #include "DTO/DTOEventCommand.h"
 #endif
 
+using namespace Qybercom;
 using namespace Qybercom::Protonix;
 
 
-
-ProtonixDevice::ProtonixDevice(IProtonixDevice* device) {
+ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
 	this->_timerTick = new ProtonixTimer();
 	this->_timerNetwork = new ProtonixTimer(1000); // TODO: refactor for custom reconnect interval
 	this->_timerUptime = new ProtonixTimer();
@@ -62,20 +64,21 @@ ProtonixDevice::ProtonixDevice(IProtonixDevice* device) {
 	this->_registry = new ProtonixRegistry(this->_memory);
 	this->_registry->Debug(this->_debug); // TODO: runtime switch for every debuggable component
 
-	#if defined(ESP32) || defined(ESP8266)
+#if defined(ESP32) || defined(ESP8266)
 	this->_networkConnected1 = false;
 	this->_networkConnected2 = false;
 	this->_protocolConnected1 = false;
 	this->_protocolConnected2 = false;
+	this->_authorized = false;
 
 	this->_dtoInput = new ProtonixDTO();
 	this->_dtoOutput = new ProtonixDTO();
-	#endif
+#endif
 
-	#if defined(AVR)
+#if defined(AVR)
 	pinMode(4, OUTPUT);
 	digitalWrite(4, HIGH);
-	#endif
+#endif
 
 	int i = 0;
 	while (i < PROTONIX_LIMIT_ACTION_BACKLOG) {
@@ -85,37 +88,37 @@ ProtonixDevice::ProtonixDevice(IProtonixDevice* device) {
 	}
 }
 
-void ProtonixDevice::Device(IProtonixDevice* device) {
+void ProtonixDevice::Device (IProtonixDevice* device) {
 	this->_device = device;
 	this->_timerTick->Interval(this->_device->DeviceTick());
 }
 
-IProtonixDevice* ProtonixDevice::Device() {
+IProtonixDevice* ProtonixDevice::Device () {
 	return this->_device;
 }
 
-ProtonixTimer* ProtonixDevice::TimerTick() {
+ProtonixTimer* ProtonixDevice::TimerTick () {
 	return this->_timerTick;
 }
 
-ProtonixTimer* ProtonixDevice::TimerNetwork() {
+ProtonixTimer* ProtonixDevice::TimerNetwork () {
 	return this->_timerNetwork;
 }
 
-ProtonixTimer* ProtonixDevice::TimerUptime() {
+ProtonixTimer* ProtonixDevice::TimerUptime () {
 	return this->_timerUptime;
 }
 
-ProtonixDeviceStatus* ProtonixDevice::Status() {
+ProtonixDeviceStatus* ProtonixDevice::Status () {
 	return this->_status;
 }
 
-void ProtonixDevice::Summary(String additional) {
+void ProtonixDevice::Summary (String additional) {
 	String state = this->_status->State();
 	String summary = ""
-		+ String("[on:") + String(this->_status->On() ? "yes" : "no") + String("] ")
-		+ String("[uptime:") + String(this->_status->Uptime()) + String("] ")
-		+ String(state == "" ? "" : "[state:" + state + "]");
+					 + String("[on:") + String(this->_status->On() ? "yes" : "no") + String("] ")
+					 + String("[uptime:") + String(this->_status->Uptime()) + String("] ")
+					 + String(state == "" ? "" : "[state:" + state + "]");
 
 	unsigned int i = 0;
 	unsigned int count = this->_status->SensorCount();
@@ -129,68 +132,68 @@ void ProtonixDevice::Summary(String additional) {
 	this->_status->Summary(summary + additional);
 }
 
-bool ProtonixDevice::Ready() {
+bool ProtonixDevice::Ready () {
 	return this->_ready;
 }
 
-unsigned int ProtonixDevice::Tick() {
+unsigned int ProtonixDevice::Tick () {
 	return this->_device->DeviceTick();
 }
 
-void ProtonixDevice::Debug(bool debug) {
+void ProtonixDevice::Debug (bool debug) {
 	this->_debug = debug;
 }
 
-bool ProtonixDevice::Debug() {
+bool ProtonixDevice::Debug () {
 	return this->_debug;
 }
 
-ProtonixMemory* ProtonixDevice::Memory() {
+ProtonixMemory* ProtonixDevice::Memory () {
 	return this->_memory;
 }
 
-ProtonixRegistry* ProtonixDevice::Registry() {
+ProtonixRegistry* ProtonixDevice::Registry () {
 	return this->_registry;
 }
 
 extern int __heap_start, * __brkval;
 
-int ProtonixDevice::FreeRAM() {
-	#if defined(ESP32)
-		return esp_get_free_heap_size();
-	#elif defined(ESP8266)
-		return ESP.getFreeHeap();
-	#elif defined(AVR)
-		// https://docs.arduino.cc/learn/programming/memory-guide
-		int v;
-		//int __heap_start, * __brkval;
+int ProtonixDevice::FreeRAM () {
+#if defined(ESP32)
+	return esp_get_free_heap_size();
+#elif defined(ESP8266)
+	return ESP.getFreeHeap();
+#elif defined(AVR)
+	// https://docs.arduino.cc/learn/programming/memory-guide
+	int v;
+	//int __heap_start, * __brkval;
 
-		return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
-	#else
-		return 0;
-	#endif
+	return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
+#else
+	return 0;
+#endif
 }
 
-int ProtonixDevice::FreeFlash() {
-	#if defined(ESP32) || defined(ESP8266)
-		return ESP.getFreeSketchSpace();
-	#elif defined(AVR)
-		return 0;
-	#else
-		return 0;
-	#endif
+int ProtonixDevice::FreeFlash () {
+#if defined(ESP32) || defined(ESP8266)
+	return ESP.getFreeSketchSpace();
+#elif defined(AVR)
+	return 0;
+#else
+	return 0;
+#endif
 }
 
-void ProtonixDevice::Reboot() {
-	#if defined(ESP32) || defined(ESP8266)
-		ESP.restart();
-	#elif defined(AVR)
-		digitalWrite(4, LOW);
-	#else
-	#endif
+void ProtonixDevice::Reboot () {
+#if defined(ESP32) || defined(ESP8266)
+	ESP.restart();
+#elif defined(AVR)
+	digitalWrite(4, LOW);
+#else
+#endif
 }
 
-IProtonixHardware* ProtonixDevice::Hardware(String id) {
+IProtonixHardware* ProtonixDevice::Hardware (String id) {
 	unsigned int i = 0;
 
 	while (i < this->_hardwareCount) {
@@ -203,7 +206,7 @@ IProtonixHardware* ProtonixDevice::Hardware(String id) {
 	return nullptr;
 }
 
-ProtonixDevice* ProtonixDevice::Hardware(String id, IProtonixHardware* hardware) {
+ProtonixDevice* ProtonixDevice::Hardware (String id, IProtonixHardware* hardware) {
 	hardware->HardwareID(id);
 
 	this->_hardware[this->_hardwareCount] = hardware;
@@ -212,7 +215,7 @@ ProtonixDevice* ProtonixDevice::Hardware(String id, IProtonixHardware* hardware)
 	return this;
 }
 
-ProtonixDevicePort* ProtonixDevice::Port(String name) {
+ProtonixDevicePort* ProtonixDevice::Port (String name) {
 	unsigned int i = 0;
 
 	while (i < this->_portCount) {
@@ -225,86 +228,86 @@ ProtonixDevicePort* ProtonixDevice::Port(String name) {
 	return nullptr;
 }
 
-ProtonixDevicePort* ProtonixDevice::Port(ProtonixDevicePort* port) {
+ProtonixDevicePort* ProtonixDevice::Port (ProtonixDevicePort* port) {
 	this->_ports[this->_portCount] = port;
 	this->_portCount++;
 
 	return port;
 }
 
-ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX) {
+ProtonixDevicePort* ProtonixDevice::Port (String name, unsigned int pinTX, unsigned int pinRX) {
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX));
 }
 
-ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, bool blocking) {
+ProtonixDevicePort* ProtonixDevice::Port (String name, unsigned int pinTX, unsigned int pinRX, bool blocking) {
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, blocking));
 }
 
-ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, bool blocking, bool observable) {
+ProtonixDevicePort* ProtonixDevice::Port (String name, unsigned int pinTX, unsigned int pinRX, bool blocking, bool observable) {
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, blocking, observable));
 }
 
-ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed) {
+ProtonixDevicePort* ProtonixDevice::Port (String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed) {
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed));
 }
 
-ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, bool blocking) {
+ProtonixDevicePort* ProtonixDevice::Port (String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, bool blocking) {
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed, blocking));
 }
 
-ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, bool blocking, bool observable) {
+ProtonixDevicePort* ProtonixDevice::Port (String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, bool blocking, bool observable) {
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed, blocking, observable));
 }
 
-ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout) {
+ProtonixDevicePort* ProtonixDevice::Port (String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout) {
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed, timeout));
 }
 
-ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout, bool blocking) {
+ProtonixDevicePort* ProtonixDevice::Port (String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout, bool blocking) {
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed, timeout, blocking));
 }
 
-ProtonixDevicePort* ProtonixDevice::Port(String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout, bool blocking, bool observable) {
+ProtonixDevicePort* ProtonixDevice::Port (String name, unsigned int pinTX, unsigned int pinRX, unsigned int speed, unsigned int timeout, bool blocking, bool observable) {
 	return this->Port(new ProtonixDevicePort(name, pinTX, pinRX, speed, timeout, blocking, observable));
 }
 
-ProtonixDevicePort* ProtonixDevice::PortDefault() {
+ProtonixDevicePort* ProtonixDevice::PortDefault () {
 	return this->Port(new ProtonixDevicePort());
 }
 
-ProtonixDevicePort* ProtonixDevice::PortDefault(bool blocking) {
+ProtonixDevicePort* ProtonixDevice::PortDefault (bool blocking) {
 	return this->Port(new ProtonixDevicePort(blocking));
 }
 
-ProtonixDevicePort* ProtonixDevice::PortDefault(bool blocking, bool observable) {
+ProtonixDevicePort* ProtonixDevice::PortDefault (bool blocking, bool observable) {
 	return this->Port(new ProtonixDevicePort(blocking, observable));
 }
 
-ProtonixDevicePort* ProtonixDevice::PortDefault(unsigned int speed) {
+ProtonixDevicePort* ProtonixDevice::PortDefault (unsigned int speed) {
 	return this->Port(new ProtonixDevicePort(speed));
 }
 
-ProtonixDevicePort* ProtonixDevice::PortDefault(unsigned int speed, bool blocking) {
+ProtonixDevicePort* ProtonixDevice::PortDefault (unsigned int speed, bool blocking) {
 	return this->Port(new ProtonixDevicePort(speed, blocking));
 }
 
-ProtonixDevicePort* ProtonixDevice::PortDefault(unsigned int speed, bool blocking, bool observable) {
+ProtonixDevicePort* ProtonixDevice::PortDefault (unsigned int speed, bool blocking, bool observable) {
 	return this->Port(new ProtonixDevicePort(speed, blocking, observable));
 }
 
-ProtonixDevicePort* ProtonixDevice::PortDefault(unsigned int speed, unsigned int timeout) {
+ProtonixDevicePort* ProtonixDevice::PortDefault (unsigned int speed, unsigned int timeout) {
 	return this->Port(new ProtonixDevicePort(speed, timeout));
 }
 
-ProtonixDevicePort* ProtonixDevice::PortDefault(unsigned int speed, unsigned int timeout, bool blocking) {
+ProtonixDevicePort* ProtonixDevice::PortDefault (unsigned int speed, unsigned int timeout, bool blocking) {
 	return this->Port(new ProtonixDevicePort(speed, timeout, blocking));
 }
 
-ProtonixDevicePort* ProtonixDevice::PortDefault(unsigned int speed, unsigned int timeout, bool blocking, bool observable) {
+ProtonixDevicePort* ProtonixDevice::PortDefault (unsigned int speed, unsigned int timeout, bool blocking, bool observable) {
 	return this->Port(new ProtonixDevicePort(speed, timeout, blocking, observable));
 }
 
-ProtonixAction* ProtonixDevice::Action(String name) {
+ProtonixAction* ProtonixDevice::Action (String name) {
 	int i = 0;
 
 	while (i < this->_actionCursorList) {
@@ -317,7 +320,7 @@ ProtonixAction* ProtonixDevice::Action(String name) {
 	return nullptr;
 }
 
-bool ProtonixDevice::ActionRegister(ProtonixAction* action) {
+bool ProtonixDevice::ActionRegister (ProtonixAction* action) {
 	if (this->_actionCursorList == PROTONIX_LIMIT_ACTION_LIST) return false;
 
 	this->_actionList[this->_actionCursorList] = action;
@@ -326,27 +329,27 @@ bool ProtonixDevice::ActionRegister(ProtonixAction* action) {
 	return true;
 }
 
-bool ProtonixDevice::ActionRegister(String name) {
+bool ProtonixDevice::ActionRegister (String name) {
 	return this->ActionRegister(new ProtonixAction(name));
 }
 
-bool ProtonixDevice::ActionRegister(String name, unsigned int interval) {
+bool ProtonixDevice::ActionRegister (String name, unsigned int interval) {
 	return this->ActionRegister(new ProtonixAction(name, interval));
 }
 
-bool ProtonixDevice::ActionRegister(String name, unsigned int interval, int stepEnd) {
+bool ProtonixDevice::ActionRegister (String name, unsigned int interval, int stepEnd) {
 	return this->ActionRegister(new ProtonixAction(name, interval, stepEnd));
 }
 
-bool ProtonixDevice::ActionRegister(String name, unsigned int interval, int stepBegin, int stepEnd) {
+bool ProtonixDevice::ActionRegister (String name, unsigned int interval, int stepBegin, int stepEnd) {
 	return this->ActionRegister(new ProtonixAction(name, interval, stepBegin, stepEnd));
 }
 
-bool ProtonixDevice::ActionRegister(String name, unsigned int interval, int stepBegin, int stepEnd, int step) {
+bool ProtonixDevice::ActionRegister (String name, unsigned int interval, int stepBegin, int stepEnd, int step) {
 	return this->ActionRegister(new ProtonixAction(name, interval, stepBegin, stepEnd, step));
 }
 
-bool ProtonixDevice::ActionTrigger(String name) {
+bool ProtonixDevice::ActionTrigger (String name) {
 	if (this->_actionCursorBacklog == PROTONIX_LIMIT_ACTION_BACKLOG) return false;
 
 	this->_actionBacklog[this->_actionCursorBacklog] = name;
@@ -355,7 +358,7 @@ bool ProtonixDevice::ActionTrigger(String name) {
 	return true;
 }
 
-void ProtonixDevice::ActionReset() {
+void ProtonixDevice::ActionReset () {
 	int i = 0;
 
 	i = 0;
@@ -434,7 +437,7 @@ void ProtonixDevice::_pipeNetwork() {
 
 			this->_device->DeviceOnProtocolConnect(this);
 
-			this->RequestStreamAuthorize();
+			//this->RequestStreamAuthorize();
 		}
 
 		if (!this->Connected()) {
@@ -442,6 +445,8 @@ void ProtonixDevice::_pipeNetwork() {
 			bool onlineP = this->_protocol->Connected();
 
 			Serial.println("[WARNING] RECONNECT N:" + String(onlineN) + " P:" + String(onlineP));
+
+			this->_authorized = false;
 
 			if (!onlineN) {
 				this->_networkConnected1 = false;
@@ -456,6 +461,12 @@ void ProtonixDevice::_pipeNetwork() {
 			return;
 		}
 
+		if (!this->_authorized) {
+			this->RequestStreamAuthorize();
+
+			return;
+		}
+
 		this->_timerNetwork->Enabled(false);
 	}
 
@@ -463,7 +474,7 @@ void ProtonixDevice::_pipeNetwork() {
 }
 #endif
 
-void ProtonixDevice::_pipeActions() {
+void ProtonixDevice::_pipeActions () {
 	if (this->_actionCursorCurrent == PROTONIX_LIMIT_ACTION_BACKLOG)
 		this->_actionCursorCurrent = 0;
 
@@ -509,7 +520,7 @@ void ProtonixDevice::_pipeActions() {
 	*/
 }
 
-void ProtonixDevice::Pipe() {
+void ProtonixDevice::Pipe () {
 	this->_timerUptime->Pipe();
 	this->_status->Uptime(this->_timerUptime->RunTime());
 
@@ -544,9 +555,9 @@ void ProtonixDevice::Pipe() {
 		this->_device->DeviceOnReady(this);
 	}
 
-	#if defined(ESP32) || defined(ESP8266)
+#if defined(ESP32) || defined(ESP8266)
 	this->_pipeNetwork();
-	#endif
+#endif
 
 	i = 0;
 
@@ -569,21 +580,21 @@ void ProtonixDevice::Pipe() {
 	if (this->_timerTick->Pipe()) {
 		this->_device->DeviceOnTick(this);
 
-		if (this->_device->DeviceAutoStatus()) {
-			#if defined(ESP32) || defined(ESP8266)
+		if (this->_device->DeviceAutoStatus() && this->_authorized) {
+#if defined(ESP32) || defined(ESP8266)
 			this->RequestStream("/api/mechanism/status", new DTO::DTORequestDeviceStatus(this->_status, this->_registry->Raw()));
-			#endif
+#endif
 		}
 	}
 
 	this->_pipeActions();
 }
 
-void ProtonixDevice::OnSerial(ProtonixDevicePort* port, IProtonixCommand* command) {
+void ProtonixDevice::OnSerial (ProtonixDevicePort* port, IProtonixCommand* command) {
 	this->_device->DeviceOnSerialCommand(this, port, command);
 }
 
-bool ProtonixDevice::SerialCommand(String port, IProtonixCommand* command) {
+bool ProtonixDevice::SerialCommand (String port, IProtonixCommand* command) {
 	unsigned int i = 0;
 	bool ok = true;
 
@@ -597,7 +608,7 @@ bool ProtonixDevice::SerialCommand(String port, IProtonixCommand* command) {
 	return ok;
 }
 
-bool ProtonixDevice::SerialCommandCustom(String port, String command) {
+bool ProtonixDevice::SerialCommandCustom (String port, String command) {
 	Command::CCustom* cmd = new Command::CCustom(command);
 
 	bool ok = this->SerialCommand(port, cmd);
@@ -608,7 +619,7 @@ bool ProtonixDevice::SerialCommandCustom(String port, String command) {
 	return ok;
 }
 
-bool ProtonixDevice::SerialCommandSensor(String port, ProtonixDeviceSensor* sensor) {
+bool ProtonixDevice::SerialCommandSensor (String port, ProtonixDeviceSensor* sensor) {
 	Command::CStdSensor* cmd = new Command::CStdSensor(sensor);
 
 	bool ok = this->SerialCommand(port, cmd);
@@ -619,7 +630,7 @@ bool ProtonixDevice::SerialCommandSensor(String port, ProtonixDeviceSensor* sens
 	return ok;
 }
 
-bool ProtonixDevice::SerialCommandSensor(String port, String id, String value) {
+bool ProtonixDevice::SerialCommandSensor (String port, String id, String value) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value);
 
 	bool ok = this->SerialCommandSensor(port, sensor);
@@ -630,7 +641,7 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, String value) {
 	return ok;
 }
 
-bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, bool active) {
+bool ProtonixDevice::SerialCommandSensor (String port, String id, String value, bool active) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value, active);
 
 	bool ok = this->SerialCommandSensor(port, sensor);
@@ -641,7 +652,7 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, b
 	return ok;
 }
 
-bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, bool active, bool failure) {
+bool ProtonixDevice::SerialCommandSensor (String port, String id, String value, bool active, bool failure) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value, active, failure);
 
 	bool ok = this->SerialCommandSensor(port, sensor);
@@ -652,7 +663,7 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, b
 	return ok;
 }
 
-bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, bool active, bool failure, String state) {
+bool ProtonixDevice::SerialCommandSensor (String port, String id, String value, bool active, bool failure, String state) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value, active, failure, state);
 
 	bool ok = this->SerialCommandSensor(port, sensor);
@@ -663,7 +674,7 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, b
 	return ok;
 }
 
-bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active) {
+bool ProtonixDevice::SerialCommandSensor (String port, String id, bool active) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, active);
 
 	bool ok = this->SerialCommandSensor(port, sensor);
@@ -674,7 +685,7 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active) {
 	return ok;
 }
 
-bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active, bool failure) {
+bool ProtonixDevice::SerialCommandSensor (String port, String id, bool active, bool failure) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, active, failure);
 
 	bool ok = this->SerialCommandSensor(port, sensor);
@@ -685,7 +696,7 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active, bo
 	return ok;
 }
 
-bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active, bool failure, String state) {
+bool ProtonixDevice::SerialCommandSensor (String port, String id, bool active, bool failure, String state) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, active, failure, state);
 
 	bool ok = this->SerialCommandSensor(port, sensor);
@@ -696,7 +707,7 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, bool active, bo
 	return ok;
 }
 
-bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, String state) {
+bool ProtonixDevice::SerialCommandSensor (String port, String id, String value, String state) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id, value, state);
 
 	bool ok = this->SerialCommandSensor(port, sensor);
@@ -707,7 +718,7 @@ bool ProtonixDevice::SerialCommandSensor(String port, String id, String value, S
 	return ok;
 }
 
-bool ProtonixDevice::SerialStatus(String port) {
+bool ProtonixDevice::SerialStatus (String port) {
 	unsigned count = this->_status->SensorCount();
 	unsigned int i = 0;
 	bool ok = true;
@@ -804,23 +815,38 @@ void ProtonixDevice::RequestStreamAuthorize() {
 }
 
 void ProtonixDevice::OnStream(unsigned char* data) {
+	String raw = String((char*)data);
+
 	if (this->_debug)
-		Serial.println("[OnStream] " + String((char*)data));
+		Serial.println("[OnStream] " + raw);
 
-	this->_dtoInput->Debug(this->_debug);
-	this->_dtoInput->BufferRaw((char*)data);
-	this->_dtoInput->Deserialize();
+	raw.replace("}{", "}}-{{");
+	//Serial.println("[debug] 1: " + raw);
 
-	if (this->_dtoInput->IsURL())
-		this->_onStreamURL();
+	List<String>* cmds = explode("}-{", raw);
+	//Serial.println("[debug] 2: " + String(cmds->Count()));
 
-	if (this->_dtoInput->IsResponse())
-		this->_onStreamResponse();
+	for (String& cmd : *cmds) {
+		//Serial.println("[debug] 3: " + cmd);
 
-	if (this->_dtoInput->IsEvent())
-		this->_onStreamEvent();
+		this->_dtoInput->Debug(this->_debug);
+		this->_dtoInput->BufferRaw(cmd);
+		this->_dtoInput->Deserialize();
 
-	this->_dtoInput->Reset();
+		if (this->_dtoInput->IsURL())
+			this->_onStreamURL();
+
+		if (this->_dtoInput->IsResponse())
+			this->_onStreamResponse();
+
+		if (this->_dtoInput->IsEvent())
+			this->_onStreamEvent();
+
+		this->_dtoInput->Reset();
+	}
+
+	delete cmds;
+	cmds = nullptr;
 }
 
 void ProtonixDevice::_onStreamURL() {
@@ -837,6 +863,8 @@ void ProtonixDevice::_onStreamResponse() {
 	if (this->_dtoInput->Response() == "/api/authorize/mechanism") {
 		DTO::DTOResponseAuthorization* dto = new DTO::DTOResponseAuthorization();
 		dto->DTOPopulate(this->_dtoInput);
+
+		this->_authorized = dto->Status() == 200;
 
 		this->_device->DeviceOnStreamResponseAuthorization(this, dto);
 
@@ -889,18 +917,18 @@ bool ProtonixDevice::FirmwareUpdateOTA(String version) {
 	String url = this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID() + "?platform=";
 	String ver = version == "" ? "" : String("&version=" + version);
 
-	#if defined(ESP32)
+#if defined(ESP32)
 		t_httpUpdate_return out = ESPhttpUpdate.update(url + "esp32" + ver);
 
 		return out == HTTP_UPDATE_OK;
-	#elif defined(ESP8266)
+#elif defined(ESP8266)
 		WiFiClient client;
 		t_httpUpdate_return out = ESPhttpUpdate.update(client, url + "esp8266" + ver);
 
 		return out == HTTP_UPDATE_OK;
-	#else
+#else
 		return false;
-	#endif
+#endif
 }
 
 /*
@@ -1027,14 +1055,14 @@ bool ProtonixDevice::FirmwareUpdate(Stream& stream, void(*onProgress)(int, int))
 
 	if (!Update.begin(size, cmd)) this->_updateError("begin", error);
 	else {
-	  	Serial.println("[debug] FirmwareUpdate begin");
+		  Serial.println("[debug] FirmwareUpdate begin");
 
 		if (onProgress)
 			onProgress(0, size);
 
 		// TODO: think of necessarity
 		//if (!Update.setMD5(md5.c_str()))
-	  		//this->_updateError("md5", error);
+			  //this->_updateError("md5", error);
 
 		if (Update.writeStream(stream) != size) this->_updateError("writeStream", error);
 		else {

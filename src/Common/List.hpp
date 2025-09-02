@@ -1,0 +1,223 @@
+#pragma once
+
+namespace Qybercom {
+	template<typename T>
+	class List {
+		private:
+			struct Node {
+				T Data;
+				Node* Prev;
+				Node* Next;
+				int Index;
+
+				Node (const T &data) : Data(data), Prev(0), Next(0), Index(-1) {}
+			};
+
+			class Iterator {
+				private:
+					Node* _node;
+
+				public:
+					Iterator (Node* node) : _node(node) {}
+
+					T &operator* () { return _node->Data; }
+
+					Iterator &operator++ () {
+						_node = _node->Next;
+
+						return *this;
+					}
+
+					bool operator!= (const Iterator &other) const {
+						return _node != other._node;
+					}
+			};
+
+			Node* _head;
+			Node* _tail;
+			int _count;
+
+			Node* _iNode;
+			bool _iStarted;
+
+			void _reindex () {
+				Node* cur = _head;
+				int idx = 0;
+
+				while (cur) {
+					cur->Index = idx++;
+					cur = cur->Next;
+				}
+			}
+
+		public:
+			List () : _head(0), _tail(0), _count(0), _iNode(0), _iStarted(false) {}
+
+			Node* Head () { return _head; }
+
+			Node* Tail () { return _tail; }
+
+			int Count () const { return _count; }
+
+			Node* INode () { return _iNode; }
+
+			List<T> &Add (const T &data, bool before = false) {
+				Node* node = new Node(data);
+
+				if (!_head) _head = _tail = node;
+				else if (before) {
+					node->Next = _head;
+					_head->Prev = node;
+					_head = node;
+				}
+				else {
+					node->Prev = _tail;
+					_tail->Next = node;
+					_tail = node;
+				}
+
+				_count++;
+				_reindex();
+
+				return *this;
+			}
+
+			List<T> &Insert (const T &data, int index) {
+				if (index <= 0) return Add(data, true);
+				if (index >= _count) return Add(data, false);
+
+				Node* cur = _head;
+				while (cur && cur->Index != index) cur = cur->Next;
+
+				if (cur) {
+					Node* node = new Node(data);
+					node->Prev = cur->Prev;
+					node->Next = cur;
+
+					if (cur->Prev)
+						cur->Prev->Next = node;
+
+					cur->Prev = node;
+
+					if (cur == _head)
+						_head = node;
+
+					_count++;
+					_reindex();
+				}
+
+				return *this;
+			}
+
+			List<T> &Remove (int index) {
+				if (index < 0 || index >= _count) return *this;
+
+				Node* cur = _head;
+				while (cur && cur->Index != index) cur = cur->Next;
+
+				if (cur) {
+					if (cur->Prev) cur->Prev->Next = cur->Next;
+					if (cur->Next) cur->Next->Prev = cur->Prev;
+					if (cur == _head) _head = cur->Next;
+					if (cur == _tail) _tail = cur->Prev;
+
+					delete cur;
+					_count--;
+					_reindex();
+				}
+
+				return *this;
+			}
+
+			List<T> &Clear () {
+				Node* cur = _head;
+
+				while (cur) {
+					Node* next = cur->Next;
+					delete cur;
+					cur = next;
+				}
+
+				_head = _tail = 0;
+				_count = 0;
+				_iNode = 0;
+				_iStarted = false;
+
+				return *this;
+			}
+
+			int IndexOf (const T &data) {
+				Node* cur = _head;
+
+				while (cur) {
+					if (cur->Data == data)
+						return cur->Index;
+
+					cur = cur->Next;
+				}
+
+				return -1;
+			}
+
+			T &Get (int index) {
+				Node* cur = _head;
+
+				while (cur) {
+					if (cur->Index == index)
+						return cur->Data;
+
+					cur = cur->Next;
+				}
+
+				if (_head)
+					return _head->Data;
+
+				return *(T*) 0;
+			}
+
+			Node* GetNode (unsigned int index) {
+				if (index >= _count) return 0;
+
+				Node* cur = _head;
+				for (unsigned int i = 0; i < index; i++) cur = cur->Next;
+
+				return cur;
+			}
+
+			List<T> &Reset () {
+				_iNode = 0;
+				_iStarted = false;
+
+				return *this;
+			}
+
+			T &Current () {
+				return _iNode->Data;
+			}
+
+			T* Next () {
+				_iNode = _iNode ? _iNode->Next : _head;
+
+				return _iNode ? &_iNode->Data : nullptr;
+			}
+
+			bool Iterate () {
+				if (!_iStarted) {
+					_iNode = _head;
+					_iStarted = true;
+				}
+				else if (_iNode) {
+					_iNode = _iNode->Next;
+				}
+
+				return _iNode != nullptr;
+			}
+
+			// `for (item : list) {...}`
+			Iterator begin () { return Iterator(_head); }
+
+			Iterator end () { return Iterator(0); }
+
+			~List () { Clear(); }
+	};
+}
