@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 
+#include "Common/List.hpp"
+
 #include <IProtonixCommand.h>
 #include <ProtonixDevicePort.h>
 
@@ -12,6 +14,7 @@
 #include "Command/CStdRegistry.h"
 #include "Command/CStdSensor.h"
 
+using namespace Qybercom;
 using namespace Qybercom::Protonix;
 
 #if !defined(ESP32) && !defined(ESP8266)
@@ -43,14 +46,21 @@ void ProtonixDevicePort::_init(bool serial, String name, unsigned int pinRX, uns
 	this->_lenActive = false;
 
 	#if defined(ESP32) || defined(ESP8266)
-	this->_cmds[0] = new Command::CCustom();
+	this->_cmds.Add(new Command::CCustom());
+	this->_cmds.Add(new Command::CStdFirmware());
+	this->_cmds.Add(new Command::CStdOff());
+	this->_cmds.Add(new Command::CStdOn());
+	this->_cmds.Add(new Command::CStdReboot());
+	this->_cmds.Add(new Command::CStdRegistry());
+	/*this->_cmds[0] = new Command::CCustom();
 	this->_cmds[1] = new Command::CStdFirmware();
 	this->_cmds[2] = new Command::CStdOff();
 	this->_cmds[3] = new Command::CStdOn();
 	this->_cmds[4] = new Command::CStdReboot();
-	this->_cmds[5] = new Command::CStdRegistry();
+	this->_cmds[5] = new Command::CStdRegistry();*/
 	#endif
-	this->_cmds[6] = new Command::CStdSensor();
+	this->_cmds.Add(new Command::CStdSensor());
+	//this->_cmds[6] = new Command::CStdSensor();
 }
 
 byte ProtonixDevicePort::_crc8(String data) {
@@ -293,7 +303,7 @@ void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 		}
 	}
 
-	int i = 0;
+	//int i = 0;
 	String lenBuffer = String(this->_blocking ? s.length() + 1 : this->_cmdBuffer.length() + 1);
 
 	if (lenBuffer != this->_lenBuffer) {
@@ -302,13 +312,18 @@ void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 	else {
 		//::Serial.println("[debug] cmd " + String(s));
 
-		while (i < 7) {
+		for (IProtonixCommand* command : this->_cmds) {
+			if (command != nullptr && command->CommandRecognize(device, this, this->_blocking ? s : this->_cmdBuffer)) {
+				device->OnSerial(this, command);
+			}
+		}
+		/*while (i < 7) {
 			if (this->_cmds[i] != nullptr && this->_cmds[i]->CommandRecognize(device, this, this->_blocking ? s : this->_cmdBuffer)) {
 				device->OnSerial(this, this->_cmds[i]);
 			}
 	
 			i++;
-		}
+		}*/
 	}
 	
 	this->_cmdBuffer = "";

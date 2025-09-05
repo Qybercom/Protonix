@@ -1,5 +1,7 @@
 #include <Arduino.h>
 
+#include "Common/List.hpp"
+
 #include "IProtonixDevice.h"
 #include "IProtonixCommand.h"
 #include "ProtonixDevice.h"
@@ -21,6 +23,7 @@
 
 #include "ProtonixGenericDevice.h"
 
+using namespace Qybercom;
 using namespace Qybercom::Protonix;
 
 void ProtonixGenericDevice::_init () {
@@ -30,13 +33,20 @@ void ProtonixGenericDevice::_init () {
 void ProtonixGenericDevice::_init (bool debug) {
 	this->_debug = debug;
 
-	this->_cmds[0] = new Command::CCustom();
+	this->_cmds.Add(new Command::CCustom());
+	this->_cmds.Add(new Command::CStdFirmware());
+	this->_cmds.Add(new Command::CStdOff());
+	this->_cmds.Add(new Command::CStdOn());
+	this->_cmds.Add(new Command::CStdReboot());
+	this->_cmds.Add(new Command::CStdRegistry());
+	this->_cmds.Add(new Command::CStdSensor());
+	/*this->_cmds[0] = new Command::CCustom();
 	this->_cmds[1] = new Command::CStdFirmware();
 	this->_cmds[2] = new Command::CStdOff();
 	this->_cmds[3] = new Command::CStdOn();
 	this->_cmds[4] = new Command::CStdReboot();
 	this->_cmds[5] = new Command::CStdRegistry();
-	this->_cmds[6] = new Command::CStdSensor();
+	this->_cmds[6] = new Command::CStdSensor();*/
 
 	#if defined(ESP32) || defined(ESP8266)
 	pinMode(2, OUTPUT);
@@ -161,7 +171,15 @@ void ProtonixGenericDevice::DeviceOnStreamEventCommand(ProtonixDevice* device, D
 	if (this->_debug)
 		Serial.println("[device:command] " + cmd);
 
-	unsigned int i = 0;
+	for (IProtonixCommand* item : this->_cmds) {
+		item->CommandReset();
+		item->CommandFromDTO(command);
+
+		if (item->CommandRecognize(device, nullptr, cmd)) {
+			this->DeviceOnCommand(device, nullptr, item);
+		}
+	}
+	/*unsigned int i = 0;
 
 	while (i < 7) {
 		this->_cmds[i]->CommandReset();
@@ -172,6 +190,6 @@ void ProtonixGenericDevice::DeviceOnStreamEventCommand(ProtonixDevice* device, D
 		}
 
 		i++;
-	}
+	}*/
 }
 #endif

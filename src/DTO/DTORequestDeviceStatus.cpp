@@ -51,15 +51,25 @@ void DTO::DTORequestDeviceStatus::DTOSerialize(JsonDocument& dto) {
 	dto["data"]["uptime"] = this->_status->Uptime();
 	dto["data"]["summary"] = this->_status->Summary();
 
-	ProtonixDeviceSensor** sensors = this->_status->Sensors();
-	//JsonArray sensors_out = dto["data"].createNestedArray("sensors");
 	JsonArray sensors_out = dto["data"]["sensors"].to<JsonArray>();
+
+	List<ProtonixDeviceSensor*> &sensors = this->_status->Sensors();
+
+	for (ProtonixDeviceSensor* sensor : sensors) {
+		JsonObject item = sensors_out.add<JsonObject>();
+
+		item["id"] = sensor->ID();
+		item["value"] = sensor->Value();
+		item["active"] = sensor->Active();
+		item["failure"] = sensor->Failure();
+		item["state"] = sensor->State();
+	}
+	/*ProtonixDeviceSensor** sensors = this->_status->Sensors();
 
 	unsigned int i = 0;
 	unsigned int size = this->_status->SensorCount();
 
 	while (i < size) {
-		//JsonObject sensor = sensors_out.createNestedObject();
 		JsonObject sensor = sensors_out.add<JsonObject>();
 
 		sensor["id"] = sensors[i]->ID();
@@ -69,7 +79,7 @@ void DTO::DTORequestDeviceStatus::DTOSerialize(JsonDocument& dto) {
 		sensor["state"] = sensors[i]->State();
 
 		i++;
-	}
+	}*/
 
 	dto["data"]["registry"] = String(this->_registry + "");
 }

@@ -23,7 +23,7 @@
 #include "ProtonixDevicePort.h"
 #include "ProtonixDeviceSensor.h"
 
-#if defined(ESP32) || defined(ESP8266)
+/*#if defined(ESP32) || defined(ESP8266)
 #define PROTONIX_LIMIT_HARDWARE 32
 #define PROTONIX_LIMIT_ACTION_LIST 64
 #define PROTONIX_LIMIT_ACTION_BACKLOG 256
@@ -33,7 +33,7 @@
 #define PROTONIX_LIMIT_ACTION_LIST 8
 #define PROTONIX_LIMIT_ACTION_BACKLOG 16
 #define PROTONIX_LIMIT_PORT 4
-#endif
+#endif*/
 
 namespace Qybercom {
 	namespace Protonix {
@@ -58,19 +58,16 @@ namespace Qybercom {
 				ProtonixRegistry* _registry;
 				String _serverBaseURI;
 
-				unsigned int _hardwareCount;
-				IProtonixHardware* _hardware[PROTONIX_LIMIT_HARDWARE];
+				/*unsigned int _hardwareCount;
+				IProtonixHardware* _hardware[PROTONIX_LIMIT_HARDWARE];*/
+				List<IProtonixHardware*> _hardware;
 
-				unsigned int _portCount;
-				ProtonixDevicePort* _ports[PROTONIX_LIMIT_PORT];
+				/*unsigned int _portCount;
+				ProtonixDevicePort* _ports[PROTONIX_LIMIT_PORT];*/
+				List<ProtonixDevicePort*> _ports;
 
 				List<ProtonixAction*> _actions;
 				List<ProtonixAction*> _actionQueue;
-				/*ProtonixAction* _actionList[PROTONIX_LIMIT_ACTION_LIST]; // deprecated
-				String _actionBacklog[PROTONIX_LIMIT_ACTION_BACKLOG]; // deprecated
-				int _actionCursorList;
-				int _actionCursorBacklog;
-				int _actionCursorCurrent;*/
 				void _pipeActions();
 
 				#if defined(ESP32) || defined(ESP8266)
@@ -125,9 +122,11 @@ namespace Qybercom {
 				static int FreeFlash ();
 				static void Reboot ();
 
+				List<IProtonixHardware*> &Hardware ();
 				IProtonixHardware* Hardware (String id);
 				ProtonixDevice* Hardware (String id, IProtonixHardware* hardware);
 
+				List<ProtonixDevicePort*> &Ports ();
 				ProtonixDevicePort* Port (String name);
 				ProtonixDevicePort* Port (ProtonixDevicePort* port);
 				ProtonixDevicePort* Port (String name, unsigned int pinTX, unsigned int pinRX);
@@ -150,6 +149,7 @@ namespace Qybercom {
 				ProtonixDevicePort* PortDefault (unsigned int speed, unsigned int timeout, bool blocking, bool observable);
 
 				// https://stackoverflow.com/a/120916/2097055
+				List<ProtonixAction*> &Actions ();
 				ProtonixAction* Action (String name);
 				ProtonixAction* ActionRegister (ProtonixAction* action);
 				ProtonixAction* ActionRegister (String name);

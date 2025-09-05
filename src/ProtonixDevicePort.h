@@ -3,6 +3,8 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 
+#include "Common/List.hpp"
+
 #include "IProtonixCommand.h"
 
 namespace Qybercom {
@@ -28,7 +30,8 @@ namespace Qybercom {
 				String _cmdBuffer;
 				String _lenBuffer;
 				bool _lenActive;
-				IProtonixCommand* _cmds[7];
+				//IProtonixCommand* _cmds[7];
+				List<IProtonixCommand*> _cmds;
 				//byte 
 				void _init(bool serial, String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, unsigned int timeout, bool blocking, bool observable);
 				byte _crc8(String data);

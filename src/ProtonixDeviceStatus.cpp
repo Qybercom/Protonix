@@ -1,8 +1,11 @@
 #include <Arduino.h>
 
+#include "Common/List.hpp"
+
 #include "ProtonixDeviceStatus.h"
 #include "ProtonixDeviceSensor.h"
 
+using namespace Qybercom;
 using namespace Qybercom::Protonix;
 
 
@@ -13,7 +16,7 @@ ProtonixDeviceStatus::ProtonixDeviceStatus() {
 	this->_state = "";
 	this->_uptime = "";
 	this->_summary = "";
-	this->_sensorCount = 0;
+	//this->_sensorCount = 0;
 }
 
 void ProtonixDeviceStatus::Firmware(String firmware) {
@@ -56,25 +59,35 @@ String ProtonixDeviceStatus::Summary() {
 	return this->_summary;
 }
 
-ProtonixDeviceSensor** ProtonixDeviceStatus::Sensors() {
+/*ProtonixDeviceSensor** ProtonixDeviceStatus::Sensors() {
+	return this->_sensors;
+}*/
+
+List<ProtonixDeviceSensor*> &ProtonixDeviceStatus::Sensors () {
 	return this->_sensors;
 }
 
-unsigned int ProtonixDeviceStatus::SensorCount() {
-	return this->_sensorCount;
-}
+/*unsigned int ProtonixDeviceStatus::SensorCount() {
+	return this->_sensors.Count;
+}*/
 
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorAdd(String id) {
 	ProtonixDeviceSensor* sensor = new ProtonixDeviceSensor(id);
 
-	this->_sensors[this->_sensorCount] = sensor;
-	this->_sensorCount++;
+	this->_sensors.Add(sensor);
+	/*this->_sensors[this->_sensorCount] = sensor;
+	this->_sensorCount++;*/
 
 	return this;
 }
 
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, String value) {
-	unsigned int i = 0;
+	for (ProtonixDeviceSensor* sensor : this->_sensors) {
+		if (id == "" || sensor->ID() == id) {
+			sensor->Value(value);
+		}
+	}
+	/*unsigned int i = 0;
 
 	while (i < this->_sensorCount) {
 		if (id == "" || this->_sensors[i]->ID() == id) {
@@ -82,13 +95,19 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, String value) {
 		}
 
 		i++;
-	}
+	}*/
 
 	return this;
 }
 
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, String value, bool active) {
-	unsigned int i = 0;
+	for (ProtonixDeviceSensor* sensor : this->_sensors) {
+		if (id == "" || sensor->ID() == id) {
+			sensor->Value(value);
+			sensor->Active(active);
+		}
+	}
+	/*unsigned int i = 0;
 
 	while (i < this->_sensorCount) {
 		if (id == "" || this->_sensors[i]->ID() == id) {
@@ -97,13 +116,20 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, String value, b
 		}
 
 		i++;
-	}
+	}*/
 
 	return this;
 }
 
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, String value, bool active, bool failure) {
-	unsigned int i = 0;
+	for (ProtonixDeviceSensor* sensor : this->_sensors) {
+		if (id == "" || sensor->ID() == id) {
+			sensor->Value(value);
+			sensor->Active(active);
+			sensor->Failure(failure);
+		}
+	}
+	/*unsigned int i = 0;
 
 	while (i < this->_sensorCount) {
 		if (id == "" || this->_sensors[i]->ID() == id) {
@@ -113,13 +139,21 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, String value, b
 		}
 
 		i++;
-	}
+	}*/
 
 	return this;
 }
 
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, String value, bool active, bool failure, String state) {
-	unsigned int i = 0;
+	for (ProtonixDeviceSensor* sensor : this->_sensors) {
+		if (id == "" || sensor->ID() == id) {
+			sensor->Value(value);
+			sensor->Active(active);
+			sensor->Failure(failure);
+			sensor->State(state);
+		}
+	}
+	/*unsigned int i = 0;
 
 	while (i < this->_sensorCount) {
 		if (id == "" || this->_sensors[i]->ID() == id) {
@@ -130,13 +164,18 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, String value, b
 		}
 
 		i++;
-	}
+	}*/
 
 	return this;
 }
 
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, bool active) {
-	unsigned int i = 0;
+	for (ProtonixDeviceSensor* sensor : this->_sensors) {
+		if (id == "" || sensor->ID() == id) {
+			sensor->Active(active);
+		}
+	}
+	/*unsigned int i = 0;
 
 	while (i < this->_sensorCount) {
 		if (id == "" || this->_sensors[i]->ID() == id) {
@@ -144,13 +183,19 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, bool active) {
 		}
 
 		i++;
-	}
+	}*/
 
 	return this;
 }
 
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, bool active, bool failure) {
-	unsigned int i = 0;
+	for (ProtonixDeviceSensor* sensor : this->_sensors) {
+		if (id == "" || sensor->ID() == id) {
+			sensor->Active(active);
+			sensor->Failure(failure);
+		}
+	}
+	/*unsigned int i = 0;
 
 	while (i < this->_sensorCount) {
 		if (id == "" || this->_sensors[i]->ID() == id) {
@@ -159,13 +204,20 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, bool active, bo
 		}
 
 		i++;
-	}
+	}*/
 
 	return this;
 }
 
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, bool active, bool failure, String state) {
-	unsigned int i = 0;
+	for (ProtonixDeviceSensor* sensor : this->_sensors) {
+		if (id == "" || sensor->ID() == id) {
+			sensor->Active(active);
+			sensor->Failure(failure);
+			sensor->State(state);
+		}
+	}
+	/*unsigned int i = 0;
 
 	while (i < this->_sensorCount) {
 		if (id == "" || this->_sensors[i]->ID() == id) {
@@ -175,13 +227,19 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, bool active, bo
 		}
 
 		i++;
-	}
+	}*/
 
 	return this;
 }
 
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, String value, String state) {
-	unsigned int i = 0;
+	for (ProtonixDeviceSensor* sensor : this->_sensors) {
+		if (id == "" || sensor->ID() == id) {
+			sensor->Value(value);
+			sensor->State(state);
+		}
+	}
+	/*unsigned int i = 0;
 
 	while (i < this->_sensorCount) {
 		if (id == "" || this->_sensors[i]->ID() == id) {
@@ -190,7 +248,7 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(String id, String value, S
 		}
 
 		i++;
-	}
+	}*/
 
 	return this;
 }
@@ -206,14 +264,19 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorSet(ProtonixDeviceSensor* sens
 }
 
 ProtonixDeviceStatus* ProtonixDeviceStatus::SensorReset(String id) {
-	unsigned int i = 0;
+	for (ProtonixDeviceSensor* sensor : this->_sensors) {
+		if (id == "" || sensor->ID() == id) {
+			sensor->Reset();
+		}
+	}
+	/*unsigned int i = 0;
 
 	while (i < this->_sensorCount) {
 		if (id == "" || this->_sensors[i]->ID() == id)
 			this->_sensors[i]->Reset();
 
 		i++;
-	}
+	}*/
 
 	return this;
 }
@@ -223,18 +286,21 @@ ProtonixDeviceStatus* ProtonixDeviceStatus::SensorReset() {
 }
 
 ProtonixDeviceSensor* ProtonixDeviceStatus::Sensor(String id) {
-	unsigned int i = 0;
+	for (ProtonixDeviceSensor* sensor : this->_sensors)
+		if (sensor->ID() == id) return sensor;
+	/*unsigned int i = 0;
 
 	while (i < this->_sensorCount) {
 		if (this->_sensors[i]->ID() == id)
 			return this->_sensors[i];
 
 		i++;
-	}
+	}*/
 
 	return nullptr;
 }
 
+/*
 ProtonixDeviceSensor* ProtonixDeviceStatus::Sensor(unsigned int i) {
 	unsigned int j = 0;
 
@@ -246,4 +312,4 @@ ProtonixDeviceSensor* ProtonixDeviceStatus::Sensor(unsigned int i) {
 	}
 
 	return nullptr;
-}
+}*/

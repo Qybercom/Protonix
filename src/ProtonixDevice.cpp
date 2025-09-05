@@ -50,11 +50,8 @@ ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
 	this->_timerTick = new ProtonixTimer(0);
 	this->_status = new ProtonixDeviceStatus();
 	this->_ready = false;
-	this->_portCount = 0;
-	this->_hardwareCount = 0;
-	/*this->_actionCursorList = 0;
-	this->_actionCursorBacklog = 0;
-	this->_actionCursorCurrent = 0;*/
+	/*this->_portCount = 0;
+	this->_hardwareCount = 0;*/
 
 	this->Device(device);
 	this->Debug(false);
@@ -83,13 +80,6 @@ ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
 	pinMode(4, OUTPUT);
 	digitalWrite(4, HIGH);
 	#endif
-
-	/*int i = 0;
-	while (i < PROTONIX_LIMIT_ACTION_BACKLOG) {
-		this->_actionBacklog[i] = "";
-
-		i++;
-	}*/
 }
 
 void ProtonixDevice::Device (IProtonixDevice* device) {
@@ -133,16 +123,20 @@ void ProtonixDevice::Summary (String additional) {
 		 + String("[on:") + String(this->_status->On() ? "yes" : "no") + String("] ")
 		 + String("[uptime:") + String(this->_status->Uptime()) + String("] ")
 		 + String("[memory:") + String(this->FreeRAM()) + String("] ")
-		 + String(state == "" ? "" : "[state:" + state + "]");
+		 + String("[state:" + state + "]");
 
-	unsigned int i = 0;
+	List<ProtonixDeviceSensor*> &sensors = this->_status->Sensors();
+
+	for (ProtonixDeviceSensor* sensor : sensors)
+		summary += " " + sensor->Summary();
+	/*unsigned int i = 0;
 	unsigned int count = this->_status->SensorCount();
 
 	while (i < count) {
 		summary += " " + this->_status->Sensors()[i]->Summary();
 
 		i++;
-	}
+	}*/
 
 	this->_status->Summary(summary + additional);
 }
@@ -208,15 +202,21 @@ void ProtonixDevice::Reboot () {
 	#endif
 }
 
+List<IProtonixHardware*> &ProtonixDevice::Hardware () {
+	return this->_hardware;
+}
+
 IProtonixHardware* ProtonixDevice::Hardware (String id) {
-	unsigned int i = 0;
+	for (IProtonixHardware* hardware : this->_hardware)
+		if (hardware->HardwareID() == id) return hardware;
+	/*unsigned int i = 0;
 
 	while (i < this->_hardwareCount) {
 		if (id == this->_hardware[i]->HardwareID())
 			return this->_hardware[i];
 
 		i++;
-	}
+	}*/
 
 	return nullptr;
 }
@@ -224,28 +224,36 @@ IProtonixHardware* ProtonixDevice::Hardware (String id) {
 ProtonixDevice* ProtonixDevice::Hardware (String id, IProtonixHardware* hardware) {
 	hardware->HardwareID(id);
 
-	this->_hardware[this->_hardwareCount] = hardware;
-	this->_hardwareCount++;
+	this->_hardware.Add(hardware);
+	/*this->_hardware[this->_hardwareCount] = hardware;
+	this->_hardwareCount++;*/
 
 	return this;
 }
 
+List<ProtonixDevicePort*> &ProtonixDevice::Ports () {
+	return this->_ports;
+}
+
 ProtonixDevicePort* ProtonixDevice::Port (String name) {
-	unsigned int i = 0;
+	for (ProtonixDevicePort* port : this->_ports)
+		if (port->Name() == name) return port;
+	/*unsigned int i = 0;
 
 	while (i < this->_portCount) {
 		if (name == this->_ports[i]->Name())
 			return this->_ports[i];
 
 		i++;
-	}
+	}*/
 
 	return nullptr;
 }
 
 ProtonixDevicePort* ProtonixDevice::Port (ProtonixDevicePort* port) {
-	this->_ports[this->_portCount] = port;
-	this->_portCount++;
+	this->_ports.Add(port);
+	/*this->_ports[this->_portCount] = port;
+	this->_portCount++;*/
 
 	return port;
 }
@@ -322,17 +330,13 @@ ProtonixDevicePort* ProtonixDevice::PortDefault (unsigned int speed, unsigned in
 	return this->Port(new ProtonixDevicePort(speed, timeout, blocking, observable));
 }
 
+List<ProtonixAction*> &ProtonixDevice::Actions () {
+	return this->_actions;
+}
+
 ProtonixAction* ProtonixDevice::Action (String name) {
-	for (ProtonixAction* action : _actions)
+	for (ProtonixAction* action : this->_actions)
 		if (action->Name() == name) return action;
-	/*int i = 0;
-
-	while (i < this->_actionCursorList) {
-		if (this->_actionList[i]->Name() == name)
-			return this->_actionList[i];
-
-		i++;
-	}*/
 
 	return nullptr;
 }
@@ -340,12 +344,6 @@ ProtonixAction* ProtonixDevice::Action (String name) {
 ProtonixAction* ProtonixDevice::ActionRegister (ProtonixAction* action) {
 	this->_actions.Add(action);
 
-	/*if (this->_actionCursorList == PROTONIX_LIMIT_ACTION_LIST) return false;
-
-	this->_actionList[this->_actionCursorList] = action;
-	this->_actionCursorList++;
-
-	return true;*/
 	return action;
 }
 
@@ -446,7 +444,7 @@ bool ProtonixDevice::ActionPipe (ProtonixAction* action) {
 void ProtonixDevice::ActionReset () {
 	this->_actionQueue.Clear();
 
-	for (ProtonixAction* action : _actions)
+	for (ProtonixAction* action : this->_actions)
 		action->Reset();
 }
 
@@ -556,7 +554,7 @@ void ProtonixDevice::_pipeActions () {
 		}
 	}
 
-	for (ProtonixAction* action : _actions) {
+	for (ProtonixAction* action : this->_actions) {
 		if (action->Queued()) continue;
 
 		this->ActionPipe(action);
@@ -567,17 +565,19 @@ void ProtonixDevice::Pipe () {
 	this->_timerUptime->Pipe();
 	this->_status->Uptime(this->_timerUptime->RunTime());
 
-	unsigned int i = 0;
+	//unsigned int i = 0;
 
 	if (!this->_ready) {
 		this->_ready = true;
 
-		i = 0;
+		for (ProtonixDevicePort* port : this->_ports)
+			port->Init(this);
+		/*i = 0;
 		while (i < this->_portCount) {
 			this->_ports[i]->Init(this);
 
 			i++;
-		}
+		}*/
 
 		/*i = 0;
 		while (i < this->_hardwareCount) {
@@ -602,21 +602,25 @@ void ProtonixDevice::Pipe () {
 	this->_pipeNetwork();
 	#endif
 
-	i = 0;
+	for (IProtonixHardware* hardware : this->_hardware)
+		hardware->HardwarePipe(this);
+	/*i = 0;
 
 	while (i < this->_hardwareCount) {
 		this->_hardware[i]->HardwarePipe(this);
 
 		i++;
-	}
+	}*/
 
-	i = 0;
+	for (ProtonixDevicePort* port : this->_ports)
+		port->Pipe(this);
+	/*i = 0;
 
 	while (i < this->_portCount) {
 		this->_ports[i]->Pipe(this);
 
 		i++;
-	}
+	}*/
 
 	this->_device->DeviceOnLoop(this);
 
@@ -640,15 +644,18 @@ void ProtonixDevice::OnSerial (ProtonixDevicePort* port, IProtonixCommand* comma
 }
 
 bool ProtonixDevice::SerialCommand (String port, IProtonixCommand* command) {
-	unsigned int i = 0;
 	bool ok = true;
+
+	for (ProtonixDevicePort* port : this->_ports)
+		ok &= port->Send(command);
+	/*unsigned int i = 0;
 
 	while (i < this->_portCount) {
 		if (this->_ports[i]->Name() == port)
 			ok &= this->_ports[i]->Send(command);
 
 		i++;
-	}
+	}*/
 
 	return ok;
 }
@@ -764,15 +771,20 @@ bool ProtonixDevice::SerialCommandSensor (String port, String id, String value, 
 }
 
 bool ProtonixDevice::SerialStatus (String port) {
-	unsigned count = this->_status->SensorCount();
-	unsigned int i = 0;
 	bool ok = true;
+
+	List<ProtonixDeviceSensor*> &sensors = this->_status->Sensors();
+
+	for (ProtonixDeviceSensor* sensor : sensors)
+		ok &= this->SerialCommandSensor(port, sensor);
+	/*unsigned count = this->_status->SensorCount();
+	unsigned int i = 0;
 
 	while (i < count) {
 		this->SerialCommandSensor(port, this->_status->Sensors()[i]);
 
 		i++;
-	}
+	}*/
 
 	return ok;
 }

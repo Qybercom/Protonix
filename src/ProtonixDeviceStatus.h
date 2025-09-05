@@ -2,13 +2,15 @@
 
 #include <Arduino.h>
 
+#include "Common/List.hpp"
+
 #include "ProtonixDeviceSensor.h"
 
-#if defined(ESP32) || defined(ESP8266)
+/*#if defined(ESP32) || defined(ESP8266)
 #define PROTONIX_LIMIT_SENSORS 256
 #else
 #define PROTONIX_LIMIT_SENSORS 16
-#endif
+#endif*/
 
 namespace Qybercom {
 	namespace Protonix {
@@ -19,8 +21,10 @@ namespace Qybercom {
 				String _state;
 				String _uptime;
 				String _summary;
-				ProtonixDeviceSensor* _sensors[PROTONIX_LIMIT_SENSORS];
-				unsigned int _sensorCount;
+
+				/*ProtonixDeviceSensor* _sensors[PROTONIX_LIMIT_SENSORS];
+				unsigned int _sensorCount;*/
+				List<ProtonixDeviceSensor*> _sensors;
 
 			public:
 				ProtonixDeviceStatus();
@@ -40,8 +44,9 @@ namespace Qybercom {
 				void Summary(String summary);
 				String Summary();
 
-				ProtonixDeviceSensor** Sensors();
-				unsigned int SensorCount();
+				/*ProtonixDeviceSensor** Sensors();
+				unsigned int SensorCount();*/
+				List<ProtonixDeviceSensor*> &Sensors ();
 				ProtonixDeviceStatus* SensorAdd(String id);
 				ProtonixDeviceStatus* SensorSet(String id, String value);
 				ProtonixDeviceStatus* SensorSet(String id, String value, bool active);
@@ -55,7 +60,7 @@ namespace Qybercom {
 				ProtonixDeviceStatus* SensorReset();
 				ProtonixDeviceStatus* SensorReset(String id);
 				ProtonixDeviceSensor* Sensor(String id);
-				ProtonixDeviceSensor* Sensor(unsigned int i);
+				//ProtonixDeviceSensor* Sensor(unsigned int i);
 		};
 	}
 }
