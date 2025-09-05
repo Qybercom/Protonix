@@ -23,11 +23,11 @@
 
 using namespace Qybercom::Protonix;
 
-void ProtonixGenericDevice::_init() {
+void ProtonixGenericDevice::_init () {
 	this->_init(false);
 }
 
-void ProtonixGenericDevice::_init(bool debug) {
+void ProtonixGenericDevice::_init (bool debug) {
 	this->_debug = debug;
 
 	this->_cmds[0] = new Command::CCustom();
@@ -39,41 +39,79 @@ void ProtonixGenericDevice::_init(bool debug) {
 	this->_cmds[6] = new Command::CStdSensor();
 
 	#if defined(ESP32) || defined(ESP8266)
-		pinMode(2, OUTPUT);
+	pinMode(2, OUTPUT);
 	#elif defined(LED_BUILTIN)
-		pinMode(LED_BUILTIN, OUTPUT);
+	pinMode(LED_BUILTIN, OUTPUT);
 	#else
 	#endif
 }
 
-void ProtonixGenericDevice::LED(bool on) {
+void ProtonixGenericDevice::LED (bool on) {
 	if (on) {
 		#if defined(ESP32)
-			digitalWrite(2, HIGH);
+		digitalWrite(2, HIGH);
 		#elif defined(ESP8266)
-			digitalWrite(2, LOW);
+		digitalWrite(2, LOW);
 		#elif defined(LED_BUILTIN)
-			digitalWrite(LED_BUILTIN, HIGH);
+		digitalWrite(LED_BUILTIN, HIGH);
 		#else
 		#endif
 	}
 	else {
 		#if defined(ESP32)
-			digitalWrite(2, LOW);
+		digitalWrite(2, LOW);
 		#elif defined(ESP8266)
-			digitalWrite(2, HIGH);
+		digitalWrite(2, HIGH);
 		#elif defined(LED_BUILTIN)
-			digitalWrite(LED_BUILTIN, LOW);
+		digitalWrite(LED_BUILTIN, LOW);
 		#else
 		#endif
 	}
 }
 
-void ProtonixGenericDevice::DeviceOnSerialCommand(ProtonixDevice* device, ProtonixDevicePort* port, IProtonixCommand* command) {
+void ProtonixGenericDevice::DeviceOnSerialCommand (ProtonixDevice* device, ProtonixDevicePort* port, IProtonixCommand* command) {
 	this->DeviceOnCommand(device, port, command);
 }
 
-bool ProtonixGenericDevice::DeviceAutoStatus() {
+void ProtonixGenericDevice::DeviceHandleStdCommand (ProtonixDevice* device, IProtonixCommand* command) {
+	String name = command->CommandName();
+
+	if (name == "std:on") {
+		this->LED(true);
+		device->Status()->On(true);
+	}
+
+	if (name == "std:off") {
+		this->LED(false);
+		device->Status()->On(false);
+	}
+
+	if (name == "std:reboot") {
+		ProtonixDevice::Reboot();
+	}
+
+	if (name == "std:sensor") {
+		Command::CStdSensor* cmd = (Command::CStdSensor*) command;
+		device->Status()->SensorSet(cmd->Sensor());
+	}
+
+	if (name == "std:registry") {
+		Command::CStdRegistry* cmd = (Command::CStdRegistry*) command;
+		device->Registry()->SetRaw(cmd->Key(), cmd->Value(), true);
+	}
+
+	if (name == "std:firmware") {
+		Command::CStdFirmware* cmd = (Command::CStdFirmware*) command;
+
+		if (cmd->ActionUpdate()) {
+			Serial.println("[device] Firmware update requested");
+
+			device->FirmwareUpdateOTA(cmd->Version());
+		}
+	}
+}
+
+bool ProtonixGenericDevice::DeviceAutoStatus () {
 	return true;
 }
 

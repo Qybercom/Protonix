@@ -34,6 +34,13 @@ void Protocol::PWiFiTCP::Pipe() {
 	int available = this->_client.available();
 
 	if (available) {
+		int i = 0;
+		while (i < 2048) {
+			this->_buffer[i] = '\0';
+
+			i++;
+		}
+
 		this->_bufferPTR = this->_buffer;
 		this->_client.read(this->_bufferPTR, available);
 

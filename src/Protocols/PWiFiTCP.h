@@ -23,7 +23,7 @@ namespace Qybercom {
 					WiFiClient _client;
 					#endif
 					ProtonixDevice* _device;
-					unsigned char _buffer[1024];
+					unsigned char _buffer[2048];
 					unsigned char* _bufferPTR;
 
 				public:

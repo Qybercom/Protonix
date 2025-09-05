@@ -54,8 +54,9 @@ namespace Qybercom {
 			List () : _head(0), _tail(0), _count(0), _iNode(0), _iStarted(false) {}
 
 			Node* Head () { return _head; }
-
+			T &First () { return _head->Data; }
 			Node* Tail () { return _tail; }
+			T &Last () { return _tail->Data; }
 
 			int Count () const { return _count; }
 
@@ -159,6 +160,10 @@ namespace Qybercom {
 				return -1;
 			}
 
+			bool Exists (const T &data) {
+				return IndexOf(data) != -1;
+			}
+
 			T &Get (int index) {
 				Node* cur = _head;
 
@@ -182,6 +187,57 @@ namespace Qybercom {
 				for (unsigned int i = 0; i < index; i++) cur = cur->Next;
 
 				return cur;
+			}
+
+			T PopFirst () {
+				if (!_head) return T();
+
+				Node* node = _head;
+				T data = node->Data;
+				_head = _head->Next;
+
+				if (_head) _head->Prev = nullptr;
+				else _tail = nullptr;
+
+				delete node;
+				_count--;
+
+				return data;
+			}
+
+			T PopLast () {
+				if (!_tail) return T();
+
+				Node* node = _tail;
+				T data = node->Data;
+				_tail = _tail->Prev;
+
+				if (_tail) _tail->Next = nullptr;
+				else _head = nullptr;
+
+				delete node;
+				_count--;
+
+				return data;
+			}
+
+			T PopAt (int index) {
+				if (index < 0 || index >= _count) return T();
+				if (index == 0) return PopFirst();
+				if (index == _count - 1) return PopLast();
+
+				Node* node = _head;
+				for (int i = 0; i < index; i++)
+					node = node->Next;
+
+				T data = node->Data;
+				node->Prev->Next = node->Next;
+				node->Next->Prev = node->Prev;
+
+				delete node;
+				_count--;
+
+				return data;
 			}
 
 			List<T> &Reset () {

@@ -13,33 +13,33 @@ namespace Qybercom {
 					MILLISECONDS
 				};
 
-				ProtonixTimer();
-				ProtonixTimer(unsigned int interval);
-				ProtonixTimer(unsigned int interval, ProtonixTimerUnit unit);
+				//ProtonixTimer (bool enabled = true);
+				ProtonixTimer (unsigned int interval, bool enabled = true);
+				ProtonixTimer (unsigned int interval, ProtonixTimerUnit unit, bool enabled = true);
 
-				unsigned long Previous();
+				unsigned long Previous ();
 
-				unsigned long long TotalMilliseconds();
-				unsigned long long TotalSeconds();
-				unsigned int RunDays();
-				unsigned int RunHours();
-				unsigned int RunMinutes();
-				unsigned int RunSeconds();
-				unsigned int RunMilliseconds();
-				String RunTime();
+				unsigned long long TotalMilliseconds ();
+				unsigned long long TotalSeconds ();
+				unsigned int RunDays ();
+				unsigned int RunHours ();
+				unsigned int RunMinutes ();
+				unsigned int RunSeconds ();
+				unsigned int RunMilliseconds ();
+				String RunTime ();
 
-				void Interval(int interval);
-				unsigned int Interval();
+				void Interval (int interval);
+				unsigned int Interval ();
 
-				void Unit(ProtonixTimerUnit unit);
-				ProtonixTimerUnit Unit();
+				void Unit (ProtonixTimerUnit unit);
+				ProtonixTimerUnit Unit ();
 
-				void Enabled(bool enabled);
-				bool Enabled();
+				void Enabled (bool enabled);
+				bool Enabled ();
 
-				bool Pipe();
+				bool Pipe ();
 
-				void Reset();
+				void Reset ();
 
 			private:
 				bool _enabled;

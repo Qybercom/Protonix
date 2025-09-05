@@ -19,23 +19,24 @@ namespace Qybercom {
 			protected:
 				bool _debug;
 				IProtonixCommand* _cmds[7];
-				void _init();
-				void _init(bool debug);
+				void _init ();
+				void _init (bool debug);
 
 			public:
-				void LED(bool on);
+				void LED (bool on);
 
 				// https://stackoverflow.com/a/16248582/2097055
-				virtual String DeviceID() = 0;
-				virtual unsigned int DeviceTick() = 0;
-				virtual void DeviceOnReady(ProtonixDevice* device) = 0;
+				virtual String DeviceID () = 0;
+				virtual unsigned int DeviceTick () = 0;
+				virtual void DeviceOnReady (ProtonixDevice* device) = 0;
 				//virtual void DeviceOnLoop(ProtonixDevice* device) = 0;
-				virtual void DeviceOnTick(ProtonixDevice* device) = 0;
-				virtual void DeviceOnCommand(ProtonixDevice* device, ProtonixDevicePort* port, IProtonixCommand* command) = 0;
-				void DeviceOnSerialCommand(ProtonixDevice* device, ProtonixDevicePort* port, IProtonixCommand* command);
-				bool DeviceAutoStatus();
+				virtual void DeviceOnTick (ProtonixDevice* device) = 0;
+				virtual void DeviceOnCommand (ProtonixDevice* device, ProtonixDevicePort* port, IProtonixCommand* command) = 0;
+				void DeviceOnSerialCommand (ProtonixDevice* device, ProtonixDevicePort* port, IProtonixCommand* command);
+				void DeviceHandleStdCommand (ProtonixDevice* device, IProtonixCommand* command);
+				bool DeviceAutoStatus ();
 
-				void DeviceOnLoop (ProtonixDevice* device) { }
+				void DeviceOnLoop (ProtonixDevice* device) {}
 
 				#if defined(ESP32) || defined(ESP8266)
 				virtual String DevicePassphrase() = 0;
@@ -52,6 +53,6 @@ namespace Qybercom {
 
 				void DeviceOnDedicatedTask (unsigned short core) { }
 				#endif
-		};
+			};
 	}
 }

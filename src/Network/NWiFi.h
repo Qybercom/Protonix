@@ -14,6 +14,7 @@ namespace Qybercom {
 					String _mac;
 					uint8_t _macBuffer[6];
 					String _hostname;
+					String _status(int code);
 
 				public:
 					NWiFi(String ssid, String password, String mac, String hostname);

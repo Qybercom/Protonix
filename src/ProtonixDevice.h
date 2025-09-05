@@ -6,6 +6,8 @@
 #include <StreamString.h>
 #endif
 
+#include "Common/List.hpp"
+
 #include "IProtonixHardware.h"
 #include "IProtonixNetwork.h"
 #include "IProtonixProtocol.h"
@@ -42,9 +44,13 @@ namespace Qybercom {
 		class ProtonixDevice {
 			private:
 				IProtonixDevice* _device;
-				ProtonixTimer* _timerTick;
-				ProtonixTimer* _timerNetwork;
 				ProtonixTimer* _timerUptime;
+				ProtonixTimer* _timerTick;
+				#if defined(ESP32) || defined(ESP8266)
+				ProtonixTimer* _timerNetwork;
+				ProtonixTimer* _timerNetworkAuthorize;
+				ProtonixTimer* _timerNetworkStatus;
+				#endif
 				ProtonixDeviceStatus* _status;
 				bool _ready;
 				bool _debug;
@@ -58,11 +64,13 @@ namespace Qybercom {
 				unsigned int _portCount;
 				ProtonixDevicePort* _ports[PROTONIX_LIMIT_PORT];
 
-				ProtonixAction* _actionList[PROTONIX_LIMIT_ACTION_LIST];
-				String _actionBacklog[PROTONIX_LIMIT_ACTION_BACKLOG];
+				List<ProtonixAction*> _actions;
+				List<ProtonixAction*> _actionQueue;
+				/*ProtonixAction* _actionList[PROTONIX_LIMIT_ACTION_LIST]; // deprecated
+				String _actionBacklog[PROTONIX_LIMIT_ACTION_BACKLOG]; // deprecated
 				int _actionCursorList;
 				int _actionCursorBacklog;
-				int _actionCursorCurrent;
+				int _actionCursorCurrent;*/
 				void _pipeActions();
 
 				#if defined(ESP32) || defined(ESP8266)
@@ -98,9 +106,13 @@ namespace Qybercom {
 
 				void Device (IProtonixDevice* device);
 				IProtonixDevice* Device ();
-				ProtonixTimer* TimerTick ();
-				ProtonixTimer* TimerNetwork ();
 				ProtonixTimer* TimerUptime ();
+				ProtonixTimer* TimerTick ();
+				#if defined(ESP32) || defined(ESP8266)
+				ProtonixTimer* TimerNetwork ();
+				ProtonixTimer* TimerNetworkAuthorize ();
+				ProtonixTimer* TimerNetworkStatus ();
+				#endif
 				ProtonixDeviceStatus* Status ();
 				void Summary (String additional);
 				bool Ready ();
@@ -139,13 +151,18 @@ namespace Qybercom {
 
 				// https://stackoverflow.com/a/120916/2097055
 				ProtonixAction* Action (String name);
-				bool ActionRegister (ProtonixAction* action);
-				bool ActionRegister (String name);
-				bool ActionRegister (String name, unsigned int interval);
-				bool ActionRegister (String name, unsigned int interval, int stepEnd);
-				bool ActionRegister (String name, unsigned int interval, int stepBegin, int stepEnd);
-				bool ActionRegister (String name, unsigned int interval, int stepBegin, int stepEnd, int step);
-				bool ActionTrigger (String name);
+				ProtonixAction* ActionRegister (ProtonixAction* action);
+				ProtonixAction* ActionRegister (String name);
+				ProtonixAction* ActionRegister (String name, unsigned int interval);
+				ProtonixAction* ActionRegister (String name, unsigned int interval, int stepEnd);
+				ProtonixAction* ActionRegister (String name, unsigned int interval, int stepBegin, int stepEnd);
+				ProtonixAction* ActionRegister (String name, unsigned int interval, int stepBegin, int stepEnd, int step);
+				bool ActionTrigger (String name); // deprecated
+				bool ActionStart (String name);
+				bool ActionPlay (String name);
+				bool ActionPause (String name);
+				bool ActionStop (String name);
+				bool ActionPipe (ProtonixAction* action);
 				void ActionReset ();
 
 				void Pipe ();
@@ -165,32 +182,32 @@ namespace Qybercom {
 				bool SerialStatus (String port);
 
 				#if defined(ESP32) || defined(ESP8266)
-				void Network(IProtonixNetwork* network);
-				IProtonixNetwork* Network();
-				bool NetworkConnected();
-				void Protocol(IProtonixProtocol* protocol);
-				IProtonixProtocol* Protocol();
-				bool ProtocolConnected();
-				void Server(ProtonixURI* uri);
-				ProtonixURI* Server();
-				void ServerEndpoint(String host, unsigned int port);
-				void ServerEndpoint(String host, unsigned int port, String path);
-				void ServerBaseURI(String uri);
-				bool Connected();
-				void OnStream(unsigned char* data);
-				void RequestStream(String url, IProtonixDTORequest* request);
-				void RequestStreamAuthorize();
-				ProtonixDTO* DTOInput();
-				ProtonixDTO* DTOOutput();
-				bool FirmwareUpdateOTA(String version = "");
+				void Network (IProtonixNetwork* network);
+				IProtonixNetwork* Network ();
+				bool NetworkConnected ();
+				void Protocol (IProtonixProtocol* protocol);
+				IProtonixProtocol* Protocol ();
+				bool ProtocolConnected ();
+				void Server (ProtonixURI* uri);
+				ProtonixURI* Server ();
+				void ServerEndpoint (String host, unsigned int port);
+				void ServerEndpoint (String host, unsigned int port, String path);
+				void ServerBaseURI (String uri);
+				bool Connected ();
+				void OnStream (unsigned char* data);
+				void RequestStream (String url, IProtonixDTORequest* request);
+				void RequestStreamAuthorize ();
+				ProtonixDTO* DTOInput ();
+				ProtonixDTO* DTOOutput ();
+				bool FirmwareUpdateOTA (String version = "");
 				//bool FirmwareUpdateOTA(void(*onProgress)(int, int) = nullptr);
 				//bool FirmwareUpdate(String firmware, void(*onProgress)(int, int) = nullptr);
 				//bool FirmwareUpdate(Stream& stream, void(*onProgress)(int, int) = nullptr);
 				#endif
 
 				#if defined(ESP32)
-				void DedicateTaskCore0();
-				void DedicateTaskCore1();
+				void DedicateTaskCore0 ();
+				void DedicateTaskCore1 ();
 				#endif
 		};
 	}

@@ -8,7 +8,9 @@ using namespace Qybercom::Protonix;
 
 
 void ProtonixAction::_init (String name, unsigned int interval, int stepBegin, int stepEnd, int step) {
+	this->_active = false;
 	this->_completed = false;
+	this->_delayConsumed = false;
 	this->_timer = new ProtonixTimer(interval);
 
 	this->Name(name);
@@ -19,6 +21,10 @@ void ProtonixAction::_init (String name, unsigned int interval, int stepBegin, i
 
 	this->_stepDirection = this->_stepBegin <= this->_stepEnd ? 1 : -1;
 	this->_cursor = this->_stepBegin;
+
+	this->Infinite(false);
+	this->Delayed(false);
+	this->Queued(false);
 }
 
 ProtonixAction::ProtonixAction (String name) {
@@ -85,8 +91,24 @@ int ProtonixAction::Cursor () {
 	return this->_cursor;
 }
 
+bool ProtonixAction::Active () {
+	return this->_active;
+}
+
 bool ProtonixAction::Completed () {
 	return this->_completed;
+}
+
+bool ProtonixAction::OneShot () {
+	return this->_stepBegin == 0 && this->_stepEnd == 0;
+}
+
+bool ProtonixAction::DelayedVirtual () {
+	return this->OneShot() && this->_timer->Interval() != 0;
+}
+
+String ProtonixAction::Summary () {
+	return String(this->_stepBegin) + " -> " + String(this->_cursor) + "/" + String(this->_step) + ":" + String(this->_timer->Interval()) + " -> " + String(this->_stepEnd) + String(this->_infinite ? " *" : "");
 }
 
 bool ProtonixAction::Infinite () {
@@ -99,28 +121,98 @@ ProtonixAction* ProtonixAction::Infinite (bool infinite) {
 	return this;
 }
 
-bool ProtonixAction::PipeStart () {
-	return this->_timer->Pipe();
+bool ProtonixAction::Delayed () {
+	return this->_delayed;
 }
 
-bool ProtonixAction::Pipe () {
-	bool completed = false;
-	if (this->_stepDirection == 1) completed = (this->_cursor > this->_stepEnd);
-	if (this->_stepDirection == -1) completed = (this->_cursor < this->_stepEnd);
+ProtonixAction* ProtonixAction::Delayed (bool delayed) {
+	this->_delayed = delayed;
 
-	if (completed)
-		this->_completed = true;
-
-	return !this->_completed;
+	return this;
 }
 
-void ProtonixAction::PipeEnd () {
+bool ProtonixAction::Queued () {
+	return this->_queued;
+}
+
+ProtonixAction* ProtonixAction::Queued (bool queued) {
+	this->_queued = queued;
+
+	return this;
+}
+
+ProtonixAction* ProtonixAction::Start () {
+	this->_cursor = this->_stepBegin;
+	this->_active = true;
+	this->_completed = false;
+
+	this->_timer->Enabled(true);
+
+	return this;
+}
+
+ProtonixAction* ProtonixAction::Play () {
+	this->_active = true;
+
+	this->_timer->Enabled(true);
+
+	return this;
+}
+
+ProtonixAction* ProtonixAction::Pause () {
+	this->_active = false;
+
+	this->_timer->Enabled(false);
+
+	return this;
+}
+
+ProtonixAction* ProtonixAction::Stop () {
+	this->_cursor = this->_stepEnd;
+	this->_active = false;
+	this->_completed = true;
+	this->_delayConsumed = false;
+
+	this->_timer->Enabled(false);
+
+	return this;
+}
+
+bool ProtonixAction::PipePre () {
+	if (!this->_active) return false;
+	if (!this->_timer->Pipe()) return false;
+
+	bool delayed = this->_delayed || this->DelayedVirtual();
+
+	if (delayed && !this->_delayConsumed) {
+		this->_delayConsumed = true;
+
+		return false;
+	}
+
+	return true;
+}
+
+void ProtonixAction::PipePost () {
 	this->_cursor += (this->_stepDirection * this->_step);
+
+	this->_completed = false;
+	if (this->_stepDirection == 1) this->_completed = this->_cursor >= this->_stepEnd;
+	if (this->_stepDirection == -1) this->_completed = this->_cursor <= this->_stepEnd;
+
+	if (this->_completed) {
+		if (this->_infinite) this->Start();
+		else this->Stop();
+	}
 }
 
 void ProtonixAction::Reset () {
-	this->_cursor = this->_stepBegin;
+	this->_active = false;
 	this->_completed = false;
+	this->_cursor = this->_stepBegin;
+	this->_delayConsumed = false;
+
+	this->Queued(false);
 
 	this->_timer->Reset();
 }

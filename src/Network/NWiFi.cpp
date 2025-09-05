@@ -15,14 +15,33 @@ using namespace Qybercom::Protonix;
 
 
 
-Network::NWiFi::NWiFi(String ssid, String password, String mac, String hostname) {
+String Network::NWiFi::_status (int code) {
+	switch (code) {
+		case 255: return "WL_NO_SHIELD";
+		case 254: return "WL_STOPPED";
+		case 0:   return "WL_IDLE_STATUS";
+		case 1:   return "WL_NO_SSID_AVAIL";
+		case 2:   return "WL_SCAN_COMPLETED";
+		case 3:   return "WL_CONNECTED";
+		case 4:   return "WL_CONNECT_FAILED";
+		case 5:   return "WL_CONNECTION_LOST";
+		case 6:   return "WL_DISCONNECTED";
+		// WiFiNINA/WiFi101
+		case 7:   return "WL_AP_LISTENING";
+		case 8:   return "WL_AP_CONNECTED";
+		case 9:   return "WL_AP_FAILED";
+		default:  return "UNKNOWN";
+	}
+}
+
+Network::NWiFi::NWiFi (String ssid, String password, String mac, String hostname) {
 	this->_ssid = ssid;
 	this->_password = password;
 	this->_mac = mac;
 	this->_hostname = hostname;
 }
 
-bool Network::NWiFi::Connect() {
+bool Network::NWiFi::Connect () {
 	//uint8_t mac[6] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
 	IProtonixNetwork::ParseMAC(this->_mac, this->_macBuffer);
 
@@ -56,42 +75,42 @@ bool Network::NWiFi::Connect() {
 
 unsigned int __NWiFi_status = 0;
 
-bool Network::NWiFi::Connected() {
+bool Network::NWiFi::Connected () {
 	#if defined(ESP32) || defined(ESP8266)
-	unsigned int status = WiFi.status();
-	bool connected = status == WL_CONNECTED;
-	
-	if (!connected && status != __NWiFi_status) {
-		Serial.print("[WARNING] WiFi status: ");
-		Serial.println(status);
-	}
-	
-	__NWiFi_status = status;
+		unsigned int status = WiFi.status();
+		bool connected = status == WL_CONNECTED;
 
-	return connected;
+		if (!connected && status != __NWiFi_status) {
+			Serial.print("[network:wifi] Status: ");
+			Serial.println(this->_status(status));
+		}
+
+		__NWiFi_status = status;
+
+		return connected;
 	#else
-	return false;
+		return false;
 	#endif
 }
 
-bool Network::NWiFi::Disconnect() {
+bool Network::NWiFi::Disconnect () {
 	#if defined(ESP32) || defined(ESP8266)
-	WiFi.disconnect();
+		WiFi.disconnect();
 	#endif
 
 	return true;
 }
 
-String Network::NWiFi::AddressMAC() {
+String Network::NWiFi::AddressMAC () {
 	return this->_mac;
 }
 
-String Network::NWiFi::AddressIP() {
+String Network::NWiFi::AddressIP () {
 	#if defined(ESP32)
-	return String(WiFi.localIP());
+		return String(WiFi.localIP());
 	#elif defined(ESP8266)
-	return WiFi.localIP().toString();
+		return WiFi.localIP().toString();
 	#else
-	return "";
+		return "";
 	#endif
 }

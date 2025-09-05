@@ -46,16 +46,16 @@ using namespace Qybercom::Protonix;
 
 
 ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
-	this->_timerTick = new ProtonixTimer();
-	this->_timerNetwork = new ProtonixTimer(1000); // TODO: refactor for custom reconnect interval
-	this->_timerUptime = new ProtonixTimer();
+	this->_timerUptime = new ProtonixTimer(0);
+	this->_timerTick = new ProtonixTimer(0);
 	this->_status = new ProtonixDeviceStatus();
 	this->_ready = false;
 	this->_portCount = 0;
 	this->_hardwareCount = 0;
-	this->_actionCursorList = 0;
+	/*this->_actionCursorList = 0;
 	this->_actionCursorBacklog = 0;
-	this->_actionCursorCurrent = 0;
+	this->_actionCursorCurrent = 0;*/
+
 	this->Device(device);
 	this->Debug(false);
 
@@ -64,7 +64,11 @@ ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
 	this->_registry = new ProtonixRegistry(this->_memory);
 	this->_registry->Debug(this->_debug); // TODO: runtime switch for every debuggable component
 
-#if defined(ESP32) || defined(ESP8266)
+	#if defined(ESP32) || defined(ESP8266)
+	this->_timerNetwork = new ProtonixTimer(1000); // TODO: refactor for custom interval
+	this->_timerNetworkAuthorize = new ProtonixTimer(1000, false); // TODO: refactor for custom interval
+	this->_timerNetworkStatus = new ProtonixTimer(100); // TODO: refactor for custom interval
+
 	this->_networkConnected1 = false;
 	this->_networkConnected2 = false;
 	this->_protocolConnected1 = false;
@@ -73,19 +77,19 @@ ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
 
 	this->_dtoInput = new ProtonixDTO();
 	this->_dtoOutput = new ProtonixDTO();
-#endif
+	#endif
 
-#if defined(AVR)
+	#if defined(AVR)
 	pinMode(4, OUTPUT);
 	digitalWrite(4, HIGH);
-#endif
+	#endif
 
-	int i = 0;
+	/*int i = 0;
 	while (i < PROTONIX_LIMIT_ACTION_BACKLOG) {
 		this->_actionBacklog[i] = "";
 
 		i++;
-	}
+	}*/
 }
 
 void ProtonixDevice::Device (IProtonixDevice* device) {
@@ -97,17 +101,27 @@ IProtonixDevice* ProtonixDevice::Device () {
 	return this->_device;
 }
 
+ProtonixTimer* ProtonixDevice::TimerUptime () {
+	return this->_timerUptime;
+}
+
 ProtonixTimer* ProtonixDevice::TimerTick () {
 	return this->_timerTick;
 }
 
+#if defined(ESP32) || defined(ESP8266)
 ProtonixTimer* ProtonixDevice::TimerNetwork () {
 	return this->_timerNetwork;
 }
 
-ProtonixTimer* ProtonixDevice::TimerUptime () {
-	return this->_timerUptime;
+ProtonixTimer* ProtonixDevice::TimerNetworkAuthorize () {
+	return this->_timerNetworkAuthorize;
 }
+
+ProtonixTimer* ProtonixDevice::TimerNetworkStatus () {
+	return this->_timerNetworkStatus;
+}
+#endif
 
 ProtonixDeviceStatus* ProtonixDevice::Status () {
 	return this->_status;
@@ -116,9 +130,10 @@ ProtonixDeviceStatus* ProtonixDevice::Status () {
 void ProtonixDevice::Summary (String additional) {
 	String state = this->_status->State();
 	String summary = ""
-					 + String("[on:") + String(this->_status->On() ? "yes" : "no") + String("] ")
-					 + String("[uptime:") + String(this->_status->Uptime()) + String("] ")
-					 + String(state == "" ? "" : "[state:" + state + "]");
+		 + String("[on:") + String(this->_status->On() ? "yes" : "no") + String("] ")
+		 + String("[uptime:") + String(this->_status->Uptime()) + String("] ")
+		 + String("[memory:") + String(this->FreeRAM()) + String("] ")
+		 + String(state == "" ? "" : "[state:" + state + "]");
 
 	unsigned int i = 0;
 	unsigned int count = this->_status->SensorCount();
@@ -159,38 +174,38 @@ ProtonixRegistry* ProtonixDevice::Registry () {
 extern int __heap_start, * __brkval;
 
 int ProtonixDevice::FreeRAM () {
-#if defined(ESP32)
+	#if defined(ESP32)
 	return esp_get_free_heap_size();
-#elif defined(ESP8266)
+	#elif defined(ESP8266)
 	return ESP.getFreeHeap();
-#elif defined(AVR)
+	#elif defined(AVR)
 	// https://docs.arduino.cc/learn/programming/memory-guide
 	int v;
 	//int __heap_start, * __brkval;
 
 	return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
-#else
+	#else
 	return 0;
-#endif
+	#endif
 }
 
 int ProtonixDevice::FreeFlash () {
-#if defined(ESP32) || defined(ESP8266)
+	#if defined(ESP32) || defined(ESP8266)
 	return ESP.getFreeSketchSpace();
-#elif defined(AVR)
+	#elif defined(AVR)
 	return 0;
-#else
+	#else
 	return 0;
-#endif
+	#endif
 }
 
 void ProtonixDevice::Reboot () {
-#if defined(ESP32) || defined(ESP8266)
+	#if defined(ESP32) || defined(ESP8266)
 	ESP.restart();
-#elif defined(AVR)
+	#elif defined(AVR)
 	digitalWrite(4, LOW);
-#else
-#endif
+	#else
+	#endif
 }
 
 IProtonixHardware* ProtonixDevice::Hardware (String id) {
@@ -308,83 +323,142 @@ ProtonixDevicePort* ProtonixDevice::PortDefault (unsigned int speed, unsigned in
 }
 
 ProtonixAction* ProtonixDevice::Action (String name) {
-	int i = 0;
+	for (ProtonixAction* action : _actions)
+		if (action->Name() == name) return action;
+	/*int i = 0;
 
 	while (i < this->_actionCursorList) {
 		if (this->_actionList[i]->Name() == name)
 			return this->_actionList[i];
 
 		i++;
-	}
+	}*/
 
 	return nullptr;
 }
 
-bool ProtonixDevice::ActionRegister (ProtonixAction* action) {
-	if (this->_actionCursorList == PROTONIX_LIMIT_ACTION_LIST) return false;
+ProtonixAction* ProtonixDevice::ActionRegister (ProtonixAction* action) {
+	this->_actions.Add(action);
+
+	/*if (this->_actionCursorList == PROTONIX_LIMIT_ACTION_LIST) return false;
 
 	this->_actionList[this->_actionCursorList] = action;
 	this->_actionCursorList++;
 
-	return true;
+	return true;*/
+	return action;
 }
 
-bool ProtonixDevice::ActionRegister (String name) {
+ProtonixAction* ProtonixDevice::ActionRegister (String name) {
 	return this->ActionRegister(new ProtonixAction(name));
 }
 
-bool ProtonixDevice::ActionRegister (String name, unsigned int interval) {
+ProtonixAction* ProtonixDevice::ActionRegister (String name, unsigned int interval) {
 	return this->ActionRegister(new ProtonixAction(name, interval));
 }
 
-bool ProtonixDevice::ActionRegister (String name, unsigned int interval, int stepEnd) {
+ProtonixAction* ProtonixDevice::ActionRegister (String name, unsigned int interval, int stepEnd) {
 	return this->ActionRegister(new ProtonixAction(name, interval, stepEnd));
 }
 
-bool ProtonixDevice::ActionRegister (String name, unsigned int interval, int stepBegin, int stepEnd) {
+ProtonixAction* ProtonixDevice::ActionRegister (String name, unsigned int interval, int stepBegin, int stepEnd) {
 	return this->ActionRegister(new ProtonixAction(name, interval, stepBegin, stepEnd));
 }
 
-bool ProtonixDevice::ActionRegister (String name, unsigned int interval, int stepBegin, int stepEnd, int step) {
+ProtonixAction* ProtonixDevice::ActionRegister (String name, unsigned int interval, int stepBegin, int stepEnd, int step) {
 	return this->ActionRegister(new ProtonixAction(name, interval, stepBegin, stepEnd, step));
 }
 
 bool ProtonixDevice::ActionTrigger (String name) {
-	if (this->_actionCursorBacklog == PROTONIX_LIMIT_ACTION_BACKLOG) return false;
+	ProtonixAction* action = this->Action(name);
+	if (action == nullptr) return false;
 
-	this->_actionBacklog[this->_actionCursorBacklog] = name;
-	this->_actionCursorBacklog++;
+	if (this->_debug)
+		Serial.println("[action] Triggered '" + name + "' (" + String(action->Summary()) + ")");
+
+	action->Start();
+	action->Queued(true);
+
+	this->_actionQueue.Add(action);
+
+	return true;
+}
+
+bool ProtonixDevice::ActionStart (String name) {
+	ProtonixAction* action = this->Action(name);
+	if (action == nullptr) return false;
+
+	if (this->_debug)
+		Serial.println("[action] Started '" + name + "' (" + String(action->Summary()) + ")");
+
+	action->Start();
+
+	return true;
+}
+
+bool ProtonixDevice::ActionPlay (String name) {
+	ProtonixAction* action = this->Action(name);
+	if (action == nullptr) return false;
+
+	if (this->_debug)
+		Serial.println("[action] Played '" + name + "' (" + String(action->Summary()) + ")");
+
+	action->Play();
+
+	return true;
+}
+
+bool ProtonixDevice::ActionPause (String name) {
+	ProtonixAction* action = this->Action(name);
+	if (action == nullptr) return false;
+
+	if (this->_debug)
+		Serial.println("[action] Paused '" + name + "' (" + String(action->Summary()) + ")");
+
+	action->Pause();
+
+	return true;
+}
+
+bool ProtonixDevice::ActionStop (String name) {
+	ProtonixAction* action = this->Action(name);
+	if (action == nullptr) return false;
+
+	if (this->_debug)
+		Serial.println("[action] Stopped '" + name + "' (" + String(action->Summary()) + ")");
+
+	action->Stop();
+
+	return true;
+}
+
+bool ProtonixDevice::ActionPipe (ProtonixAction* action) {
+	if (action == nullptr) return false;
+	if (!action->PipePre()) return false;
+
+	this->_device->DeviceOnAction(this, action);
+
+	action->PipePost();
 
 	return true;
 }
 
 void ProtonixDevice::ActionReset () {
-	int i = 0;
+	this->_actionQueue.Clear();
 
-	i = 0;
-	while (i < PROTONIX_LIMIT_ACTION_BACKLOG) { //this->_actionCursorBacklog) {
-		this->_actionBacklog[i] = "";
-
-		i++;
-	}
-
-	i = 0;
-	while (i < this->_actionCursorList) {
-		this->_actionList[i]->Reset();
-
-		i++;
-	}
-
-	this->_actionCursorBacklog = 0;
-	this->_actionCursorCurrent = 0;
+	for (ProtonixAction* action : _actions)
+		action->Reset();
 }
 
 #if defined(ESP32) || defined(ESP8266)
 void ProtonixDevice::_pipeNetwork() {
 	if (this->_network == nullptr || this->_protocol == nullptr) return;
 		
-	if (!this->Connected())
+	if (!this->Connected()) {
 		this->_timerNetwork->Enabled(true);
+
+		this->_authorized = false;
+	}
 	
 	if (this->_timerNetwork->Pipe()) {
 		if (!this->_networkConnected1 || !this->_networkConnected2) {
@@ -436,17 +510,13 @@ void ProtonixDevice::_pipeNetwork() {
 			this->_protocolConnected2 = true;
 
 			this->_device->DeviceOnProtocolConnect(this);
-
-			//this->RequestStreamAuthorize();
 		}
 
 		if (!this->Connected()) {
 			bool onlineN = this->_network->Connected();
 			bool onlineP = this->_protocol->Connected();
 
-			Serial.println("[WARNING] RECONNECT N:" + String(onlineN) + " P:" + String(onlineP));
-
-			this->_authorized = false;
+			Serial.println("[info] Reconnect N:" + String(onlineN) + " P:" + String(onlineP));
 
 			if (!onlineN) {
 				this->_networkConnected1 = false;
@@ -461,13 +531,12 @@ void ProtonixDevice::_pipeNetwork() {
 			return;
 		}
 
-		if (!this->_authorized) {
-			this->RequestStreamAuthorize();
-
-			return;
-		}
-
 		this->_timerNetwork->Enabled(false);
+		this->_timerNetworkAuthorize->Enabled(true);
+	}
+
+	if (this->_timerNetworkAuthorize->Pipe()) {
+		this->RequestStreamAuthorize();
 	}
 
 	this->_protocol->Pipe();
@@ -475,49 +544,23 @@ void ProtonixDevice::_pipeNetwork() {
 #endif
 
 void ProtonixDevice::_pipeActions () {
-	if (this->_actionCursorCurrent == PROTONIX_LIMIT_ACTION_BACKLOG)
-		this->_actionCursorCurrent = 0;
+	if (this->_actionQueue.Count() != 0) {
+		ProtonixAction* action = this->_actionQueue.First();
 
-	//Serial.println("!!! " + String(this->_actionCursorCurrent));
+		this->ActionPipe(action);
 
-	if (this->_actionBacklog[this->_actionCursorCurrent] == "") {
-		this->_actionCursorCurrent++;
+		if (action->Completed()) {
+			action->Queued(false);
 
-		return;
-	}
-
-	int i = 0;
-	//bool finished = true;
-
-	while (i < this->_actionCursorList) {
-		if (this->_actionList[i]->Name() == this->_actionBacklog[this->_actionCursorCurrent]) {
-			if (this->_actionList[i]->PipeStart()) {
-				if (this->_actionList[i]->Pipe()) {
-					this->_device->DeviceOnAction(this, this->_actionList[i]);
-
-					this->_actionList[i]->PipeEnd();
-				}
-			}
-
-			if (this->_actionList[i]->Completed()) {
-				this->_actionBacklog[this->_actionCursorCurrent] = "";
-				this->_actionCursorCurrent++;
-
-				this->_actionList[i]->Reset();
-			}
-
-			//finished = false;
+			this->_actionQueue.PopFirst();
 		}
-
-		i++;
 	}
 
-	/*
-	if (finished) {
-		this->_actionCursorBacklog = 0;
-		this->_actionCursorCurrent = 0;
+	for (ProtonixAction* action : _actions) {
+		if (action->Queued()) continue;
+
+		this->ActionPipe(action);
 	}
-	*/
 }
 
 void ProtonixDevice::Pipe () {
@@ -555,9 +598,9 @@ void ProtonixDevice::Pipe () {
 		this->_device->DeviceOnReady(this);
 	}
 
-#if defined(ESP32) || defined(ESP8266)
+	#if defined(ESP32) || defined(ESP8266)
 	this->_pipeNetwork();
-#endif
+	#endif
 
 	i = 0;
 
@@ -579,13 +622,15 @@ void ProtonixDevice::Pipe () {
 
 	if (this->_timerTick->Pipe()) {
 		this->_device->DeviceOnTick(this);
+	}
 
+	#if defined(ESP32) || defined(ESP8266)
+	if (this->_timerNetworkStatus->Pipe()) {
 		if (this->_device->DeviceAutoStatus() && this->_authorized) {
-#if defined(ESP32) || defined(ESP8266)
 			this->RequestStream("/api/mechanism/status", new DTO::DTORequestDeviceStatus(this->_status, this->_registry->Raw()));
-#endif
 		}
 	}
+	#endif
 
 	this->_pipeActions();
 }
@@ -785,7 +830,7 @@ bool ProtonixDevice::Connected() {
 		&& this->_protocol->Connected();
 }
 
-void ProtonixDevice::RequestStream(String url, IProtonixDTORequest* request) {
+void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
 	String error = "";
 
 	if (this->Connected()) {
@@ -799,7 +844,7 @@ void ProtonixDevice::RequestStream(String url, IProtonixDTORequest* request) {
 	else error = "Device not connected, can not send request";
 
 	if (this->_debug && error != "")
-		Serial.println("[WARNING] " + error);
+		Serial.println("[warn] " + error);
 
 	delete request;
 	request = nullptr;
@@ -807,14 +852,17 @@ void ProtonixDevice::RequestStream(String url, IProtonixDTORequest* request) {
 	this->_dtoOutput->Reset();
 }
 
-void ProtonixDevice::RequestStreamAuthorize() {
-	this->RequestStream("/api/authorize/mechanism", new DTO::DTORequestAuthorization(
-		this->_device->DeviceID(),
-		this->_device->DevicePassphrase()
-	));
+void ProtonixDevice::RequestStreamAuthorize () {
+	String id = this->_device->DeviceID();
+	String passphrase = this->_device->DevicePassphrase();
+
+	if (this->_debug)
+		Serial.println("[info] Authorization request: '" + id + "':'" + passphrase + "'");
+
+	this->RequestStream("/api/authorize/mechanism", new DTO::DTORequestAuthorization(id, passphrase));
 }
 
-void ProtonixDevice::OnStream(unsigned char* data) {
+void ProtonixDevice::OnStream (unsigned char* data) {
 	String raw = String((char*)data);
 
 	if (this->_debug)
@@ -864,7 +912,12 @@ void ProtonixDevice::_onStreamResponse() {
 		DTO::DTOResponseAuthorization* dto = new DTO::DTOResponseAuthorization();
 		dto->DTOPopulate(this->_dtoInput);
 
-		this->_authorized = dto->Status() == 200;
+		int status = dto->Status();
+
+		Serial.println("[info] Authorization response: " + String(status));
+
+		this->_authorized = status == 200;
+		this->_timerNetworkAuthorize->Enabled(!this->_authorized);
 
 		this->_device->DeviceOnStreamResponseAuthorization(this, dto);
 
@@ -917,18 +970,18 @@ bool ProtonixDevice::FirmwareUpdateOTA(String version) {
 	String url = this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID() + "?platform=";
 	String ver = version == "" ? "" : String("&version=" + version);
 
-#if defined(ESP32)
+	#if defined(ESP32)
 		t_httpUpdate_return out = ESPhttpUpdate.update(url + "esp32" + ver);
 
 		return out == HTTP_UPDATE_OK;
-#elif defined(ESP8266)
+	#elif defined(ESP8266)
 		WiFiClient client;
 		t_httpUpdate_return out = ESPhttpUpdate.update(client, url + "esp8266" + ver);
 
 		return out == HTTP_UPDATE_OK;
-#else
+	#else
 		return false;
-#endif
+	#endif
 }
 
 /*

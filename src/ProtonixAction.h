@@ -15,8 +15,12 @@ namespace Qybercom {
 				int _stepEnd;
 				int _stepDirection;
 				int _cursor;
+				bool _active;
 				bool _completed;
 				bool _infinite;
+				bool _delayed;
+				bool _delayConsumed;
+				bool _queued;
 
 				void _init (String name, unsigned int interval, int stepBegin, int stepEnd, int step);
 
@@ -42,17 +46,31 @@ namespace Qybercom {
 				int StepEnd ();
 
 				int StepDirection ();
-
 				int Cursor ();
 
+				bool Active ();
 				bool Completed ();
+				bool OneShot ();
+				bool DelayedVirtual ();
+
+				String Summary();
 
 				bool Infinite ();
 				ProtonixAction* Infinite (bool infinite);
 
-				bool PipeStart ();
-				bool Pipe ();
-				void PipeEnd ();
+				bool Delayed ();
+				ProtonixAction* Delayed (bool delayed);
+
+				bool Queued ();
+				ProtonixAction* Queued (bool queued);
+
+				ProtonixAction* Start();
+				ProtonixAction* Play();
+				ProtonixAction* Pause();
+				ProtonixAction* Stop();
+
+				bool PipePre ();
+				void PipePost ();
 
 				void Reset ();
 		};
