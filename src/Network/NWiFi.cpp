@@ -66,9 +66,7 @@ bool Network::NWiFi::Connect () {
 	#endif
 
 	delay(1000);
-	/*
-	WiFi.reconnect();
-	*/
+	//WiFi.reconnect();
 
 	return true;
 }

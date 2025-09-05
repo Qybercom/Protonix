@@ -64,22 +64,6 @@ void DTO::DTORequestDeviceStatus::DTOSerialize(JsonDocument& dto) {
 		item["failure"] = sensor->Failure();
 		item["state"] = sensor->State();
 	}
-	/*ProtonixDeviceSensor** sensors = this->_status->Sensors();
-
-	unsigned int i = 0;
-	unsigned int size = this->_status->SensorCount();
-
-	while (i < size) {
-		JsonObject sensor = sensors_out.add<JsonObject>();
-
-		sensor["id"] = sensors[i]->ID();
-		sensor["value"] = sensors[i]->Value();
-		sensor["active"] = sensors[i]->Active();
-		sensor["failure"] = sensors[i]->Failure();
-		sensor["state"] = sensors[i]->State();
-
-		i++;
-	}*/
 
 	dto["data"]["registry"] = String(this->_registry + "");
 }

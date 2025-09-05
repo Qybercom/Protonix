@@ -40,13 +40,6 @@ void ProtonixGenericDevice::_init (bool debug) {
 	this->_cmds.Add(new Command::CStdReboot());
 	this->_cmds.Add(new Command::CStdRegistry());
 	this->_cmds.Add(new Command::CStdSensor());
-	/*this->_cmds[0] = new Command::CCustom();
-	this->_cmds[1] = new Command::CStdFirmware();
-	this->_cmds[2] = new Command::CStdOff();
-	this->_cmds[3] = new Command::CStdOn();
-	this->_cmds[4] = new Command::CStdReboot();
-	this->_cmds[5] = new Command::CStdRegistry();
-	this->_cmds[6] = new Command::CStdSensor();*/
 
 	#if defined(ESP32) || defined(ESP8266)
 	pinMode(2, OUTPUT);
@@ -179,17 +172,5 @@ void ProtonixGenericDevice::DeviceOnStreamEventCommand(ProtonixDevice* device, D
 			this->DeviceOnCommand(device, nullptr, item);
 		}
 	}
-	/*unsigned int i = 0;
-
-	while (i < 7) {
-		this->_cmds[i]->CommandReset();
-		this->_cmds[i]->CommandFromDTO(command);
-
-		if (this->_cmds[i]->CommandRecognize(device, nullptr, cmd)) {
-			this->DeviceOnCommand(device, nullptr, this->_cmds[i]);
-		}
-
-		i++;
-	}*/
 }
 #endif

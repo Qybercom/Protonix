@@ -110,10 +110,6 @@ void ProtonixDTO::BufferRaw (String data) {
 	this->_bufferRaw = data;
 }
 
-/*void ProtonixDTO::BufferRaw(char* data) {
-	this->_bufferRaw = String(data);
-}*/
-
 String ProtonixDTO::BufferRaw () {
 	return this->_bufferRaw;
 }
@@ -122,9 +118,6 @@ void ProtonixDTO::Reset () {
 	this->_url = "";
 	this->_response = "";
 	this->_event = "";
-
-	/*delete this->_data;
-	this->_data = nullptr;*/
 
 	this->_buffer.clear();
 	this->_bufferRaw = "";

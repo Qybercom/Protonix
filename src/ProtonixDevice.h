@@ -23,18 +23,6 @@
 #include "ProtonixDevicePort.h"
 #include "ProtonixDeviceSensor.h"
 
-/*#if defined(ESP32) || defined(ESP8266)
-#define PROTONIX_LIMIT_HARDWARE 32
-#define PROTONIX_LIMIT_ACTION_LIST 64
-#define PROTONIX_LIMIT_ACTION_BACKLOG 256
-#define PROTONIX_LIMIT_PORT 8
-#else
-#define PROTONIX_LIMIT_HARDWARE 8
-#define PROTONIX_LIMIT_ACTION_LIST 8
-#define PROTONIX_LIMIT_ACTION_BACKLOG 16
-#define PROTONIX_LIMIT_PORT 4
-#endif*/
-
 namespace Qybercom {
 	namespace Protonix {
 		class IProtonixDevice;
@@ -58,12 +46,8 @@ namespace Qybercom {
 				ProtonixRegistry* _registry;
 				String _serverBaseURI;
 
-				/*unsigned int _hardwareCount;
-				IProtonixHardware* _hardware[PROTONIX_LIMIT_HARDWARE];*/
 				List<IProtonixHardware*> _hardware;
 
-				/*unsigned int _portCount;
-				ProtonixDevicePort* _ports[PROTONIX_LIMIT_PORT];*/
 				List<ProtonixDevicePort*> _ports;
 
 				List<ProtonixAction*> _actions;
@@ -86,8 +70,6 @@ namespace Qybercom {
 				void _onStreamURL();
 				void _onStreamResponse();
 				void _onStreamEvent();
-
-				//void _updateError(String step, StreamString &error);
 				#endif
 
 				#if defined(ESP32)
@@ -200,9 +182,6 @@ namespace Qybercom {
 				ProtonixDTO* DTOInput ();
 				ProtonixDTO* DTOOutput ();
 				bool FirmwareUpdateOTA (String version = "");
-				//bool FirmwareUpdateOTA(void(*onProgress)(int, int) = nullptr);
-				//bool FirmwareUpdate(String firmware, void(*onProgress)(int, int) = nullptr);
-				//bool FirmwareUpdate(Stream& stream, void(*onProgress)(int, int) = nullptr);
 				#endif
 
 				#if defined(ESP32)

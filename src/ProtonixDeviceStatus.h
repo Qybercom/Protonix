@@ -6,12 +6,6 @@
 
 #include "ProtonixDeviceSensor.h"
 
-/*#if defined(ESP32) || defined(ESP8266)
-#define PROTONIX_LIMIT_SENSORS 256
-#else
-#define PROTONIX_LIMIT_SENSORS 16
-#endif*/
-
 namespace Qybercom {
 	namespace Protonix {
 		class ProtonixDeviceStatus {
@@ -22,8 +16,6 @@ namespace Qybercom {
 				String _uptime;
 				String _summary;
 
-				/*ProtonixDeviceSensor* _sensors[PROTONIX_LIMIT_SENSORS];
-				unsigned int _sensorCount;*/
 				List<ProtonixDeviceSensor*> _sensors;
 
 			public:
@@ -44,8 +36,6 @@ namespace Qybercom {
 				void Summary(String summary);
 				String Summary();
 
-				/*ProtonixDeviceSensor** Sensors();
-				unsigned int SensorCount();*/
 				List<ProtonixDeviceSensor*> &Sensors ();
 				ProtonixDeviceStatus* SensorAdd(String id);
 				ProtonixDeviceStatus* SensorSet(String id, String value);
@@ -60,7 +50,6 @@ namespace Qybercom {
 				ProtonixDeviceStatus* SensorReset();
 				ProtonixDeviceStatus* SensorReset(String id);
 				ProtonixDeviceSensor* Sensor(String id);
-				//ProtonixDeviceSensor* Sensor(unsigned int i);
 		};
 	}
 }

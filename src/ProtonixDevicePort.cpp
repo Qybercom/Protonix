@@ -52,41 +52,11 @@ void ProtonixDevicePort::_init(bool serial, String name, unsigned int pinRX, uns
 	this->_cmds.Add(new Command::CStdOn());
 	this->_cmds.Add(new Command::CStdReboot());
 	this->_cmds.Add(new Command::CStdRegistry());
-	/*this->_cmds[0] = new Command::CCustom();
-	this->_cmds[1] = new Command::CStdFirmware();
-	this->_cmds[2] = new Command::CStdOff();
-	this->_cmds[3] = new Command::CStdOn();
-	this->_cmds[4] = new Command::CStdReboot();
-	this->_cmds[5] = new Command::CStdRegistry();*/
 	#endif
 	this->_cmds.Add(new Command::CStdSensor());
-	//this->_cmds[6] = new Command::CStdSensor();
 }
 
 byte ProtonixDevicePort::_crc8(String data) {
-	/*byte crc = 0;
-	byte buffer;
-
-	int size = data.length();
-	int i = 0;
-	int j = 8;
-
-	while (i < size) {
-		buffer = (byte)data[i];
-		j = 0;
-
-		while (j > 0) {
-			crc = ((crc ^ buffer) & 1) ? (crc >> 1) ^ 0x8C : (crc >> 1);
-			buffer >>= 1;
-
-			j--;
-		}
-
-		i++;
-	}
-
-	return crc;
-	*/
 	int start = 0;
 	int cnt = data.length();
 
@@ -106,7 +76,7 @@ byte ProtonixDevicePort::_crc8(String data) {
 		}
 	}
 
-	/* Reverse byte order. */
+	// Reverse byte order
 	temp2 = temp >> 8;
 	temp = (temp << 8) | temp2;
 	temp &= 0xFFFF;
@@ -317,13 +287,6 @@ void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 				device->OnSerial(this, command);
 			}
 		}
-		/*while (i < 7) {
-			if (this->_cmds[i] != nullptr && this->_cmds[i]->CommandRecognize(device, this, this->_blocking ? s : this->_cmdBuffer)) {
-				device->OnSerial(this, this->_cmds[i]);
-			}
-	
-			i++;
-		}*/
 	}
 	
 	this->_cmdBuffer = "";
