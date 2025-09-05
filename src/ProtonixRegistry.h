@@ -48,29 +48,30 @@ namespace Qybercom {
 
 				String Raw();
 
-				String GetRaw(String key, String defaultValue);
+				String GetRaw(String key, String defaultValue = "");
 				bool SetRaw(String key, String value, bool commit);
 
-				int GetInt(String key, int defaultValue);
+				int GetInt(String key, int defaultValue = 0);
 				bool SetInt(String key, int value, bool commit);
 
-				float GetFloat(String key, float defaultValue);
+				float GetFloat(String key, float defaultValue = 0.0);
 				bool SetFloat(String key, float value, bool commit);
 
-				ProtonixRegistryColor GetColor(String key, String defaultValue);
+				ProtonixRegistryColor GetColor(String key, String defaultValue = "0,0,0");
 				bool SetColor(String key, String value, bool commit);
 				bool SetColor(String key, ProtonixRegistryColor &color, bool commit);
 
-				ProtonixRegistryList GetList(String key, String defaultValue);
+				// TODO: refactor for `List<T>`
+				ProtonixRegistryList GetList(String key, String defaultValue = "");
 				bool GetListItemExists(String key, String value);
 				short GetListItemIndex(String key, String value);
 				bool SetList(String key, String value, bool commit);
 				bool SetList(String key, ProtonixRegistryList &list, bool commit);
 
-				int GetIntervalMin(String key, int defaultValue);
-				int GetIntervalMax(String key, int defaultValue);
-				float GetIntervalMin_f(String key, float defaultValue);
-				float GetIntervalMax_f(String key, float defaultValue);
+				int GetIntervalMin(String key, int defaultValue = 0);
+				int GetIntervalMax(String key, int defaultValue = 0);
+				float GetIntervalMin_f(String key, float defaultValue = 0.0);
+				float GetIntervalMax_f(String key, float defaultValue = 0.0);
 
 				bool Commit();
 		};
