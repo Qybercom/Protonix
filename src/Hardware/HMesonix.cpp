@@ -1,0 +1,44 @@
+#include <Arduino.h>
+
+#include <QybercomMesonix.h>
+
+#include "../IProtonixHardware.h"
+#include "../ProtonixDevice.h"
+
+#include "HMesonix.h"
+
+using namespace Qybercom::Mesonix;
+using namespace Qybercom::Protonix;
+
+Hardware::HMesonix::HMesonix (int pinSS, int pinRST, unsigned short uuidReadDebounce, short dedicatedCore) {
+	this->_reader = new Mesonix(27, 4);
+	this->_reader->UUIDReadDebounce(uuidReadDebounce);
+
+	this->_dedicatedCore = dedicatedCore;
+}
+
+Mesonix* Hardware::HMesonix::Reader () {
+	return this->_reader;
+}
+
+bool Hardware::HMesonix::HardwareSPI () {
+	return true;
+}
+
+void Hardware::HMesonix::HardwareInitPre (ProtonixDevice* device) {
+	(void)device;
+
+	this->_reader->InitMFRC();
+}
+
+void Hardware::HMesonix::HardwareInitPost (ProtonixDevice* device) {
+	(void)device;
+}
+
+void Hardware::HMesonix::HardwarePipe (ProtonixDevice* device, short core) {
+	(void)device;
+
+	//Serial.println("[hardware:mesonix] Pipe on core " + String(core));
+
+	this->_reader->Pipe();
+}

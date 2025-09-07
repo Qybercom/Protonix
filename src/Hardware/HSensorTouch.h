@@ -13,9 +13,10 @@ namespace Qybercom {
 
 
 				public:
-					void HardwareInitPre(ProtonixDevice* device);
-					void HardwareInitPost(ProtonixDevice* device);
-					void HardwarePipe(ProtonixDevice* device);
+					bool HardwareSPI ();
+					void HardwareInitPre (ProtonixDevice* device);
+					void HardwareInitPost (ProtonixDevice* device);
+					void HardwarePipe (ProtonixDevice* device, short core);
 			};
 		}
 	}

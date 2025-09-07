@@ -2,22 +2,24 @@
 
 #include <Arduino.h>
 
+#include <QybercomMesonix.h>
+
 #include "../IProtonixHardware.h"
 #include "../ProtonixDevice.h"
 
 namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
-			class HRelay : public IProtonixHardware {
+			using Qybercom::Mesonix::Mesonix;
+
+			class HMesonix : public IProtonixHardware {
 				private:
-					unsigned short _pin;
-					bool _inverted;
+					Mesonix* _reader;
 
 				public:
-					HRelay (unsigned short pin, bool inverted = false);
+					HMesonix (int pinSS, int pinRST, unsigned short uuidReadDebounce = 0, short dedicatedCore = -1);
 
-					void Open ();
-					void Close ();
+					Mesonix* Reader ();
 
 					bool HardwareSPI ();
 					void HardwareInitPre (ProtonixDevice* device);

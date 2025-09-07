@@ -7,19 +7,23 @@
 
 using namespace Qybercom::Protonix;
 
-void Hardware::HSensorPhotoResistor::HardwareInitPre(ProtonixDevice* device) {
+bool Hardware::HSensorPhotoResistor::HardwareSPI () {
+	return false;
+}
+
+void Hardware::HSensorPhotoResistor::HardwareInitPre (ProtonixDevice* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HSensorPhotoResistor::HardwareInitPost(ProtonixDevice* device) {
+void Hardware::HSensorPhotoResistor::HardwareInitPost (ProtonixDevice* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HSensorPhotoResistor::HardwarePipe(ProtonixDevice* device) {
+void Hardware::HSensorPhotoResistor::HardwarePipe (ProtonixDevice* device, short core) {
 	(void)device;
 
 

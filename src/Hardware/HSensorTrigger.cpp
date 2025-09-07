@@ -7,19 +7,23 @@
 
 using namespace Qybercom::Protonix;
 
-void Hardware::HSensorTrigger::HardwareInitPre(ProtonixDevice* device) {
+bool Hardware::HSensorTrigger::HardwareSPI () {
+	return false;
+}
+
+void Hardware::HSensorTrigger::HardwareInitPre (ProtonixDevice* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HSensorTrigger::HardwareInitPost(ProtonixDevice* device) {
+void Hardware::HSensorTrigger::HardwareInitPost (ProtonixDevice* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HSensorTrigger::HardwarePipe(ProtonixDevice* device) {
+void Hardware::HSensorTrigger::HardwarePipe (ProtonixDevice* device, short core) {
 	(void)device;
 
 

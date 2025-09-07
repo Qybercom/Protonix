@@ -26,7 +26,7 @@
 #include "ProtonixAction.h"
 #include "ProtonixMemory.h"
 
-#include "Hardware/HReaderMFRC.h"
+#include "Hardware/HMesonix.h"
 
 #include "Command/CStdSensor.h"
 #include "Command/CCustom.h"
@@ -44,6 +44,7 @@
 using namespace Qybercom;
 using namespace Qybercom::Protonix;
 
+List<ProtonixDevice*> ProtonixDevice::_instances;
 
 ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
 	this->_timerUptime = new ProtonixTimer(0);
@@ -78,6 +79,18 @@ ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
 	pinMode(4, OUTPUT);
 	digitalWrite(4, HIGH);
 	#endif
+
+	_instances.Add(this);
+}
+
+void ProtonixDevice::_interruptProcess () {
+	for (IProtonixHardware* hardware : this->_hardware)
+		hardware->HardwarePipeInterrupt(this);
+}
+
+void ProtonixDevice::_interrupt () {
+	for (ProtonixDevice* instance : _instances)
+		instance->_interruptProcess();
 }
 
 void ProtonixDevice::Device (IProtonixDevice* device) {
@@ -87,6 +100,14 @@ void ProtonixDevice::Device (IProtonixDevice* device) {
 
 IProtonixDevice* ProtonixDevice::Device () {
 	return this->_device;
+}
+
+void ProtonixDevice::InterruptAttach (unsigned short pin, int mode) {
+	attachInterrupt(digitalPinToInterrupt(pin), _interrupt, mode);
+}
+
+void ProtonixDevice::InterruptDetach (unsigned short pin) {
+	detachInterrupt(digitalPinToInterrupt(pin));
 }
 
 ProtonixTimer* ProtonixDevice::TimerUptime () {
@@ -535,29 +556,33 @@ void ProtonixDevice::Pipe () {
 	this->_timerUptime->Pipe();
 	this->_status->Uptime(this->_timerUptime->RunTime());
 
-	//unsigned int i = 0;
-
 	if (!this->_ready) {
 		this->_ready = true;
 
 		for (ProtonixDevicePort* port : this->_ports)
 			port->Init(this);
 
-		/*i = 0;
-		while (i < this->_hardwareCount) {
-			this->_hardware[i]->HardwareInitPre(this);
+		bool spi = false;
+		short core = -1;
 
-			i++;
+		for (IProtonixHardware* hardware : this->_hardware) {
+			spi |= hardware->HardwareSPI();
+
+			#if defined(ESP32)
+			core = hardware->HardwareDedicatedCore();
+			if (core == 0) this->DedicateTaskCore0();
+			if (core == 1) this->DedicateTaskCore1();
+			#endif
+
+			hardware->HardwareInitPre(this);
 		}
 
-		SPI.begin();
+		if (spi)
+			SPI.begin();
 
-		i = 0;
-		while (i < this->_hardwareCount) {
-			this->_hardware[i]->HardwareInitPost(this);
-
-			i++;
-		}*/
+		for (IProtonixHardware* hardware : this->_hardware) {
+			hardware->HardwareInitPost(this);
+		}
 
 		this->_device->DeviceOnReady(this);
 	}
@@ -566,8 +591,13 @@ void ProtonixDevice::Pipe () {
 	this->_pipeNetwork();
 	#endif
 
-	for (IProtonixHardware* hardware : this->_hardware)
-		hardware->HardwarePipe(this);
+	for (IProtonixHardware* hardware : this->_hardware) {
+		#if defined(ESP32)
+		if (hardware->HardwareDedicatedCore() != -1) continue;
+		#endif
+
+		hardware->HardwarePipe(this, -1);
+	}
 
 	for (ProtonixDevicePort* port : this->_ports)
 		port->Pipe(this);
@@ -935,9 +965,14 @@ void ProtonixDevice::_dedicateTask (TaskHandle_t* handle, unsigned short core, u
 void ProtonixDevice::_dedicatedTask (void* param) {
 	ProtonixDevice* device = (ProtonixDevice*)param;
 	bool run = true;
+	unsigned short core = xPortGetCoreID();
 
 	while (run) {
-		device->_device->DeviceOnDedicatedTask(xPortGetCoreID());
+		for (IProtonixHardware* hardware : device->_hardware)
+			if (hardware->HardwareDedicatedCore() == core)
+				hardware->HardwarePipe(device, core);
+
+		device->_device->DeviceOnDedicatedTask(core);
 
 		vTaskDelay(10 / portTICK_PERIOD_MS);
 	}

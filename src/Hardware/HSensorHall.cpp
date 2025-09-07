@@ -7,19 +7,23 @@
 
 using namespace Qybercom::Protonix;
 
-void Hardware::HSensorHall::HardwareInitPre(ProtonixDevice* device) {
+bool Hardware::HSensorHall::HardwareSPI () {
+	return false;
+}
+
+void Hardware::HSensorHall::HardwareInitPre (ProtonixDevice* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HSensorHall::HardwareInitPost(ProtonixDevice* device) {
+void Hardware::HSensorHall::HardwareInitPost (ProtonixDevice* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HSensorHall::HardwarePipe(ProtonixDevice* device) {
+void Hardware::HSensorHall::HardwarePipe (ProtonixDevice* device, short core) {
 	(void)device;
 
 

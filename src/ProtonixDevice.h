@@ -6,6 +6,12 @@
 #include <StreamString.h>
 #endif
 
+#if defined(ESP32) || defined(ESP8266)
+#define ISR_ATTR IRAM_ATTR
+#else
+#define ISR_ATTR
+#endif
+
 #include "Common/List.hpp"
 
 #include "IProtonixHardware.h"
@@ -80,11 +86,20 @@ namespace Qybercom {
 				static void _dedicatedTask (void* param);
 				#endif
 
+				void _interruptProcess ();
+				static void ISR_ATTR _interrupt ();
+
+				static List<ProtonixDevice*> _instances;
+
 			public:
 				ProtonixDevice (IProtonixDevice* device);
 
 				void Device (IProtonixDevice* device);
 				IProtonixDevice* Device ();
+
+				void InterruptAttach (unsigned short pin, int mode);
+				void InterruptDetach (unsigned short pin);
+
 				ProtonixTimer* TimerUptime ();
 				ProtonixTimer* TimerTick ();
 				#if defined(ESP32) || defined(ESP8266)

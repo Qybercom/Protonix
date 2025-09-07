@@ -6,24 +6,28 @@
 
 using namespace Qybercom::Protonix;
 
-Hardware::HRelay::HRelay(unsigned short pin, bool inverted) {
+Hardware::HRelay::HRelay (unsigned short pin, bool inverted) {
 	this->_pin = pin;
 	this->_inverted = inverted;
 }
 
-void Hardware::HRelay::Open() {
+void Hardware::HRelay::Open () {
 	digitalWrite(this->_pin, this->_inverted ? LOW : HIGH);
 }
 
-void Hardware::HRelay::Close() {
+void Hardware::HRelay::Close () {
 	digitalWrite(this->_pin, this->_inverted ? HIGH : LOW);
 }
 
-void Hardware::HRelay::HardwareInitPre(ProtonixDevice* device) {
+bool Hardware::HRelay::HardwareSPI () {
+	return false;
+}
+
+void Hardware::HRelay::HardwareInitPre (ProtonixDevice* device) {
 	(void)device;
 }
 
-void Hardware::HRelay::HardwareInitPost(ProtonixDevice* device) {
+void Hardware::HRelay::HardwareInitPost (ProtonixDevice* device) {
 	(void)device;
 
 	pinMode(this->_pin, OUTPUT);
@@ -31,6 +35,6 @@ void Hardware::HRelay::HardwareInitPost(ProtonixDevice* device) {
 	this->Close();
 }
 
-void Hardware::HRelay::HardwarePipe(ProtonixDevice* device) {
+void Hardware::HRelay::HardwarePipe (ProtonixDevice* device, short core) {
 	(void)device;
 }
