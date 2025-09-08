@@ -15,10 +15,29 @@ namespace Qybercom {
 				Value (const T &data) : Data(data), Count(0) {}
 			};
 
+			volatile unsigned long _checkLast;
+			volatile unsigned int _checkInterval;
 			List<Value> _values;
 
 		public:
-			Debouncer () {}
+			Debouncer (unsigned int checkInterval = 0) {
+				this->_checkLast = 0;
+				this->_checkInterval = checkInterval;
+			}
+
+			unsigned long CheckLast () {
+				return this->_checkLast;
+			}
+
+			unsigned int CheckInterval () {
+				return this->_checkInterval;
+			}
+
+			Debouncer<T> &CheckInterval (unsigned int checkInterval) {
+				this->_checkInterval = checkInterval;
+
+				return *this;
+			}
 
 			Debouncer<T> &Use (T value) {
 				for (Value &val : this->_values) {
@@ -35,6 +54,16 @@ namespace Qybercom {
 				this->_values.Add(val);
 
 				return *this;
+			}
+
+			bool Pipe () {
+				unsigned long now = micros();
+				bool out = (now - this->_checkLast) > this->_checkInterval;
+
+				if (out)
+					this->_checkLast = now;
+
+				return out;
 			}
 
 			T Actual () {

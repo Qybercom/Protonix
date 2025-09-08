@@ -38,8 +38,8 @@ namespace Qybercom {
 		float angleDegrees = angleRadians * 180.0 / PI;
 
 		// normalization to 0..360 range
-		if (angleDegrees < 0)
-			angleDegrees += 360;
+		if (angleDegrees < 0.0)
+			angleDegrees += 360.0;
 
 		return angleDegrees;
 	}
@@ -48,19 +48,27 @@ namespace Qybercom {
 		return round(angleByXY(x, y, minX, maxX, minY, maxY));
 	}
 
-	inline int angleOffset (int value, int offset) {
-		int out = value - offset;
+	inline float angleOffset (float value, float offset) {
+		float out = value - offset;
 
 		if (out < 0)
-			out = 360 + out;
+			out = 360.0 + out;
 
 		return out;
 	}
 
-	inline bool matchRange (int value, int min, int max, bool minEQ = true, bool maxEQ = true) {
+	inline int angleOffset (int value, int offset) {
+		return (int)angleOffset((float)value, (float)offset);
+	}
+
+	inline bool matchRange (float value, float min, float max, bool minEQ = true, bool maxEQ = true) {
 		bool _min = minEQ ? value >= min : value > min;
 		bool _max = maxEQ ? value <= max : value < max;
 
 		return max >= min ? _min && _max : _min || _max;
+	}
+
+	inline bool matchRange (int value, int min, int max, bool minEQ = true, bool maxEQ = true) {
+		return matchRange((float)value, (float)min, (float)max, minEQ, maxEQ);
 	}
 }

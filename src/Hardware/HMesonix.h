@@ -17,7 +17,7 @@ namespace Qybercom {
 					Mesonix* _reader;
 
 				public:
-					HMesonix (int pinSS, int pinRST, unsigned short uuidReadDebounce = 0, short dedicatedCore = -1);
+					HMesonix (unsigned short pinSS, unsigned short pinRST, unsigned short uuidReadDebounce = 0, short dedicatedCore = -1);
 
 					Mesonix* Reader ();
 

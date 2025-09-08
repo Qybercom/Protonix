@@ -8,7 +8,7 @@
 namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
-			class HSensorHall : public IProtonixHardware {
+			class HPotentiometer : public IProtonixHardware {
 				private:
 					unsigned short _pin;
 					int _value;
@@ -16,16 +16,16 @@ namespace Qybercom {
 					int _min;
 
 				public:
-					HSensorHall (unsigned short pin, int max = ANALOG_MAX, int min = 0);
+					HPotentiometer (unsigned short pin, int max = ANALOG_MAX, int min = 0);
 
 					unsigned short Pin ();
-					HSensorHall* Pin (unsigned short pin);
+					HPotentiometer* Pin (unsigned short pin);
 
 					int Max ();
-					HSensorHall* Max (int max);
+					HPotentiometer* Max (int max);
 
 					int Min ();
-					HSensorHall* Min (int min);
+					HPotentiometer* Min (int min);
 
 					int Value ();
 					bool ValueMatch (int min = 0, int max = ANALOG_MAX, bool minEQ = true, bool maxEQ = true);

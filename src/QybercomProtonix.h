@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+
+
 #include "Common/List.hpp"
 #include "Common/Utils.hpp"
 
@@ -10,16 +12,20 @@
 #include "ProtonixDevice.h"
 #include "ProtonixGenericDevice.h"
 
+#include "Hardware/HButton.h"
+#include "Hardware/HEncoder.h"
 #include "Hardware/HMesonix.h"
 #include "Hardware/HPhotonix.h"
+#include "Hardware/HPhotoResistor.h"
 #include "Hardware/HPlayerMP3.h"
+#include "Hardware/HPotentiometer.h"
 #include "Hardware/HRelay.h"
-#include "Hardware/HSensorEncoder.h"
+#include "Hardware/HSelector3P.h"
 #include "Hardware/HSensorHall.h"
+#include "Hardware/HSensorHall2D.h"
 #include "Hardware/HSensorMicrophone.h"
-#include "Hardware/HSensorPhotoResistor.h"
-#include "Hardware/HSensorTouch.h"
-#include "Hardware/HSensorTrigger.h"
+#include "Hardware/HTouchButton.h"
+#include "Hardware/HTrigger.h"
 
 #include "Command/CCustom.h"
 #include "Command/CStdFirmware.h"

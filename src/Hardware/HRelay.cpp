@@ -11,6 +11,16 @@ Hardware::HRelay::HRelay (unsigned short pin, bool inverted) {
 	this->_inverted = inverted;
 }
 
+unsigned short Hardware::HRelay::Pin () {
+	return this->_pin;
+}
+
+Hardware::HRelay* Hardware::HRelay::Pin (unsigned short pin) {
+	this->_pin = pin;
+
+	return this;
+}
+
 void Hardware::HRelay::Open () {
 	digitalWrite(this->_pin, this->_inverted ? LOW : HIGH);
 }
@@ -25,14 +35,14 @@ bool Hardware::HRelay::HardwareSPI () {
 
 void Hardware::HRelay::HardwareInitPre (ProtonixDevice* device) {
 	(void)device;
-}
-
-void Hardware::HRelay::HardwareInitPost (ProtonixDevice* device) {
-	(void)device;
 
 	pinMode(this->_pin, OUTPUT);
 
 	this->Close();
+}
+
+void Hardware::HRelay::HardwareInitPost (ProtonixDevice* device) {
+	(void)device;
 }
 
 void Hardware::HRelay::HardwarePipe (ProtonixDevice* device, short core) {

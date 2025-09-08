@@ -10,7 +10,7 @@
 using namespace Qybercom::Mesonix;
 using namespace Qybercom::Protonix;
 
-Hardware::HMesonix::HMesonix (int pinSS, int pinRST, unsigned short uuidReadDebounce, short dedicatedCore) {
+Hardware::HMesonix::HMesonix (unsigned short pinSS, unsigned short pinRST, unsigned short uuidReadDebounce, short dedicatedCore) {
 	this->_reader = new Mesonix(27, 4);
 	this->_reader->UUIDReadDebounce(uuidReadDebounce);
 

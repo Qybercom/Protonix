@@ -8,11 +8,19 @@
 namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
-			class HSensorTrigger : public IProtonixHardware {
+			class HTouchButton : public IProtonixHardware {
 				private:
-
+					unsigned short _pin;
+					bool _active;
 
 				public:
+					HTouchButton (unsigned short pin);
+
+					unsigned short Pin ();
+					HTouchButton* Pin (unsigned short pin);
+
+					bool Active ();
+
 					bool HardwareSPI ();
 					void HardwareInitPre (ProtonixDevice* device);
 					void HardwareInitPost (ProtonixDevice* device);

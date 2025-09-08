@@ -12,6 +12,8 @@
 #define ISR_ATTR
 #endif
 
+#include "_directives.h"
+
 #include "Common/List.hpp"
 
 #include "IProtonixHardware.h"
@@ -122,6 +124,12 @@ namespace Qybercom {
 				List<IProtonixHardware*> &Hardware ();
 				IProtonixHardware* Hardware (String id);
 				ProtonixDevice* Hardware (String id, IProtonixHardware* hardware);
+				template<typename T>
+				T* Hardware (String id) {
+					IProtonixHardware* base = this->Hardware(id);
+
+					return static_cast<T*>(base);
+				}
 
 				List<ProtonixDevicePort*> &Ports ();
 				ProtonixDevicePort* Port (String name);

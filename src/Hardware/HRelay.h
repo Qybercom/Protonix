@@ -16,6 +16,9 @@ namespace Qybercom {
 				public:
 					HRelay (unsigned short pin, bool inverted = false);
 
+					unsigned short Pin ();
+					HRelay* Pin (unsigned short pin);
+
 					void Open ();
 					void Close ();
 

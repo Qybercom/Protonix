@@ -5,68 +5,65 @@
 #include "../IProtonixHardware.h"
 #include "../ProtonixDevice.h"
 
-#include "HSensorEncoder.h"
+#include "HEncoder.h"
 
 using namespace Qybercom::Protonix;
 
-Hardware::HSensorEncoder::HSensorEncoder (unsigned short pinA, unsigned short pinB, unsigned int checkInterval) {
+Hardware::HEncoder::HEncoder (unsigned short pinA, unsigned short pinB, unsigned int checkInterval) {
 	this->_pinA = pinA;
 	this->_pinB = pinB;
 	this->_valA = false;
 	this->_valB = false;
 	this->_dir = 0;
-	this->_checkLast = 0;
-	this->_checkInterval = checkInterval;
+	this->_changed = false;
+
+	this->_debouncer.CheckInterval(checkInterval);
 
 	/*this->_debounceValues[0] = 0;
 	this->_debounceValues[1] = 0;
 	this->_debounceValues[2] = 0;*/
 }
 
-unsigned short Hardware::HSensorEncoder::PinA () {
+unsigned short Hardware::HEncoder::PinA () {
 	return this->_pinA;
 }
 
-unsigned short Hardware::HSensorEncoder::PinB () {
+unsigned short Hardware::HEncoder::PinB () {
 	return this->_pinB;
 }
 
-bool Hardware::HSensorEncoder::ValA () {
+bool Hardware::HEncoder::ValA () {
 	return this->_valA;
 }
 
-bool Hardware::HSensorEncoder::ValB () {
+bool Hardware::HEncoder::ValB () {
 	return this->_valB;
 }
 
-short Hardware::HSensorEncoder::Dir () {
+short Hardware::HEncoder::Dir () {
 	return this->_dir;
 }
 
-bool Hardware::HSensorEncoder::Changed (bool allowZero) {
-	bool out = this->_changed && (allowZero || this->_dir != 0);
-	this->_changed = false;
+bool Hardware::HEncoder::Changed (bool allowZero) {
+	bool out = false;
+
+	if (this->_changed && (allowZero || this->_dir != 0)) {
+		out = true;
+		this->_changed = false;
+	}
 
 	return out;
 }
 
-unsigned long Hardware::HSensorEncoder::CheckLast () {
-	return this->_checkLast;
-}
-
-unsigned int Hardware::HSensorEncoder::CheckInterval () {
-	return this->_checkInterval;
-}
-
-Qybercom::Debouncer<short> &Hardware::HSensorEncoder::Debouncer () {
+Qybercom::Debouncer<short> &Hardware::HEncoder::Debouncer () {
 	return this->_debouncer;
 }
 
-bool Hardware::HSensorEncoder::HardwareSPI () {
+bool Hardware::HEncoder::HardwareSPI () {
 	return false;
 }
 
-void Hardware::HSensorEncoder::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HEncoder::HardwareInitPre (ProtonixDevice* device) {
 	pinMode(this->_pinA, INPUT_PULLUP);
 	device->InterruptAttach(this->_pinA, CHANGE);
 
@@ -74,19 +71,18 @@ void Hardware::HSensorEncoder::HardwareInitPre (ProtonixDevice* device) {
 	device->InterruptAttach(this->_pinB, CHANGE);
 }
 
-void Hardware::HSensorEncoder::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HEncoder::HardwareInitPost (ProtonixDevice* device) {
 	(void) device;
 
 }
 
-void Hardware::HSensorEncoder::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HEncoder::HardwarePipe (ProtonixDevice* device, short core) {
 	(void) device;
 
 
 }
 
-void Hardware::HSensorEncoder::HardwarePipeInterrupt (ProtonixDevice* device) {
-	unsigned long now = micros();
+void Hardware::HEncoder::HardwarePipeInterrupt (ProtonixDevice* device) {
 	bool valA = digitalRead(this->_pinA);
 	bool valB = digitalRead(this->_pinB);
 	short dir = 0;
@@ -98,31 +94,29 @@ void Hardware::HSensorEncoder::HardwarePipeInterrupt (ProtonixDevice* device) {
 	/*if (dir == -1) this->_debounceValues[0]++;
 	if (dir == 0) this->_debounceValues[1]++;
 	if (dir == 1) this->_debounceValues[2]++;*/
-	Serial.println("[encoder] use1");
+	Serial.println("[hardware:encoder] use1");
 	this->_debouncer.Use(dir);
-	Serial.println("[encoder] use2");
+	Serial.println("[hardware:encoder] use2");
 
-	if (now - this->_checkLast > this->_checkInterval) {
+	if (this->_debouncer.Pipe()) {
 		/*dir = 0;
 		if (this->_debounceValues[0] > this->_debounceValues[2]) dir = -1;
 		if (this->_debounceValues[0] < this->_debounceValues[2]) dir = 1;*/
-		Serial.println("[encoder] actual1");
+		Serial.println("[hardware:encoder] actual1");
 		dir = this->_debouncer.Empty() ? 0 : this->_debouncer.Actual();
-		Serial.println("[encoder] actual2");
+		Serial.println("[hardware:encoder] actual2");
 
 		if (this->_dir != dir) {
 			this->_dir = dir;
 			this->_changed = true;
 		}
 
-		this->_checkLast = now;
-
 		/*this->_debounceValues[0] = 0;
 		this->_debounceValues[1] = 0;
 		this->_debounceValues[2] = 0;*/
-		Serial.println("[encoder] reset1");
+		Serial.println("[hardware:encoder] reset1");
 		this->_debouncer.Reset();
-		Serial.println("[encoder] reset2");
+		Serial.println("[hardware:encoder] reset2");
 	}
 
 	this->_valA = valA;
