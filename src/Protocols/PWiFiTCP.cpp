@@ -13,12 +13,22 @@ void Protocol::PWiFiTCP::Init(ProtonixDevice* device) {
 }
 
 bool Protocol::PWiFiTCP::Connect(ProtonixURI* uri) {
-	#if defined(ESP32) || defined(ESP8266)
-	this->_client.connect(uri->Host().c_str(), uri->Port());
-	return true;
+#if defined(ESP32) || defined(ESP8266)
+	#if defined(ESP32)
+	bool out = this->_client.connect(uri->Host().c_str(), uri->Port(), 10);
 	#else
-	return false;
+	bool out = this->_client.connect(uri->Host().c_str(), uri->Port());
 	#endif
+
+	if (out) {
+		this->_client.setNoDelay(true);
+		this->_client.setTimeout(10);
+	}
+
+	return out;
+#else
+	return false;
+#endif
 }
 
 bool Protocol::PWiFiTCP::Connected() {
