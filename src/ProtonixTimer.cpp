@@ -108,7 +108,7 @@ bool ProtonixTimer::Pipe () {
 	long diff = current - this->_previous;
 
 	if (diff < 0)
-		this->_overflows++;
+		this->_overflows = this->_overflows + 1; // required by compiler
 
 	bool elapsed = diff < 0 || diff >= this->_interval;
 

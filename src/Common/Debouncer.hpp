@@ -43,7 +43,7 @@ namespace Qybercom {
 				for (Value &val : this->_values) {
 					if (val.Data != value) continue;
 
-					val.Count++;
+					val.Count = val.Count + 1; // required by compiler
 
 					return *this;
 				}

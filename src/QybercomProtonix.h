@@ -13,6 +13,7 @@
 #include "ProtonixGenericDevice.h"
 
 #include "Hardware/HButton.h"
+#include "Hardware/HBuzzer.h"
 #include "Hardware/HEncoder.h"
 #include "Hardware/HMesonix.h"
 #include "Hardware/HPhotonix.h"
@@ -26,6 +27,20 @@
 #include "Hardware/HSensorMicrophone.h"
 #include "Hardware/HTouchButton.h"
 #include "Hardware/HTrigger.h"
+/*
+ * awaiting implementation
+ *
+ * keypad 3x4, 4x4 (IOXhop_I2CKeypad.h)
+ * 7seg
+ * clock7seg (https://github.com/AKJ7/TM1637)
+ * canBus
+ * i2cExpander (pcf8574)
+ * radio module (RCSwitch.h)
+ * ...
+ *
+ * button switch handling - not working for the moment
+ * recognizing UX gestures (double-click etc. for buttons, touch etc.)
+ */
 
 #include "Command/CCustom.h"
 #include "Command/CStdFirmware.h"
