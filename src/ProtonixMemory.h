@@ -33,7 +33,7 @@ namespace Qybercom {
 	namespace Protonix {
 		class ProtonixMemory {
 			private:
-				static int _ramFree();
+				static int _ramFree ();
 
 				bool _eepromReady;
 
@@ -46,16 +46,16 @@ namespace Qybercom {
 				unsigned int _flashAddressCurrent;
 
 			public:
-				ProtonixMemory();
+				ProtonixMemory ();
 
 
-				int RAMFree();
+				int RAMFree ();
 
 
-				void EEPROMBegin();
+				void EEPROMBegin ();
 
 				template<typename T>
-				T &EEPROMGet(int const address, T &data) {
+				T &EEPROMGet (int const address, T &data) {
 					if (!this->_eepromReady)
 						this->EEPROMBegin();
 
@@ -63,7 +63,7 @@ namespace Qybercom {
 				}
 
 				template<typename T>
-				const T &EEPROMSet(int const address, const T &data) {
+				const T &EEPROMSet (int const address, const T &data) {
 					if (!this->_eepromReady)
 						this->EEPROMBegin();
 
@@ -71,7 +71,7 @@ namespace Qybercom {
 				}
 
 				template<typename T>
-				const T &EEPROMSet(int const address, const T &data, bool commit) {
+				const T &EEPROMSet (int const address, const T &data, bool commit) {
 					if (!this->_eepromReady)
 						this->EEPROMBegin();
 
@@ -83,28 +83,28 @@ namespace Qybercom {
 					return out;
 				}
 
-				bool EEPROMCommit();
+				bool EEPROMCommit ();
 
-				void EEPROMEnd();
+				void EEPROMEnd ();
 
 
-				int FlashFree();
+				int FlashFree ();
 
-				bool FlashFirmwareBegin(size_t size);
-				bool FlashFileSystemBegin(size_t size);
-				bool FlashWrite(String batch);
-				unsigned int FlashSize();
-				unsigned int FlashBufferSize();
-				unsigned int FlashFirmwareSize();
+				bool FlashFirmwareBegin (size_t size);
+				bool FlashFileSystemBegin (size_t size);
+				bool FlashWrite (String batch);
+				unsigned int FlashSize ();
+				unsigned int FlashBufferSize ();
+				unsigned int FlashFirmwareSize ();
 				#if defined(ESP8266)
-				static unsigned int FlashSectorSize(size_t size);
-				static unsigned int FlashBufferSizeExpected();
+				static unsigned int FlashSectorSize (size_t size);
+				static unsigned int FlashBufferSizeExpected ();
 				#endif
-				bool FlashEnd();
+				bool FlashEnd ();
 
 				#if defined(ESP8266)
-				static void EBootCommand(uint32_t addressStart, uint32_t addressEnd, size_t size);
-				static void EBootCommandRead();
+				static void EBootCommand (uint32_t addressStart, uint32_t addressEnd, size_t size);
+				static void EBootCommandRead ();
 				#endif
 		};
 	}

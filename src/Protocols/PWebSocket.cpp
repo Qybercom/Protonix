@@ -12,7 +12,7 @@ using namespace Qybercom::Protonix;
 
 
 
-void Protocol::PWebSocket::Init(ProtonixDevice* device) {
+void Protocol::PWebSocket::ProtocolInit (ProtonixDevice* device) {
 	this->_device = device;
 
 	#if defined(ESP32) || defined(ESP8266)
@@ -27,7 +27,7 @@ void Protocol::PWebSocket::Init(ProtonixDevice* device) {
 	#endif
 }
 
-bool Protocol::PWebSocket::Connect(ProtonixURI* uri) {
+bool Protocol::PWebSocket::ProtocolConnect (ProtonixURI* uri) {
 	#if defined(ESP32) || defined(ESP8266)
 	return this->_client.connect(
 		uri->Host(),
@@ -39,7 +39,7 @@ bool Protocol::PWebSocket::Connect(ProtonixURI* uri) {
 	#endif
 }
 
-bool Protocol::PWebSocket::Connected() {
+bool Protocol::PWebSocket::ProtocolConnected () {
 	#if defined(ESP32) || defined(ESP8266)
 	return this->_client.available();
 	#else
@@ -47,13 +47,13 @@ bool Protocol::PWebSocket::Connected() {
 	#endif
 }
 
-void Protocol::PWebSocket::Pipe() {
+void Protocol::PWebSocket::ProtocolPipe () {
 	#if defined(ESP32) || defined(ESP8266)
 	this->_client.poll();
 	#endif
 }
 
-void Protocol::PWebSocket::Send(String raw) {
+void Protocol::PWebSocket::ProtocolSend (String raw) {
 	#if defined(ESP32) || defined(ESP8266)
 	this->_client.send(raw);
 	#endif

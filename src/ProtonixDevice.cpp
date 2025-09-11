@@ -449,7 +449,7 @@ void ProtonixDevice::ActionReset () {
 }
 
 #if defined(ESP32) || defined(ESP8266)
-void ProtonixDevice::_pipeNetwork() {
+void ProtonixDevice::_pipeNetwork () {
 	if (this->_network == nullptr || this->_protocol == nullptr) return;
 		
 	if (!this->Connected()) {
@@ -464,7 +464,7 @@ void ProtonixDevice::_pipeNetwork() {
 				if (this->_debug)
 					Serial.println("[network:connect 1]");
 
-				this->_network->Connect();
+				this->_network->NetworkConnect();
 
 				if (this->_debug)
 					Serial.println("[network:connect 2]");
@@ -472,7 +472,7 @@ void ProtonixDevice::_pipeNetwork() {
 				this->_networkConnected1 = true;
 			}
 
-			if (!this->_network->Connected()) return;
+			if (!this->_network->NetworkConnected()) return;
 
 			if (this->_debug)
 				Serial.println("[network:connected]");
@@ -487,18 +487,18 @@ void ProtonixDevice::_pipeNetwork() {
 				if (this->_debug)
 					Serial.println("[protocol:connect 1]");
 
-				this->_protocol->Init(this);
+				this->_protocol->ProtocolInit(this);
 
 				if (this->_debug)
 					Serial.println("[protocol:connect 2]");
 
-				this->_protocol->Connect(this->_uri);
+				this->_protocol->ProtocolConnect(this->_uri);
 
 				if (this->_debug)
 					Serial.println("[protocol:connect 3]");
 			}
 
-			if (!this->_protocol->Connected()) return;
+			if (!this->_protocol->ProtocolConnected()) return;
 
 			this->_protocolConnected1 = true;
 
@@ -511,8 +511,8 @@ void ProtonixDevice::_pipeNetwork() {
 		}
 
 		if (!this->Connected()) {
-			bool onlineN = this->_network->Connected();
-			bool onlineP = this->_protocol->Connected();
+			bool onlineN = this->_network->NetworkConnected();
+			bool onlineP = this->_protocol->ProtocolConnected();
 
 			Serial.println("[info] Reconnect N:" + String(onlineN) + " P:" + String(onlineP));
 
@@ -537,7 +537,7 @@ void ProtonixDevice::_pipeNetwork() {
 		this->RequestStreamAuthorize();
 	}
 
-	this->_protocol->Pipe();
+	this->_protocol->ProtocolPipe();
 }
 #endif
 
@@ -554,7 +554,6 @@ void ProtonixDevice::_pipeActions () {
 			this->ActionPipe(action);
 
 			if (action->Completed()) {
-				//action->Queued(false);
 				action->Reset();
 
 				this->_actionQueue.PopFirst();
@@ -771,56 +770,56 @@ bool ProtonixDevice::SerialStatus (String port) {
 }
 
 #if defined(ESP32) || defined(ESP8266)
-void ProtonixDevice::Network(IProtonixNetwork* network) {
+void ProtonixDevice::Network (IProtonixNetwork* network) {
 	this->_network = network;
 }
 
-IProtonixNetwork* ProtonixDevice::Network() {
+IProtonixNetwork* ProtonixDevice::Network () {
 	return this->_network;
 }
 
-bool ProtonixDevice::NetworkConnected() {
+bool ProtonixDevice::NetworkConnected () {
 	return this->_networkConnected1 && this->_networkConnected2;
 }
 
-void ProtonixDevice::Protocol(IProtonixProtocol* protocol) {
+void ProtonixDevice::Protocol (IProtonixProtocol* protocol) {
 	this->_protocol = protocol;
 }
 
-IProtonixProtocol* ProtonixDevice::Protocol() {
+IProtonixProtocol* ProtonixDevice::Protocol () {
 	return this->_protocol;
 }
 
-bool ProtonixDevice::ProtocolConnected() {
+bool ProtonixDevice::ProtocolConnected () {
 	return this->_protocolConnected1 && this->_protocolConnected2;
 }
 
-void ProtonixDevice::Server(ProtonixURI* uri) {
+void ProtonixDevice::Server (ProtonixURI* uri) {
 	this->_uri = uri;
 }
 
-ProtonixURI* ProtonixDevice::Server() {
+ProtonixURI* ProtonixDevice::Server () {
 	return this->_uri;
 }
 
-void ProtonixDevice::ServerEndpoint(String host, unsigned int port) {
+void ProtonixDevice::ServerEndpoint (String host, unsigned int port) {
 	this->Server(new ProtonixURI(host, port));
 }
 
-void ProtonixDevice::ServerEndpoint(String host, unsigned int port, String path) {
+void ProtonixDevice::ServerEndpoint (String host, unsigned int port, String path) {
 	this->Server(new ProtonixURI(host, port, path));
 }
 
-void ProtonixDevice::ServerBaseURI(String uri) {
+void ProtonixDevice::ServerBaseURI (String uri) {
 	this->_serverBaseURI = uri;
 }
 
-bool ProtonixDevice::Connected() {
+bool ProtonixDevice::Connected () {
 	return true
 		&& this->_network != nullptr
 		&& this->_protocol != nullptr
-		&& this->_network->Connected()
-		&& this->_protocol->Connected();
+		&& this->_network->NetworkConnected()
+		&& this->_protocol->ProtocolConnected();
 }
 
 void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
@@ -831,7 +830,7 @@ void ProtonixDevice::RequestStream (String url, IProtonixDTORequest* request) {
 		this->_dtoOutput->URL(url);
 		this->_dtoOutput->DTO(request);
 
-		if (this->_dtoOutput->Serialize()) this->_protocol->Send(this->_dtoOutput->BufferRaw());
+		if (this->_dtoOutput->Serialize()) this->_protocol->ProtocolSend(this->_dtoOutput->BufferRaw());
 		else error = "Cannot serialize request";
 	}
 	else error = "Device not connected, can not send request";
@@ -890,12 +889,12 @@ void ProtonixDevice::OnStream (unsigned char* data) {
 	cmds = nullptr;
 }
 
-void ProtonixDevice::_onStreamURL() {
+void ProtonixDevice::_onStreamURL () {
 	if (this->_debug)
 		Serial.println("[url] " + this->_dtoInput->URL());
 }
 
-void ProtonixDevice::_onStreamResponse() {
+void ProtonixDevice::_onStreamResponse () {
 	if (this->_debug)
 		Serial.println("[response] " + this->_dtoInput->Response());
 
@@ -930,7 +929,7 @@ void ProtonixDevice::_onStreamResponse() {
 	}
 }
 
-void ProtonixDevice::_onStreamEvent() {
+void ProtonixDevice::_onStreamEvent () {
 	if (this->_debug)
 		Serial.println("[event] " + this->_dtoInput->Event());
 
@@ -947,15 +946,15 @@ void ProtonixDevice::_onStreamEvent() {
 	}
 }
 
-ProtonixDTO* ProtonixDevice::DTOInput() {
+ProtonixDTO* ProtonixDevice::DTOInput () {
 	return this->_dtoInput;
 }
 
-ProtonixDTO* ProtonixDevice::DTOOutput() {
+ProtonixDTO* ProtonixDevice::DTOOutput () {
 	return this->_dtoOutput;
 }
 
-bool ProtonixDevice::FirmwareUpdateOTA(String version) {
+bool ProtonixDevice::FirmwareUpdateOTA (String version) {
 	String url = this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID() + "?platform=";
 	String ver = version == "" ? "" : String("&version=" + version);
 

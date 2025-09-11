@@ -21,7 +21,7 @@ using namespace Qybercom::Protonix;
 SoftwareSerial __port__ = SoftwareSerial(0, 0);
 #endif
 
-void ProtonixDevicePort::_init(bool serial, String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, unsigned int timeout, bool blocking, bool observable) {
+void ProtonixDevicePort::_init (bool serial, String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, unsigned int timeout, bool blocking, bool observable) {
 	this->_started = false;
 	this->_serial = serial;
 
@@ -56,7 +56,7 @@ void ProtonixDevicePort::_init(bool serial, String name, unsigned int pinRX, uns
 	this->_cmds.Add(new Command::CStdSensor());
 }
 
-byte ProtonixDevicePort::_crc8(String data) {
+byte ProtonixDevicePort::_crc8 (String data) {
 	int start = 0;
 	int cnt = data.length();
 
@@ -84,107 +84,107 @@ byte ProtonixDevicePort::_crc8(String data) {
 	return (byte)temp;
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned int pinRX, unsigned int pinTX) {
+ProtonixDevicePort::ProtonixDevicePort (String name, unsigned int pinRX, unsigned int pinTX) {
 	this->_init(false, name, pinRX, pinTX, 9600, 1000, false, true);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned int pinRX, unsigned int pinTX, bool blocking) {
+ProtonixDevicePort::ProtonixDevicePort (String name, unsigned int pinRX, unsigned int pinTX, bool blocking) {
 	this->_init(false, name, pinRX, pinTX, 9600, 1000, blocking, true);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned int pinRX, unsigned int pinTX, bool blocking, bool observable) {
+ProtonixDevicePort::ProtonixDevicePort (String name, unsigned int pinRX, unsigned int pinTX, bool blocking, bool observable) {
 	this->_init(false, name, pinRX, pinTX, 9600, 1000, blocking, observable);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed) {
+ProtonixDevicePort::ProtonixDevicePort (String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed) {
 	this->_init(false, name, pinRX, pinTX, speed, 1000, false, true);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, bool blocking) {
+ProtonixDevicePort::ProtonixDevicePort (String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, bool blocking) {
 	this->_init(false, name, pinRX, pinTX, speed, 1000, blocking, true);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, bool blocking, bool observable) {
+ProtonixDevicePort::ProtonixDevicePort (String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, bool blocking, bool observable) {
 	this->_init(false, name, pinRX, pinTX, speed, 1000, blocking, observable);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, unsigned int timeout) {
+ProtonixDevicePort::ProtonixDevicePort (String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, unsigned int timeout) {
 	this->_init(false, name, pinRX, pinTX, speed, timeout, false, true);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, unsigned int timeout, bool blocking) {
+ProtonixDevicePort::ProtonixDevicePort (String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, unsigned int timeout, bool blocking) {
 	this->_init(false, name, pinRX, pinTX, speed, timeout, blocking, true);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, unsigned int timeout, bool blocking, bool observable) {
+ProtonixDevicePort::ProtonixDevicePort (String name, unsigned int pinRX, unsigned int pinTX, unsigned int speed, unsigned int timeout, bool blocking, bool observable) {
 	this->_init(false, name, pinRX, pinTX, speed, timeout, blocking, observable);
 }
 
-ProtonixDevicePort::ProtonixDevicePort() {
+ProtonixDevicePort::ProtonixDevicePort () {
 	this->_init(true, "", 0, 0, 9600, 1000, false, true);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(bool blocking) {
+ProtonixDevicePort::ProtonixDevicePort (bool blocking) {
 	this->_init(true, "", 0, 0, 9600, 1000, blocking, true);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(bool blocking, bool observable) {
+ProtonixDevicePort::ProtonixDevicePort (bool blocking, bool observable) {
 	this->_init(true, "", 0, 0, 9600, 1000, blocking, observable);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(unsigned int speed) {
+ProtonixDevicePort::ProtonixDevicePort (unsigned int speed) {
 	this->_init(true, "", 0, 0, speed, 1000, false, true);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(unsigned int speed, bool blocking) {
+ProtonixDevicePort::ProtonixDevicePort (unsigned int speed, bool blocking) {
 	this->_init(true, "", 0, 0, speed, 1000, blocking, true);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(unsigned int speed, bool blocking, bool observable) {
+ProtonixDevicePort::ProtonixDevicePort (unsigned int speed, bool blocking, bool observable) {
 	this->_init(true, "", 0, 0, speed, 1000, blocking, observable);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(unsigned int speed, unsigned int timeout) {
+ProtonixDevicePort::ProtonixDevicePort (unsigned int speed, unsigned int timeout) {
 	this->_init(true, "", 0, 0, speed, timeout, false, true);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(unsigned int speed, unsigned int timeout, bool blocking) {
+ProtonixDevicePort::ProtonixDevicePort (unsigned int speed, unsigned int timeout, bool blocking) {
 	this->_init(true, "", 0, 0, speed, timeout, blocking, true);
 }
 
-ProtonixDevicePort::ProtonixDevicePort(unsigned int speed, unsigned int timeout, bool blocking, bool observable) {
+ProtonixDevicePort::ProtonixDevicePort (unsigned int speed, unsigned int timeout, bool blocking, bool observable) {
 	this->_init(true, "", 0, 0, speed, timeout, blocking, observable);
 }
 
-bool ProtonixDevicePort::Started() {
+bool ProtonixDevicePort::Started () {
 	return this->_started;
 }
 
-bool ProtonixDevicePort::Serial() {
+bool ProtonixDevicePort::Serial () {
 	return this->_serial;
 }
 
-unsigned int ProtonixDevicePort::PinRX() {
+unsigned int ProtonixDevicePort::PinRX () {
 	return this->_pinRX;
 }
 
-unsigned int ProtonixDevicePort::PinTX() {
+unsigned int ProtonixDevicePort::PinTX () {
 	return this->_pinTX;
 }
 
-unsigned int ProtonixDevicePort::Speed() {
+unsigned int ProtonixDevicePort::Speed () {
 	return this->_speed;
 }
 
-void ProtonixDevicePort::Name(String name) {
+void ProtonixDevicePort::Name (String name) {
 	this->_name = name;
 }
 
-String ProtonixDevicePort::Name() {
+String ProtonixDevicePort::Name () {
 	return this->_name;
 }
 
-void ProtonixDevicePort::Timeout(unsigned short timeout) {
+void ProtonixDevicePort::Timeout (unsigned short timeout) {
 	this->_timeout = timeout;
 	if (!this->_started) return;
 	
@@ -198,27 +198,27 @@ void ProtonixDevicePort::Timeout(unsigned short timeout) {
 	}
 }
 
-unsigned short ProtonixDevicePort::Timeout() {
+unsigned short ProtonixDevicePort::Timeout () {
 	return this->_timeout;
 }
 
-void ProtonixDevicePort::Blocking(bool blocking) {
+void ProtonixDevicePort::Blocking (bool blocking) {
 	this->_blocking = blocking;
 }
 
-bool ProtonixDevicePort::Blocking() {
+bool ProtonixDevicePort::Blocking () {
 	return this->_blocking;
 }
 
-void ProtonixDevicePort::Observable(bool observable) {
+void ProtonixDevicePort::Observable (bool observable) {
 	this->_observable = observable;
 }
 
-bool ProtonixDevicePort::Observable() {
+bool ProtonixDevicePort::Observable () {
 	return this->_observable;
 }
 
-void ProtonixDevicePort::Init(ProtonixDevice* device) {
+void ProtonixDevicePort::Init (ProtonixDevice* device) {
 	(void)device;
 
 	#if defined(ESP32) || defined(ESP8266)
@@ -232,7 +232,7 @@ void ProtonixDevicePort::Init(ProtonixDevice* device) {
 	this->Timeout(this->_timeout);
 }
 
-void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
+void ProtonixDevicePort::Pipe (ProtonixDevice* device) {
 	if (!this->_observable) return;
 	
 	if (this->_cmdBuffer.length() >= 128)
@@ -293,7 +293,7 @@ void ProtonixDevicePort::Pipe(ProtonixDevice* device) {
 	this->_lenBuffer = "";
 }
 
-bool ProtonixDevicePort::Send(IProtonixCommand* command) {
+bool ProtonixDevicePort::Send (IProtonixCommand* command) {
 	if (!command->CommandSerialize()) {
 		::Serial.println("[WARNING] Can not serialize port command");
 
@@ -318,7 +318,7 @@ bool ProtonixDevicePort::Send(IProtonixCommand* command) {
 	return true;
 }
 
-bool ProtonixDevicePort::Write(byte b) {
+bool ProtonixDevicePort::Write (byte b) {
 	if (!this->_started) return false;
 	
 	if (this->_serial) ::Serial.write(b);
@@ -333,7 +333,7 @@ bool ProtonixDevicePort::Write(byte b) {
 	return true;
 }
 
-byte ProtonixDevicePort::Read() {
+byte ProtonixDevicePort::Read () {
 	if (this->_serial) return ::Serial.read();
 	else {
 		#if defined(ESP32) || defined(ESP8266)

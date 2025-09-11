@@ -6,11 +6,11 @@ using namespace Qybercom::Protonix;
 
 
 
-ProtonixURI::ProtonixURI() {
+ProtonixURI::ProtonixURI () {
 
 }
 
-ProtonixURI::ProtonixURI(String uri) {
+ProtonixURI::ProtonixURI (String uri) {
 	int posScheme = uri.indexOf("://");
 	if (posScheme == -1) return; // TODO: handle incomplete
 
@@ -48,58 +48,58 @@ ProtonixURI::ProtonixURI(String uri) {
 	if (posFragment != -1) this->Fragment(buffer.substring(posFragment + 1));
 }
 
-ProtonixURI::ProtonixURI(String host, unsigned int port) {
+ProtonixURI::ProtonixURI (String host, unsigned int port) {
 	this->Host(host);
 	this->Port(port);
 }
 
-ProtonixURI::ProtonixURI(String host, unsigned int port, String path) {
+ProtonixURI::ProtonixURI (String host, unsigned int port, String path) {
 	this->Host(host);
 	this->Port(port);
 	this->Path(path);
 }
 
-void ProtonixURI::Scheme(String scheme) {
+void ProtonixURI::Scheme (String scheme) {
 	this->_scheme = scheme;
 }
 
-String ProtonixURI::Scheme() {
+String ProtonixURI::Scheme () {
 	return this->_scheme;
 }
 
-void ProtonixURI::Username(String username) {
+void ProtonixURI::Username (String username) {
 	this->_username = username;
 }
 
-String ProtonixURI::Username() {
+String ProtonixURI::Username () {
 	return this->_username;
 }
 
-void ProtonixURI::Password(String password) {
+void ProtonixURI::Password (String password) {
 	this->_password = password;
 }
 
-String ProtonixURI::Password() {
+String ProtonixURI::Password () {
 	return this->_password;
 }
 
-void ProtonixURI::Host(String host) {
+void ProtonixURI::Host (String host) {
 	this->_host = host;
 }
 
-String ProtonixURI::Host() {
+String ProtonixURI::Host () {
 	return this->_host;
 }
 
-void ProtonixURI::Port(unsigned int port) {
+void ProtonixURI::Port (unsigned int port) {
 	this->_port = port;
 }
 
-unsigned int ProtonixURI::Port() {
+unsigned int ProtonixURI::Port () {
 	return this->_port;
 }
 
-unsigned int ProtonixURI::PortConnection() {
+unsigned int ProtonixURI::PortConnection () {
 	if (this->_port == 0) {
 		if (this->_scheme == "http") return 80;
 		if (this->_scheme == "https") return 443;
@@ -110,35 +110,35 @@ unsigned int ProtonixURI::PortConnection() {
 	return this->_port;
 }
 
-void ProtonixURI::Path(String path) {
+void ProtonixURI::Path (String path) {
 	this->_path = path;
 }
 
-String ProtonixURI::Path() {
+String ProtonixURI::Path () {
 	return this->_path;
 }
 
-void ProtonixURI::Query(String query) {
+void ProtonixURI::Query (String query) {
 	this->_query = query;
 }
 
-String ProtonixURI::Query() {
+String ProtonixURI::Query () {
 	return this->_query;
 }
 
-String ProtonixURI::Query(bool includePath) {
+String ProtonixURI::Query (bool includePath) {
 	return String(includePath ? this->_path : "") + this->_query;
 }
 
-void ProtonixURI::Fragment(String fragment) {
+void ProtonixURI::Fragment (String fragment) {
 	this->_fragment = fragment;
 }
 
-String ProtonixURI::Fragment() {
+String ProtonixURI::Fragment () {
 	return this->_fragment;
 }
 
-String ProtonixURI::URI() {
+String ProtonixURI::URI () {
 	String path = String(this->_path ? this->_path : "/");
 	String uri = this->_scheme + "://"
 		+ String(this->_username != "" ? this->_username + String(this->_password != "" ? ":" + this->_password : "") + "@" : "")

@@ -41,7 +41,7 @@ Network::NWiFi::NWiFi (String ssid, String password, String mac, String hostname
 	this->_hostname = hostname;
 }
 
-bool Network::NWiFi::Connect () {
+bool Network::NWiFi::NetworkConnect () {
 	//uint8_t mac[6] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
 	IProtonixNetwork::ParseMAC(this->_mac, this->_macBuffer);
 
@@ -73,7 +73,7 @@ bool Network::NWiFi::Connect () {
 
 unsigned int __NWiFi_status = 0;
 
-bool Network::NWiFi::Connected () {
+bool Network::NWiFi::NetworkConnected () {
 	#if defined(ESP32) || defined(ESP8266)
 		unsigned int status = WiFi.status();
 		bool connected = status == WL_CONNECTED;
@@ -91,7 +91,7 @@ bool Network::NWiFi::Connected () {
 	#endif
 }
 
-bool Network::NWiFi::Disconnect () {
+bool Network::NWiFi::NetworkDisconnect () {
 	#if defined(ESP32) || defined(ESP8266)
 		WiFi.disconnect();
 	#endif
@@ -99,11 +99,11 @@ bool Network::NWiFi::Disconnect () {
 	return true;
 }
 
-String Network::NWiFi::AddressMAC () {
+String Network::NWiFi::NetworkAddressMAC () {
 	return this->_mac;
 }
 
-String Network::NWiFi::AddressIP () {
+String Network::NWiFi::NetworkAddressIP () {
 	#if defined(ESP32)
 		return String(WiFi.localIP());
 	#elif defined(ESP8266)

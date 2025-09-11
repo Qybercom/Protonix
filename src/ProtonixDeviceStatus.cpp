@@ -16,7 +16,6 @@ ProtonixDeviceStatus::ProtonixDeviceStatus () {
 	this->_state = "";
 	this->_uptime = "";
 	this->_summary = "";
-	//this->_sensorCount = 0;
 }
 
 void ProtonixDeviceStatus::Firmware (String firmware) {

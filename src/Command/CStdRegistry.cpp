@@ -13,31 +13,31 @@ using namespace Qybercom::Protonix;
 
 
 
-Command::CStdRegistry::CStdRegistry() {
+Command::CStdRegistry::CStdRegistry () {
 	this->_init("std:registry");
 }
 
-Command::CStdRegistry* Command::CStdRegistry::Key(String key) {
+Command::CStdRegistry* Command::CStdRegistry::Key (String key) {
 	this->_key = key;
 
 	return this;
 }
 
-String Command::CStdRegistry::Key() {
+String Command::CStdRegistry::Key () {
 	return this->_key;
 }
 
-Command::CStdRegistry* Command::CStdRegistry::Value(String value) {
+Command::CStdRegistry* Command::CStdRegistry::Value (String value) {
 	this->_value = value;
 
 	return this;
 }
 
-String Command::CStdRegistry::Value() {
+String Command::CStdRegistry::Value () {
 	return this->_value;
 }
 
-bool Command::CStdRegistry::CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name) {
+bool Command::CStdRegistry::CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name) {
 	(void)device;
 	(void)port;
 
@@ -70,7 +70,7 @@ bool Command::CStdRegistry::CommandRecognize(ProtonixDevice* device, ProtonixDev
 	return true;
 }
 
-bool Command::CStdRegistry::CommandSerialize() {
+bool Command::CStdRegistry::CommandSerialize () {
 	this->_output = "";
 	this->_output += this->_name;
 	this->_output += ":";
@@ -78,12 +78,12 @@ bool Command::CStdRegistry::CommandSerialize() {
 	return true;
 }
 
-void Command::CStdRegistry::CommandReset() {
+void Command::CStdRegistry::CommandReset () {
 	this->_output = "";
 }
 
 #if defined(ESP32) || defined(ESP8266)
-void Command::CStdRegistry::CommandFromDTO(DTO::DTOEventCommand* dto) {
+void Command::CStdRegistry::CommandFromDTO (DTO::DTOEventCommand* dto) {
 	(void)dto;
 }
 #endif

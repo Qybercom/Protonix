@@ -21,7 +21,7 @@ namespace Qybercom {
 					HBuzzer* Pin (unsigned short pin);
 
 					void On (short value);
-					void Off();
+					void Off ();
 					void Play (short value, unsigned long duration);
 					void Stop ();
 

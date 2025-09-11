@@ -19,15 +19,17 @@ namespace Qybercom {
 					String _cmd;
 
 				public:
-					CCustom();
-					CCustom(String cmd);
-					void CMD(String cmd);
-					String CMD();
-					bool CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name);
-					bool CommandSerialize();
-					void CommandReset();
+					CCustom ();
+					CCustom (String cmd);
+
+					void CMD (String cmd);
+					String CMD ();
+
+					bool CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name);
+					bool CommandSerialize ();
+					void CommandReset ();
 					#if defined(ESP32) || defined(ESP8266)
-					void CommandFromDTO(DTO::DTOEventCommand* dto);
+					void CommandFromDTO (DTO::DTOEventCommand* dto);
 					#endif
 			};
 		}

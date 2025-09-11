@@ -15,20 +15,20 @@ namespace Qybercom {
 					String _passphrase;
 
 				public:
-					DTORequestAuthorization();
-					DTORequestAuthorization(String id, String passphrase);
+					DTORequestAuthorization ();
+					DTORequestAuthorization (String id, String passphrase);
 
-					void ID(String id);
-					String ID();
+					void ID (String id);
+					String ID ();
 
-					void Passphrase(String passphrase);
-					String Passphrase();
+					void Passphrase (String passphrase);
+					String Passphrase ();
 
-					void DTOPopulate(ProtonixDTO* dto);
-					void DTOSerialize(JsonDocument& dto);
-					String DTOSerializeFilter(String raw);
+					void DTOPopulate (ProtonixDTO* dto);
+					void DTOSerialize (JsonDocument& dto);
+					String DTOSerializeFilter (String raw);
 
-					DTORequestAuthorization* Reset(String id, String passphrase);
+					DTORequestAuthorization* Reset (String id, String passphrase);
 			};
 		}
 	}

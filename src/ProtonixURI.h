@@ -16,38 +16,38 @@ namespace Qybercom {
 				String _fragment;
 
 			public:
-				ProtonixURI();
-				ProtonixURI(String uri);
-				ProtonixURI(String host, unsigned int port);
-				ProtonixURI(String host, unsigned int port, String path);
+				ProtonixURI ();
+				ProtonixURI (String uri);
+				ProtonixURI (String host, unsigned int port);
+				ProtonixURI (String host, unsigned int port, String path);
 
-				void Scheme(String scheme);
-				String Scheme();
+				void Scheme (String scheme);
+				String Scheme ();
 
-				void Username(String username);
-				String Username();
+				void Username (String username);
+				String Username ();
 
-				void Password(String password);
-				String Password();
+				void Password (String password);
+				String Password ();
 
-				void Host(String host);
-				String Host();
+				void Host (String host);
+				String Host ();
 
-				void Port(unsigned int port);
-				unsigned int Port();
-				unsigned int PortConnection();
+				void Port (unsigned int port);
+				unsigned int Port ();
+				unsigned int PortConnection ();
 
-				void Path(String path);
-				String Path();
+				void Path (String path);
+				String Path ();
 
-				void Query(String query);
-				String Query();
-				String Query(bool includePath);
+				void Query (String query);
+				String Query ();
+				String Query (bool includePath);
 
-				void Fragment(String fragment);
-				String Fragment();
+				void Fragment (String fragment);
+				String Fragment ();
 
-				String URI();
+				String URI ();
 		};
 	}
 }

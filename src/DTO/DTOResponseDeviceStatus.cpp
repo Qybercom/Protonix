@@ -8,30 +8,29 @@ using namespace Qybercom::Protonix;
 
 
 
-void DTO::DTOResponseDeviceStatus::Status(unsigned short status) {
+void DTO::DTOResponseDeviceStatus::Status (unsigned short status) {
 	this->_status = status;
 }
 
-unsigned short DTO::DTOResponseDeviceStatus::Status() {
+unsigned short DTO::DTOResponseDeviceStatus::Status () {
 	return this->_status;
 }
 
-void DTO::DTOResponseDeviceStatus::DTOPopulate(ProtonixDTO* dto) {
+void DTO::DTOResponseDeviceStatus::DTOPopulate (ProtonixDTO* dto) {
 	JsonObject data = dto->Data();
 
-	//if (data.containsKey("status"))
 	if (data["status"].is<unsigned short>())
 		this->Status(data["status"]);
 }
 
-void DTO::DTOResponseDeviceStatus::DTOSerialize(JsonDocument& dto) {
+void DTO::DTOResponseDeviceStatus::DTOSerialize (JsonDocument& dto) {
 	dto["data"]["status"] = this->_status;
 }
 
-String DTO::DTOResponseDeviceStatus::DTOSerializeFilter(String raw) {
+String DTO::DTOResponseDeviceStatus::DTOSerializeFilter (String raw) {
 	return raw;
 }
 
-unsigned short DTO::DTOResponseDeviceStatus::DTOResponseStatus() {
+unsigned short DTO::DTOResponseDeviceStatus::DTOResponseStatus () {
 	return this->_status;
 }

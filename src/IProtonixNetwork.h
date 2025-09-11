@@ -8,15 +8,15 @@ namespace Qybercom {
 
 		class IProtonixNetwork {
 			public:
-				virtual bool Connect();
-				virtual bool Connected();
-				virtual bool Disconnect();
-				virtual String AddressMAC();
-				virtual String AddressIP();
+				virtual bool NetworkConnect ();
+				virtual bool NetworkConnected ();
+				virtual bool NetworkDisconnect ();
+				virtual String NetworkAddressMAC ();
+				virtual String NetworkAddressIP ();
 
 				// https://stackoverflow.com/a/12772708/2097055
 				// https://stackoverflow.com/a/1755042/2097055
-				static void ParseMAC(String mac, uint8_t out[6]) {
+				static void ParseMAC (String mac, uint8_t out[6]) {
 					char buffer[18];
 					mac.toCharArray(buffer, 18);
 

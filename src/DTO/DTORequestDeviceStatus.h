@@ -17,20 +17,20 @@ namespace Qybercom {
 					bool _trailing;
 
 				public:
-					DTORequestDeviceStatus();
-					DTORequestDeviceStatus(ProtonixDeviceStatus* status, String registry);
+					DTORequestDeviceStatus ();
+					DTORequestDeviceStatus (ProtonixDeviceStatus* status, String registry);
 
-					void Status(ProtonixDeviceStatus* status);
-					ProtonixDeviceStatus* Status();
+					void Status (ProtonixDeviceStatus* status);
+					ProtonixDeviceStatus* Status ();
 
-					void Registry(String registry);
-					String Registry();
+					void Registry (String registry);
+					String Registry ();
 
-					void DTOPopulate(ProtonixDTO* dto);
-					void DTOSerialize(JsonDocument& dto);
-					String DTOSerializeFilter(String raw);
+					void DTOPopulate (ProtonixDTO* dto);
+					void DTOSerialize (JsonDocument& dto);
+					String DTOSerializeFilter (String raw);
 
-					DTORequestDeviceStatus* Reset(ProtonixDeviceStatus* status);
+					DTORequestDeviceStatus* Reset (ProtonixDeviceStatus* status);
 			};
 		}
 	}

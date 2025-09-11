@@ -22,11 +22,11 @@ namespace Qybercom {
 					ProtonixDevice* _device;
 
 				public:
-					void Init(ProtonixDevice* device);
-					bool Connect(ProtonixURI* uri);
-					bool Connected();
-					void Pipe();
-					void Send(String data);
+					void ProtocolInit (ProtonixDevice* device);
+					bool ProtocolConnect (ProtonixURI* uri);
+					bool ProtocolConnected ();
+					void ProtocolPipe ();
+					void ProtocolSend (String data);
 			};
 		}
 	}

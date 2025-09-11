@@ -14,13 +14,13 @@ namespace Qybercom {
 					unsigned short _status;
 
 				public:
-					void Status(unsigned short status);
-					unsigned short Status();
+					void Status (unsigned short status);
+					unsigned short Status ();
 
-					void DTOPopulate(ProtonixDTO* dto);
-					void DTOSerialize(JsonDocument& dto);
-					String DTOSerializeFilter(String raw);
-					unsigned short DTOResponseStatus();
+					void DTOPopulate (ProtonixDTO* dto);
+					void DTOSerialize (JsonDocument& dto);
+					String DTOSerializeFilter (String raw);
+					unsigned short DTOResponseStatus ();
 			};
 		}
 	}

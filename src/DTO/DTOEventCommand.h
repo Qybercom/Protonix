@@ -14,12 +14,12 @@ namespace Qybercom {
 					String _name;
 
 				public:
-					void Name(String name);
-					String Name();
+					void Name (String name);
+					String Name ();
 
-					void DTOPopulate(ProtonixDTO* dto);
-					void DTOSerialize(JsonDocument& dto);
-					String DTOSerializeFilter(String raw);
+					void DTOPopulate (ProtonixDTO* dto);
+					void DTOSerialize (JsonDocument& dto);
+					String DTOSerializeFilter (String raw);
 			};
 		}
 	}

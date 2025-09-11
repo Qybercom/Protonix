@@ -11,10 +11,10 @@ namespace Qybercom {
 
 		class IProtonixDTO {
 			public:
-				virtual void DTOPopulate(ProtonixDTO* dto);
-				virtual void DTOSerialize(JsonDocument& dto);
-				virtual String DTOSerializeFilter(String raw);
-				virtual ~IProtonixDTO() {};
+				virtual void DTOPopulate (ProtonixDTO* dto);
+				virtual void DTOSerialize (JsonDocument& dto);
+				virtual String DTOSerializeFilter (String raw);
+				virtual ~IProtonixDTO () {};
 		};
 
 		class IProtonixDTORequest : public IProtonixDTO {

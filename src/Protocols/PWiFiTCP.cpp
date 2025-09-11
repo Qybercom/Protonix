@@ -8,12 +8,12 @@ using namespace Qybercom::Protonix;
 
 
 
-void Protocol::PWiFiTCP::Init(ProtonixDevice* device) {
+void Protocol::PWiFiTCP::ProtocolInit (ProtonixDevice* device) {
 	this->_device = device;
 }
 
-bool Protocol::PWiFiTCP::Connect(ProtonixURI* uri) {
-#if defined(ESP32) || defined(ESP8266)
+bool Protocol::PWiFiTCP::ProtocolConnect (ProtonixURI* uri) {
+	#if defined(ESP32) || defined(ESP8266)
 	#if defined(ESP32)
 	bool out = this->_client.connect(uri->Host().c_str(), uri->Port(), 10);
 	#else
@@ -26,12 +26,12 @@ bool Protocol::PWiFiTCP::Connect(ProtonixURI* uri) {
 	}
 
 	return out;
-#else
+	#else
 	return false;
-#endif
+	#endif
 }
 
-bool Protocol::PWiFiTCP::Connected() {
+bool Protocol::PWiFiTCP::ProtocolConnected () {
 	#if defined(ESP32) || defined(ESP8266)
 	return this->_client.connected();
 	#else
@@ -39,7 +39,7 @@ bool Protocol::PWiFiTCP::Connected() {
 	#endif
 }
 
-void Protocol::PWiFiTCP::Pipe() {
+void Protocol::PWiFiTCP::ProtocolPipe () {
 	#if defined(ESP32) || defined(ESP8266)
 	int available = this->_client.available();
 
@@ -59,7 +59,7 @@ void Protocol::PWiFiTCP::Pipe() {
 	#endif
 }
 
-void Protocol::PWiFiTCP::Send(String data) {
+void Protocol::PWiFiTCP::ProtocolSend (String data) {
 	#if defined(ESP32) || defined(ESP8266)
 	uint8_t* buffer = (uint8_t*)data.c_str();
 

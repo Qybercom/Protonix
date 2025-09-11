@@ -13,7 +13,6 @@ namespace Qybercom {
 					MILLISECONDS
 				};
 
-				//ProtonixTimer (bool enabled = true);
 				ProtonixTimer (unsigned int interval, bool enabled = true);
 				ProtonixTimer (unsigned int interval, ProtonixTimerUnit unit, bool enabled = true);
 

@@ -11,11 +11,11 @@ namespace Qybercom {
 
 		class IProtonixProtocol {
 			public:
-				virtual void Init(ProtonixDevice* device);
-				virtual bool Connect(ProtonixURI* uri);
-				virtual bool Connected();
-				virtual void Pipe();
-				virtual void Send(String data);
+				virtual void ProtocolInit (ProtonixDevice* device);
+				virtual bool ProtocolConnect (ProtonixURI* uri);
+				virtual bool ProtocolConnected ();
+				virtual void ProtocolPipe ();
+				virtual void ProtocolSend (String data);
 		};
 	}
 }

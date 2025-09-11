@@ -14,24 +14,24 @@ using namespace Qybercom::Protonix;
 
 
 
-Command::CCustom::CCustom() {
+Command::CCustom::CCustom () {
 	this->_init("custom");
 }
 
-Command::CCustom::CCustom(String cmd) {
+Command::CCustom::CCustom (String cmd) {
 	this->_init("custom");
 	this->CMD(cmd);
 }
 
-void Command::CCustom::CMD(String cmd) {
+void Command::CCustom::CMD (String cmd) {
 	this->_cmd = cmd;
 }
 
-String Command::CCustom::CMD() {
+String Command::CCustom::CMD () {
 	return this->_cmd;
 }
 
-bool Command::CCustom::CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name) {
+bool Command::CCustom::CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name) {
 	(void)device;
 	(void)port;
 
@@ -43,19 +43,19 @@ bool Command::CCustom::CommandRecognize(ProtonixDevice* device, ProtonixDevicePo
 	return true;
 }
 
-bool Command::CCustom::CommandSerialize() {
+bool Command::CCustom::CommandSerialize () {
 	this->_output = this->_name + ":" + this->_cmd;
 
 	return true;
 }
 
-void Command::CCustom::CommandReset() {
+void Command::CCustom::CommandReset () {
 	this->_output = "";
 	this->_cmd = "";
 }
 
 #if defined(ESP32) || defined(ESP8266)
-void Command::CCustom::CommandFromDTO(DTO::DTOEventCommand* dto) {
+void Command::CCustom::CommandFromDTO (DTO::DTOEventCommand* dto) {
 	String cmd = dto->Name();
 	this->_cmd = cmd.substring(7, cmd.length());
 }

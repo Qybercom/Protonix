@@ -19,37 +19,37 @@ namespace Qybercom {
 				List<ProtonixDeviceSensor*> _sensors;
 
 			public:
-				ProtonixDeviceStatus();
+				ProtonixDeviceStatus ();
 
-				void Firmware(String firmware);
-				String Firmware();
+				void Firmware (String firmware);
+				String Firmware ();
 
-				void On(bool on);
-				bool On();
+				void On (bool on);
+				bool On ();
 
-				void State(String state);
-				String State();
+				void State (String state);
+				String State ();
 
-				void Uptime(String uptime);
-				String Uptime();
+				void Uptime (String uptime);
+				String Uptime ();
 
-				void Summary(String summary);
-				String Summary();
+				void Summary (String summary);
+				String Summary ();
 
 				List<ProtonixDeviceSensor*> &Sensors ();
-				ProtonixDeviceStatus* SensorAdd(String id);
-				ProtonixDeviceStatus* SensorSet(String id, String value);
-				ProtonixDeviceStatus* SensorSet(String id, String value, bool active);
-				ProtonixDeviceStatus* SensorSet(String id, String value, bool active, bool failure);
-				ProtonixDeviceStatus* SensorSet(String id, String value, bool active, bool failure, String state);
-				ProtonixDeviceStatus* SensorSet(String id, bool active);
-				ProtonixDeviceStatus* SensorSet(String id, bool active, bool failure);
-				ProtonixDeviceStatus* SensorSet(String id, bool active, bool failure, String state);
-				ProtonixDeviceStatus* SensorSet(String id, String value, String state);
-				ProtonixDeviceStatus* SensorSet(ProtonixDeviceSensor* sensor);
-				ProtonixDeviceStatus* SensorReset();
-				ProtonixDeviceStatus* SensorReset(String id);
-				ProtonixDeviceSensor* Sensor(String id);
+				ProtonixDeviceStatus* SensorAdd (String id);
+				ProtonixDeviceStatus* SensorSet (String id, String value);
+				ProtonixDeviceStatus* SensorSet (String id, String value, bool active);
+				ProtonixDeviceStatus* SensorSet (String id, String value, bool active, bool failure);
+				ProtonixDeviceStatus* SensorSet (String id, String value, bool active, bool failure, String state);
+				ProtonixDeviceStatus* SensorSet (String id, bool active);
+				ProtonixDeviceStatus* SensorSet (String id, bool active, bool failure);
+				ProtonixDeviceStatus* SensorSet (String id, bool active, bool failure, String state);
+				ProtonixDeviceStatus* SensorSet (String id, String value, String state);
+				ProtonixDeviceStatus* SensorSet (ProtonixDeviceSensor* sensor);
+				ProtonixDeviceStatus* SensorReset ();
+				ProtonixDeviceStatus* SensorReset (String id);
+				ProtonixDeviceSensor* Sensor (String id);
 		};
 	}
 }

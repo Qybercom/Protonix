@@ -11,24 +11,24 @@
 
 using namespace Qybercom::Protonix;
 
-ProtonixHTTPHeader::ProtonixHTTPHeader(String name, String value) {
+ProtonixHTTPHeader::ProtonixHTTPHeader (String name, String value) {
 	this->_name = name;
 	this->_value = value;
 }
 
-String ProtonixHTTPHeader::Name() {
+String ProtonixHTTPHeader::Name () {
 	return this->_name;
 }
 
-String ProtonixHTTPHeader::Value() {
+String ProtonixHTTPHeader::Value () {
 	return this->_value;
 }
 
-String ProtonixHTTPHeader::SerializeRequest() {
+String ProtonixHTTPHeader::SerializeRequest () {
 	return this->_name + ": " + this->_value + "\r\n";
 }
 
-ProtonixHTTPHeader* ProtonixHTTPHeader::FromResponse(String header) {
+ProtonixHTTPHeader* ProtonixHTTPHeader::FromResponse (String header) {
 	int posValue = header.indexOf(':');
 
 	String name = header.substring(0, posValue);
@@ -42,7 +42,7 @@ ProtonixHTTPHeader* ProtonixHTTPHeader::FromResponse(String header) {
 
 
 
-ProtonixHTTPFrame::ProtonixHTTPFrame() {
+ProtonixHTTPFrame::ProtonixHTTPFrame () {
   	this->_version = "HTTP/1.0";
 	this->_method = "GET";
 	this->_uri = new ProtonixURI();
@@ -51,7 +51,7 @@ ProtonixHTTPFrame::ProtonixHTTPFrame() {
 	this->Debug(false);
 }
 
-ProtonixHTTPFrame::ProtonixHTTPFrame(String uri) {
+ProtonixHTTPFrame::ProtonixHTTPFrame (String uri) {
   	this->_version = "HTTP/1.0";
 	this->_method = "GET";
 	this->_uri = new ProtonixURI(uri);
@@ -61,7 +61,7 @@ ProtonixHTTPFrame::ProtonixHTTPFrame(String uri) {
 	this->HeaderAdd("Host", this->_uri->Host());
 }
 
-ProtonixHTTPFrame::ProtonixHTTPFrame(String method, String uri) {
+ProtonixHTTPFrame::ProtonixHTTPFrame (String method, String uri) {
   	this->_version = "HTTP/1.0";
 	this->_method = method;
 	this->_uri = new ProtonixURI(uri);
@@ -71,59 +71,59 @@ ProtonixHTTPFrame::ProtonixHTTPFrame(String method, String uri) {
 	this->HeaderAdd("Host", this->_uri->Host());
 }
 
-ProtonixHTTPFrame* ProtonixHTTPFrame::Debug(bool debug) {
+ProtonixHTTPFrame* ProtonixHTTPFrame::Debug (bool debug) {
 	this->_debug = debug;
 
 	return this;
 }
 
-bool ProtonixHTTPFrame::Debug() {
+bool ProtonixHTTPFrame::Debug () {
 	return this->_debug;
 }
 
-ProtonixHTTPFrame* ProtonixHTTPFrame::Version(String version) {
+ProtonixHTTPFrame* ProtonixHTTPFrame::Version (String version) {
 	this->_version = version;
 
 	return this;
 }
 
-String ProtonixHTTPFrame::Version() {
+String ProtonixHTTPFrame::Version () {
 	return this->_version;
 }
 
-ProtonixURI* ProtonixHTTPFrame::URI() {
+ProtonixURI* ProtonixHTTPFrame::URI () {
 	return this->_uri;
 }
 
-ProtonixHTTPFrame* ProtonixHTTPFrame::Method(String method) {
+ProtonixHTTPFrame* ProtonixHTTPFrame::Method (String method) {
 	this->_method = method;
 
 	return this;
 }
 
-String ProtonixHTTPFrame::Method() {
+String ProtonixHTTPFrame::Method () {
 	return this->_method;
 }
 
-String ProtonixHTTPFrame::Status() {
+String ProtonixHTTPFrame::Status () {
 	return this->_status;
 }
 
-ProtonixHTTPFrame* ProtonixHTTPFrame::HeaderAdd(String name, String value) {
+ProtonixHTTPFrame* ProtonixHTTPFrame::HeaderAdd (String name, String value) {
 	this->_headers[this->_headerCurrent] = new ProtonixHTTPHeader(name, value);
 	this->_headerCurrent++;
 
 	return this;
 }
 
-ProtonixHTTPFrame* ProtonixHTTPFrame::HeaderAdd(ProtonixHTTPHeader* header) {
+ProtonixHTTPFrame* ProtonixHTTPFrame::HeaderAdd (ProtonixHTTPHeader* header) {
 	this->_headers[this->_headerCurrent] = header;
 	this->_headerCurrent++;
 
 	return this;
 }
 
-ProtonixHTTPHeader* ProtonixHTTPFrame::Header(String name) {
+ProtonixHTTPHeader* ProtonixHTTPFrame::Header (String name) {
 	int i = 0;
 
 	while (i < this->_headerCurrent) {
@@ -136,21 +136,21 @@ ProtonixHTTPHeader* ProtonixHTTPFrame::Header(String name) {
 	return nullptr;
 }
 
-unsigned short ProtonixHTTPFrame::HeaderCount() {
+unsigned short ProtonixHTTPFrame::HeaderCount () {
 	return this->_headerCurrent;
 }
 
-ProtonixHTTPFrame* ProtonixHTTPFrame::Body(String body) {
+ProtonixHTTPFrame* ProtonixHTTPFrame::Body (String body) {
 	this->_body = body;
 
 	return this;
 }
 
-String ProtonixHTTPFrame::Body() {
+String ProtonixHTTPFrame::Body () {
 	return this->_body;
 }
 
-String ProtonixHTTPFrame::SerializeRequest() {
+String ProtonixHTTPFrame::SerializeRequest () {
 	String raw = this->_method + " " + this->_uri->Path() + " " + this->_version + "\r\n";
 
 	int i = 0;
@@ -163,9 +163,9 @@ String ProtonixHTTPFrame::SerializeRequest() {
 	return raw + "\r\n" + this->_body;
 }
 
-ProtonixHTTPFrame* ProtonixHTTPFrame::UnserializeResponse(String response) {
+ProtonixHTTPFrame* ProtonixHTTPFrame::UnserializeResponse (String response) {
 	if (this->_debug) {
-		Serial.println("[debug] ProrotnixHTTPFrame::UnserializeResponse:");
+		Serial.println("[debug] ProtonixHTTPFrame::UnserializeResponse:");
 		Serial.println(response);
 	}
 
@@ -234,7 +234,7 @@ ProtonixHTTPFrame* ProtonixHTTPFrame::UnserializeResponse(String response) {
 	return this;
 }
 
-int ProtonixHTTPFrame::LengthExpected() {
+int ProtonixHTTPFrame::LengthExpected () {
 	ProtonixHTTPHeader* header = this->Header("Content-Length");
 
 	if (header == nullptr) {
@@ -247,7 +247,7 @@ int ProtonixHTTPFrame::LengthExpected() {
 	return header->Value().toInt();
 }
 
-ProtonixHTTPFrame::~ProtonixHTTPFrame() {
+ProtonixHTTPFrame::~ProtonixHTTPFrame () {
 	delete this->_uri;
 	this->_uri = nullptr;
 
@@ -263,11 +263,11 @@ ProtonixHTTPFrame::~ProtonixHTTPFrame() {
 
 
 
-/*ProtonixHTTPClient::ProtonixHTTPClient(Client& client) {
+/*ProtonixHTTPClient::ProtonixHTTPClient (Client& client) {
 	this->_client = &client;
  */
 
-ProtonixHTTPClient::ProtonixHTTPClient(Client* client) {
+ProtonixHTTPClient::ProtonixHTTPClient (Client* client) {
 	this->_client = client;
 	this->_connected = false;
 	this->_request = nullptr;
@@ -278,7 +278,7 @@ ProtonixHTTPClient::ProtonixHTTPClient(Client* client) {
 	this->Debug(false);
 }
 
-/*ProtonixHTTPClient::ProtonixHTTPClient() {
+/*ProtonixHTTPClient::ProtonixHTTPClient () {
 	this->_connected = false;
 	this->_request = nullptr;
 	this->_response = nullptr;
@@ -286,13 +286,13 @@ ProtonixHTTPClient::ProtonixHTTPClient(Client* client) {
 	this->Debug(false);
 }*/
 
-bool ProtonixHTTPClient::_responseBatch(String batch) {
+bool ProtonixHTTPClient::_responseBatch (String batch) {
 	this->_response->Body(batch);
 
 	return true;
 }
 
-ProtonixHTTPFrame* ProtonixHTTPClient::_responseReset(String response) {
+ProtonixHTTPFrame* ProtonixHTTPClient::_responseReset (String response) {
 	if (this->_response != nullptr) {
 		delete this->_response;
 		this->_response = nullptr;
@@ -305,17 +305,17 @@ ProtonixHTTPFrame* ProtonixHTTPClient::_responseReset(String response) {
 	return this->_response;
 }
 
-ProtonixHTTPClient* ProtonixHTTPClient::Debug(bool debug) {
+ProtonixHTTPClient* ProtonixHTTPClient::Debug (bool debug) {
 	this->_debug = debug;
 
 	return this;
 }
 
-bool ProtonixHTTPClient::Debug() {
+bool ProtonixHTTPClient::Debug () {
 	return this->_debug;
 }
 
-ProtonixHTTPClient* ProtonixHTTPClient::Request(ProtonixHTTPFrame* request) {
+ProtonixHTTPClient* ProtonixHTTPClient::Request (ProtonixHTTPFrame* request) {
 	if (this->_request != nullptr) {
 		delete this->_request;
 		this->_request = nullptr;
@@ -326,11 +326,11 @@ ProtonixHTTPClient* ProtonixHTTPClient::Request(ProtonixHTTPFrame* request) {
 	return this;
 }
 
-ProtonixHTTPFrame* ProtonixHTTPClient::Response() {
+ProtonixHTTPFrame* ProtonixHTTPClient::Response () {
 	return this->_response;
 }
 
-bool ProtonixHTTPClient::Send() {
+bool ProtonixHTTPClient::Send () {
   	bool ok = false;
 
   	if (this->_response != nullptr) {
@@ -380,7 +380,7 @@ bool ProtonixHTTPClient::Send() {
 }
 
 /*
-bool ProtonixHTTPClient::Receive() {
+bool ProtonixHTTPClient::Receive () {
 	// TODO: schedule for async receiveing for non-blocking other tasks
 	if (!this->_connected) return false;
 	delay(this->_timeoutResponse);
@@ -407,12 +407,12 @@ bool ProtonixHTTPClient::Receive() {
 	return true;
 }
 
-bool ProtonixHTTPClient::ReceiveHeaders() {
+bool ProtonixHTTPClient::ReceiveHeaders () {
 }
 
  */
 /*
-bool ProtonixHTTPClient::Receive() {
+bool ProtonixHTTPClient::Receive () {
 	if (!this->_connected) return false;
 	delay(this->_timeoutResponse);
 
@@ -485,7 +485,7 @@ bool ProtonixHTTPClient::Receive() {
 }
 */
 
-bool ProtonixHTTPClient::ReceiveHeaders() {
+bool ProtonixHTTPClient::ReceiveHeaders () {
 	if (!this->_connected) return false;
 	delay(this->_timeoutResponse);
 
@@ -528,7 +528,7 @@ bool ProtonixHTTPClient::ReceiveHeaders() {
 	return received;
 }
 
-String ProtonixHTTPClient::ReceiveBody(int batchSize) {
+String ProtonixHTTPClient::ReceiveBody (int batchSize) {
 	if (!this->_connected) return "";
 
 	unsigned int diff = this->_available - this->_received;
@@ -554,13 +554,13 @@ String ProtonixHTTPClient::ReceiveBody(int batchSize) {
 	return out;
 }
 
-bool ProtonixHTTPClient::ReceiveAvailable() {
+bool ProtonixHTTPClient::ReceiveAvailable () {
 	return this->_available > this->_received;
 }
 
 /*
 //WORKING SOLUTION
-bool ProtonixHTTPClient::_receive() {
+bool ProtonixHTTPClient::_receive () {
 	if (!this->_connected) return false;
 	//delay(this->_timeoutResponse);
 
@@ -623,7 +623,7 @@ bool ProtonixHTTPClient::_receive() {
 	return true;
 }
 
-bool ProtonixHTTPClient::Receive() {
+bool ProtonixHTTPClient::Receive () {
 	this->_batchSize = 0;
 	this->_batchReady = nullptr;
 
@@ -631,7 +631,7 @@ bool ProtonixHTTPClient::Receive() {
 }
 
 
-bool ProtonixHTTPClient::Receive(unsigned int batchSize, bool(*batchReady)(String)) {
+bool ProtonixHTTPClient::Receive (unsigned int batchSize, bool(*batchReady)(String)) {
 	this->_batchSize = batchSize;
 	this->_batchReady = batchReady;
 
@@ -640,12 +640,12 @@ bool ProtonixHTTPClient::Receive(unsigned int batchSize, bool(*batchReady)(Strin
 */
 
 /*
-int ProtonixHTTPClient::available() {
+int ProtonixHTTPClient::available () {
 	Serial.println("[debug] available `" + String(this->_available) + "`");
 	return this->_available;
 }
 
-int ProtonixHTTPClient::read() {
+int ProtonixHTTPClient::read () {
 	int out = this->_client->read();
 
 	//this->_available--;
@@ -653,7 +653,7 @@ int ProtonixHTTPClient::read() {
 	return out;
 }
 
-size_t ProtonixHTTPClient::readBytes(uint8_t *buffer, size_t length) {
+size_t ProtonixHTTPClient::readBytes (uint8_t *buffer, size_t length) {
 	Serial.println("[debug] attempt to read: `" + String(length) + "` `" + String(this->_available) + "`");
 	if (this->_available == 0) return 0;
 
@@ -664,29 +664,29 @@ size_t ProtonixHTTPClient::readBytes(uint8_t *buffer, size_t length) {
 	return out;
 }
 
-int ProtonixHTTPClient::peek() {
+int ProtonixHTTPClient::peek () {
 	return this->read();
 }
 */
 
-ProtonixHTTPClient* ProtonixHTTPClient::TimeoutResponse(unsigned short timeout) {
+ProtonixHTTPClient* ProtonixHTTPClient::TimeoutResponse (unsigned short timeout) {
 	this->_timeoutResponse = timeout;
 
 	return this;
 }
 
-unsigned short ProtonixHTTPClient::TimeoutResponse() {
+unsigned short ProtonixHTTPClient::TimeoutResponse () {
 	return this->_timeoutResponse;
 }
 
 #if defined(ESP32) || defined(ESP8266)
-ProtonixHTTPClient* ProtonixHTTPClient::OverWiFi() {
+ProtonixHTTPClient* ProtonixHTTPClient::OverWiFi () {
 	return new ProtonixHTTPClient(new WiFiClient());
 }
 #endif
 
 /*
-ProtonixHTTPClient* ProtonixHTTPClient::OverWiFi() {
+ProtonixHTTPClient* ProtonixHTTPClient::OverWiFi () {
   	//WiFiClient client;
 
 	return new ProtonixHTTPClient(ProtonixHTTPClient::_clientWiFi);
@@ -694,16 +694,16 @@ ProtonixHTTPClient* ProtonixHTTPClient::OverWiFi() {
 */
 
 /*
-WiFiClient ProtonixHTTPClient::Client() {
+WiFiClient ProtonixHTTPClient::Client () {
 	return (*this->_client);
 }
 */
 
-/*Stream& ProtonixHTTPClient::ResponseStream() {
+/*Stream& ProtonixHTTPClient::ResponseStream () {
 	return (*this->_client);
 }*/
 
-ProtonixHTTPClient::~ProtonixHTTPClient() {
+ProtonixHTTPClient::~ProtonixHTTPClient () {
 	delete this->_request;
 	this->_request = nullptr;
 

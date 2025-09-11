@@ -5,7 +5,7 @@ using namespace Qybercom::Protonix;
 
 
 
-ProtonixDeviceSensor::ProtonixDeviceSensor() {
+ProtonixDeviceSensor::ProtonixDeviceSensor () {
 	this->ID("");
 	this->Value("");
 	this->Active(false);
@@ -13,7 +13,7 @@ ProtonixDeviceSensor::ProtonixDeviceSensor() {
 	this->State("");
 }
 
-ProtonixDeviceSensor::ProtonixDeviceSensor(String id) {
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id) {
 	this->ID(id);
 	this->Value("");
 	this->Active(false);
@@ -21,7 +21,7 @@ ProtonixDeviceSensor::ProtonixDeviceSensor(String id) {
 	this->State("");
 }
 
-ProtonixDeviceSensor::ProtonixDeviceSensor(String id, String value) {
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id, String value) {
 	this->ID(id);
 	this->Value(value);
 	this->Active(false);
@@ -29,7 +29,7 @@ ProtonixDeviceSensor::ProtonixDeviceSensor(String id, String value) {
 	this->State("");
 }
 
-ProtonixDeviceSensor::ProtonixDeviceSensor(String id, String value, bool active) {
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id, String value, bool active) {
 	this->ID(id);
 	this->Value(value);
 	this->Active(active);
@@ -37,7 +37,7 @@ ProtonixDeviceSensor::ProtonixDeviceSensor(String id, String value, bool active)
 	this->State("");
 }
 
-ProtonixDeviceSensor::ProtonixDeviceSensor(String id, String value, bool active, bool failure) {
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id, String value, bool active, bool failure) {
 	this->ID(id);
 	this->Value(value);
 	this->Active(active);
@@ -45,7 +45,7 @@ ProtonixDeviceSensor::ProtonixDeviceSensor(String id, String value, bool active,
 	this->State("");
 }
 
-ProtonixDeviceSensor::ProtonixDeviceSensor(String id, String value, bool active, bool failure, String state) {
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id, String value, bool active, bool failure, String state) {
 	this->ID(id);
 	this->Value(value);
 	this->Active(active);
@@ -53,7 +53,7 @@ ProtonixDeviceSensor::ProtonixDeviceSensor(String id, String value, bool active,
 	this->State(state);
 }
 
-ProtonixDeviceSensor::ProtonixDeviceSensor(String id, bool active) {
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id, bool active) {
 	this->ID(id);
 	this->Value("");
 	this->Active(active);
@@ -61,7 +61,7 @@ ProtonixDeviceSensor::ProtonixDeviceSensor(String id, bool active) {
 	this->State("");
 }
 
-ProtonixDeviceSensor::ProtonixDeviceSensor(String id, bool active, bool failure) {
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id, bool active, bool failure) {
 	this->ID(id);
 	this->Value("");
 	this->Active(active);
@@ -69,7 +69,7 @@ ProtonixDeviceSensor::ProtonixDeviceSensor(String id, bool active, bool failure)
 	this->State("");
 }
 
-ProtonixDeviceSensor::ProtonixDeviceSensor(String id, bool active, bool failure, String state) {
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id, bool active, bool failure, String state) {
 	this->ID(id);
 	this->Value("");
 	this->Active(active);
@@ -77,7 +77,7 @@ ProtonixDeviceSensor::ProtonixDeviceSensor(String id, bool active, bool failure,
 	this->State(state);
 }
 
-ProtonixDeviceSensor::ProtonixDeviceSensor(String id, String value, String state) {
+ProtonixDeviceSensor::ProtonixDeviceSensor (String id, String value, String state) {
 	this->ID(id);
 	this->Value(value);
 	this->Failure(false);
@@ -85,47 +85,47 @@ ProtonixDeviceSensor::ProtonixDeviceSensor(String id, String value, String state
 	this->State(state);
 }
 
-void ProtonixDeviceSensor::ID(String id) {
+void ProtonixDeviceSensor::ID (String id) {
 	this->_id = id;
 }
 
-String ProtonixDeviceSensor::ID() {
+String ProtonixDeviceSensor::ID () {
 	return this->_id;
 }
 
-void ProtonixDeviceSensor::Value(String value) {
+void ProtonixDeviceSensor::Value (String value) {
 	this->_value = value;
 }
 
-String ProtonixDeviceSensor::Value() {
+String ProtonixDeviceSensor::Value () {
 	return this->_value;
 }
 
-void ProtonixDeviceSensor::Active(bool active) {
+void ProtonixDeviceSensor::Active (bool active) {
 	this->_active = active;
 }
 
-bool ProtonixDeviceSensor::Active() {
+bool ProtonixDeviceSensor::Active () {
 	return this->_active;
 }
 
-void ProtonixDeviceSensor::Failure(bool failure) {
+void ProtonixDeviceSensor::Failure (bool failure) {
 	this->_failure = failure;
 }
 
-bool ProtonixDeviceSensor::Failure() {
+bool ProtonixDeviceSensor::Failure () {
 	return this->_failure;
 }
 
-void ProtonixDeviceSensor::State(String state) {
+void ProtonixDeviceSensor::State (String state) {
 	this->_state = state;
 }
 
-String ProtonixDeviceSensor::State() {
+String ProtonixDeviceSensor::State () {
 	return this->_state;
 }
 
-String ProtonixDeviceSensor::Summary() {
+String ProtonixDeviceSensor::Summary () {
 	return "[s"
 		+ this->_id + ":"
 		+ this->_value + ""
@@ -135,7 +135,7 @@ String ProtonixDeviceSensor::Summary() {
 		+ "]";
 }
 
-void ProtonixDeviceSensor::Reset() {
+void ProtonixDeviceSensor::Reset () {
 	this->Value("");
 	this->Active(false);
 	this->Failure(false);

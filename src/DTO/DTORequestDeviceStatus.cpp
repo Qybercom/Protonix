@@ -10,41 +10,41 @@ using namespace Qybercom::Protonix;
 
 
 
-DTO::DTORequestDeviceStatus::DTORequestDeviceStatus() {
+DTO::DTORequestDeviceStatus::DTORequestDeviceStatus () {
 	this->Status(new ProtonixDeviceStatus());
 	this->Registry("");
 
 	this->_trailing = false;
 }
 
-DTO::DTORequestDeviceStatus::DTORequestDeviceStatus(ProtonixDeviceStatus* status, String registry) {
+DTO::DTORequestDeviceStatus::DTORequestDeviceStatus (ProtonixDeviceStatus* status, String registry) {
 	this->Status(status);
 	this->Registry(registry);
 
 	this->_trailing = false;
 }
 
-void DTO::DTORequestDeviceStatus::Status(ProtonixDeviceStatus* status) {
+void DTO::DTORequestDeviceStatus::Status (ProtonixDeviceStatus* status) {
 	this->_status = status;
 }
 
-ProtonixDeviceStatus* DTO::DTORequestDeviceStatus::Status() {
+ProtonixDeviceStatus* DTO::DTORequestDeviceStatus::Status () {
 	return this->_status;
 }
 
-void DTO::DTORequestDeviceStatus::Registry(String registry) {
+void DTO::DTORequestDeviceStatus::Registry (String registry) {
 	this->_registry = registry;
 }
 
-String DTO::DTORequestDeviceStatus::Registry() {
+String DTO::DTORequestDeviceStatus::Registry () {
 	return this->_registry;
 }
 
-void DTO::DTORequestDeviceStatus::DTOPopulate(ProtonixDTO* dto) {
+void DTO::DTORequestDeviceStatus::DTOPopulate (ProtonixDTO* dto) {
 	(void)dto;
 }
 
-void DTO::DTORequestDeviceStatus::DTOSerialize(JsonDocument& dto) {
+void DTO::DTORequestDeviceStatus::DTOSerialize (JsonDocument& dto) {
 	dto["data"]["firmware"] = this->_status->Firmware();
 	dto["data"]["enabled"] = this->_status->On();
 	dto["data"]["state"] = this->_status->State();
@@ -68,11 +68,11 @@ void DTO::DTORequestDeviceStatus::DTOSerialize(JsonDocument& dto) {
 	dto["data"]["registry"] = String(this->_registry + "");
 }
 
-String DTO::DTORequestDeviceStatus::DTOSerializeFilter(String raw) {
+String DTO::DTORequestDeviceStatus::DTOSerializeFilter (String raw) {
 	return raw;
 }
 
-DTO::DTORequestDeviceStatus* DTO::DTORequestDeviceStatus::Reset(ProtonixDeviceStatus* status) {
+DTO::DTORequestDeviceStatus* DTO::DTORequestDeviceStatus::Reset (ProtonixDeviceStatus* status) {
 	this->Status(status);
 
 	return this;

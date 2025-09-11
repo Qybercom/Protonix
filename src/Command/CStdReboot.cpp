@@ -14,29 +14,29 @@ using namespace Qybercom::Protonix;
 
 
 
-Command::CStdReboot::CStdReboot() {
+Command::CStdReboot::CStdReboot () {
 	this->_init("std:reboot");
 }
 
-bool Command::CStdReboot::CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name) {
+bool Command::CStdReboot::CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name) {
 	(void)device;
 	(void)port;
 
 	return this->_name == name;
 }
 
-bool Command::CStdReboot::CommandSerialize() {
+bool Command::CStdReboot::CommandSerialize () {
 	this->_output = this->_name;
 
 	return true;
 }
 
-void Command::CStdReboot::CommandReset() {
+void Command::CStdReboot::CommandReset () {
 	this->_output = "";
 }
 
 #if defined(ESP32) || defined(ESP8266)
-void Command::CStdReboot::CommandFromDTO(DTO::DTOEventCommand* dto) {
+void Command::CStdReboot::CommandFromDTO (DTO::DTOEventCommand* dto) {
 	(void)dto;
 }
 #endif

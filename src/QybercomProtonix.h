@@ -30,12 +30,16 @@
 /*
  * awaiting implementation
  *
- * keypad 3x4, 4x4 (IOXhop_I2CKeypad.h)
+ * keypad 3x4, 4x4 (IOXhop_I2CKeypad.h or Keypad.h)
  * 7seg
  * clock7seg (https://github.com/AKJ7/TM1637)
- * canBus
+ * led text display (LiquidCrystal_I2C.h)
+ * velostat
+ * weight (HX711)
+ * canBus (MCP2515)
  * i2cExpander (pcf8574)
  * radio module (RCSwitch.h)
+ * servo motor (Stepper.h)
  * ...
  *
  * button switch handling - not working for the moment

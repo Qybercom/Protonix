@@ -16,12 +16,13 @@ namespace Qybercom {
 		namespace Command {
 			class CStdOff : public ProtonixGenericCommand {
 				public:
-					CStdOff();
-					bool CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name);
-					bool CommandSerialize();
-					void CommandReset();
+					CStdOff ();
+
+					bool CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name);
+					bool CommandSerialize ();
+					void CommandReset ();
 					#if defined(ESP32) || defined(ESP8266)
-					void CommandFromDTO(DTO::DTOEventCommand* dto);
+					void CommandFromDTO (DTO::DTOEventCommand* dto);
 					#endif
 			};
 		}

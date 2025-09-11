@@ -13,39 +13,39 @@ using namespace Qybercom::Protonix;
 
 
 
-Command::CStdFirmware::CStdFirmware() {
+Command::CStdFirmware::CStdFirmware () {
 	this->_init("std:firmware");
 }
 
-Command::CStdFirmware* Command::CStdFirmware::Action(String action) {
+Command::CStdFirmware* Command::CStdFirmware::Action (String action) {
 	this->_action = action;
 
 	return this;
 }
 
-String Command::CStdFirmware::Action() {
+String Command::CStdFirmware::Action () {
 	return this->_action;
 }
 
-bool Command::CStdFirmware::ActionUpdate() {
+bool Command::CStdFirmware::ActionUpdate () {
 	return this->_action == "update";
 }
 
-Command::CStdFirmware* Command::CStdFirmware::Version(String version) {
+Command::CStdFirmware* Command::CStdFirmware::Version (String version) {
 	this->_version = version;
 
 	return this;
 }
 
-String Command::CStdFirmware::Version() {
+String Command::CStdFirmware::Version () {
 	return this->_version;
 }
 
-bool Command::CStdFirmware::VersionLatest() {
+bool Command::CStdFirmware::VersionLatest () {
 	return this->_version == "";
 }
 
-bool Command::CStdFirmware::CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name) {
+bool Command::CStdFirmware::CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name) {
 	(void)device;
 	(void)port;
 
@@ -79,7 +79,7 @@ bool Command::CStdFirmware::CommandRecognize(ProtonixDevice* device, ProtonixDev
 	return true;
 }
 
-bool Command::CStdFirmware::CommandSerialize() {
+bool Command::CStdFirmware::CommandSerialize () {
 	this->_output = "";
 	this->_output += this->_name;
 	this->_output += ":";
@@ -87,12 +87,12 @@ bool Command::CStdFirmware::CommandSerialize() {
 	return true;
 }
 
-void Command::CStdFirmware::CommandReset() {
+void Command::CStdFirmware::CommandReset () {
 	this->_output = "";
 }
 
 #if defined(ESP32) || defined(ESP8266)
-void Command::CStdFirmware::CommandFromDTO(DTO::DTOEventCommand* dto) {
+void Command::CStdFirmware::CommandFromDTO (DTO::DTOEventCommand* dto) {
 	(void)dto;
 }
 #endif

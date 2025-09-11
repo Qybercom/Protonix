@@ -15,25 +15,25 @@ using namespace Qybercom::Protonix;
 
 
 
-Command::CStdSensor::CStdSensor() {
+Command::CStdSensor::CStdSensor () {
 	this->_init("std:sensor");
 	this->Sensor(new ProtonixDeviceSensor());
 }
 
-Command::CStdSensor::CStdSensor(ProtonixDeviceSensor* sensor) {
+Command::CStdSensor::CStdSensor (ProtonixDeviceSensor* sensor) {
 	this->_init("std:sensor");
 	this->Sensor(sensor);
 }
 
-void Command::CStdSensor::Sensor(ProtonixDeviceSensor* sensor) {
+void Command::CStdSensor::Sensor (ProtonixDeviceSensor* sensor) {
 	this->_sensor = sensor;
 }
 
-ProtonixDeviceSensor* Command::CStdSensor::Sensor() {
+ProtonixDeviceSensor* Command::CStdSensor::Sensor () {
 	return this->_sensor;
 }
 
-bool Command::CStdSensor::CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name) {
+bool Command::CStdSensor::CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name) {
 	(void)device;
 	(void)port;
 
@@ -81,7 +81,7 @@ bool Command::CStdSensor::CommandRecognize(ProtonixDevice* device, ProtonixDevic
 	return true;
 }
 
-bool Command::CStdSensor::CommandSerialize() {
+bool Command::CStdSensor::CommandSerialize () {
 	this->_output = "";
 	this->_output += this->_name;
 	this->_output += ":";
@@ -96,12 +96,12 @@ bool Command::CStdSensor::CommandSerialize() {
 	return true;
 }
 
-void Command::CStdSensor::CommandReset() {
+void Command::CStdSensor::CommandReset () {
 	this->_output = "";
 }
 
 #if defined(ESP32) || defined(ESP8266)
-void Command::CStdSensor::CommandFromDTO(DTO::DTOEventCommand* dto) {
+void Command::CStdSensor::CommandFromDTO (DTO::DTOEventCommand* dto) {
 	(void)dto;
 }
 #endif

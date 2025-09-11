@@ -19,23 +19,23 @@ namespace Qybercom {
 					String _version;
 
 				public:
-					CStdFirmware();
+					CStdFirmware ();
 
-					CStdFirmware* Action(String action);
-					String Action();
+					CStdFirmware* Action (String action);
+					String Action ();
 
-					bool ActionUpdate();
+					bool ActionUpdate ();
 
-					CStdFirmware* Version(String version);
-					String Version();
+					CStdFirmware* Version (String version);
+					String Version ();
 
-					bool VersionLatest();
+					bool VersionLatest ();
 
-					bool CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name);
-					bool CommandSerialize();
-					void CommandReset();
+					bool CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name);
+					bool CommandSerialize ();
+					void CommandReset ();
 					#if defined(ESP32) || defined(ESP8266)
-					void CommandFromDTO(DTO::DTOEventCommand* dto);
+					void CommandFromDTO (DTO::DTOEventCommand* dto);
 					#endif
 			};
 		}

@@ -17,12 +17,13 @@ namespace Qybercom {
 					String _status(int code);
 
 				public:
-					NWiFi(String ssid, String password, String mac, String hostname);
-					bool Connect();
-					bool Connected();
-					bool Disconnect();
-					String AddressMAC();
-					String AddressIP();
+					NWiFi (String ssid, String password, String mac, String hostname);
+
+					bool NetworkConnect ();
+					bool NetworkConnected ();
+					bool NetworkDisconnect ();
+					String NetworkAddressMAC ();
+					String NetworkAddressIP ();
 			};
 		}
 	}

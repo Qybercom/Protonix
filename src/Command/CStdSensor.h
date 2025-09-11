@@ -20,15 +20,17 @@ namespace Qybercom {
 					ProtonixDeviceSensor* _sensor;
 
 				public:
-					CStdSensor();
-					CStdSensor(ProtonixDeviceSensor* sensor);
-					void Sensor(ProtonixDeviceSensor* sensor);
-					ProtonixDeviceSensor* Sensor();
-					bool CommandRecognize(ProtonixDevice* device, ProtonixDevicePort* port, String name);
-					bool CommandSerialize();
-					void CommandReset();
+					CStdSensor ();
+					CStdSensor (ProtonixDeviceSensor* sensor);
+
+					void Sensor (ProtonixDeviceSensor* sensor);
+					ProtonixDeviceSensor* Sensor ();
+
+					bool CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name);
+					bool CommandSerialize ();
+					void CommandReset ();
 					#if defined(ESP32) || defined(ESP8266)
-					void CommandFromDTO(DTO::DTOEventCommand* dto);
+					void CommandFromDTO (DTO::DTOEventCommand* dto);
 					#endif
 			};
 		}

@@ -53,7 +53,7 @@ namespace Qybercom {
 				bool OneShot ();
 				bool DelayedVirtual ();
 
-				String Summary();
+				String Summary ();
 
 				bool Infinite ();
 				ProtonixAction* Infinite (bool infinite);
@@ -64,10 +64,10 @@ namespace Qybercom {
 				bool Queued ();
 				ProtonixAction* Queued (bool queued);
 
-				ProtonixAction* Start();
-				ProtonixAction* Play();
-				ProtonixAction* Pause();
-				ProtonixAction* Stop();
+				ProtonixAction* Start ();
+				ProtonixAction* Play ();
+				ProtonixAction* Pause ();
+				ProtonixAction* Stop ();
 
 				bool PipePre ();
 				void PipePost ();

@@ -6,7 +6,7 @@ using namespace Qybercom::Protonix;
 
 
 
-ProtonixMemory::ProtonixMemory() {
+ProtonixMemory::ProtonixMemory () {
 	this->_eepromReady = false;
 
 	this->_flashBegin = false;
@@ -17,7 +17,7 @@ ProtonixMemory::ProtonixMemory() {
 
 extern int __heap_start, * __brkval;
 
-int ProtonixMemory::_ramFree() {
+int ProtonixMemory::_ramFree () {
 	#if defined(ESP32)
 		return esp_get_free_heap_size();
 	#elif defined(ESP8266)
@@ -33,13 +33,13 @@ int ProtonixMemory::_ramFree() {
 	#endif
 }
 
-int ProtonixMemory::RAMFree() {
+int ProtonixMemory::RAMFree () {
 	return ProtonixMemory::_ramFree();
 }
 
 
 
-void ProtonixMemory::EEPROMBegin() {
+void ProtonixMemory::EEPROMBegin () {
 	#if defined(ESP32) || defined(ESP8266)
 	EEPROM.begin(PROTONIX_MEMORY_EEPROM_SIZE);
 	#endif
@@ -47,7 +47,7 @@ void ProtonixMemory::EEPROMBegin() {
 	this->_eepromReady = true;
 }
 
-bool ProtonixMemory::EEPROMCommit() {
+bool ProtonixMemory::EEPROMCommit () {
 	#if defined(ESP32) || defined(ESP8266)
 	return this->_eepromReady ? EEPROM.commit() : false;
 	#else
@@ -55,7 +55,7 @@ bool ProtonixMemory::EEPROMCommit() {
 	#endif
 }
 
-void ProtonixMemory::EEPROMEnd() {
+void ProtonixMemory::EEPROMEnd () {
 	#if defined(ESP32) || defined(ESP8266)
 	EEPROM.end();
 	#endif
@@ -65,7 +65,7 @@ void ProtonixMemory::EEPROMEnd() {
 
 
 
-int ProtonixMemory::FlashFree() {
+int ProtonixMemory::FlashFree () {
 	#if defined(ESP32) || defined(ESP8266)
 		return ESP.getFreeSketchSpace();
 	#elif defined(AVR)
@@ -75,7 +75,7 @@ int ProtonixMemory::FlashFree() {
 	#endif
 }
 
-bool ProtonixMemory::FlashFirmwareBegin(size_t size) {
+bool ProtonixMemory::FlashFirmwareBegin (size_t size) {
 	#if defined(ESP8266)
 	/**
 	 * Check boot mode; if boot mode is 1 (UART download mode),
@@ -133,11 +133,11 @@ bool ProtonixMemory::FlashFirmwareBegin(size_t size) {
 	#endif
 }
 
-bool ProtonixMemory::FlashFileSystemBegin(size_t size) {
+bool ProtonixMemory::FlashFileSystemBegin (size_t size) {
 	return false;
 }
 
-bool ProtonixMemory::FlashWrite(String batch) {
+bool ProtonixMemory::FlashWrite (String batch) {
 	if (!this->_flashBegin) return false;
 
 	int i = 0;
@@ -212,7 +212,7 @@ bool ProtonixMemory::FlashWrite(String batch) {
 	#endif
 }
 
-bool ProtonixMemory::FlashEnd() {
+bool ProtonixMemory::FlashEnd () {
 	if (!this->_flashBegin) return false;
 
 	// other verifications
@@ -262,7 +262,7 @@ bool ProtonixMemory::FlashEnd() {
 
 
 
-unsigned int ProtonixMemory::FlashSize() {
+unsigned int ProtonixMemory::FlashSize () {
 	#if defined(ESP32) || defined(ESP8266)
 		return ESP.getFlashChipSize();
 	#elif defined(AVR)
@@ -272,11 +272,11 @@ unsigned int ProtonixMemory::FlashSize() {
 	#endif
 }
 
-unsigned int ProtonixMemory::FlashBufferSize() {
+unsigned int ProtonixMemory::FlashBufferSize () {
 	return this->_flashBufferSize;
 }
 
-unsigned int ProtonixMemory::FlashFirmwareSize() {
+unsigned int ProtonixMemory::FlashFirmwareSize () {
 	#if defined(ESP32) || defined(ESP8266)
 		return ESP.getSketchSize();
 	#elif defined(AVR)
@@ -287,18 +287,18 @@ unsigned int ProtonixMemory::FlashFirmwareSize() {
 }
 
 #if defined(ESP8266)
-unsigned int ProtonixMemory::FlashSectorSize(size_t size) {
+unsigned int ProtonixMemory::FlashSectorSize (size_t size) {
 	return (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
 }
 
-unsigned int ProtonixMemory::FlashBufferSizeExpected() {
+unsigned int ProtonixMemory::FlashBufferSizeExpected () {
 	const unsigned int sector = FLASH_SECTOR_SIZE * 2;
 
 	return ProtonixMemory::_ramFree() > sector ? FLASH_SECTOR_SIZE : PROTONIX_MEMORY_BUFFER_SIZE;
 }
 
 
-void ProtonixMemory::EBootCommand(uint32_t addressStart, uint32_t addressEnd, size_t size) {
+void ProtonixMemory::EBootCommand (uint32_t addressStart, uint32_t addressEnd, size_t size) {
 	eboot_command ebcmd;
 
 	eboot_command_read(&ebcmd);
@@ -312,7 +312,7 @@ void ProtonixMemory::EBootCommand(uint32_t addressStart, uint32_t addressEnd, si
 	eboot_command_write(&ebcmd);
 }
 
-void ProtonixMemory::EBootCommandRead() {
+void ProtonixMemory::EBootCommandRead () {
 	eboot_command ebcmd;
 
 	if (!eboot_command_read(&ebcmd)) Serial.println("[WARNING] Can not read EBoot");

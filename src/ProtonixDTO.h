@@ -49,7 +49,6 @@ namespace Qybercom {
 				bool Deserialize ();
 
 				void BufferRaw (String data);
-				//void BufferRaw(char* data);
 				String BufferRaw ();
 
 				void Reset ();
