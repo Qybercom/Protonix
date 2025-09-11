@@ -195,10 +195,11 @@ bool ProtonixAction::PipePre () {
 
 void ProtonixAction::PipePost () {
 	this->_cursor += (this->_stepDirection * this->_step);
+	bool one = this->OneShot();
 
 	this->_completed = false;
-	if (this->_stepDirection == 1) this->_completed = this->_cursor >= this->_stepEnd;
-	if (this->_stepDirection == -1) this->_completed = this->_cursor <= this->_stepEnd;
+	if (this->_stepDirection == 1) this->_completed = one ? (this->_cursor >= this->_stepEnd) : (this->_cursor > this->_stepEnd);
+	if (this->_stepDirection == -1) this->_completed = one ? (this->_cursor <= this->_stepEnd) : this->_cursor < this->_stepEnd;
 
 	if (this->_completed) {
 		if (this->_infinite) this->Start();
