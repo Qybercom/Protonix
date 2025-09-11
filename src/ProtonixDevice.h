@@ -59,7 +59,7 @@ namespace Qybercom {
 				List<ProtonixDevicePort*> _ports;
 
 				List<ProtonixAction*> _actions;
-				List<ProtonixAction*> _actionQueue;
+				List<String> _actionQueue;
 				void _pipeActions();
 
 				#if defined(ESP32) || defined(ESP8266)

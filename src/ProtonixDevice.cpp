@@ -365,10 +365,10 @@ bool ProtonixDevice::ActionTrigger (String name) {
 	if (this->_debug)
 		Serial.println("[action] Triggered '" + name + "' (" + String(action->Summary()) + ")");
 
-	action->Start();
-	action->Queued(true);
+	/*action->Start();
+	action->Queued(true);*/
 
-	this->_actionQueue.Add(action);
+	this->_actionQueue.Add(name);
 
 	return true;
 }
@@ -433,10 +433,19 @@ bool ProtonixDevice::ActionPipe (ProtonixAction* action) {
 }
 
 void ProtonixDevice::ActionReset () {
+	ProtonixAction* action = nullptr;
+
+	for (String act : this->_actionQueue) {
+		action = this->Action(act);
+
+		if (action != nullptr)
+			action->Reset();
+	}
+
 	this->_actionQueue.Clear();
 
-	for (ProtonixAction* action : this->_actions)
-		action->Reset();
+	/*for (ProtonixAction* action : this->_actions)
+		action->Reset();*/
 }
 
 #if defined(ESP32) || defined(ESP8266)
@@ -534,14 +543,22 @@ void ProtonixDevice::_pipeNetwork() {
 
 void ProtonixDevice::_pipeActions () {
 	if (this->_actionQueue.Count() != 0) {
-		ProtonixAction* action = this->_actionQueue.First();
+		ProtonixAction* action = this->Action(this->_actionQueue.First());
 
-		this->ActionPipe(action);
+		if (action != nullptr) {
+			if (!action->Queued()) {
+				action->Queued(true);
+				action->Start();
+			}
 
-		if (action->Completed()) {
-			action->Queued(false);
+			this->ActionPipe(action);
 
-			this->_actionQueue.PopFirst();
+			if (action->Completed()) {
+				//action->Queued(false);
+				action->Reset();
+
+				this->_actionQueue.PopFirst();
+			}
 		}
 	}
 
