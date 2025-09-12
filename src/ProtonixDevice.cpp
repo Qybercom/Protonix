@@ -863,10 +863,11 @@ void ProtonixDevice::OnStream (unsigned char* data) {
 	if (this->_debug)
 		Serial.println("[OnStream] " + raw);
 
-	raw.replace("}{", "}}-{{");
+	String sep = Random::AZaz09(16);
+	raw.replace("}{", "}" + sep + "{");
 	//Serial.println("[debug] 1: " + raw);
 
-	List<String>* cmds = explode("}-{", raw);
+	List<String>* cmds = explode(sep, raw);
 	//Serial.println("[debug] 2: " + String(cmds->Count()));
 
 	for (String& cmd : *cmds) {
