@@ -42,3 +42,9 @@ void Hardware::HMesonix::HardwarePipe (ProtonixDevice* device, short core) {
 
 	this->_reader->Pipe();
 }
+
+void Hardware::HMesonix::HardwareCommand (ProtonixDevice* device, String command) {
+	(void)device;
+
+
+}

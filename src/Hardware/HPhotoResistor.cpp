@@ -80,3 +80,9 @@ void Hardware::HPhotoResistor::HardwarePipe (ProtonixDevice* device, short core)
 
 	this->_value = analogRead(this->_pin);
 }
+
+void Hardware::HPhotoResistor::HardwareCommand (ProtonixDevice* device, String command) {
+	(void)device;
+
+	
+}

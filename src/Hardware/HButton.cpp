@@ -48,3 +48,9 @@ void Hardware::HButton::HardwareInitPost (ProtonixDevice* device) {
 void Hardware::HButton::HardwarePipe (ProtonixDevice* device, short core) {
 	this->_trigger->HardwarePipe(device, core);
 }
+
+void Hardware::HButton::HardwareCommand (ProtonixDevice* device, String command) {
+	(void)device;
+
+
+}

@@ -50,6 +50,7 @@
 
 #include "Command/CCustom.h"
 #include "Command/CStdFirmware.h"
+#include "Command/CStdHardware.h"
 #include "Command/CStdOff.h"
 #include "Command/CStdOn.h"
 #include "Command/CStdReboot.h"

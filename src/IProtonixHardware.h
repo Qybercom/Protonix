@@ -36,6 +36,8 @@ namespace Qybercom {
 				virtual void HardwarePipe (ProtonixDevice* device, short core) = 0;
 				virtual void HardwarePipeInterrupt (ProtonixDevice* device) {}
 
+				virtual void HardwareCommand (ProtonixDevice* device, String command) = 0;
+
 				virtual ~IProtonixHardware () {};
 		};
 	}

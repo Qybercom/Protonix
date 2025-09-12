@@ -80,3 +80,9 @@ void Hardware::HSensorHall::HardwarePipe (ProtonixDevice* device, short core) {
 
 	this->_value = analogRead(this->_pin);
 }
+
+void Hardware::HSensorHall::HardwareCommand (ProtonixDevice* device, String command) {
+	(void)device;
+
+	
+}

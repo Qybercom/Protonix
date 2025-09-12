@@ -73,3 +73,9 @@ void Hardware::HSelector3P::HardwarePipe (ProtonixDevice* device, short core) {
 		this->_changed = true;
 	}
 }
+
+void Hardware::HSelector3P::HardwareCommand (ProtonixDevice* device, String command) {
+	(void)device;
+
+	
+}

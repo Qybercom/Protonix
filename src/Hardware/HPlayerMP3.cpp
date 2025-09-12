@@ -84,3 +84,9 @@ void Hardware::HPlayerMP3::HardwarePipe (ProtonixDevice* device, short core) {
 
 
 }
+
+void Hardware::HPlayerMP3::HardwareCommand (ProtonixDevice* device, String command) {
+	(void)device;
+
+	
+}

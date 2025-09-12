@@ -128,3 +128,9 @@ void Hardware::HSensorHall2D::HardwarePipe (ProtonixDevice* device, short core) 
 
 	this->_value = angleByXY(x, y, this->_minX, this->_maxX, this->_minY, this->_maxY);
 }
+
+void Hardware::HSensorHall2D::HardwareCommand (ProtonixDevice* device, String command) {
+	(void)device;
+
+	
+}

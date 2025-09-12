@@ -76,3 +76,9 @@ void Hardware::HBuzzer::HardwarePipe (ProtonixDevice* device, short core) {
 		this->Off();
 	}
 }
+
+void Hardware::HBuzzer::HardwareCommand (ProtonixDevice* device, String command) {
+	(void)device;
+
+	
+}

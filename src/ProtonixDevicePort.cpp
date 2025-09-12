@@ -8,6 +8,7 @@
 
 #include "Command/CCustom.h"
 #include "Command/CStdFirmware.h"
+#include "Command/CStdHardware.h"
 #include "Command/CStdOff.h"
 #include "Command/CStdOn.h"
 #include "Command/CStdReboot.h"
@@ -48,6 +49,7 @@ void ProtonixDevicePort::_init (bool serial, String name, unsigned int pinRX, un
 	#if defined(ESP32) || defined(ESP8266)
 	this->_cmds.Add(new Command::CCustom());
 	this->_cmds.Add(new Command::CStdFirmware());
+	this->_cmds.Add(new Command::CStdHardware());
 	this->_cmds.Add(new Command::CStdOff());
 	this->_cmds.Add(new Command::CStdOn());
 	this->_cmds.Add(new Command::CStdReboot());

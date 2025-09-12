@@ -104,3 +104,9 @@ void Hardware::HTrigger::HardwarePipe (ProtonixDevice* device, short core) {
 		this->_debouncer.Reset();
 	}
 }
+
+void Hardware::HTrigger::HardwareCommand (ProtonixDevice* device, String command) {
+	(void)device;
+
+	
+}

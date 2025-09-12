@@ -9,6 +9,7 @@
 
 #include "Command/CCustom.h"
 #include "Command/CStdFirmware.h"
+#include "Command/CStdHardware.h"
 #include "Command/CStdOff.h"
 #include "Command/CStdOn.h"
 #include "Command/CStdReboot.h"
@@ -35,6 +36,7 @@ void ProtonixGenericDevice::_init (bool debug) {
 
 	this->_cmds.Add(new Command::CCustom());
 	this->_cmds.Add(new Command::CStdFirmware());
+	this->_cmds.Add(new Command::CStdHardware());
 	this->_cmds.Add(new Command::CStdOff());
 	this->_cmds.Add(new Command::CStdOn());
 	this->_cmds.Add(new Command::CStdReboot());
@@ -95,11 +97,13 @@ void ProtonixGenericDevice::DeviceHandleStdCommand (ProtonixDevice* device, IPro
 
 	if (name == "std:sensor") {
 		Command::CStdSensor* cmd = (Command::CStdSensor*) command;
+
 		device->Status()->SensorSet(cmd->Sensor());
 	}
 
 	if (name == "std:registry") {
 		Command::CStdRegistry* cmd = (Command::CStdRegistry*) command;
+
 		device->Registry()->SetRaw(cmd->Key(), cmd->Value(), true);
 	}
 
@@ -110,6 +114,17 @@ void ProtonixGenericDevice::DeviceHandleStdCommand (ProtonixDevice* device, IPro
 			Serial.println("[device] Firmware update requested");
 
 			device->FirmwareUpdateOTA(cmd->Version());
+		}
+	}
+
+	if (name == "std:hardware") {
+		Command::CStdHardware* cmd = (Command::CStdHardware*) command;
+		IProtonixHardware* hardware = device->Hardware(cmd->ID());
+
+		if (hardware != nullptr) {
+			Serial.println("[device] Hardware '" + cmd->ID() + "' received command '" + cmd->CMD() + "'");
+
+			hardware->HardwareCommand(device, cmd->CMD());
 		}
 	}
 }
