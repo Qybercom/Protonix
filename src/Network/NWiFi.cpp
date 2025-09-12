@@ -9,6 +9,8 @@
 #endif
 
 #include "../IProtonixNetwork.h"
+#include "../ProtonixTimer.h"
+
 #include "NWiFi.h"
 
 using namespace Qybercom::Protonix;
@@ -34,14 +36,20 @@ String Network::NWiFi::_status (int code) {
 	}
 }
 
-Network::NWiFi::NWiFi (String ssid, String password, String mac, String hostname) {
+Network::NWiFi::NWiFi (String ssid, String password, String mac, String hostname) {//}, unsigned int timerCheck) {
 	this->_ssid = ssid;
 	this->_password = password;
 	this->_mac = mac;
 	this->_hostname = hostname;
+
+	//this->_timerCheck = new ProtonixTimer(timerCheck);
 }
 
 bool Network::NWiFi::NetworkConnect () {
+	//Serial.println("[network:wifi] Attempt connection...");
+
+	//this->_timerCheck->Reset();
+
 	//uint8_t mac[6] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
 	IProtonixNetwork::ParseMAC(this->_mac, this->_macBuffer);
 
@@ -65,8 +73,9 @@ bool Network::NWiFi::NetworkConnect () {
 		WiFi.begin(this->_ssid, this->_password);
 	#endif
 
-	delay(1000);
-	//WiFi.reconnect();
+	//delay(1000);
+	////WiFi.reconnect();
+	//this->_timerCheck->Enabled(true);
 
 	return true;
 }
@@ -75,6 +84,10 @@ unsigned int __NWiFi_status = 0;
 
 bool Network::NWiFi::NetworkConnected () {
 	#if defined(ESP32) || defined(ESP8266)
+		//if (!this->_timerCheck->Pipe()) return false;
+
+		//Serial.println("[network:wifi] Check connectivity...");
+
 		unsigned int status = WiFi.status();
 		bool connected = status == WL_CONNECTED;
 
@@ -84,6 +97,11 @@ bool Network::NWiFi::NetworkConnected () {
 		}
 
 		__NWiFi_status = status;
+
+		/*if (connected) {
+			this->_timerCheck->Enabled(false);
+			this->_timerCheck->Reset();
+		}*/
 
 		return connected;
 	#else

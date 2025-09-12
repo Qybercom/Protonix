@@ -17,6 +17,7 @@
 #include <ESP32httpUpdate.h>
 #endif
 
+#include "Common/Random.hpp"
 #include "Common/Utils.hpp"
 
 #include "IProtonixDevice.h"
@@ -47,6 +48,8 @@ using namespace Qybercom::Protonix;
 List<ProtonixDevice*> ProtonixDevice::_instances;
 
 ProtonixDevice::ProtonixDevice (IProtonixDevice* device) {
+	Random::Init();
+
 	this->_timerUptime = new ProtonixTimer(0);
 	this->_timerTick = new ProtonixTimer(0);
 	this->_status = new ProtonixDeviceStatus();
