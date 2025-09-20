@@ -8,6 +8,12 @@ using namespace Qybercom::Protonix;
 
 
 
+#if defined(AVR)
+extern int __heap_start, * __brkval;
+#endif
+
+
+
 ProtonixMemory::ProtonixMemory () {
 	this->_eepromReady = false;
 }
@@ -17,10 +23,9 @@ ProtonixMemory::ProtonixMemory () {
 long ProtonixMemory::RAMFree () {
 	#if defined(ESP8266) || defined(ESP32)
 		return (long)ESP.getFreeHeap();
-	#elif defined(ARDUINO_ARCH_AVR)
-		extern int __heap_start, *__brkval;
+	#elif defined(AVR)
 		int v;
-
+		// https://docs.arduino.cc/learn/programming/memory-guide
 		return (long)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
 	#else
 		return -1;
