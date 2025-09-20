@@ -3,21 +3,23 @@
 #include <Arduino.h>
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
-#include "../ProtonixDevicePort.h"
+#include "../Protonix.h"
+
+#include "HBusSerial.h"
 
 namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
 			class HPlayerMP3 : public IProtonixHardware {
 				private:
-					ProtonixDevicePort* _player;
-					String _port;
+					HBusSerial* _player;
 
 					void _cmd (byte a1, byte a2, byte a3, byte a4);
 
 				public:
-					HPlayerMP3 (String port);
+					HPlayerMP3 (unsigned short pinRX, unsigned short pinTX);
+
+					HBusSerial* Port ();
 
 					void Play (int file, int dir = 0x00);
 					void Pause ();
@@ -26,10 +28,10 @@ namespace Qybercom {
 					void Wake ();
 
 					bool HardwareSPI ();
-					void HardwareInitPre (ProtonixDevice* device);
-					void HardwareInitPost (ProtonixDevice* device);
-					void HardwarePipe (ProtonixDevice* device, short core);
-					void HardwareCommand (ProtonixDevice* device, String command);
+					void HardwareInitPre (Protonix* device);
+					void HardwareInitPost (Protonix* device);
+					void HardwarePipe (Protonix* device, short core);
+					void HardwareCommand (Protonix* device, String command);
 			};
 		}
 	}

@@ -3,11 +3,23 @@
 #include "Common/Debouncer.hpp"
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 #include "HEncoder.h"
 
 using namespace Qybercom::Protonix;
+
+bool Hardware::HEncoder::_changedPipe () {
+	bool out = false;
+
+	if (this->_changed) {
+		if (this->_allowZero || this->_dir != 0) out = true;
+
+		this->_changed = false;
+	}
+
+	return out;
+}
 
 Hardware::HEncoder::HEncoder (unsigned short pinA, unsigned short pinB, unsigned int checkInterval) {
 	this->_pinA = pinA;
@@ -20,6 +32,7 @@ Hardware::HEncoder::HEncoder (unsigned short pinA, unsigned short pinB, unsigned
 	this->_changed = false;
 	this->_changedButton = false;
 	this->_withButton = false;
+	this->_allowZero = false;
 
 	this->_debouncer.CheckInterval(checkInterval);
 }
@@ -70,15 +83,8 @@ bool Hardware::HEncoder::Clicked () {
 	return this->_clicked;
 }
 
-bool Hardware::HEncoder::Changed (bool allowZero) {
-	bool out = false;
-
-	if (this->_changed && (allowZero || this->_dir != 0)) {
-		out = true;
-		this->_changed = false;
-	}
-
-	return out;
+bool Hardware::HEncoder::Changed () {
+	return this->_changedPipe();
 }
 
 bool Hardware::HEncoder::ChangedButton () {
@@ -96,6 +102,16 @@ bool Hardware::HEncoder::WithButton () {
 	return this->_withButton;
 }
 
+bool Hardware::HEncoder::AllowZero () {
+	return this->_allowZero;
+}
+
+Hardware::HEncoder* Hardware::HEncoder::AllowZero (bool allow) {
+	this->_allowZero = allow;
+
+	return this;
+}
+
 Qybercom::Debouncer<short> &Hardware::HEncoder::Debouncer () {
 	return this->_debouncer;
 }
@@ -108,7 +124,7 @@ bool Hardware::HEncoder::HardwareSPI () {
 	return false;
 }
 
-void Hardware::HEncoder::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HEncoder::HardwareInitPre (Protonix* device) {
 	pinMode(this->_pinA, INPUT_PULLUP);
 	device->InterruptAttach(this->_pinA, CHANGE);
 
@@ -121,12 +137,12 @@ void Hardware::HEncoder::HardwareInitPre (ProtonixDevice* device) {
 	}
 }
 
-void Hardware::HEncoder::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HEncoder::HardwareInitPost (Protonix* device) {
 	(void) device;
 
 }
 
-void Hardware::HEncoder::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HEncoder::HardwarePipe (Protonix* device, short core) {
 	(void) device;
 
 	if (this->_withButton) {
@@ -145,9 +161,12 @@ void Hardware::HEncoder::HardwarePipe (ProtonixDevice* device, short core) {
 			this->_debouncerButton.Reset();
 		}
 	}
+
+	if (this->_allowSignal && this->_changedPipe())
+		device->Signal(this->_id, "dir")->ValueInt(this->_dir);
 }
 
-void Hardware::HEncoder::HardwarePipeInterrupt (ProtonixDevice* device) {
+void Hardware::HEncoder::HardwarePipeInterrupt (Protonix* device) {
 	bool valA = digitalRead(this->_pinA);
 	bool valB = digitalRead(this->_pinB);
 	short dir = 0;
@@ -173,7 +192,7 @@ void Hardware::HEncoder::HardwarePipeInterrupt (ProtonixDevice* device) {
 	this->_valB = valB;
 }
 
-void Hardware::HEncoder::HardwareCommand (ProtonixDevice* device, String command) {
+void Hardware::HEncoder::HardwareCommand (Protonix* device, String command) {
 	(void)device;
 
 	

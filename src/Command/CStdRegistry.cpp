@@ -1,17 +1,11 @@
 #include <Arduino.h>
 
-#include "../IProtonixDevice.h"
-#include "../ProtonixDevice.h"
-
-#if defined(ESP32) || defined(ESP8266)
-#include "../DTO/DTOEventCommand.h"
-#endif
+#include "../IProtonixHardware.h"
+#include "../Protonix.h"
 
 #include "CStdRegistry.h"
 
 using namespace Qybercom::Protonix;
-
-
 
 Command::CStdRegistry::CStdRegistry () {
 	this->_init("std:registry");
@@ -37,24 +31,25 @@ String Command::CStdRegistry::Value () {
 	return this->_value;
 }
 
-bool Command::CStdRegistry::CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name) {
+bool Command::CStdRegistry::CommandRecognize (Protonix* device, String command, IProtonixHardware* hardware) {
 	(void)device;
-	(void)port;
+	(void)hardware;
 
-	String n = name.substring(0, 12);
-	if (n != this->_name) return false;
+	short trail = this->_recognize(command);
+	if (trail == -1) return false;
 
-	unsigned int i = 13;
-	unsigned int l = name.length();
+	unsigned int i = trail;
+	unsigned int l = command.length();
+
 	bool setKey = false;
 
 	String key = "";
 	String value = "";
 
 	while (i < l) {
-		if (setKey) value += name[i];
+		if (setKey) value += command[i];
 		else {
-			if (name[i] != ';') key += name[i];
+			if (command[i] != ';') key += command[i];
 			else {
 				setKey = true;
 
@@ -71,19 +66,11 @@ bool Command::CStdRegistry::CommandRecognize (ProtonixDevice* device, ProtonixDe
 }
 
 bool Command::CStdRegistry::CommandSerialize () {
-	this->_output = "";
-	this->_output += this->_name;
-	this->_output += ":";
+	this->_buffer = "";
+	this->_buffer += this->_name;
+	this->_buffer += ":";
+
+	// TODO: serialize
 
 	return true;
 }
-
-void Command::CStdRegistry::CommandReset () {
-	this->_output = "";
-}
-
-#if defined(ESP32) || defined(ESP8266)
-void Command::CStdRegistry::CommandFromDTO (DTO::DTOEventCommand* dto) {
-	(void)dto;
-}
-#endif

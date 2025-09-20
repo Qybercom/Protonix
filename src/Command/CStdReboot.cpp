@@ -1,42 +1,25 @@
 #include <Arduino.h>
 
-#include "../IProtonixDevice.h"
-#include "../ProtonixDevice.h"
-#include "../ProtonixDevicePort.h"
-
-#if defined(ESP32) || defined(ESP8266)
-#include "../DTO/DTOEventCommand.h"
-#endif
+#include "../IProtonixHardware.h"
+#include "../Protonix.h"
 
 #include "CStdReboot.h"
 
 using namespace Qybercom::Protonix;
 
-
-
 Command::CStdReboot::CStdReboot () {
 	this->_init("std:reboot");
 }
 
-bool Command::CStdReboot::CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name) {
+bool Command::CStdReboot::CommandRecognize (Protonix* device, String command, IProtonixHardware* hardware) {
 	(void)device;
-	(void)port;
+	(void)hardware;
 
-	return this->_name == name;
+	return this->_name == command;
 }
 
 bool Command::CStdReboot::CommandSerialize () {
-	this->_output = this->_name;
+	this->_buffer = this->_name;
 
 	return true;
 }
-
-void Command::CStdReboot::CommandReset () {
-	this->_output = "";
-}
-
-#if defined(ESP32) || defined(ESP8266)
-void Command::CStdReboot::CommandFromDTO (DTO::DTOEventCommand* dto) {
-	(void)dto;
-}
-#endif

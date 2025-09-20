@@ -1,17 +1,11 @@
 #include <Arduino.h>
 
-#include "../IProtonixDevice.h"
-#include "../ProtonixDevice.h"
-
-#if defined(ESP32) || defined(ESP8266)
-#include "../DTO/DTOEventCommand.h"
-#endif
+#include "../IProtonixHardware.h"
+#include "../Protonix.h"
 
 #include "CStdFirmware.h"
 
 using namespace Qybercom::Protonix;
-
-
 
 Command::CStdFirmware::CStdFirmware () {
 	this->_init("std:firmware");
@@ -45,24 +39,25 @@ bool Command::CStdFirmware::VersionLatest () {
 	return this->_version == "";
 }
 
-bool Command::CStdFirmware::CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name) {
+bool Command::CStdFirmware::CommandRecognize (Protonix* device, String command, IProtonixHardware* hardware) {
 	(void)device;
-	(void)port;
+	(void)hardware;
 
-	String n = name.substring(0, 12);
-	if (n != this->_name) return false;
+	short trail = this->_recognize(command);
+	if (trail == -1) return false;
 
-	unsigned int i = 13;
-	unsigned int l = name.length();
+	unsigned int i = trail;
+	unsigned int l = command.length();
+
 	bool setAction = false;
 
 	String action = "";
 	String version = "";
 
 	while (i < l) {
-		if (setAction) version += name[i];
+		if (setAction) version += command[i];
 		else {
-			if (name[i] != ';') action += name[i];
+			if (command[i] != ';') action += command[i];
 			else {
 				setAction = true;
 
@@ -80,19 +75,11 @@ bool Command::CStdFirmware::CommandRecognize (ProtonixDevice* device, ProtonixDe
 }
 
 bool Command::CStdFirmware::CommandSerialize () {
-	this->_output = "";
-	this->_output += this->_name;
-	this->_output += ":";
+	this->_buffer = "";
+	this->_buffer += this->_name;
+	this->_buffer += ":";
+
+	// TODO: serialize
 
 	return true;
 }
-
-void Command::CStdFirmware::CommandReset () {
-	this->_output = "";
-}
-
-#if defined(ESP32) || defined(ESP8266)
-void Command::CStdFirmware::CommandFromDTO (DTO::DTOEventCommand* dto) {
-	(void)dto;
-}
-#endif

@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 #include "HTrigger.h"
 
@@ -37,19 +37,26 @@ bool Hardware::HButton::HardwareSPI () {
 	return this->_trigger->HardwareSPI();
 }
 
-void Hardware::HButton::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HButton::HardwareInitPre (Protonix* device) {
 	this->_trigger->HardwareInitPre(device);
 }
 
-void Hardware::HButton::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HButton::HardwareInitPost (Protonix* device) {
 	this->_trigger->HardwareInitPost(device);
 }
 
-void Hardware::HButton::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HButton::HardwarePipe (Protonix* device, short core) {
 	this->_trigger->HardwarePipe(device, core);
+
+	if (this->_allowSignal && this->Changed()) {
+		bool value = this->_trigger->InputValue();
+
+		device->Signal(this->_id, "changed")->ValueBool(value);
+		device->Signal(this->_id, String(value ? "pressed" : "released"));
+	}
 }
 
-void Hardware::HButton::HardwareCommand (ProtonixDevice* device, String command) {
+void Hardware::HButton::HardwareCommand (Protonix* device, String command) {
 	(void)device;
 
 

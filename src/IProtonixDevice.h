@@ -2,43 +2,33 @@
 
 #include <Arduino.h>
 
+#include "IProtonixHardware.h"
 #include "IProtonixCommand.h"
-#include "ProtonixDevice.h"
-#include "ProtonixDevicePort.h"
+#include "ProtonixSignal.h"
 #include "ProtonixAction.h"
-
-#if defined(ESP32) || defined(ESP8266)
-#include "ProtonixDTO.h"
-#include "DTO/DTOResponseAuthorization.h"
-#include "DTO/DTOEventCommand.h"
-#endif
 
 namespace Qybercom {
 	namespace Protonix {
+		class Protonix;
+
 		class IProtonixDevice {
 			public:
-				virtual String DeviceID ();
+				void DeviceHandleStdCommand (Protonix* device, IProtonixCommand* command);
+				bool DeviceHandleCommand (Protonix* device, IProtonixCommand* command);
+
 				virtual unsigned int DeviceTick ();
-				virtual void DeviceOnReady (ProtonixDevice* device);
-				virtual void DeviceOnLoop (ProtonixDevice* device);
-				virtual void DeviceOnTick (ProtonixDevice* device);
-				virtual void DeviceOnSerialCommand (ProtonixDevice* device, ProtonixDevicePort* port, IProtonixCommand* command);
-				virtual void DeviceOnAction (ProtonixDevice* device, ProtonixAction* action);
-				virtual bool DeviceAutoStatus ();
-				
-				#if defined(ESP32) || defined(ESP8266)
-				virtual String DevicePassphrase ();
-				virtual void DeviceOnNetworkConnect (ProtonixDevice* device);
-				virtual void DeviceOnProtocolConnect (ProtonixDevice* device);
-				virtual void DeviceOnStreamResponse (ProtonixDevice* device, ProtonixDTO* dto);
-				virtual void DeviceOnStreamResponseAuthorization (ProtonixDevice* device, DTO::DTOResponseAuthorization* authorization);
-				virtual void DeviceOnStreamEvent (ProtonixDevice* device, ProtonixDTO* dto);
-				virtual void DeviceOnStreamEventCommand (ProtonixDevice* device, DTO::DTOEventCommand* command);
+				virtual void DeviceOnReady (Protonix* device);
+				virtual void DeviceOnTick (Protonix* device);
+				virtual void DeviceOnLoop (Protonix* device);
+				virtual void DeviceOnAction (Protonix* device, ProtonixAction* action);
+				virtual void DeviceOnCommand (Protonix* device, IProtonixCommand* command, IProtonixHardware* hardware);
+				virtual void DeviceOnCommandCustom (Protonix* device, String command);
+				virtual void DeviceOnSignal (Protonix* device, ProtonixSignal* signal);
+				#if defined(ESP32)
+				virtual void DeviceOnDedicatedTask (Protonix* device, unsigned short core);
 				#endif
 
-				#if defined(ESP32)
-				virtual void DeviceOnDedicatedTask (unsigned short core);
-				#endif
+				virtual ~IProtonixDevice () { }
 		};
 	}
 }

@@ -3,7 +3,7 @@
 #include "Common/Debouncer.hpp"
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 #include "HTrigger.h"
 
@@ -64,7 +64,7 @@ bool Hardware::HTrigger::HardwareSPI () {
 	return false;
 }
 
-void Hardware::HTrigger::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	if (this->_input) {
@@ -77,13 +77,13 @@ void Hardware::HTrigger::HardwareInitPre (ProtonixDevice* device) {
 	}
 }
 
-void Hardware::HTrigger::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HTrigger::HardwareInitPost (Protonix* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HTrigger::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HTrigger::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	if (!this->_input) return;
 
@@ -105,7 +105,7 @@ void Hardware::HTrigger::HardwarePipe (ProtonixDevice* device, short core) {
 	}
 }
 
-void Hardware::HTrigger::HardwareCommand (ProtonixDevice* device, String command) {
+void Hardware::HTrigger::HardwareCommand (Protonix* device, String command) {
 	(void)device;
 
 	

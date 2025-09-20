@@ -3,7 +3,7 @@
 #include <QybercomMesonix.h>
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 #include "HMesonix.h"
 
@@ -25,17 +25,17 @@ bool Hardware::HMesonix::HardwareSPI () {
 	return true;
 }
 
-void Hardware::HMesonix::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HMesonix::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	this->_reader->InitMFRC();
 }
 
-void Hardware::HMesonix::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HMesonix::HardwareInitPost (Protonix* device) {
 	(void)device;
 }
 
-void Hardware::HMesonix::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HMesonix::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 
 	//Serial.println("[hardware:mesonix] Pipe on core " + String(core));
@@ -43,7 +43,7 @@ void Hardware::HMesonix::HardwarePipe (ProtonixDevice* device, short core) {
 	this->_reader->Pipe();
 }
 
-void Hardware::HMesonix::HardwareCommand (ProtonixDevice* device, String command) {
+void Hardware::HMesonix::HardwareCommand (Protonix* device, String command) {
 	(void)device;
 
 

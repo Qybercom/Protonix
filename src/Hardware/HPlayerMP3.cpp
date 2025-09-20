@@ -1,14 +1,17 @@
 #include <Arduino.h>
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
+
+#include "HBusSerial.h"
 
 #include "HPlayerMP3.h"
 
 using namespace Qybercom::Protonix;
 
-Hardware::HPlayerMP3::HPlayerMP3 (String port) {
-	this->_port = port;
+Hardware::HPlayerMP3::HPlayerMP3 (unsigned short pinRX, unsigned short pinTX) {
+	this->_player = new Hardware::HBusSerial(pinRX, pinTX);
+	this->_player->Observable(false);
 }
 
 // https://geekmatic.in.ua/pdf/Catalex_MP3_board.pdf
@@ -24,6 +27,10 @@ void Hardware::HPlayerMP3::_cmd (byte a1, byte a2, byte a3, byte a4) {
 	this->_player->Write(a3);			// Номера файла "в папке" либо 00 "на диске"
 	this->_player->Write(a4);			// НОМЕР ФАЙЛА В ПАПКЕ MP3
 	this->_player->Write((byte)0xEF);	// Код конца команды
+}
+
+Hardware::HBusSerial* Hardware::HPlayerMP3::Port () {
+	return this->_player;
 }
 
 void Hardware::HPlayerMP3::Play (int file, int dir) {
@@ -52,41 +59,25 @@ void Hardware::HPlayerMP3::Wake () {
 }
 
 bool Hardware::HPlayerMP3::HardwareSPI () {
-	return false;
+	return this->_player->HardwareSPI();
 }
 
-void Hardware::HPlayerMP3::HardwareInitPre (ProtonixDevice* device) {
-	(void)device;
-
-	this->_player = device->Port(this->_port);
-
-	if (this->_player == nullptr) {
-		Serial.println("[hardware:playerMP3] InitPre on port '" + this->_port + "' - no port configured");
-
-		return;
-	}
-
-	this->_player->Observable(false);
+void Hardware::HPlayerMP3::HardwareInitPre (Protonix* device) {
+	this->_player->HardwareInitPre(device);
 
 	this->Wake();
 
-	Serial.println("[hardware:playerMP3] InitPre on port '" + this->_port + "'");
+	Serial.println("[hardware:playerMP3] InitPre on pins " + String(this->_player->PinRX()) + ":" + String(this->_player->PinRX()));
 }
 
-void Hardware::HPlayerMP3::HardwareInitPost (ProtonixDevice* device) {
-	(void)device;
-
-
+void Hardware::HPlayerMP3::HardwareInitPost (Protonix* device) {
+	this->_player->HardwareInitPost(device);
 }
 
-void Hardware::HPlayerMP3::HardwarePipe (ProtonixDevice* device, short core) {
-	(void)device;
-
-
+void Hardware::HPlayerMP3::HardwarePipe (Protonix* device, short core) {
+	this->_player->HardwarePipe(device, core);
 }
 
-void Hardware::HPlayerMP3::HardwareCommand (ProtonixDevice* device, String command) {
-	(void)device;
-
-	
+void Hardware::HPlayerMP3::HardwareCommand (Protonix* device, String command) {
+	this->_player->HardwareCommand(device, command);
 }

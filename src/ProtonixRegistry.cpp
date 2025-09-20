@@ -1,5 +1,6 @@
 #include <Arduino.h>
 
+#include "_platforms.h"
 #include "ProtonixRegistry.h"
 #include "ProtonixMemory.h"
 
@@ -25,34 +26,34 @@ bool ProtonixRegistry::Debug () {
 bool ProtonixRegistry::_bufferLoad () {
 	if (this->_bufferLoaded) {
 		if (this->_debug)
-			Serial.println("[debug] eeprom loaded: `" + this->_bufferRaw + "`");
+			Serial.println("[registry:eeprom] Loaded: `" + this->_bufferRaw + "`");
 
 		return true;
 	}
 
-	const unsigned int size = PROTONIX_MEMORY_EEPROM_SIZE - PROTONIX_REGISTRY_START;
+	const unsigned int size = QYBERCOM_PROTONIX_MEMORY_EEPROM_SIZE - QYBERCOM_PROTONIX_REGISTRY_START;
 
 	char raw[size];
 
-	this->_memory->EEPROMGet(PROTONIX_REGISTRY_START, raw);
+	this->_memory->EEPROMGet(QYBERCOM_PROTONIX_REGISTRY_START, raw);
 
 	String rawS = String(raw);
 	rawS.trim();
 
 	if (this->_debug)
-		Serial.println("[debug] eeprom ready: `" + rawS + "`");
+		Serial.println("[registry:eeprom] Ready: `" + rawS + "`");
 
 	DeserializationError err = deserializeJson(this->_buffer, rawS);
 
 	if (err) {
-		Serial.println("[WARNING] ProtonixRegistry: json deserialize error: " + String(err.f_str()));
+		Serial.println("[registry:eeprom] Load: JSON deserialize error: " + String(err.f_str()));
 
 		this->_bufferRaw = "{}";
 		deserializeJson(this->_buffer, this->_bufferRaw);
 	}
 	else {
 		if (serializeJson(this->_buffer, this->_bufferRaw) == 0) {
-			Serial.println("[WARNING] ProtonixRegistry: json serialize error");
+			Serial.println("[registry:eeprom] Load: JSON serialize error");
 
 			return false;
 		}
@@ -261,12 +262,12 @@ bool ProtonixRegistry::SetList (String key, ProtonixRegistryList &list, bool com
 
 bool ProtonixRegistry::Commit () {
 	if (serializeJson(this->_buffer, this->_bufferRaw) == 0) {
-		Serial.println("[WARNING] ProtonixRegistry: json serialize error");
+		Serial.println("[registry:eeprom] Commit: JSON serialize error");
 
 		return false;
 	}
 
-	const unsigned int size = PROTONIX_MEMORY_EEPROM_SIZE - PROTONIX_REGISTRY_START;
+	const unsigned int size = QYBERCOM_PROTONIX_MEMORY_EEPROM_SIZE - QYBERCOM_PROTONIX_REGISTRY_START;
 	unsigned int sizeActual = this->_bufferRaw.length();
 	char raw[size];
 	unsigned int i = 0;
@@ -277,7 +278,7 @@ bool ProtonixRegistry::Commit () {
 		i++;
 	}
 
-	this->_memory->EEPROMSet(PROTONIX_REGISTRY_START, raw);
+	this->_memory->EEPROMSet(QYBERCOM_PROTONIX_REGISTRY_START, raw);
 
 	return this->_memory->EEPROMCommit();
 }

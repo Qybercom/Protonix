@@ -3,7 +3,7 @@
 #include <QybercomPhotonix.h>
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 #include "HPhotonix.h"
 
@@ -14,25 +14,25 @@ bool Hardware::HPhotonix::HardwareSPI () {
 	return true;
 }
 
-void Hardware::HPhotonix::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HPhotonix::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HPhotonix::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HPhotonix::HardwareInitPost (Protonix* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HPhotonix::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HPhotonix::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 
 
 }
 
-void Hardware::HPhotonix::HardwareCommand (ProtonixDevice* device, String command) {
+void Hardware::HPhotonix::HardwareCommand (Protonix* device, String command) {
 	(void)device;
 
 

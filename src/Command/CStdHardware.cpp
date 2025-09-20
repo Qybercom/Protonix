@@ -1,17 +1,11 @@
 #include <Arduino.h>
 
-#include "../IProtonixDevice.h"
-#include "../ProtonixDevice.h"
-
-#if defined(ESP32) || defined(ESP8266)
-#include "../DTO/DTOEventCommand.h"
-#endif
+#include "../IProtonixHardware.h"
+#include "../Protonix.h"
 
 #include "CStdHardware.h"
 
 using namespace Qybercom::Protonix;
-
-
 
 Command::CStdHardware::CStdHardware () {
 	this->_init("std:hardware");
@@ -37,24 +31,25 @@ String Command::CStdHardware::CMD () {
 	return this->_cmd;
 }
 
-bool Command::CStdHardware::CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name) {
+bool Command::CStdHardware::CommandRecognize (Protonix* device, String command, IProtonixHardware* hardware) {
 	(void)device;
-	(void)port;
+	(void)hardware;
 
-	String n = name.substring(0, 12);
-	if (n != this->_name) return false;
+	short trail = this->_recognize(command);
+	if (trail == -1) return false;
 
-	unsigned int i = 13;
-	unsigned int l = name.length();
+	unsigned int i = trail;
+	unsigned int l = command.length();
+
 	bool setID = false;
 
 	String id = "";
 	String cmd = "";
 
 	while (i < l) {
-		if (setID) cmd += name[i];
+		if (setID) cmd += command[i];
 		else {
-			if (name[i] != ';') id += name[i];
+			if (command[i] != ';') id += command[i];
 			else {
 				setID = true;
 
@@ -72,22 +67,12 @@ bool Command::CStdHardware::CommandRecognize (ProtonixDevice* device, ProtonixDe
 }
 
 bool Command::CStdHardware::CommandSerialize () {
-	this->_output = "";
-	this->_output += this->_name;
-	this->_output += ":";
-	this->_output += this->_id;
-	this->_output += ":";
-	this->_output += this->_cmd;
+	this->_buffer = "";
+	this->_buffer += this->_name;
+	this->_buffer += ":";
+	this->_buffer += this->_id;
+	this->_buffer += ":";
+	this->_buffer += this->_cmd;
 
 	return true;
 }
-
-void Command::CStdHardware::CommandReset () {
-	this->_output = "";
-}
-
-#if defined(ESP32) || defined(ESP8266)
-void Command::CStdHardware::CommandFromDTO (DTO::DTOEventCommand* dto) {
-	(void)dto;
-}
-#endif

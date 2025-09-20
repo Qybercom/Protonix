@@ -1,5 +1,21 @@
 #pragma once
 
+#if defined(ARDUINO_ARCH_AVR)
+	#define QYBERCOM_LIST_COUNT_MAx 32
+#elif defined(ARDUINO_ARCH_SAMD)
+	#define QYBERCOM_LIST_COUNT_MAx 32
+#elif defined(ARDUINO_ARCH_SAM)
+	#define QYBERCOM_LIST_COUNT_MAx 64
+#elif defined(ARDUINO_ARCH_STM32)
+	#define QYBERCOM_LIST_COUNT_MAx 64
+#elif defined(ESP8266)
+	#define QYBERCOM_LIST_COUNT_MAx 256
+#elif defined(ESP32)
+	#define QYBERCOM_LIST_COUNT_MAx 1024
+#else
+	#define QYBERCOM_LIST_COUNT_MAx 32
+#endif
+
 namespace Qybercom {
 	template<typename T>
 	class List {
@@ -10,7 +26,7 @@ namespace Qybercom {
 				Node* Next;
 				int Index;
 
-				Node (const T &data) : Data(data), Prev(0), Next(0), Index(-1) {}
+				Node (const T &data) : Data(data), Prev(0), Next(0), Index(-1) { }
 			};
 
 			class Iterator {
@@ -18,7 +34,7 @@ namespace Qybercom {
 					Node* _node;
 
 				public:
-					Iterator (Node* node) : _node(node) {}
+					Iterator (Node* node) : _node(node) { }
 
 					T &operator* () { return _node->Data; }
 
@@ -40,6 +56,8 @@ namespace Qybercom {
 			Node* _iNode;
 			bool _iStarted;
 
+			unsigned int _countMax;
+
 			void _reindex () {
 				Node* cur = _head;
 				int idx = 0;
@@ -51,7 +69,7 @@ namespace Qybercom {
 			}
 
 		public:
-			List () : _head(0), _tail(0), _count(0), _iNode(0), _iStarted(false) {}
+			List () : _head(0), _tail(0), _count(0), _iNode(0), _iStarted(false), _countMax(QYBERCOM_LIST_COUNT_MAx) { }
 
 			Node* Head () { return _head; }
 			T &First () { return _head->Data; }
@@ -60,9 +78,17 @@ namespace Qybercom {
 
 			int Count () const { return _count; }
 
+			unsigned int CountMax () const { return _countMax; }
+			List<T> &CountMax (unsigned int countMax) { _countMax = countMax; return *this; }
+
 			Node* INode () { return _iNode; }
 
-			List<T> &Add (const T &data, bool before = false) {
+			List<T> &Add (const T &data, bool before = false, bool maxBypass = false) {
+				if (!maxBypass && _countMax > 0 && _count >= _countMax) {
+					/*if (before) PopLast();
+					else PopFirst();*/
+				}
+
 				Node* node = new Node(data);
 
 				if (!_head) _head = _tail = node;
@@ -130,6 +156,10 @@ namespace Qybercom {
 				return *this;
 			}
 
+			List<T> &Remove (const T &data) {
+				return Remove(IndexOf(data));
+			}
+
 			List<T> &Clear () {
 				Node* cur = _head;
 
@@ -190,7 +220,7 @@ namespace Qybercom {
 			}
 
 			T PopFirst () {
-				if (!_head) return T();
+				if (!_head) return (*(T*) 0);//nullptr;//T();
 
 				Node* node = _head;
 				T data = node->Data;
@@ -206,7 +236,7 @@ namespace Qybercom {
 			}
 
 			T PopLast () {
-				if (!_tail) return T();
+				if (!_tail) return (*(T*) 0);//nullptr;//T();
 
 				Node* node = _tail;
 				T data = node->Data;

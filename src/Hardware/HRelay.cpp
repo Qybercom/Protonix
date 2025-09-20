@@ -33,7 +33,7 @@ bool Hardware::HRelay::HardwareSPI () {
 	return false;
 }
 
-void Hardware::HRelay::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HRelay::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	pinMode(this->_pin, OUTPUT);
@@ -41,15 +41,15 @@ void Hardware::HRelay::HardwareInitPre (ProtonixDevice* device) {
 	this->Close();
 }
 
-void Hardware::HRelay::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HRelay::HardwareInitPost (Protonix* device) {
 	(void)device;
 }
 
-void Hardware::HRelay::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HRelay::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 }
 
-void Hardware::HRelay::HardwareCommand (ProtonixDevice* device, String command) {
+void Hardware::HRelay::HardwareCommand (Protonix* device, String command) {
 	(void)device;
 
 	if (command == "open") this->Open();

@@ -3,7 +3,7 @@
 #include "Common/Utils.hpp"
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 #include "HSensorHall2D.h"
 
@@ -108,19 +108,19 @@ bool Hardware::HSensorHall2D::HardwareSPI () {
 	return false;
 }
 
-void Hardware::HSensorHall2D::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HSensorHall2D::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HSensorHall2D::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HSensorHall2D::HardwareInitPost (Protonix* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HSensorHall2D::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HSensorHall2D::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 
 	int x = analogRead(this->_pinX);
@@ -129,7 +129,7 @@ void Hardware::HSensorHall2D::HardwarePipe (ProtonixDevice* device, short core) 
 	this->_value = angleByXY(x, y, this->_minX, this->_maxX, this->_minY, this->_maxY);
 }
 
-void Hardware::HSensorHall2D::HardwareCommand (ProtonixDevice* device, String command) {
+void Hardware::HSensorHall2D::HardwareCommand (Protonix* device, String command) {
 	(void)device;
 
 	

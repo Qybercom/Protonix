@@ -2,19 +2,14 @@
 
 #include <Arduino.h>
 
-#include "../IProtonixDevice.h"
-#include "../ProtonixDevice.h"
-#include "../ProtonixDevicePort.h"
-#include "../ProtonixGenericCommand.h"
-
-#if defined(ESP32) || defined(ESP8266)
-#include "../DTO/DTOEventCommand.h"
-#endif
+#include "../IProtonixCommand.h"
+#include "../IProtonixHardware.h"
+#include "../Protonix.h"
 
 namespace Qybercom {
 	namespace Protonix {
 		namespace Command {
-			class CStdHardware : public ProtonixGenericCommand {
+			class CStdHardware : public IProtonixCommand {
 				private:
 					String _id;
 					String _cmd;
@@ -28,12 +23,8 @@ namespace Qybercom {
 					CStdHardware* CMD (String cmd);
 					String CMD ();
 
-					bool CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name);
+					bool CommandRecognize (Protonix* device, String command, IProtonixHardware* hardware);
 					bool CommandSerialize ();
-					void CommandReset ();
-					#if defined(ESP32) || defined(ESP8266)
-					void CommandFromDTO (DTO::DTOEventCommand* dto);
-					#endif
 			};
 		}
 	}

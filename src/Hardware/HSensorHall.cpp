@@ -3,7 +3,7 @@
 #include "Common/Utils.hpp"
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 #include "HSensorHall.h"
 
@@ -63,25 +63,25 @@ bool Hardware::HSensorHall::HardwareSPI () {
 	return false;
 }
 
-void Hardware::HSensorHall::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HSensorHall::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HSensorHall::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HSensorHall::HardwareInitPost (Protonix* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HSensorHall::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HSensorHall::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 
 	this->_value = analogRead(this->_pin);
 }
 
-void Hardware::HSensorHall::HardwareCommand (ProtonixDevice* device, String command) {
+void Hardware::HSensorHall::HardwareCommand (Protonix* device, String command) {
 	(void)device;
 
 	

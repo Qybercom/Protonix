@@ -2,43 +2,34 @@
 
 #include <Arduino.h>
 
-#include "ProtonixDevice.h"
-
 namespace Qybercom {
 	namespace Protonix {
-		class ProtonixDevice;
+		class Protonix;
 
 		class IProtonixHardware {
 			protected:
 				String _id;
+				bool _allowSignal;
 				short _dedicatedCore = -1;
 
 			public:
-				IProtonixHardware* HardwareID (String id) {
-					this->_id = id;
-
-					return this;
-				}
-
-				String HardwareID () {
-					return this->_id;
-				}
-
-				short HardwareDedicatedCore () {
-					return this->_dedicatedCore;
-				}
+				String HardwareID ();
+				IProtonixHardware* HardwareID (String id);
+				short HardwareDedicatedCore ();
+				bool HardwareAllowSignal ();
+				IProtonixHardware* HardwareAllowSignal (bool allow);
 
 				virtual bool HardwareSPI () = 0;
+				virtual void HardwareInitPre (Protonix* device) = 0;
+				virtual void HardwareInitPost (Protonix* device) = 0;
+				virtual void HardwarePipe (Protonix* device, short core) = 0;
+				virtual void HardwareCommand (Protonix* device, String command) = 0;
 
-				virtual void HardwareInitPre (ProtonixDevice* device) = 0;
-				virtual void HardwareInitPost (ProtonixDevice* device) = 0;
+				virtual void HardwarePipeInterrupt (Protonix* device) { }
+				virtual ~IProtonixHardware () { };
+		};
 
-				virtual void HardwarePipe (ProtonixDevice* device, short core) = 0;
-				virtual void HardwarePipeInterrupt (ProtonixDevice* device) {}
-
-				virtual void HardwareCommand (ProtonixDevice* device, String command) = 0;
-
-				virtual ~IProtonixHardware () {};
+		class IProtonixBus : public IProtonixHardware {
 		};
 	}
 }

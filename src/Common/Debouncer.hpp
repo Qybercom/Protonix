@@ -12,7 +12,7 @@ namespace Qybercom {
 				volatile T Data;
 				volatile unsigned long Count;
 
-				Value (const T &data) : Data(data), Count(0) {}
+				Value (const T &data) : Data(data), Count(0) { }
 			};
 
 			volatile unsigned long _checkLast;

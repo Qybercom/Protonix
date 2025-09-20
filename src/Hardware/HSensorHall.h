@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 namespace Qybercom {
 	namespace Protonix {
@@ -16,7 +16,7 @@ namespace Qybercom {
 					int _min;
 
 				public:
-					HSensorHall (unsigned short pin, int max = ANALOG_MAX, int min = 0);
+					HSensorHall (unsigned short pin, int max = QYBERCOM_PROTONIX_ANALOG_MAX, int min = 0);
 
 					unsigned short Pin ();
 					HSensorHall* Pin (unsigned short pin);
@@ -28,15 +28,15 @@ namespace Qybercom {
 					HSensorHall* Min (int min);
 
 					int Value ();
-					bool ValueMatch (int min = 0, int max = ANALOG_MAX, bool minEQ = true, bool maxEQ = true);
+					bool ValueMatch (int min = 0, int max = QYBERCOM_PROTONIX_ANALOG_MAX, bool minEQ = true, bool maxEQ = true);
 
 					int ValueMapped (int min, int max);
 
 					bool HardwareSPI ();
-					void HardwareInitPre (ProtonixDevice* device);
-					void HardwareInitPost (ProtonixDevice* device);
-					void HardwarePipe (ProtonixDevice* device, short core);
-					void HardwareCommand (ProtonixDevice* device, String command);
+					void HardwareInitPre (Protonix* device);
+					void HardwareInitPost (Protonix* device);
+					void HardwarePipe (Protonix* device, short core);
+					void HardwareCommand (Protonix* device, String command);
 			};
 		}
 	}

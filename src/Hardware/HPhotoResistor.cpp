@@ -3,7 +3,7 @@
 #include "Common/Utils.hpp"
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 #include "HPhotoResistor.h"
 
@@ -63,25 +63,25 @@ bool Hardware::HPhotoResistor::HardwareSPI () {
 	return false;
 }
 
-void Hardware::HPhotoResistor::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HPhotoResistor::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	pinMode(this->_pin, INPUT);
 }
 
-void Hardware::HPhotoResistor::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HPhotoResistor::HardwareInitPost (Protonix* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HPhotoResistor::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HPhotoResistor::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 
 	this->_value = analogRead(this->_pin);
 }
 
-void Hardware::HPhotoResistor::HardwareCommand (ProtonixDevice* device, String command) {
+void Hardware::HPhotoResistor::HardwareCommand (Protonix* device, String command) {
 	(void)device;
 
 	

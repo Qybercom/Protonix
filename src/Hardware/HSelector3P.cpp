@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 #include "HTrigger.h"
 
@@ -45,17 +45,17 @@ bool Hardware::HSelector3P::HardwareSPI () {
 		&& this->_trigger2->HardwareSPI();
 }
 
-void Hardware::HSelector3P::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HSelector3P::HardwareInitPre (Protonix* device) {
 	this->_trigger1->HardwareInitPre(device);
 	this->_trigger2->HardwareInitPre(device);
 }
 
-void Hardware::HSelector3P::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HSelector3P::HardwareInitPost (Protonix* device) {
 	this->_trigger1->HardwareInitPost(device);
 	this->_trigger2->HardwareInitPost(device);
 }
 
-void Hardware::HSelector3P::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HSelector3P::HardwarePipe (Protonix* device, short core) {
 	this->_trigger1->HardwarePipe(device, core);
 	this->_trigger2->HardwarePipe(device, core);
 
@@ -74,7 +74,7 @@ void Hardware::HSelector3P::HardwarePipe (ProtonixDevice* device, short core) {
 	}
 }
 
-void Hardware::HSelector3P::HardwareCommand (ProtonixDevice* device, String command) {
+void Hardware::HSelector3P::HardwareCommand (Protonix* device, String command) {
 	(void)device;
 
 	

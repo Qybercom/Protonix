@@ -24,60 +24,48 @@ Hardware::HBuzzer* Hardware::HBuzzer::Pin (unsigned short pin) {
 	return this;
 }
 
-void Hardware::HBuzzer::On (short value) {
-	tone(this->_pin, value);
-}
-
-void Hardware::HBuzzer::Off () {
-	noTone(this->_pin);
-}
-
 void Hardware::HBuzzer::Play (short value, unsigned long duration) {
 	this->_started = millis();
 	this->_duration = duration;
 
-	this->Off();
-	this->On(value);
+	noTone(this->_pin);
+	tone(this->_pin, value);
 }
 
 void Hardware::HBuzzer::Stop () {
 	this->_started = 0;
 	this->_duration = 0;
 
-	this->Off();
+	noTone(this->_pin);
 }
 
 bool Hardware::HBuzzer::HardwareSPI () {
 	return false;
 }
 
-void Hardware::HBuzzer::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HBuzzer::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	pinMode(this->_pin, OUTPUT);
 
-	this->Off();
+	this->Stop();
 }
 
-void Hardware::HBuzzer::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HBuzzer::HardwareInitPost (Protonix* device) {
 	(void)device;
 }
 
-void Hardware::HBuzzer::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HBuzzer::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 
 	unsigned long current = millis();
 	unsigned long edge = this->_started + this->_duration;
 
-	if (current >= edge) {
-		this->_started = 0;
-		this->_duration = 0;
-
-		this->Off();
-	}
+	if (current >= edge)
+		this->Stop();
 }
 
-void Hardware::HBuzzer::HardwareCommand (ProtonixDevice* device, String command) {
+void Hardware::HBuzzer::HardwareCommand (Protonix* device, String command) {
 	(void)device;
 
 	

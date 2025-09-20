@@ -7,23 +7,61 @@
 
 namespace Qybercom {
 	inline List<String>* explode (String delimiter, String input) {
-		List<String>* result = new List<String>();
+		List<String>* out = new List<String>();
 
 		int start = 0;
 		int pos = input.indexOf(delimiter, start);
 
 		while (pos >= 0) {
 			String token = input.substring(start, pos);
-			result->Add(token);
+			out->Add(token);
 
 			start = pos + delimiter.length();
 			pos = input.indexOf(delimiter, start);
 		}
 
 		if (start <= input.length())
-			result->Add(input.substring(start));
+			out->Add(input.substring(start));
 
-		return result;
+		return out;
+	}
+
+	inline List<String>* strChunks (String input, unsigned int chunkSize) {
+		List<String>* out = new List<String>();
+
+		if (chunkSize > 0) {
+			int length = input.length();
+			int start = 0;
+
+			while (start < length) {
+				int end = start + chunkSize;
+				if (end > length) end = length;
+
+				out->Add(input.substring(start, end));
+
+				start += chunkSize;
+			}
+		}
+
+		return out;
+	}
+
+	inline uint8_t* strBuf (String str) {
+		int len = str.length();
+		uint8_t* out = nullptr;
+
+		if (len != 0) {
+			out = new uint8_t[len];
+
+			int i = 0;
+			while (i < len) {
+				out[i] = (uint8_t)str[i];
+
+				i++;
+			}
+		}
+
+		return out;
 	}
 
 	inline float angleByXY (int x, int y, int minX, int maxX, int minY, int maxY) {
@@ -70,5 +108,46 @@ namespace Qybercom {
 
 	inline bool matchRange (int value, int min, int max, bool minEQ = true, bool maxEQ = true) {
 		return matchRange((float)value, (float)min, (float)max, minEQ, maxEQ);
+	}
+
+	inline uint8_t hexNibble (char c) {
+		if (c >= '0' && c <= '9') return c - '0';
+		if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+		if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+
+		return 0;
+	}
+
+	inline List<uint8_t> hexToBytes (const String &hex) {
+		List<uint8_t> out;
+
+		int len = hex.length();
+		int i = 0;
+
+		while (i < len) {
+			// skip spaces
+			while (i < len && isspace((unsigned char) hex[i])) ++i;
+
+			if (i >= len) break;
+
+			// read two hex chars (skip separators if single nibble)
+			char c1 = hex[i++];
+
+			// skip spaces
+			while (i < len && isspace((unsigned char) hex[i])) ++i;
+
+			if (i >= len) {
+				// single nibble -> treat as '0x0c1'
+				uint8_t b = hexNibble(c1);
+				out.Add((uint8_t)b);
+				break;
+			}
+
+			char c2 = hex[i++];
+			uint8_t b = (hexNibble(c1) << 4) | hexNibble(c2);
+			out.Add(b);
+		}
+
+		return out;
 	}
 }

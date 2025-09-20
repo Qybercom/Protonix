@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 #include "HTouchButton.h"
 
@@ -33,19 +33,19 @@ bool Hardware::HTouchButton::HardwareSPI () {
 	return false;
 }
 
-void Hardware::HTouchButton::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HTouchButton::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HTouchButton::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HTouchButton::HardwareInitPost (Protonix* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HTouchButton::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HTouchButton::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 
 	int value = digitalRead(this->_pin);
@@ -53,7 +53,7 @@ void Hardware::HTouchButton::HardwarePipe (ProtonixDevice* device, short core) {
 	this->_active = value == HIGH;
 }
 
-void Hardware::HTouchButton::HardwareCommand (ProtonixDevice* device, String command) {
+void Hardware::HTouchButton::HardwareCommand (Protonix* device, String command) {
 	(void)device;
 
 	

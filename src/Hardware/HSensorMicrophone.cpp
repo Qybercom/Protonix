@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 #include "HSensorMicrophone.h"
 
@@ -31,26 +31,26 @@ bool Hardware::HSensorMicrophone::HardwareSPI () {
 	return false;
 }
 
-void Hardware::HSensorMicrophone::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HSensorMicrophone::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	this->Pin(this->_pin);
 }
 
-void Hardware::HSensorMicrophone::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HSensorMicrophone::HardwareInitPost (Protonix* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HSensorMicrophone::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HSensorMicrophone::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 
 	// TODO: refactor for analogRead
 	this->_active = digitalRead(this->_pin);
 }
 
-void Hardware::HSensorMicrophone::HardwareCommand (ProtonixDevice* device, String command) {
+void Hardware::HSensorMicrophone::HardwareCommand (Protonix* device, String command) {
 	(void)device;
 
 	

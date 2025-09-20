@@ -1,47 +1,41 @@
 #include <Arduino.h>
 
-#include "../IProtonixDevice.h"
-#include "../ProtonixDevice.h"
-#include "../ProtonixDevicePort.h"
-#include "../ProtonixDeviceSensor.h"
-
-#if defined(ESP32) || defined(ESP8266)
-#include "../DTO/DTOEventCommand.h"
-#endif
+#include "../IProtonixHardware.h"
+#include "../Protonix.h"
+#include "../ProtonixSensor.h"
 
 #include "CStdSensor.h"
 
 using namespace Qybercom::Protonix;
 
-
-
 Command::CStdSensor::CStdSensor () {
 	this->_init("std:sensor");
-	this->Sensor(new ProtonixDeviceSensor());
+	this->Sensor(new ProtonixSensor());
 }
 
-Command::CStdSensor::CStdSensor (ProtonixDeviceSensor* sensor) {
+Command::CStdSensor::CStdSensor (ProtonixSensor* sensor) {
 	this->_init("std:sensor");
 	this->Sensor(sensor);
 }
 
-void Command::CStdSensor::Sensor (ProtonixDeviceSensor* sensor) {
+void Command::CStdSensor::Sensor (ProtonixSensor* sensor) {
 	this->_sensor = sensor;
 }
 
-ProtonixDeviceSensor* Command::CStdSensor::Sensor () {
+ProtonixSensor* Command::CStdSensor::Sensor () {
 	return this->_sensor;
 }
 
-bool Command::CStdSensor::CommandRecognize (ProtonixDevice* device, ProtonixDevicePort* port, String name) {
+bool Command::CStdSensor::CommandRecognize (Protonix* device, String command, IProtonixHardware* hardware) {
 	(void)device;
-	(void)port;
+	(void)hardware;
 
-	String n = name.substring(0, 10);
-	if (n != this->_name) return false;
+	short trail = this->_recognize(command);
+	if (trail == -1) return false;
 	
-	unsigned int i = 11;
-	unsigned int l = name.length();
+	unsigned int i = trail;
+	unsigned int l = command.length();
+
 	bool setID = false;
 	bool setVal = false;
 
@@ -50,7 +44,7 @@ bool Command::CStdSensor::CommandRecognize (ProtonixDevice* device, ProtonixDevi
 	
 	while (i < l) {
 		if (!setID) {
-			if (name[i] != ';') id += name[i];
+			if (command[i] != ';') id += command[i];
 			else {
 				setID = true;
 
@@ -59,7 +53,7 @@ bool Command::CStdSensor::CommandRecognize (ProtonixDevice* device, ProtonixDevi
 		}
 		else {
 			if (!setVal) {
-				if (name[i] != ';') val += name[i];
+				if (command[i] != ';') val += command[i];
 				else {
 					setVal = true;
 
@@ -67,9 +61,9 @@ bool Command::CStdSensor::CommandRecognize (ProtonixDevice* device, ProtonixDevi
 				}
 			}
 			else {
-				this->_sensor->Active(name[i] == '1');
+				this->_sensor->Active(command[i] == '1');
 				i += 2;
-				this->_sensor->Failure(name[i] == '1');
+				this->_sensor->Failure(command[i] == '1');
 
 				break;
 			}
@@ -82,26 +76,18 @@ bool Command::CStdSensor::CommandRecognize (ProtonixDevice* device, ProtonixDevi
 }
 
 bool Command::CStdSensor::CommandSerialize () {
-	this->_output = "";
-	this->_output += this->_name;
-	this->_output += ":";
-	this->_output += this->_sensor->ID();
-	this->_output += ";";
-	this->_output += this->_sensor->Value();
-	this->_output += ";";
-	this->_output += String(this->_sensor->Active() ? "1" : "0");
-	this->_output += ";";
-	this->_output += String(this->_sensor->Failure() ? "1" : "0");
+	this->_buffer = "";
+	this->_buffer += this->_name;
+	this->_buffer += ":";
+	this->_buffer += this->_sensor->ID();
+	this->_buffer += ";";
+	this->_buffer += this->_sensor->Value();
+	this->_buffer += ";";
+	this->_buffer += String(this->_sensor->Active() ? "1" : "0");
+	this->_buffer += ";";
+	this->_buffer += String(this->_sensor->Failure() ? "1" : "0");
+
+	// TODO: add support for sensor state
 
 	return true;
 }
-
-void Command::CStdSensor::CommandReset () {
-	this->_output = "";
-}
-
-#if defined(ESP32) || defined(ESP8266)
-void Command::CStdSensor::CommandFromDTO (DTO::DTOEventCommand* dto) {
-	(void)dto;
-}
-#endif

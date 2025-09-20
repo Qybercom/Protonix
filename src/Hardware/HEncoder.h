@@ -5,7 +5,7 @@
 #include "Common/Debouncer.hpp"
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 namespace Qybercom {
 	namespace Protonix {
@@ -22,8 +22,11 @@ namespace Qybercom {
 					volatile bool _changed;
 					volatile bool _changedButton;
 					volatile bool _withButton;
+					volatile bool _allowZero;
 					Qybercom::Debouncer<short> _debouncer;
 					Qybercom::Debouncer<bool> _debouncerButton;
+
+					bool _changedPipe ();
 
 				public:
 					HEncoder (unsigned short pinA, unsigned short pinB, unsigned int checkInterval = 0);
@@ -39,18 +42,22 @@ namespace Qybercom {
 					bool ValB ();
 					short Dir ();
 					bool Clicked ();
-					bool Changed (bool allowZero = false);
+					bool Changed ();
 					bool ChangedButton ();
 					bool WithButton ();
+
+					bool AllowZero ();
+					HEncoder* AllowZero (bool allow);
+
 					Qybercom::Debouncer<short> &Debouncer ();
 					Qybercom::Debouncer<bool> &DebouncerButton ();
 
 					bool HardwareSPI ();
-					void HardwareInitPre (ProtonixDevice* device);
-					void HardwareInitPost (ProtonixDevice* device);
-					void HardwarePipe (ProtonixDevice* device, short core);
-					void HardwarePipeInterrupt (ProtonixDevice* device);
-					void HardwareCommand (ProtonixDevice* device, String command);
+					void HardwareInitPre (Protonix* device);
+					void HardwareInitPost (Protonix* device);
+					void HardwarePipe (Protonix* device, short core);
+					void HardwarePipeInterrupt (Protonix* device);
+					void HardwareCommand (Protonix* device, String command);
 			};
 		}
 	}

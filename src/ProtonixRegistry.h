@@ -5,8 +5,6 @@
 
 #include "ProtonixMemory.h"
 
-#define PROTONIX_REGISTRY_START 0
-
 namespace Qybercom {
 	namespace Protonix {
 		struct ProtonixRegistryColor {

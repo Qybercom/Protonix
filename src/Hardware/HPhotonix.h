@@ -5,7 +5,7 @@
 #include <QybercomPhotonix.h>
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 namespace Qybercom {
 	namespace Protonix {
@@ -18,10 +18,10 @@ namespace Qybercom {
 
 				public:
 					bool HardwareSPI ();
-					void HardwareInitPre (ProtonixDevice* device);
-					void HardwareInitPost (ProtonixDevice* device);
-					void HardwarePipe (ProtonixDevice* device, short core);
-					void HardwareCommand (ProtonixDevice* device, String command);
+					void HardwareInitPre (Protonix* device);
+					void HardwareInitPost (Protonix* device);
+					void HardwarePipe (Protonix* device, short core);
+					void HardwareCommand (Protonix* device, String command);
 			};
 		}
 	}

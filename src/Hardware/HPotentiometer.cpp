@@ -3,7 +3,7 @@
 #include "Common/Utils.hpp"
 
 #include "../IProtonixHardware.h"
-#include "../ProtonixDevice.h"
+#include "../Protonix.h"
 
 #include "HPotentiometer.h"
 
@@ -63,25 +63,25 @@ bool Hardware::HPotentiometer::HardwareSPI () {
 	return false;
 }
 
-void Hardware::HPotentiometer::HardwareInitPre (ProtonixDevice* device) {
+void Hardware::HPotentiometer::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HPotentiometer::HardwareInitPost (ProtonixDevice* device) {
+void Hardware::HPotentiometer::HardwareInitPost (Protonix* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HPotentiometer::HardwarePipe (ProtonixDevice* device, short core) {
+void Hardware::HPotentiometer::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 
 	this->_value = analogRead(this->_pin);
 }
 
-void Hardware::HPotentiometer::HardwareCommand (ProtonixDevice* device, String command) {
+void Hardware::HPotentiometer::HardwareCommand (Protonix* device, String command) {
 	(void)device;
 
 
