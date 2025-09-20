@@ -57,6 +57,7 @@ void Hardware::HBuzzer::HardwareInitPost (Protonix* device) {
 
 void Hardware::HBuzzer::HardwarePipe (Protonix* device, short core) {
 	(void)device;
+	(void)core;
 
 	unsigned long current = millis();
 	unsigned long edge = this->_started + this->_duration;
@@ -67,6 +68,5 @@ void Hardware::HBuzzer::HardwarePipe (Protonix* device, short core) {
 
 void Hardware::HBuzzer::HardwareCommand (Protonix* device, String command) {
 	(void)device;
-
-	
+	(void)command;
 }

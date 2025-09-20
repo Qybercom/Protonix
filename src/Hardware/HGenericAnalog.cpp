@@ -26,6 +26,8 @@ bool Hardware::HGenericAnalog::HardwareSPI () {
 }
 
 void Hardware::HGenericAnalog::HardwareInitPre (Protonix* device) {
+	(void)device;
+
 	if (this->_init)
 		pinMode(this->_pin, INPUT);
 }
@@ -36,12 +38,12 @@ void Hardware::HGenericAnalog::HardwareInitPost (Protonix* device) {
 
 void Hardware::HGenericAnalog::HardwarePipe (Protonix* device, short core) {
 	(void)device;
+	(void)core;
 
 	this->_value = analogRead(this->_pin);
 }
 
 void Hardware::HGenericAnalog::HardwareCommand (Protonix* device, String command) {
 	(void)device;
-
-
+	(void)command;
 }

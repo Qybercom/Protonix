@@ -47,6 +47,7 @@ void Hardware::HRelay::HardwareInitPost (Protonix* device) {
 
 void Hardware::HRelay::HardwarePipe (Protonix* device, short core) {
 	(void)device;
+	(void)core;
 }
 
 void Hardware::HRelay::HardwareCommand (Protonix* device, String command) {

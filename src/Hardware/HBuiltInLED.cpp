@@ -34,8 +34,10 @@ void Hardware::HBuiltInLED::HardwareInitPost (Protonix* device) {
 
 void Hardware::HBuiltInLED::HardwarePipe (Protonix* device, short core) {
 	(void)device;
+	(void)core;
 }
 
 void Hardware::HBuiltInLED::HardwareCommand (Protonix* device, String command) {
 	(void)device;
+	(void)command;
 }

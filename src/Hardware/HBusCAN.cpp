@@ -295,6 +295,7 @@ void Hardware::HBusCAN::HardwareInitPost (Protonix* device) {
 
 void Hardware::HBusCAN::HardwarePipe (Protonix* device, short core) {
 	(void)device;
+	(void)core;
 	if (!this->_ready) return;
 
 	struct can_frame frame;
@@ -435,6 +436,7 @@ void Hardware::HBusCAN::HardwarePipe (Protonix* device, short core) {
 
 void Hardware::HBusCAN::HardwareCommand (Protonix* device, String command) {
 	(void)device;
+	(void)command;
 }
 
 canid_t Hardware::HBusCAN::ID (uint8_t id, uint8_t cmd, uint8_t priority) {

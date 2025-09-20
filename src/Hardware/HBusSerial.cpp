@@ -135,6 +135,7 @@ void Hardware::HBusSerial::HardwareInitPost (Protonix* device) {
 }
 
 void Hardware::HBusSerial::HardwarePipe (Protonix* device, short core) {
+	(void)core;
 	if (!this->_observable) return;
 
 	if (this->_cmdBuffer.length() >= 128)
@@ -177,10 +178,11 @@ void Hardware::HBusSerial::HardwarePipe (Protonix* device, short core) {
 
 	this->_cmdBuffer = "";
 	this->_lenBuffer = "";
+
+	(void)device;
 }
 
 void Hardware::HBusSerial::HardwareCommand (Protonix* device, String command) {
 	(void)device;
-
-
+	(void)command;
 }

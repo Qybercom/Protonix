@@ -9,11 +9,24 @@
 
 using namespace Qybercom::Protonix;
 
+bool Hardware::HSelector3P::_changedPipe () {
+	bool out = false;
+
+	if (this->_changed) {
+		if (this->_allowZero || this->_value != 0) out = true;
+
+		this->_changed = false;
+	}
+
+	return out;
+}
+
 Hardware::HSelector3P::HSelector3P (unsigned short pin1, unsigned short pin2, unsigned int checkInterval) {
 	this->_trigger1 = Hardware::HTrigger::Input(pin1, HIGH, checkInterval);
 	this->_trigger2 = Hardware::HTrigger::Input(pin2, HIGH, checkInterval);
 	this->_value = 0;
 	this->_changed = false;
+	this->_allowZero = true;
 }
 
 Hardware::HTrigger* Hardware::HSelector3P::Trigger1 () {
@@ -24,19 +37,22 @@ Hardware::HTrigger* Hardware::HSelector3P::Trigger2 () {
 	return this->_trigger2;
 }
 
-bool Hardware::HSelector3P::Changed (bool allowZero) {
-	bool out = false;
-
-	if (this->_changed && (allowZero || this->_value != 0)) {
-		out = true;
-		this->_changed = false;
-	}
-
-	return out;
+bool Hardware::HSelector3P::Changed () {
+	return this->_changedPipe();
 }
 
 short Hardware::HSelector3P::Value () {
 	return this->_value;
+}
+
+bool Hardware::HSelector3P::AllowZero () {
+	return this->_allowZero;
+}
+
+Hardware::HSelector3P* Hardware::HSelector3P::AllowZero (bool allow) {
+	this->_allowZero = allow;
+
+	return this;
 }
 
 bool Hardware::HSelector3P::HardwareSPI () {
@@ -72,10 +88,14 @@ void Hardware::HSelector3P::HardwarePipe (Protonix* device, short core) {
 		this->_value = value;
 		this->_changed = true;
 	}
+
+	if (this->_allowSignal && this->_changedPipe())
+		device->Signal(this->_id, "changed")->ValueInt(value);
 }
 
 void Hardware::HSelector3P::HardwareCommand (Protonix* device, String command) {
 	(void)device;
+	(void)command;
 
-	
+	// TODO: maybe transmit commands to triggers
 }

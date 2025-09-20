@@ -25,7 +25,8 @@ namespace Qybercom {
 				virtual void HardwarePipe (Protonix* device, short core) = 0;
 				virtual void HardwareCommand (Protonix* device, String command) = 0;
 
-				virtual void HardwarePipeInterrupt (Protonix* device) { }
+				virtual void HardwarePipeInterrupt (Protonix* device) { (void)device; }
+
 				virtual ~IProtonixHardware () { };
 		};
 

@@ -37,6 +37,7 @@ void Hardware::HMesonix::HardwareInitPost (Protonix* device) {
 
 void Hardware::HMesonix::HardwarePipe (Protonix* device, short core) {
 	(void)device;
+	(void)core;
 
 	//Serial.println("[hardware:mesonix] Pipe on core " + String(core));
 
@@ -45,6 +46,5 @@ void Hardware::HMesonix::HardwarePipe (Protonix* device, short core) {
 
 void Hardware::HMesonix::HardwareCommand (Protonix* device, String command) {
 	(void)device;
-
-
+	(void)command;
 }

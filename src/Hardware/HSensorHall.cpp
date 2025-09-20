@@ -65,24 +65,20 @@ bool Hardware::HSensorHall::HardwareSPI () {
 
 void Hardware::HSensorHall::HardwareInitPre (Protonix* device) {
 	(void)device;
-
-
 }
 
 void Hardware::HSensorHall::HardwareInitPost (Protonix* device) {
 	(void)device;
-
-
 }
 
 void Hardware::HSensorHall::HardwarePipe (Protonix* device, short core) {
 	(void)device;
+	(void)core;
 
 	this->_value = analogRead(this->_pin);
 }
 
 void Hardware::HSensorHall::HardwareCommand (Protonix* device, String command) {
 	(void)device;
-
-	
+	(void)command;
 }

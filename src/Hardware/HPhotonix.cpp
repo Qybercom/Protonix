@@ -28,12 +28,14 @@ void Hardware::HPhotonix::HardwareInitPost (Protonix* device) {
 
 void Hardware::HPhotonix::HardwarePipe (Protonix* device, short core) {
 	(void)device;
+	(void)core;
 
 
 }
 
 void Hardware::HPhotonix::HardwareCommand (Protonix* device, String command) {
 	(void)device;
+	(void)command;
 
 
 }

@@ -16,6 +16,9 @@ namespace Qybercom {
 					HTrigger* _trigger2;
 					short _value;
 					bool _changed;
+					bool _allowZero;
+
+					bool _changedPipe ();
 
 				public:
 					HSelector3P (unsigned short pin1, unsigned short pin2, unsigned int checkInterval = 0);
@@ -23,8 +26,11 @@ namespace Qybercom {
 					HTrigger* Trigger1 ();
 					HTrigger* Trigger2 ();
 
-					bool Changed (bool allowZero = true);
+					bool Changed ();
 					short Value ();
+
+					bool AllowZero ();
+					HSelector3P* AllowZero (bool allow);
 
 					bool HardwareSPI ();
 					void HardwareInitPre (Protonix* device);

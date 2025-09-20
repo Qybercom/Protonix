@@ -119,6 +119,8 @@ void IProtonixDevice::DeviceOnSignal (Protonix* device, ProtonixSignal* signal) 
 	(void)signal;
 }
 
+#if defined(ESP32)
 void IProtonixDevice::DeviceOnDedicatedTask (Protonix* device, unsigned short core) {
 	(void)device;
 }
+#endif

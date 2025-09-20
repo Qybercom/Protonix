@@ -110,18 +110,15 @@ bool Hardware::HSensorHall2D::HardwareSPI () {
 
 void Hardware::HSensorHall2D::HardwareInitPre (Protonix* device) {
 	(void)device;
-
-
 }
 
 void Hardware::HSensorHall2D::HardwareInitPost (Protonix* device) {
 	(void)device;
-
-
 }
 
 void Hardware::HSensorHall2D::HardwarePipe (Protonix* device, short core) {
 	(void)device;
+	(void)core;
 
 	int x = analogRead(this->_pinX);
 	int y = analogRead(this->_pinY);
@@ -131,6 +128,5 @@ void Hardware::HSensorHall2D::HardwarePipe (Protonix* device, short core) {
 
 void Hardware::HSensorHall2D::HardwareCommand (Protonix* device, String command) {
 	(void)device;
-
-	
+	(void)command;
 }

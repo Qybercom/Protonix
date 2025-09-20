@@ -71,18 +71,16 @@ void Hardware::HPhotoResistor::HardwareInitPre (Protonix* device) {
 
 void Hardware::HPhotoResistor::HardwareInitPost (Protonix* device) {
 	(void)device;
-
-
 }
 
 void Hardware::HPhotoResistor::HardwarePipe (Protonix* device, short core) {
 	(void)device;
+	(void)core;
 
 	this->_value = analogRead(this->_pin);
 }
 
 void Hardware::HPhotoResistor::HardwareCommand (Protonix* device, String command) {
 	(void)device;
-
-	
+	(void)command;
 }

@@ -79,12 +79,11 @@ void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
 
 void Hardware::HTrigger::HardwareInitPost (Protonix* device) {
 	(void)device;
-
-
 }
 
 void Hardware::HTrigger::HardwarePipe (Protonix* device, short core) {
 	(void)device;
+	(void)core;
 	if (!this->_input) return;
 
 	unsigned short value = digitalRead(this->_pin);
@@ -107,6 +106,5 @@ void Hardware::HTrigger::HardwarePipe (Protonix* device, short core) {
 
 void Hardware::HTrigger::HardwareCommand (Protonix* device, String command) {
 	(void)device;
-
-	
+	(void)command;
 }

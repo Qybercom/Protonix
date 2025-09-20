@@ -35,18 +35,15 @@ bool Hardware::HTouchButton::HardwareSPI () {
 
 void Hardware::HTouchButton::HardwareInitPre (Protonix* device) {
 	(void)device;
-
-
 }
 
 void Hardware::HTouchButton::HardwareInitPost (Protonix* device) {
 	(void)device;
-
-
 }
 
 void Hardware::HTouchButton::HardwarePipe (Protonix* device, short core) {
 	(void)device;
+	(void)core;
 
 	int value = digitalRead(this->_pin);
 
@@ -55,6 +52,5 @@ void Hardware::HTouchButton::HardwarePipe (Protonix* device, short core) {
 
 void Hardware::HTouchButton::HardwareCommand (Protonix* device, String command) {
 	(void)device;
-
-	
+	(void)command;
 }

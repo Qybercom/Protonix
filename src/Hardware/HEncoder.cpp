@@ -139,11 +139,10 @@ void Hardware::HEncoder::HardwareInitPre (Protonix* device) {
 
 void Hardware::HEncoder::HardwareInitPost (Protonix* device) {
 	(void) device;
-
 }
 
 void Hardware::HEncoder::HardwarePipe (Protonix* device, short core) {
-	(void) device;
+	(void)core;
 
 	if (this->_withButton) {
 		bool clicked = digitalRead(this->_pinButton);
@@ -167,6 +166,8 @@ void Hardware::HEncoder::HardwarePipe (Protonix* device, short core) {
 }
 
 void Hardware::HEncoder::HardwarePipeInterrupt (Protonix* device) {
+	(void)device;
+
 	bool valA = digitalRead(this->_pinA);
 	bool valB = digitalRead(this->_pinB);
 	short dir = 0;
@@ -194,6 +195,5 @@ void Hardware::HEncoder::HardwarePipeInterrupt (Protonix* device) {
 
 void Hardware::HEncoder::HardwareCommand (Protonix* device, String command) {
 	(void)device;
-
-	
+	(void)command;
 }

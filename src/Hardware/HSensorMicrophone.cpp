@@ -39,12 +39,11 @@ void Hardware::HSensorMicrophone::HardwareInitPre (Protonix* device) {
 
 void Hardware::HSensorMicrophone::HardwareInitPost (Protonix* device) {
 	(void)device;
-
-
 }
 
 void Hardware::HSensorMicrophone::HardwarePipe (Protonix* device, short core) {
 	(void)device;
+	(void)core;
 
 	// TODO: refactor for analogRead
 	this->_active = digitalRead(this->_pin);
@@ -52,6 +51,5 @@ void Hardware::HSensorMicrophone::HardwarePipe (Protonix* device, short core) {
 
 void Hardware::HSensorMicrophone::HardwareCommand (Protonix* device, String command) {
 	(void)device;
-
-	
+	(void)command;
 }
