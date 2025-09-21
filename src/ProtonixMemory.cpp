@@ -7,9 +7,11 @@
 using namespace Qybercom::Protonix;
 
 
-
-#if defined(AVR)
+#if defined(ESP32)
+#elif defined(ESP8266)
+#elif defined(AVR)
 extern int __heap_start, * __brkval;
+extern char __data_load_end;
 #endif
 
 
@@ -21,8 +23,15 @@ ProtonixMemory::ProtonixMemory () {
 
 
 long ProtonixMemory::RAMFree () {
-	#if defined(ESP8266) || defined(ESP32)
+	#if defined(ESP32)
 		return (long)ESP.getFreeHeap();
+	#elif defined(ESP8266)
+		uint32_t mFree = 0;
+		uint32_t mMax = 0;
+		uint8_t mFragmented = 0;
+		ESP.getHeapStats(&mFree, &mMax, &mFragmented);
+
+		return (long)mFree;
 	#elif defined(AVR)
 		int v;
 		// https://docs.arduino.cc/learn/programming/memory-guide
@@ -33,26 +42,38 @@ long ProtonixMemory::RAMFree () {
 }
 
 long ProtonixMemory::RAMUsed () {
-	#if defined(ESP8266) || defined(ESP32)
-		long total = (long)ESP.getHeapSize();
-		long free = (long)ESP.getFreeHeap();
+	long used = this->RAMTotal() - this->RAMFree();
 
-		return total - free;
+	return used < 0 ? -1 : used;
+}
+
+long ProtonixMemory::RAMTotal () {
+	#if defined(ESP32)
+		return (long)ESP.getHeapSize();
+	#elif defined(ESP8266)
+		uint32_t mFree = 0;
+		uint32_t mMax = 0;
+		uint8_t mFragmented = 0;
+		ESP.getHeapStats(&mFree, &mMax, &mFragmented);
+
+		return (long)mMax;
 	#elif defined(ARDUINO_ARCH_AVR)
-		long total = (long)(RAMEND + 1);
-		long free = this->RAMFree();
-
-		return total - free;
+		return (long)(RAMEND + 1);
 	#else
 		return -1;
 	#endif
 }
 
-long ProtonixMemory::RAMTotal () {
-	#if defined(ESP8266) || defined(ESP32)
-		return (long)ESP.getHeapSize();
-	#elif defined(ARDUINO_ARCH_AVR)
-		return (long)(RAMEND + 1);
+long ProtonixMemory::RAMFragmented () {
+	#if defined(ESP32)
+		return -1;
+	#elif defined(ESP8266)
+		uint32_t mFree = 0;
+		uint32_t mMax = 0;
+		uint8_t mFragmented = 0;
+		ESP.getHeapStats(&mFree, &mMax, &mFragmented);
+
+		return (long)mFragmented;
 	#else
 		return -1;
 	#endif
@@ -61,11 +82,9 @@ long ProtonixMemory::RAMTotal () {
 
 
 long ProtonixMemory::FlashFree () {
-	#if defined(ESP8266) || defined(ESP32)
+	#if defined(ESP32) || defined(ESP8266)
 		return (long)ESP.getFreeSketchSpace();
-	#elif defined(ARDUINO_ARCH_AVR)
-		extern char __data_load_end;
-
+	#elif defined(AVR)
 		long used  = (long)&__data_load_end;
 		long total = (long)(FLASHEND + 1);
 
@@ -79,14 +98,12 @@ long ProtonixMemory::FlashFree () {
 }
 
 long ProtonixMemory::FlashUsed () {
-	#if defined(ESP8266) || defined(ESP32)
+	#if defined(ESP32) || defined(ESP8266)
 		long total = (long)ESP.getFlashChipSize();
 		long free  = (long)ESP.getFreeSketchSpace();
 
 		return total - free;
-	#elif defined(ARDUINO_ARCH_AVR)
-		extern char __data_load_end;
-
+	#elif defined(AVR)
 		return (long)&__data_load_end;
 	#else
 		return -1;
@@ -94,7 +111,7 @@ long ProtonixMemory::FlashUsed () {
 }
 
 long ProtonixMemory::FlashTotal () {
-	#if defined(ESP8266) || defined(ESP32)
+	#if defined(ESP32) || defined(ESP8266)
 		return (long)ESP.getFlashChipSize();
 	#elif defined(ARDUINO_ARCH_AVR)
 		return (long)(FLASHEND + 1);

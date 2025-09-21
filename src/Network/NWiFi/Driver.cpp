@@ -79,7 +79,7 @@ bool Network::NWiFi::Driver::NetworkDriverConnected () {
 	if (!this->_ready) return false;
 
 	#if defined(ESP32) || defined(ESP8266)
-		unsigned int status = WiFi.status();
+		int status = WiFi.status();
 		bool connected = status == WL_CONNECTED;
 
 		if (status != this->_status)
@@ -112,12 +112,10 @@ String Network::NWiFi::Driver::NetworkDriverAddressMAC () {
 }
 
 String Network::NWiFi::Driver::NetworkDriverAddressIP () {
-	#if defined(ESP32)
-		return String(WiFi.localIP());
-	#elif defined(ESP8266)
-		return WiFi.localIP().toString();
+	#if defined(ESP32) || defined(ESP8266)
+	return this->_ip(WiFi.localIP());
 	#else
-		return "";
+	return "";
 	#endif
 }
 

@@ -22,22 +22,22 @@ String Network::NEthernet::Driver::_statusRecognize (EthernetLinkStatus code) {
 	}
 }
 
-Network::NEthernet::Driver::Driver (unsigned short pinSS, bool connectAuto, unsigned int timerConnect) {
-	if (!this->_init(true, "ethernet", "eth", "", "", connectAuto, timerConnect)) return;
+Network::NEthernet::Driver::Driver (unsigned short pinSS) {
+	if (!this->_init(true, "ethernet", "eth", "", "")) return;
 
 	this->_pinSS = pinSS;
 	this->_status = LinkOFF;
 }
 
-Network::NEthernet::Driver::Driver (String mac, bool connectAuto, unsigned int timerConnect) {
-	if (!this->_init(true, "ethernet", "eth", mac, "", connectAuto, timerConnect)) return;
+Network::NEthernet::Driver::Driver (String mac) {
+	if (!this->_init(true, "ethernet", "eth", mac, "")) return;
 
 	this->_pinSS = -1;
 	this->_status = LinkOFF;
 }
 
-Network::NEthernet::Driver::Driver (unsigned short pinSS, String mac, bool connectAuto, unsigned int timerConnect) {
-	if (!this->_init(true, "ethernet", "eth", mac, "", connectAuto, timerConnect)) return;
+Network::NEthernet::Driver::Driver (unsigned short pinSS, String mac) {
+	if (!this->_init(true, "ethernet", "eth", mac, "")) return;
 
 	this->_pinSS = pinSS;
 	this->_status = LinkOFF;
@@ -63,6 +63,7 @@ bool Network::NEthernet::Driver::NetworkDriverConnect () {
 	Ethernet.init(this->_pinSS);
 
 	if (Ethernet.begin(this->_macBuffer) == 0) {
+		this->_log("Connection with MAC '" + this->_mac + "' failed");
 		// DHCP failed
 
 		if (Ethernet.hardwareStatus() == EthernetNoHardware)
@@ -80,7 +81,11 @@ bool Network::NEthernet::Driver::NetworkDriverConnect () {
 bool Network::NEthernet::Driver::NetworkDriverConnected () {
 	if (!this->_ready) return false;
 
-	EthernetLinkStatus status = Ethernet.linkStatus();
+	// @important - Ethernet.h is broken - linkStatus() is not returned correctly
+	// falling back to IP check...
+	EthernetLinkStatus status = Ethernet.linkStatus(); // still need to check...
+	status = this->NetworkDriverAddressIP() == "0.0.0.0" ? Unknown : LinkON;
+
 	bool connected = status == LinkON;
 
 	if (status != this->_status)
@@ -102,7 +107,7 @@ String Network::NEthernet::Driver::NetworkDriverAddressMAC () {
 }
 
 String Network::NEthernet::Driver::NetworkDriverAddressIP () {
-	return String(Ethernet.localIP());
+	return this->_ip(Ethernet.localIP());
 }
 
 IProtonixNetworkClient* Network::NEthernet::Driver::NetworkDriverAllocateClient () {

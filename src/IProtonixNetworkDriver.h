@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include "Client.h"
 
 #include "IProtonixNetworkClient.h"
 #include "ProtonixTimer.h"
@@ -25,8 +26,9 @@ namespace Qybercom {
 				bool _connectAttempt;
 				bool _connectAuto;
 
-				bool _init (bool single, String kind, String name, String mac, String hostname, bool connectAuto, unsigned int timerConnect);
+				bool _init (bool single, String kind, String name, String mac, String hostname, bool connectAuto = true, unsigned int timerConnect = 1000);
 				void _macParse ();
+				String _ip (IPAddress ip);
 				bool _log (String message, bool ret = true);
 
 			public:

@@ -1,11 +1,13 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-#if defined(ESP8266)
+#if defined(ESP32)
+#include <ESP32httpUpdate.h>
+#elif defined(ESP8266)
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
-#elif defined(ESP32)
-#include <ESP32httpUpdate.h>
+#elif defined(AVR)
+#include <avr/wdt.h>
 #endif
 
 #include "Common/index.h"
@@ -44,12 +46,14 @@ Protonix::Protonix (IProtonixDevice* device, IProtonixProfile* profile) {
 	this->_networkDefault = nullptr;
 
 	this->_commands.Add(new Command::CCustom());
+	#if defined(ESP32) || defined(ESP8266)
 	this->_commands.Add(new Command::CStdAction());
 	this->_commands.Add(new Command::CStdActive());
 	this->_commands.Add(new Command::CStdFirmware());
 	this->_commands.Add(new Command::CStdHardware());
-	this->_commands.Add(new Command::CStdReboot());
 	this->_commands.Add(new Command::CStdRegistry());
+	#endif
+	this->_commands.Add(new Command::CStdReboot());
 	this->_commands.Add(new Command::CStdSensor());
 
 	this->_active = true;
@@ -190,7 +194,9 @@ Protonix* Protonix::Pipe () {
 		this->_ready = true;
 
 		bool spi = false;
+		#if defined(ESP32)
 		short core = -1;
+		#endif
 
 		for (IProtonixHardware* hardware : this->_hardware) {
 			spi |= hardware->HardwareSPI();
@@ -272,12 +278,16 @@ Protonix* Protonix::Pipe () {
 }
 
 bool Protonix::Reboot () {
+	Serial.println("[debug] reboot");
 	#if defined(ESP32) || defined(ESP8266)
 		ESP.restart();
 
 		return true;
 	#elif defined(AVR)
-		digitalWrite(4, LOW);
+		// https://forum.arduino.cc/t/soft-reset-and-arduino/367284/6
+		wdt_disable();
+		wdt_enable(WDTO_15MS);
+		while (1) {}
 
 		return true;
 	#else
@@ -285,23 +295,35 @@ bool Protonix::Reboot () {
 	#endif
 }
 
-bool Protonix::FirmwareUpdateOTA (String version) {
-	/*String url = this->_serverBaseURI + "/api/mechanism/firmware/" + this->_device->DeviceID() + "?platform=";
-	String ver = version == "" ? "" : String("&version=" + version);
+bool Protonix::FirmwareUpdateOTA (String version, String network) {
+	IProtonixNetworkDriver* driver = this->Network(network);
+	if (driver == nullptr) return false;
+
+	IProtonixNetworkClient* client = driver->NetworkDriverAllocateClient();
+	if (client == nullptr) return false;
+
+	bool out = false;
 
 	#if defined(ESP32)
-		t_httpUpdate_return out = ESPhttpUpdate.update(url + "esp32" + ver);
+		t_httpUpdate_return result = ESPhttpUpdate.update(this->_profile->ProfileFirmwareURI(this, "esp32", version));
 
-		return out == HTTP_UPDATE_OK;
+		out = result == HTTP_UPDATE_OK;
 	#elif defined(ESP8266)
-		WiFiClient client;
-		t_httpUpdate_return out = ESPhttpUpdate.update(client, url + "esp8266" + ver);
+		WiFiClient* clientWiFi = (WiFiClient*)client->NetworkClientClient();
+		WiFiClient& clientWiFiLink = *clientWiFi;
+		t_httpUpdate_return result = ESPhttpUpdate.update(clientWiFiLink, this->_profile->ProfileFirmwareURI(this, "esp8266", version));
 
-		return out == HTTP_UPDATE_OK;
+		out = result == HTTP_UPDATE_OK;
 	#else
-		return false;
-	#endif*/
-	return false;
+		(void)version;
+
+		out = false;
+	#endif
+
+	delete client;
+	client = nullptr;
+
+	return out;
 }
 
 
@@ -387,6 +409,9 @@ Protonix* Protonix::Network (IProtonixNetworkDriver* network) {
 }
 
 IProtonixNetworkDriver* Protonix::Network (String name) {
+	if (name == "")
+		return this->_networkDefault;
+
 	for (IProtonixNetworkDriver* network : this->_networks)
 		if (network->NetworkDriverName() == name) return network;
 

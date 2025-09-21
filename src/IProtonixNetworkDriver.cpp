@@ -1,4 +1,5 @@
 #include "Arduino.h"
+#include "Client.h"
 
 #include "IProtonixNetworkDriver.h"
 #include "Protonix.h"
@@ -35,6 +36,13 @@ void IProtonixNetworkDriver::_macParse () {
 	ParseMAC(this->_mac, this->_macBuffer);
 }
 
+String IProtonixNetworkDriver::_ip (IPAddress ip) {
+	return String(ip[0])
+		+ String("." )+ String(ip[1])
+		+ String(".") + String(ip[2])
+		+ String(".") + String(ip[3]);
+}
+
 bool IProtonixNetworkDriver::_log (String message, bool ret) {
 	Serial.println("[network:driver:" + this->_kind + "] " + message);
 
@@ -60,6 +68,7 @@ ProtonixTimer* IProtonixNetworkDriver::TimerConnect () {
 }
 
 bool IProtonixNetworkDriver::NetworkDriverPipe (Protonix* device) {
+	(void)device;
 	if (this->_timerConnect == nullptr) return false;
 
 	if (this->_timerConnect->Pipe()) {

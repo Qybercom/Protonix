@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include "Client.h"
 
 #include "ProtonixURI.h"
 
@@ -8,6 +9,7 @@ namespace Qybercom {
 	namespace Protonix {
 		class IProtonixNetworkClient {
 			public:
+				virtual ::Client* NetworkClientClient () = 0;
 				virtual bool NetworkClientConnect (ProtonixURI* uri) = 0;
 				virtual bool NetworkClientConnected () = 0;
 				virtual String NetworkClientReceive () = 0;

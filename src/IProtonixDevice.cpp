@@ -112,6 +112,7 @@ void IProtonixDevice::DeviceOnCommand (Protonix* device, IProtonixCommand* comma
 
 void IProtonixDevice::DeviceOnCommandCustom (Protonix* device, String command) {
 	(void)device;
+	(void)command;
 }
 
 void IProtonixDevice::DeviceOnSignal (Protonix* device, ProtonixSignal* signal) {

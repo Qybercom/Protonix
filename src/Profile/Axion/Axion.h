@@ -39,6 +39,7 @@ namespace Qybercom {
 						Axion (String uriStream, String uriHTTP, unsigned int intervalData = 100, unsigned int intervalConnectStream = 1000, unsigned int intervalAuthorize = 1000);
 
 						void ProfilePipe (Protonix* device);
+						String ProfileFirmwareURI (Protonix* device, String platform, String version);
 
 						ProtonixNetworkClient* ClientStream ();
 
@@ -60,7 +61,7 @@ namespace Qybercom {
 						bool AutoData ();
 						Axion* AutoData (bool value);
 
-						void RequestStream (String url, IAxionDTORequest* request);
+						void RequestStream (Protonix* device, String url, IAxionDTORequest* request);
 						void RequestStreamAuthorize (Protonix* device);
 						void RequestStreamDeviceData (Protonix* device);
 

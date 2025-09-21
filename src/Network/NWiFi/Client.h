@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include "Client.h"
 
 #if defined(ESP32)
 #include <WiFi.h>
@@ -20,21 +21,25 @@ namespace Qybercom {
 				class Client : public IProtonixNetworkClient {
 					private:
 						#if defined(ESP32) || defined(ESP8266)
-						WiFiClient _client;
-						unsigned char _buffer[2048];
+							WiFiClient* _client;
+							unsigned char _buffer[2048];
 						#else
-						unsigned char _buffer[0];
+							::Client* _client;
+							unsigned char _buffer[0];
 						#endif
 						unsigned char* _bufferPTR;
 
 					public:
 						Client ();
 
+						::Client* NetworkClientClient ();
 						bool NetworkClientConnect (ProtonixURI* uri);
 						bool NetworkClientConnected ();
 						String NetworkClientReceive ();
 						bool NetworkClientSend (String data);
 						bool NetworkClientClose ();
+
+						~Client ();
 				};
 			}
 		}

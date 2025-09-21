@@ -27,13 +27,13 @@ namespace Qybercom {
 				uint8_t cmd;
 				uint8_t srcID;
 				uint8_t priority;
-				uint16_t expectedLen;
-				uint16_t rxLen;
+				unsigned short expectedLen;
+				unsigned short rxLen;
 				uint8_t expectedSeq;
-				uint32_t lastRxTime;
+				unsigned int lastRxTime;
 				uint8_t* buffer;
 
-				HBusCANBuffer (uint8_t c, uint8_t s, uint8_t p, uint16_t len)
+				HBusCANBuffer (uint8_t c, uint8_t s, uint8_t p, unsigned short len)
 					: cmd(c), srcID(s), priority(p), expectedLen(len), rxLen(0),
 					  expectedSeq(0), lastRxTime(0), buffer(nullptr)
 				{
@@ -66,10 +66,10 @@ namespace Qybercom {
 					bool _ready;
 					unsigned short _pinCS;
 					uint8_t _sourceID;
-					uint32_t _timeout;
+					unsigned int _timeout;
 					CAN_SPEED _bitrate;
 					CAN_CLOCK _clock;
-					uint16_t _payloadMax;
+					unsigned short _payloadMax;
 					MCP2515* _driver;
 					List<HBusCANCommand*> _commands;
 					List<HBusCANBuffer*> _buffers;
@@ -85,8 +85,8 @@ namespace Qybercom {
 					void _inputFrame (const struct can_frame &frame, uint8_t cmd, uint8_t src, uint8_t priority);
 
 				public:
-					HBusCAN (unsigned short pinCS, uint8_t sourceID, uint32_t timeout = 1000, CAN_SPEED bitrate = CAN_500KBPS, CAN_CLOCK clock = MCP_8MHZ, uint16_t payloadMax = 1024);
-					static HBusCAN* Init (unsigned short pinCS, uint8_t sourceID, uint32_t timeout = 1000, CAN_SPEED bitrate = CAN_500KBPS, CAN_CLOCK clock = MCP_8MHZ, uint16_t payloadMax = 1024);
+					HBusCAN (unsigned short pinCS, uint8_t sourceID, unsigned int timeout = 1000, CAN_SPEED bitrate = CAN_500KBPS, CAN_CLOCK clock = MCP_8MHZ, unsigned short payloadMax = 1024);
+					static HBusCAN* Init (unsigned short pinCS, uint8_t sourceID, unsigned int timeout = 1000, CAN_SPEED bitrate = CAN_500KBPS, CAN_CLOCK clock = MCP_8MHZ, unsigned short payloadMax = 1024);
 
 					unsigned short PinCS ();
 
@@ -102,19 +102,19 @@ namespace Qybercom {
 					CAN_CLOCK Clock ();
 					HBusCAN* Clock (CAN_CLOCK clock);
 
-					uint16_t PayloadMax ();
-					HBusCAN* PayloadMax (uint16_t size);
+					unsigned short PayloadMax ();
+					HBusCAN* PayloadMax (unsigned short size);
 
-					HBusCAN* FilterID (const uint32_t value);
+					HBusCAN* FilterID (const unsigned int value);
 
 					List<HBusCANCommand*> &Commands ();
 					HBusCAN* CommandAdd (uint8_t cmd, uint8_t priority = 7);
 
 					bool Send (struct can_frame* frame);
-					bool Send (uint32_t id, const String &hexData);
+					bool Send (unsigned int id, const String &hexData);
 
 					bool Enqueue (struct can_frame* frame);
-					bool Enqueue (uint32_t cmd, const String &payload);
+					bool Enqueue (unsigned int cmd, const String &payload);
 
 					bool HardwareSPI ();
 					void HardwareInitPre (Protonix* device);
@@ -123,7 +123,7 @@ namespace Qybercom {
 					void HardwareCommand (Protonix* device, String command);
 
 					static canid_t ID (uint8_t id, uint8_t cmd, uint8_t priority = 7);
-					static can_frame* Frame (canid_t id, uint8_t* buf, uint16_t offset, uint16_t length, uint16_t remaining, uint8_t seq = 0, bool first = true, bool last = true);
+					static can_frame* Frame (canid_t id, uint8_t* buf, unsigned short offset, unsigned short length, unsigned short remaining, uint8_t seq = 0, bool first = true, bool last = true);
 					static String Status (MCP2515::ERROR status);
 			};
 		}

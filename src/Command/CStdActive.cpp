@@ -28,6 +28,16 @@ bool Command::CStdActive::CommandRecognize (Protonix* device, String command, IP
 	(void)device;
 	(void)hardware;
 
+	if (command == "std:on") {
+		this->_active = true;
+		return true;
+	}
+
+	if (command == "std:off") {
+		this->_active = false;
+		return true;
+	}
+
 	short trail = this->_recognize(command);
 	if (trail == -1) return false;
 

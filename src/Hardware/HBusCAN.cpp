@@ -111,7 +111,7 @@ void Hardware::HBusCAN::_inputFrame (const struct can_frame &frame, uint8_t cmd,
 	this->_input.Add(message);
 }
 
-Hardware::HBusCAN::HBusCAN (unsigned short pinCS, uint8_t sourceID, unsigned long timeout, CAN_SPEED bitrate, CAN_CLOCK clock, uint16_t payloadMax) {
+Hardware::HBusCAN::HBusCAN (unsigned short pinCS, uint8_t sourceID, unsigned int timeout, CAN_SPEED bitrate, CAN_CLOCK clock, unsigned short payloadMax) {
 	this->_ready = false;
 	this->_pinCS = pinCS;
 	this->_sourceID = sourceID;
@@ -123,7 +123,7 @@ Hardware::HBusCAN::HBusCAN (unsigned short pinCS, uint8_t sourceID, unsigned lon
 	this->_driver = new MCP2515(this->_pinCS);
 }
 
-Hardware::HBusCAN* Hardware::HBusCAN::Init (unsigned short pinCS, uint8_t sourceID, unsigned long timeout, CAN_SPEED bitrate, CAN_CLOCK clock, uint16_t payloadMax) {
+Hardware::HBusCAN* Hardware::HBusCAN::Init (unsigned short pinCS, uint8_t sourceID, unsigned int timeout, CAN_SPEED bitrate, CAN_CLOCK clock, unsigned short payloadMax) {
 	return new Hardware::HBusCAN(pinCS, sourceID, timeout, bitrate, clock, payloadMax);
 }
 
@@ -174,17 +174,17 @@ Hardware::HBusCAN* Hardware::HBusCAN::Clock (CAN_CLOCK clock) {
 }
 
 
-uint16_t Hardware::HBusCAN::PayloadMax () {
+unsigned short Hardware::HBusCAN::PayloadMax () {
 	return this->_payloadMax;
 }
 
-Hardware::HBusCAN* Hardware::HBusCAN::PayloadMax (uint16_t size) {
+Hardware::HBusCAN* Hardware::HBusCAN::PayloadMax (unsigned short size) {
 	this->_payloadMax = size;
 
 	return this;
 }
 
-Hardware::HBusCAN* Hardware::HBusCAN::FilterID (const uint32_t value) {
+Hardware::HBusCAN* Hardware::HBusCAN::FilterID (const unsigned int value) {
 	this->_driver->setFilterMask(MCP2515::MASK::MASK0, false, 0x7FF);
 	this->_driver->setFilter(MCP2515::RXF::RXF0, false, value);
 
@@ -207,7 +207,7 @@ bool Hardware::HBusCAN::Send (struct can_frame* frame) {
 	return this->_ready && this->_driver->sendMessage(frame) == MCP2515::ERROR::ERROR_OK;
 }
 
-bool Hardware::HBusCAN::Send (uint32_t id, const String &hexData) {
+bool Hardware::HBusCAN::Send (unsigned int id, const String &hexData) {
 	if (!this->_ready) return false;
 
 	Qybercom::List<uint8_t> bytes = hexToBytes(hexData);
@@ -237,7 +237,7 @@ bool Hardware::HBusCAN::Enqueue (struct can_frame* frame) {
 	return true;
 }
 
-bool Hardware::HBusCAN::Enqueue (uint32_t cmd, const String &payload) {
+bool Hardware::HBusCAN::Enqueue (unsigned int cmd, const String &payload) {
 	long length = payload.length();
 	if (length > this->_payloadMax) return false;
 
@@ -249,8 +249,8 @@ bool Hardware::HBusCAN::Enqueue (uint32_t cmd, const String &payload) {
         this->_output.Add(Frame(id, buf, 0, length, length));
     }
     else {
-        uint16_t remaining = length;
-        uint16_t offset = 0;
+        unsigned short remaining = length;
+        unsigned short offset = 0;
         uint8_t seq = 0;
 
         while (remaining > 0) {
@@ -339,11 +339,11 @@ void Hardware::HBusCAN::HardwarePipe (Protonix* device, short core) {
 
 			if (start) {
 				// read length from bytes 1..2 if present
-				uint16_t msgLen = 0;
+				unsigned short msgLen = 0;
 
 				if (frame.can_dlc < 3) msgLen = 255; // fallback
 				else {
-					msgLen = ((uint16_t)frame.data[1] << 8) | (uint16_t)frame.data[2];
+					msgLen = ((unsigned short)frame.data[1] << 8) | (unsigned short)frame.data[2];
 
 					if (msgLen == 0) msgLen = 1;
 				}
@@ -376,7 +376,7 @@ void Hardware::HBusCAN::HardwarePipe (Protonix* device, short core) {
 			}
 			else if (buf != nullptr) {
 				// continuation fragment for existing buffer
-				uint32_t now = millis();
+				unsigned int now = millis();
 
 				if ((now - buf->lastRxTime) > this->_timeout) {
 					// timed out — drop
@@ -440,10 +440,10 @@ void Hardware::HBusCAN::HardwareCommand (Protonix* device, String command) {
 }
 
 canid_t Hardware::HBusCAN::ID (uint8_t id, uint8_t cmd, uint8_t priority) {
-	 return ((uint16_t) priority << 8) | ((uint16_t) (id & 0x0F) << 4) | (cmd & 0x0F);
+	 return ((unsigned short) priority << 8) | ((unsigned short) (id & 0x0F) << 4) | (cmd & 0x0F);
 }
 
-can_frame* Hardware::HBusCAN::Frame (canid_t id, uint8_t* buf, uint16_t offset, uint16_t length, uint16_t remaining, uint8_t seq, bool first, bool last) {
+can_frame* Hardware::HBusCAN::Frame (canid_t id, uint8_t* buf, unsigned short offset, unsigned short length, unsigned short remaining, uint8_t seq, bool first, bool last) {
 	struct can_frame* frame = new struct can_frame();
 
 	uint8_t i = 0;

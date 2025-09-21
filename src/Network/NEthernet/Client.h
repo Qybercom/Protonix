@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include "Client.h"
 
 #include <Ethernet.h>
 
@@ -13,18 +14,21 @@ namespace Qybercom {
 			namespace NEthernet {
 				class Client : public IProtonixNetworkClient {
 					private:
-						EthernetClient _client;
+						EthernetClient* _client;
 						unsigned char _buffer[2048];
 						unsigned char* _bufferPTR;
 
 					public:
 						Client ();
 
+						::Client* NetworkClientClient ();
 						bool NetworkClientConnect (ProtonixURI* uri);
 						bool NetworkClientConnected ();
 						String NetworkClientReceive ();
 						bool NetworkClientSend (String data);
 						bool NetworkClientClose ();
+
+						~Client ();
 				};
 			}
 		}

@@ -16,6 +16,7 @@ namespace Qybercom {
 				long RAMFree ();
 				long RAMUsed ();
 				long RAMTotal ();
+				long RAMFragmented ();
 
 
 				long FlashFree ();

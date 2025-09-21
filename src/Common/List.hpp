@@ -51,7 +51,7 @@ namespace Qybercom {
 
 			Node* _head;
 			Node* _tail;
-			int _count;
+			unsigned int _count;
 
 			Node* _iNode;
 			bool _iStarted;
@@ -76,7 +76,7 @@ namespace Qybercom {
 			Node* Tail () { return _tail; }
 			T &Last () { return _tail->Data; }
 
-			int Count () const { return _count; }
+			unsigned int Count () const { return _count; }
 
 			unsigned int CountMax () const { return _countMax; }
 			List<T> &CountMax (unsigned int countMax) { _countMax = countMax; return *this; }
@@ -109,12 +109,12 @@ namespace Qybercom {
 				return *this;
 			}
 
-			List<T> &Insert (const T &data, int index) {
-				if (index <= 0) return Add(data, true);
+			List<T> &Insert (const T &data, unsigned int index) {
+				if (index == 0) return Add(data, true);
 				if (index >= _count) return Add(data, false);
 
 				Node* cur = _head;
-				while (cur && cur->Index != index) cur = cur->Next;
+				while (cur && cur->Index != (int)index) cur = cur->Next;
 
 				if (cur) {
 					Node* node = new Node(data);
@@ -136,11 +136,11 @@ namespace Qybercom {
 				return *this;
 			}
 
-			List<T> &Remove (int index) {
-				if (index < 0 || index >= _count) return *this;
+			List<T> &Remove (unsigned int index) {
+				if (index >= _count || _count == 0) return *this;
 
 				Node* cur = _head;
-				while (cur && cur->Index != index) cur = cur->Next;
+				while (cur && cur->Index != (int)index) cur = cur->Next;
 
 				if (cur) {
 					if (cur->Prev) cur->Prev->Next = cur->Next;
@@ -194,11 +194,11 @@ namespace Qybercom {
 				return IndexOf(data) != -1;
 			}
 
-			T &Get (int index) {
+			T &Get (unsigned int index) {
 				Node* cur = _head;
 
 				while (cur) {
-					if (cur->Index == index)
+					if (cur->Index == (int)index)
 						return cur->Data;
 
 					cur = cur->Next;
@@ -220,7 +220,7 @@ namespace Qybercom {
 			}
 
 			T PopFirst () {
-				if (!_head) return (*(T*) 0);//nullptr;//T();
+				if (_count == 0 || !_head) return (*(T*) 0);//nullptr;//T();
 
 				Node* node = _head;
 				T data = node->Data;
@@ -236,7 +236,7 @@ namespace Qybercom {
 			}
 
 			T PopLast () {
-				if (!_tail) return (*(T*) 0);//nullptr;//T();
+				if (_count == 0 || !_tail) return (*(T*) 0);//nullptr;//T();
 
 				Node* node = _tail;
 				T data = node->Data;
@@ -251,8 +251,8 @@ namespace Qybercom {
 				return data;
 			}
 
-			T PopAt (int index) {
-				if (index < 0 || index >= _count) return T();
+			T PopAt (unsigned int index) {
+				if (index >= _count) return T();
 				if (index == 0) return PopFirst();
 				if (index == _count - 1) return PopLast();
 

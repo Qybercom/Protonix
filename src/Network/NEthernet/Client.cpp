@@ -6,26 +6,30 @@
 
 using namespace Qybercom::Protonix;
 
-Network::NEthernet::Client::Client () {
+::Client* Network::NEthernet::Client::NetworkClientClient () {
+	return this->_client;
+}
 
+Network::NEthernet::Client::Client () {
+	this->_client = new EthernetClient();
 }
 
 bool Network::NEthernet::Client::NetworkClientConnect (ProtonixURI* uri) {
-	bool out = this->_client.connect(uri->Host().c_str(), uri->Port());
+	bool out = this->_client->connect(uri->Host().c_str(), uri->Port());
 
 	if (out) {
-		this->_client.setConnectionTimeout(10);
+		this->_client->setConnectionTimeout(10);
 	}
 
 	return out;
 }
 
 bool Network::NEthernet::Client::NetworkClientConnected () {
-	return this->_client.connected();
+	return this->_client->connected();
 }
 
 String Network::NEthernet::Client::NetworkClientReceive () {
-	int available = this->_client.available();
+	int available = this->_client->available();
 
 	int i = 0;
 	while (i < 2048) {
@@ -37,7 +41,7 @@ String Network::NEthernet::Client::NetworkClientReceive () {
 	this->_bufferPTR = this->_buffer;
 
 	if (available)
-		this->_client.read(this->_bufferPTR, available);
+		this->_client->read(this->_bufferPTR, available);
 
 	return String((char*)this->_buffer);
 }
@@ -45,14 +49,19 @@ String Network::NEthernet::Client::NetworkClientReceive () {
 bool Network::NEthernet::Client::NetworkClientSend (String data) {
 	uint8_t* buffer = (uint8_t*)data.c_str();
 
-	bool out = (bool)this->_client.write(buffer, data.length());
-	this->_client.flush();
+	bool out = (bool)this->_client->write(buffer, data.length());
+	this->_client->flush();
 
 	return out;
 }
 
 bool Network::NEthernet::Client::NetworkClientClose () {
-	this->_client.stop();
+	this->_client->stop();
 
 	return true;
+}
+
+Network::NEthernet::Client::~Client () {
+	delete this->_client;
+	this->_client = nullptr;
 }

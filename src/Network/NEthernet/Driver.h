@@ -19,9 +19,9 @@ namespace Qybercom {
 						String _statusRecognize (EthernetLinkStatus code);
 
 					public:
-						Driver (unsigned short pinSS, bool connectAuto = true, unsigned int timerConnect = 1000);
-						Driver (String mac, bool connectAuto = true, unsigned int timerConnect = 1000);
-						Driver (unsigned short pinSS, String mac, bool connectAuto = true, unsigned int timerConnect = 1000);
+						Driver (unsigned short pinSS);
+						Driver (String mac);
+						Driver (unsigned short pinSS, String mac);
 
 						short PinSS ();
 						Driver* PinSS (unsigned short pinSS);

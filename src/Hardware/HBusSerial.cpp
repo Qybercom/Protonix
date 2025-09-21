@@ -123,6 +123,8 @@ bool Hardware::HBusSerial::HardwareSPI () {
 }
 
 void Hardware::HBusSerial::HardwareInitPre (Protonix* device) {
+	(void)device;
+
 	this->_port->begin(this->_speed);
 
 	this->_started = true;

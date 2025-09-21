@@ -9,7 +9,7 @@ namespace Qybercom {
 	inline List<String>* explode (String delimiter, String input) {
 		List<String>* out = new List<String>();
 
-		int start = 0;
+		unsigned int start = 0;
 		int pos = input.indexOf(delimiter, start);
 
 		while (pos >= 0) {

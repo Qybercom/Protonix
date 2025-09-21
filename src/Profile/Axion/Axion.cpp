@@ -91,6 +91,15 @@ void Profile::Axion::Axion::ProfilePipe (Protonix* device) {
 	}
 }
 
+String Profile::Axion::Axion::ProfileFirmwareURI (Protonix* device, String platform, String version) {
+	Profile::Axion::IAxionDevice* dev = (Profile::Axion::IAxionDevice*)device->Device();
+
+	String url = this->_uriHTTP + "/api/mechanism/firmware/" + dev->AxionDeviceID() + "?platform=";
+	String ver = version == "" ? "" : String("&version=" + version);
+
+	return url + platform + ver;
+}
+
 ProtonixNetworkClient* Profile::Axion::Axion::ClientStream () {
 	return this->_clientStream;
 }
@@ -149,7 +158,9 @@ Profile::Axion::Axion* Profile::Axion::Axion::AutoData (bool value) {
 	return this;
 }
 
-void Profile::Axion::Axion::RequestStream (String url, Profile::Axion::IAxionDTORequest* request) {
+void Profile::Axion::Axion::RequestStream (Protonix* device, String url, Profile::Axion::IAxionDTORequest* request) {
+	(void)device;
+
 	String error = "";
 
 	if (this->_clientStream->Connected()) {
@@ -179,14 +190,14 @@ void Profile::Axion::Axion::RequestStreamAuthorize (Protonix* device) {
 	//if (this->_debug)
 		Serial.println("[Axion:RequestStreamAuthorize] '" + id + "':'" + passphrase + "'");
 
-	this->RequestStream("/api/authorize/mechanism", new Profile::Axion::DTO::DTORequestAuthorization(id, passphrase));
+	this->RequestStream(device, "/api/authorize/mechanism", new Profile::Axion::DTO::DTORequestAuthorization(id, passphrase));
 }
 
 void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 	if (this->_debug)
 		Serial.println("[Axion:RequestStreamDeviceData]");
 
-	this->RequestStream("/api/mechanism/status", new Profile::Axion::DTO::DTORequestDeviceData(device));
+	this->RequestStream(device, "/api/mechanism/status", new Profile::Axion::DTO::DTORequestDeviceData(device));
 }
 
 void Profile::Axion::Axion::_onStreamURL (Protonix* device) {
@@ -238,18 +249,19 @@ void Profile::Axion::Axion::_onStreamEvent (Protonix* device) {
 	if (this->_debug)
 		Serial.println("[Axion:OnStreamEvent] " + this->_dtoInput->Event());
 
-	IAxionDevice* dev = (IAxionDevice*)device->Device();
+	Profile::Axion::IAxionDevice* dev = (Profile::Axion::IAxionDevice*)device->Device();
 
 	if (this->_dtoInput->Event().startsWith("/api/mechanism/command/" + dev->AxionDeviceID())) {
 		Profile::Axion::DTO::DTOEventCommand* dto = new Profile::Axion::DTO::DTOEventCommand();
 		dto->AxionDTOPopulate(this->_dtoInput);
 
 		String cmd = dto->Command();
-
 		//if (this->_debug)
 			Serial.println("[Axion:OnStreamEvent:Command] " + cmd);
 
-		device->CommandRecognizeAndProcess(cmd);
+		bool ok = device->CommandRecognizeAndProcess(cmd);
+		if (this->_debug || !ok)
+			Serial.println("[Axion:OnStreamEvent:Command] Result: " + String(ok));
 
 		delete dto;
 		dto = nullptr;
