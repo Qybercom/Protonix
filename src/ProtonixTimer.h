@@ -27,21 +27,26 @@ namespace Qybercom {
 				unsigned int RunMilliseconds ();
 				String RunTime ();
 
-				void Interval (int interval);
 				unsigned int Interval ();
+				ProtonixTimer* Interval (int interval);
 
-				void Unit (ProtonixTimerUnit unit);
 				ProtonixTimerUnit Unit ();
+				ProtonixTimer* Unit (ProtonixTimerUnit unit);
 
-				void Enabled (bool enabled);
 				bool Enabled ();
+				ProtonixTimer* Enabled (bool enabled);
+
+				bool Delayed ();
+				ProtonixTimer* Delayed (bool delayed);
 
 				bool Pipe ();
 
-				void Reset ();
+				ProtonixTimer* Reset ();
 
 			private:
 				bool _enabled;
+				bool _delayed;
+				bool _delayedConsumed;
 				unsigned long _previous;
 				unsigned int _interval;
 				ProtonixTimerUnit _unit;

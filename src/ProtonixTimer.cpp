@@ -8,6 +8,8 @@ using namespace Qybercom::Protonix;
 
 ProtonixTimer::ProtonixTimer (unsigned int interval, bool enabled) {
 	this->_enabled = enabled;
+	this->_delayed = false;
+	this->_delayedConsumed = false;
 	this->_previous = 0;
 	this->_overflows = 0;
 
@@ -17,6 +19,8 @@ ProtonixTimer::ProtonixTimer (unsigned int interval, bool enabled) {
 
 ProtonixTimer::ProtonixTimer (unsigned int interval, ProtonixTimer::ProtonixTimerUnit unit, bool enabled) {
 	this->_enabled = enabled;
+	this->_delayed = false;
+	this->_delayedConsumed = false;
 	this->_previous = 0;
 	this->_overflows = 0;
 
@@ -70,28 +74,44 @@ String ProtonixTimer::RunTime () {
 		   + String(ms < 10 ? "00" : String(ms < 100 ? "0" : "")) + String(ms);
 }
 
-void ProtonixTimer::Interval (int interval) {
+ProtonixTimer* ProtonixTimer::Interval (int interval) {
 	this->_interval = interval;
+
+	return this;
 }
 
 unsigned int ProtonixTimer::Interval () {
 	return this->_interval;
 }
 
-void ProtonixTimer::Unit (ProtonixTimer::ProtonixTimerUnit unit) {
+ProtonixTimer* ProtonixTimer::Unit (ProtonixTimer::ProtonixTimerUnit unit) {
 	this->_unit = unit;
+
+	return this;
 }
 
 ProtonixTimer::ProtonixTimerUnit ProtonixTimer::Unit () {
 	return this->_unit;
 }
 
-void ProtonixTimer::Enabled (bool enabled) {
+ProtonixTimer* ProtonixTimer::Enabled (bool enabled) {
 	this->_enabled = enabled;
+
+	return this;
 }
 
 bool ProtonixTimer::Enabled () {
 	return this->_enabled;
+}
+
+ProtonixTimer* ProtonixTimer::Delayed (bool delayed) {
+	this->_delayed = delayed;
+
+	return this;
+}
+
+bool ProtonixTimer::Delayed () {
+	return this->_delayed;
 }
 
 bool ProtonixTimer::Pipe () {
@@ -110,7 +130,7 @@ bool ProtonixTimer::Pipe () {
 	if (diff < 0)
 		this->_overflows = this->_overflows + 1; // required by compiler
 
-	bool elapsed = diff < 0 || diff >= this->_interval;
+	bool elapsed = diff < 0 || diff >= (long)this->_interval;
 
 	this->_totalMS = (unsigned long long)this->_overflows * TIMER_MAX + current;
 	this->_totalS = this->_totalMS / 1000;
@@ -118,9 +138,17 @@ bool ProtonixTimer::Pipe () {
 	if (elapsed)
 		this->_previous = current;
 
-	return elapsed;
+	bool pass = true;
+	if (this->_delayed && !this->_delayedConsumed) {
+		this->_delayedConsumed = true;
+		pass = false;
+	}
+
+	return elapsed && pass;
 }
 
-void ProtonixTimer::Reset () {
+ProtonixTimer* ProtonixTimer::Reset () {
 	this->_previous = 0;
+
+	return this;
 }
