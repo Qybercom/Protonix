@@ -2,8 +2,10 @@
 #include <SPI.h>
 
 #if defined(ESP32)
+#include <StreamString.h>
 #include <ESP32httpUpdate.h>
 #elif defined(ESP8266)
+#include <StreamString.h>
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
 #elif defined(AVR)
@@ -309,9 +311,9 @@ bool Protonix::FirmwareUpdateOTA (String version, String network) {
 
 		out = result == HTTP_UPDATE_OK;
 	#elif defined(ESP8266)
-		WiFiClient* clientWiFi = (WiFiClient*)client->NetworkClientClient();
-		WiFiClient& clientWiFiLink = *clientWiFi;
-		t_httpUpdate_return result = ESPhttpUpdate.update(clientWiFiLink, this->_profile->ProfileFirmwareURI(this, "esp8266", version));
+		String uri = this->_profile->ProfileFirmwareURI(this, "esp8266", version);
+		WiFiClient clientWiFi;
+		t_httpUpdate_return result = ESPhttpUpdate.update(clientWiFi, uri);
 
 		out = result == HTTP_UPDATE_OK;
 	#else
