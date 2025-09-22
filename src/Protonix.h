@@ -120,6 +120,12 @@ namespace Qybercom {
 					return static_cast<T*>(base);
 				}
 
+				bool BusSend (String bus, String data);
+				bool BusCommand (String bus, String command);
+				bool BusCommand (String bus, IProtonixCommand* command);
+				bool BusCommandCustom (String bus, String cmd);
+				bool BusCommandSensor (String bus, String id, String value = "", bool active = false, bool failure = false, String state = "");
+
 				List<IProtonixNetworkDriver*> &Networks ();
 				Protonix* Network (IProtonixNetworkDriver* network);
 				IProtonixNetworkDriver* Network (String name);

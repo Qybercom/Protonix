@@ -51,7 +51,7 @@ namespace Qybercom {
 					void HardwareInitPre (Protonix* device);
 					void HardwareInitPost (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
-					void HardwareCommand (Protonix* device, String command);
+					void HardwareOnCommand (Protonix* device, String command);
 			};
 		}
 	}

@@ -39,12 +39,10 @@ void Hardware::HMesonix::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
 
-	//Serial.println("[hardware:mesonix] Pipe on core " + String(core));
-
 	this->_reader->Pipe();
 }
 
-void Hardware::HMesonix::HardwareCommand (Protonix* device, String command) {
+void Hardware::HMesonix::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;
 }

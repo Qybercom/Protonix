@@ -43,7 +43,7 @@ void Hardware::HGenericAnalog::HardwarePipe (Protonix* device, short core) {
 	this->_value = analogRead(this->_pin);
 }
 
-void Hardware::HGenericAnalog::HardwareCommand (Protonix* device, String command) {
+void Hardware::HGenericAnalog::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;
 }

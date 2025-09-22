@@ -397,6 +397,37 @@ Protonix* Protonix::Hardware (String id, IProtonixHardware* hardware, bool allow
 
 
 
+bool Protonix::BusSend (String bus, String data) {
+	IProtonixBus* hardware = (IProtonixBus*)this->Hardware(bus);
+
+	return hardware == nullptr ? false : hardware->HardwareBusSend(this, data);
+}
+
+bool Protonix::BusCommand (String bus, String command) {
+	IProtonixBus* hardware = (IProtonixBus*)this->Hardware(bus);
+
+	return hardware == nullptr ? false : hardware->HardwareBusCommand(this, command);
+}
+
+bool Protonix::BusCommand (String bus, IProtonixCommand* command) {
+	return command->CommandSerialize() ? this->BusCommand(bus, command->CommandBuffer()) : false;
+}
+
+bool Protonix::BusCommandCustom (String bus, String command) {
+	return this->BusCommand(bus, "custom:" + command);
+}
+
+bool Protonix::BusCommandSensor (String bus, String id, String value, bool active, bool failure, String state) {
+	return this->BusCommand(bus, "std:sensor:" + id
+		+ ";" + value
+		+ ";" + String(active ? 1 : 0)
+		+ ";" + String(failure ? 1 : 0)
+		+ String(state == "" ? "" : ";" + state)
+	);
+}
+
+
+
 List<IProtonixNetworkDriver*> &Protonix::Networks () {
 	return this->_networks;
 }

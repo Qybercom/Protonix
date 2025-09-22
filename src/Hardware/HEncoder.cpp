@@ -193,7 +193,7 @@ void Hardware::HEncoder::HardwarePipeInterrupt (Protonix* device) {
 	this->_valB = valB;
 }
 
-void Hardware::HEncoder::HardwareCommand (Protonix* device, String command) {
+void Hardware::HEncoder::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;
 }

@@ -11,6 +11,7 @@ namespace Qybercom {
 				String _id;
 				bool _allowSignal;
 				short _dedicatedCore = -1;
+				bool _log (String message, bool ret = true);
 
 			public:
 				String HardwareID ();
@@ -23,7 +24,7 @@ namespace Qybercom {
 				virtual void HardwareInitPre (Protonix* device) = 0;
 				virtual void HardwareInitPost (Protonix* device) = 0;
 				virtual void HardwarePipe (Protonix* device, short core) = 0;
-				virtual void HardwareCommand (Protonix* device, String command) = 0;
+				virtual void HardwareOnCommand (Protonix* device, String command) = 0;
 
 				virtual void HardwarePipeInterrupt (Protonix* device) { (void)device; }
 
@@ -31,6 +32,9 @@ namespace Qybercom {
 		};
 
 		class IProtonixBus : public IProtonixHardware {
+			public:
+				virtual bool HardwareBusSend (Protonix* device, String data) = 0;
+				virtual bool HardwareBusCommand (Protonix* device, String command) = 0;
 		};
 	}
 }

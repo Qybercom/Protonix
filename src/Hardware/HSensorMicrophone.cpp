@@ -49,7 +49,7 @@ void Hardware::HSensorMicrophone::HardwarePipe (Protonix* device, short core) {
 	this->_active = digitalRead(this->_pin);
 }
 
-void Hardware::HSensorMicrophone::HardwareCommand (Protonix* device, String command) {
+void Hardware::HSensorMicrophone::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;
 }

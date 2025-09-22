@@ -50,7 +50,7 @@ void Hardware::HTouchButton::HardwarePipe (Protonix* device, short core) {
 	this->_active = value == HIGH;
 }
 
-void Hardware::HTouchButton::HardwareCommand (Protonix* device, String command) {
+void Hardware::HTouchButton::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;
 }

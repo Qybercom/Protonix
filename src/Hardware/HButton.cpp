@@ -56,7 +56,7 @@ void Hardware::HButton::HardwarePipe (Protonix* device, short core) {
 	}
 }
 
-void Hardware::HButton::HardwareCommand (Protonix* device, String command) {
+void Hardware::HButton::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;
 }

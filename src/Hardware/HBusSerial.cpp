@@ -2,7 +2,6 @@
 
 #include <SoftwareSerial.h>
 
-#include "../IProtonixCommand.h"
 #include "../Protonix.h"
 
 #include "HBusSerial.h"
@@ -82,24 +81,21 @@ SoftwareSerial* Hardware::HBusSerial::Port () {
 	return this->_port;
 }
 
-bool Hardware::HBusSerial::Send (IProtonixCommand* command) {
-	if (!command->CommandSerialize()) {
-		Serial.println("[hardware:busSerial] Can not serialize command");
+bool Hardware::HBusSerial::SendCommand (String command) {
+	if (command == "") return false;
 
-		return false;
-	}
+	command += '\r';
+	command += String(command.length());
 
-	String out = command->CommandBuffer();
-	if (out == "") return false;
+	this->_log("[debug] SendCommand " + command);
 
-	out += '\r';
-	out += String(out.length());
-
-	return this->Send(out);
+	return this->Send(command);
 }
 
 bool Hardware::HBusSerial::Send (String s) {
 	if (!this->_started) return false;
+
+	this->_log("[debug] Send " + s);
 
 	this->_port->println(s);
 
@@ -149,7 +145,8 @@ void Hardware::HBusSerial::HardwarePipe (Protonix* device, short core) {
 	if (this->_blocking) s = this->_port->readStringUntil('\n');
 	else b = this->_port->read();
 
-	//Serial.println("[debug] " + String(s));
+	this->_log("[debug] Pipe " + String(s));
+
 	if (this->_blocking) s.trim();
 	else {
 		if (b == -1) return;
@@ -170,10 +167,10 @@ void Hardware::HBusSerial::HardwarePipe (Protonix* device, short core) {
 	String lenBuffer = String(this->_blocking ? s.length() + 1 : this->_cmdBuffer.length() + 1);
 
 	if (lenBuffer != this->_lenBuffer) {
-		Serial.println("[hardware:busSerial] Message corrupted: e:" + this->_lenBuffer + " a:" + lenBuffer);
+		this->_log("Message corrupted: e:" + this->_lenBuffer + " a:" + lenBuffer);
 	}
 	else {
-		//Serial.println("[debug] cmd " + String(s));
+		this->_log("[debug] Pipe:cmd " + String(s));
 
 		device->CommandRecognizeAndProcess(s, this);
 	}
@@ -184,7 +181,19 @@ void Hardware::HBusSerial::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 }
 
-void Hardware::HBusSerial::HardwareCommand (Protonix* device, String command) {
+void Hardware::HBusSerial::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;
+}
+
+bool Hardware::HBusSerial::HardwareBusSend (Protonix* device, String data) {
+	(void)device;
+
+	return this->Send(data);
+}
+
+bool Hardware::HBusSerial::HardwareBusCommand (Protonix* device, String command) {
+	(void)device;
+
+	return this->SendCommand(command);
 }

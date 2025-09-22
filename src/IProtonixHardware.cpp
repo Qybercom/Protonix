@@ -5,6 +5,12 @@
 
 using namespace Qybercom::Protonix;
 
+bool IProtonixHardware::_log (String message, bool ret) {
+	Serial.println("[hardware:" + this->_id + "] " + message);
+
+	return ret;
+}
+
 String IProtonixHardware::HardwareID () {
 	return this->_id;
 }

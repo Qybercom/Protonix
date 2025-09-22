@@ -17,7 +17,8 @@ Hardware::HPlayerMP3::HPlayerMP3 (unsigned short pinRX, unsigned short pinTX) {
 // https://geekmatic.in.ua/pdf/Catalex_MP3_board.pdf
 void Hardware::HPlayerMP3::_cmd (byte a1, byte a2, byte a3, byte a4) {
 	if (this->_player == nullptr) return;
-	//Serial.println("[hardware:playerMP3] CMD: " + String(a1) + ":" + String(a2) + ":" + String(a3) + ":" + String(a4));
+
+	this->_log("CMD: " + String(a1) + ":" + String(a2) + ":" + String(a3) + ":" + String(a4));
 
 	this->_player->Write((byte)0x7E);	// Код начала команды
 	this->_player->Write((byte)0xFF);	// Все модули
@@ -67,7 +68,7 @@ void Hardware::HPlayerMP3::HardwareInitPre (Protonix* device) {
 
 	this->Wake();
 
-	Serial.println("[hardware:playerMP3] InitPre on pins " + String(this->_player->PinRX()) + ":" + String(this->_player->PinRX()));
+	this->_log("InitPre on pins " + String(this->_player->PinRX()) + ":" + String(this->_player->PinRX()));
 }
 
 void Hardware::HPlayerMP3::HardwareInitPost (Protonix* device) {
@@ -78,6 +79,6 @@ void Hardware::HPlayerMP3::HardwarePipe (Protonix* device, short core) {
 	this->_player->HardwarePipe(device, core);
 }
 
-void Hardware::HPlayerMP3::HardwareCommand (Protonix* device, String command) {
-	this->_player->HardwareCommand(device, command);
+void Hardware::HPlayerMP3::HardwareOnCommand (Protonix* device, String command) {
+	this->_player->HardwareOnCommand(device, command);
 }

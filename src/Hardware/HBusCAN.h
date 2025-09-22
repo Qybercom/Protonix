@@ -120,7 +120,9 @@ namespace Qybercom {
 					void HardwareInitPre (Protonix* device);
 					void HardwareInitPost (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
-					void HardwareCommand (Protonix* device, String command);
+					void HardwareOnCommand (Protonix* device, String command);
+					bool HardwareBusSend (Protonix* device, String data);
+					bool HardwareBusCommand (Protonix* device, String command);
 
 					static canid_t ID (uint8_t id, uint8_t cmd, uint8_t priority = 7);
 					static can_frame* Frame (canid_t id, uint8_t* buf, unsigned short offset, unsigned short length, unsigned short remaining, uint8_t seq = 0, bool first = true, bool last = true);

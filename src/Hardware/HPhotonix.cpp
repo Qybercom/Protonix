@@ -33,7 +33,7 @@ void Hardware::HPhotonix::HardwarePipe (Protonix* device, short core) {
 
 }
 
-void Hardware::HPhotonix::HardwareCommand (Protonix* device, String command) {
+void Hardware::HPhotonix::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;
 

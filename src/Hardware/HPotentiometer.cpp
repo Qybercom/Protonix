@@ -78,7 +78,7 @@ void Hardware::HPotentiometer::HardwarePipe (Protonix* device, short core) {
 	this->_value = analogRead(this->_pin);
 }
 
-void Hardware::HPotentiometer::HardwareCommand (Protonix* device, String command) {
+void Hardware::HPotentiometer::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;
 }

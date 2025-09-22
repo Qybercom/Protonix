@@ -50,7 +50,7 @@ void Hardware::HRelay::HardwarePipe (Protonix* device, short core) {
 	(void)core;
 }
 
-void Hardware::HRelay::HardwareCommand (Protonix* device, String command) {
+void Hardware::HRelay::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 
 	if (command == "open") this->Open();

@@ -5,7 +5,6 @@
 #include <SoftwareSerial.h>
 
 #include "../IProtonixHardware.h"
-#include "../IProtonixCommand.h"
 #include "../Protonix.h"
 
 namespace Qybercom {
@@ -44,7 +43,7 @@ namespace Qybercom {
 
 					SoftwareSerial* Port ();
 
-					bool Send (IProtonixCommand* command);
+					bool SendCommand (String command);
 					bool Send (String s);
 					bool Write (byte b);
 					byte Read ();
@@ -53,7 +52,9 @@ namespace Qybercom {
 					void HardwareInitPre (Protonix* device);
 					void HardwareInitPost (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
-					void HardwareCommand (Protonix* device, String command);
+					void HardwareOnCommand (Protonix* device, String command);
+					bool HardwareBusSend (Protonix* device, String data);
+					bool HardwareBusCommand (Protonix* device, String command);
 			};
 		}
 	}

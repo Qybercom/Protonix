@@ -87,7 +87,11 @@ bool Command::CStdSensor::CommandSerialize () {
 	this->_buffer += ";";
 	this->_buffer += String(this->_sensor->Failure() ? "1" : "0");
 
-	// TODO: add support for sensor state
+	String state = this->_sensor->State();
+	if (state != "") {
+		this->_buffer += ";";
+		this->_buffer += state;
+	}
 
 	return true;
 }

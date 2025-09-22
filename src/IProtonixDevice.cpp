@@ -52,7 +52,7 @@ void IProtonixDevice::DeviceHandleStdCommand (Protonix* device, IProtonixCommand
 		if (hardware != nullptr) {
 			Serial.println("[device] Hardware '" + cmd->ID() + "' received command '" + cmd->CMD() + "'");
 
-			hardware->HardwareCommand(device, cmd->CMD());
+			hardware->HardwareOnCommand(device, cmd->CMD());
 		}
 	}
 

@@ -53,7 +53,7 @@ bool Hardware::HTrigger::InputValue () {
 bool Hardware::HTrigger::OutputValue (unsigned short value) {
 	if (this->_input) return false;
 
-	Serial.println("[hardware:trigger] OutputValue " + String(value));
+	this->_log("OutputValue " + String(value));
 
 	digitalWrite(this->_pin, value);
 
@@ -104,7 +104,7 @@ void Hardware::HTrigger::HardwarePipe (Protonix* device, short core) {
 	}
 }
 
-void Hardware::HTrigger::HardwareCommand (Protonix* device, String command) {
+void Hardware::HTrigger::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;
 }

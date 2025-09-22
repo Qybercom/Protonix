@@ -424,7 +424,7 @@ void Hardware::HBusCAN::HardwarePipe (Protonix* device, short core) {
 		struct can_frame* f = this->_output.PopFirst();
 		MCP2515::ERROR status = this->_driver->sendMessage(f);
 
-		Serial.println("[hardware:busCAN] Send status: '" + Status(status) + "'");
+		this->_log("Send status: '" + Status(status) + "'");
 
 		if (status == MCP2515::ERROR::ERROR_OK) {
 		}
@@ -434,9 +434,23 @@ void Hardware::HBusCAN::HardwarePipe (Protonix* device, short core) {
 	}
 }
 
-void Hardware::HBusCAN::HardwareCommand (Protonix* device, String command) {
+void Hardware::HBusCAN::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;
+}
+
+bool Hardware::HBusCAN::HardwareBusSend (Protonix* device, String data) {
+	(void)device;
+	(void)data;
+
+	return false;
+}
+
+bool Hardware::HBusCAN::HardwareBusCommand (Protonix* device, String command) {
+	(void)device;
+	(void)command;
+
+	return false;
 }
 
 canid_t Hardware::HBusCAN::ID (uint8_t id, uint8_t cmd, uint8_t priority) {
