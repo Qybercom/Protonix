@@ -139,15 +139,14 @@ void Hardware::HBusSerial::HardwarePipe (Protonix* device, short core) {
 	if (this->_cmdBuffer.length() >= 128)
 		this->_cmdBuffer = "";
 
-	String s = "";
 	int b = 0;
 
-	if (this->_blocking) s = this->_port->readStringUntil('\n');
+	if (this->_blocking) this->_cmdBuffer = this->_port->readStringUntil('\n');
 	else b = this->_port->read();
 
-	this->_log("[debug] Pipe " + String(s));
+	//this->_log("Pipe " + String(this->_cmdBuffer));
 
-	if (this->_blocking) s.trim();
+	if (this->_blocking) this->_cmdBuffer.trim();
 	else {
 		if (b == -1) return;
 		char bc = (char)b;
@@ -164,15 +163,15 @@ void Hardware::HBusSerial::HardwarePipe (Protonix* device, short core) {
 		}
 	}
 
-	String lenBuffer = String(this->_blocking ? s.length() + 1 : this->_cmdBuffer.length() + 1);
+	String lenBuffer = String(this->_cmdBuffer.length() + 1);
 
 	if (lenBuffer != this->_lenBuffer) {
 		this->_log("Message corrupted: e:" + this->_lenBuffer + " a:" + lenBuffer);
 	}
 	else {
-		this->_log("[debug] Pipe:cmd " + String(s));
+		//this->_log("Pipe:cmd " + String(this->_cmdBuffer));
 
-		device->CommandRecognizeAndProcess(s, this);
+		device->CommandRecognizeAndProcess(this->_cmdBuffer, this);
 	}
 
 	this->_cmdBuffer = "";
