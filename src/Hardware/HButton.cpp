@@ -33,16 +33,8 @@ bool Hardware::HButton::Released (bool changed) {
 	return (changed ? this->Changed() : true) && !this->_trigger->InputValue();
 }
 
-bool Hardware::HButton::HardwareSPI () {
-	return this->_trigger->HardwareSPI();
-}
-
 void Hardware::HButton::HardwareInitPre (Protonix* device) {
 	this->_trigger->HardwareInitPre(device);
-}
-
-void Hardware::HButton::HardwareInitPost (Protonix* device) {
-	this->_trigger->HardwareInitPost(device);
 }
 
 void Hardware::HButton::HardwarePipe (Protonix* device, short core) {
@@ -59,4 +51,6 @@ void Hardware::HButton::HardwarePipe (Protonix* device, short core) {
 void Hardware::HButton::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;
+
+	// TODO: send command to trigger
 }

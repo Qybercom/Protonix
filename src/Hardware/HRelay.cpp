@@ -29,25 +29,12 @@ void Hardware::HRelay::Close () {
 	digitalWrite(this->_pin, this->_inverted ? HIGH : LOW);
 }
 
-bool Hardware::HRelay::HardwareSPI () {
-	return false;
-}
-
 void Hardware::HRelay::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	pinMode(this->_pin, OUTPUT);
 
 	this->Close();
-}
-
-void Hardware::HRelay::HardwareInitPost (Protonix* device) {
-	(void)device;
-}
-
-void Hardware::HRelay::HardwarePipe (Protonix* device, short core) {
-	(void)device;
-	(void)core;
 }
 
 void Hardware::HRelay::HardwareOnCommand (Protonix* device, String command) {

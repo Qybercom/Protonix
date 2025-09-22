@@ -18,26 +18,18 @@ void Hardware::HBuiltInLED::Active (bool active) {
 	);
 }
 
-bool Hardware::HBuiltInLED::HardwareSPI () {
-	return false;
-}
-
 void Hardware::HBuiltInLED::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	pinMode(this->_pin, OUTPUT);
 }
 
-void Hardware::HBuiltInLED::HardwareInitPost (Protonix* device) {
-	(void)device;
-}
-
-void Hardware::HBuiltInLED::HardwarePipe (Protonix* device, short core) {
-	(void)device;
-	(void)core;
-}
-
 void Hardware::HBuiltInLED::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
-	(void)command;
+
+	if (command == "on")
+		this->Active(true);
+
+	if (command == "off")
+		this->Active(false);
 }

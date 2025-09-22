@@ -59,15 +59,7 @@ int Hardware::HPotentiometer::ValueMapped (int min, int max) {
 	return map(this->_value, this->_min, this->_max, min, max);
 }
 
-bool Hardware::HPotentiometer::HardwareSPI () {
-	return false;
-}
-
 void Hardware::HPotentiometer::HardwareInitPre (Protonix* device) {
-	(void)device;
-}
-
-void Hardware::HPotentiometer::HardwareInitPost (Protonix* device) {
 	(void)device;
 }
 

@@ -104,18 +104,6 @@ bool Hardware::HSensorHall2D::ValueIntMatch (int offset, int min, int max, bool 
 	return matchRange(angleOffset(this->ValueInt(), offset), min, max, minEQ, maxEQ);
 }
 
-bool Hardware::HSensorHall2D::HardwareSPI () {
-	return false;
-}
-
-void Hardware::HSensorHall2D::HardwareInitPre (Protonix* device) {
-	(void)device;
-}
-
-void Hardware::HSensorHall2D::HardwareInitPost (Protonix* device) {
-	(void)device;
-}
-
 void Hardware::HSensorHall2D::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;

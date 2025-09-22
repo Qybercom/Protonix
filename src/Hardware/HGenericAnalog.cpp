@@ -21,19 +21,11 @@ int Hardware::HGenericAnalog::Value () {
 	return this->_value;
 }
 
-bool Hardware::HGenericAnalog::HardwareSPI () {
-	return false;
-}
-
 void Hardware::HGenericAnalog::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	if (this->_init)
 		pinMode(this->_pin, INPUT);
-}
-
-void Hardware::HGenericAnalog::HardwareInitPost (Protonix* device) {
-	(void)device;
 }
 
 void Hardware::HGenericAnalog::HardwarePipe (Protonix* device, short core) {

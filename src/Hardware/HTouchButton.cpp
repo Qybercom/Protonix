@@ -29,25 +29,20 @@ bool Hardware::HTouchButton::Active () {
 	return this->_active;
 }
 
-bool Hardware::HTouchButton::HardwareSPI () {
-	return false;
-}
-
-void Hardware::HTouchButton::HardwareInitPre (Protonix* device) {
-	(void)device;
-}
-
-void Hardware::HTouchButton::HardwareInitPost (Protonix* device) {
-	(void)device;
-}
-
 void Hardware::HTouchButton::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
 
 	int value = digitalRead(this->_pin);
+	bool active = value == HIGH;
+	bool changed = this->_active != active;
 
-	this->_active = value == HIGH;
+	this->_active = active;
+
+	if (this->_allowSignal && changed) {
+		device->Signal(this->_id, "changed")->ValueBool(active);
+		device->Signal(this->_id, String(active ? "touch" : "release"));
+	}
 }
 
 void Hardware::HTouchButton::HardwareOnCommand (Protonix* device, String command) {

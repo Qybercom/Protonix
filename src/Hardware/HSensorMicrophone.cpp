@@ -27,18 +27,10 @@ bool Hardware::HSensorMicrophone::Active () {
 	return this->_active;
 }
 
-bool Hardware::HSensorMicrophone::HardwareSPI () {
-	return false;
-}
-
 void Hardware::HSensorMicrophone::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	this->Pin(this->_pin);
-}
-
-void Hardware::HSensorMicrophone::HardwareInitPost (Protonix* device) {
-	(void)device;
 }
 
 void Hardware::HSensorMicrophone::HardwarePipe (Protonix* device, short core) {

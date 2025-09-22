@@ -47,9 +47,6 @@ namespace Qybercom {
 					int ValueInt (int offset);
 					bool ValueIntMatch (int offset, int min, int max, bool minEQ = true, bool maxEQ = true);
 
-					bool HardwareSPI ();
-					void HardwareInitPre (Protonix* device);
-					void HardwareInitPost (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwareOnCommand (Protonix* device, String command);
 			};

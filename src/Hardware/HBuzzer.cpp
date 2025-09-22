@@ -39,20 +39,12 @@ void Hardware::HBuzzer::Stop () {
 	noTone(this->_pin);
 }
 
-bool Hardware::HBuzzer::HardwareSPI () {
-	return false;
-}
-
 void Hardware::HBuzzer::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	pinMode(this->_pin, OUTPUT);
 
 	this->Stop();
-}
-
-void Hardware::HBuzzer::HardwareInitPost (Protonix* device) {
-	(void)device;
 }
 
 void Hardware::HBuzzer::HardwarePipe (Protonix* device, short core) {

@@ -55,20 +55,9 @@ Hardware::HSelector3P* Hardware::HSelector3P::AllowZero (bool allow) {
 	return this;
 }
 
-bool Hardware::HSelector3P::HardwareSPI () {
-	return true
-		&& this->_trigger1->HardwareSPI()
-		&& this->_trigger2->HardwareSPI();
-}
-
 void Hardware::HSelector3P::HardwareInitPre (Protonix* device) {
 	this->_trigger1->HardwareInitPre(device);
 	this->_trigger2->HardwareInitPre(device);
-}
-
-void Hardware::HSelector3P::HardwareInitPost (Protonix* device) {
-	this->_trigger1->HardwareInitPost(device);
-	this->_trigger2->HardwareInitPost(device);
 }
 
 void Hardware::HSelector3P::HardwarePipe (Protonix* device, short core) {

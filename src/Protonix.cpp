@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Wire.h>
 #include <SPI.h>
 
 #if defined(ESP32)
@@ -195,12 +196,14 @@ Protonix* Protonix::Pipe () {
 	if (!this->_ready) {
 		this->_ready = true;
 
+		bool i2c = false;
 		bool spi = false;
 		#if defined(ESP32)
 		short core = -1;
 		#endif
 
 		for (IProtonixHardware* hardware : this->_hardware) {
+			i2c |= hardware->HardwareI2C();
 			spi |= hardware->HardwareSPI();
 
 			#if defined(ESP32)
@@ -212,8 +215,25 @@ Protonix* Protonix::Pipe () {
 			hardware->HardwareInitPre(this);
 		}
 
-		if (spi)
+		if (i2c) {
+			for (IProtonixHardware* hardware : this->_hardware)
+				hardware->HardwareI2CPre(this);
+
+			Wire.begin();
+
+			for (IProtonixHardware* hardware : this->_hardware)
+				hardware->HardwareI2CPost(this);
+		}
+
+		if (spi) {
+			for (IProtonixHardware* hardware : this->_hardware)
+				hardware->HardwareSPIPre(this);
+
 			SPI.begin();
+
+			for (IProtonixHardware* hardware : this->_hardware)
+				hardware->HardwareSPIPost(this);
+		}
 
 		for (IProtonixHardware* hardware : this->_hardware)
 			hardware->HardwareInitPost(this);

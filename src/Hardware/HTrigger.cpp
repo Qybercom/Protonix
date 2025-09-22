@@ -60,10 +60,6 @@ bool Hardware::HTrigger::OutputValue (unsigned short value) {
 	return true;
 }
 
-bool Hardware::HTrigger::HardwareSPI () {
-	return false;
-}
-
 void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
 	(void)device;
 
@@ -75,10 +71,6 @@ void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
 		pinMode(this->_pin, OUTPUT);
 		digitalWrite(this->_pin, LOW);
 	}
-}
-
-void Hardware::HTrigger::HardwareInitPost (Protonix* device) {
-	(void)device;
 }
 
 void Hardware::HTrigger::HardwarePipe (Protonix* device, short core) {

@@ -59,18 +59,6 @@ int Hardware::HSensorHall::ValueMapped (int min, int max) {
 	return map(this->_value, this->_min, this->_max, min, max);
 }
 
-bool Hardware::HSensorHall::HardwareSPI () {
-	return false;
-}
-
-void Hardware::HSensorHall::HardwareInitPre (Protonix* device) {
-	(void)device;
-}
-
-void Hardware::HSensorHall::HardwareInitPost (Protonix* device) {
-	(void)device;
-}
-
 void Hardware::HSensorHall::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;

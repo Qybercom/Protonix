@@ -15,6 +15,7 @@ namespace Qybercom {
 			class HMesonix : public IProtonixHardware {
 				private:
 					Mesonix* _reader;
+					bool _init;
 
 				public:
 					HMesonix (unsigned short pinSS, unsigned short pinRST, unsigned short uuidReadDebounce = 0, short dedicatedCore = -1);
@@ -22,8 +23,8 @@ namespace Qybercom {
 					Mesonix* Reader ();
 
 					bool HardwareSPI ();
-					void HardwareInitPre (Protonix* device);
-					void HardwareInitPost (Protonix* device);
+					void HardwareSPIPre (Protonix* device);
+					void HardwareSPIPost (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwareOnCommand (Protonix* device, String command);
 			};

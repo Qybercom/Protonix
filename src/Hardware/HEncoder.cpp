@@ -120,10 +120,6 @@ Qybercom::Debouncer<bool> &Hardware::HEncoder::DebouncerButton () {
 	return this->_debouncerButton;
 }
 
-bool Hardware::HEncoder::HardwareSPI () {
-	return false;
-}
-
 void Hardware::HEncoder::HardwareInitPre (Protonix* device) {
 	pinMode(this->_pinA, INPUT_PULLUP);
 	device->InterruptAttach(this->_pinA, CHANGE);
@@ -135,10 +131,6 @@ void Hardware::HEncoder::HardwareInitPre (Protonix* device) {
 		pinMode(this->_pinButton, INPUT_PULLUP);
 		//device->InterruptAttach(this->_pinButton, CHANGE);
 	}
-}
-
-void Hardware::HEncoder::HardwareInitPost (Protonix* device) {
-	(void) device;
 }
 
 void Hardware::HEncoder::HardwarePipe (Protonix* device, short core) {

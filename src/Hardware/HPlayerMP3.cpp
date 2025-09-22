@@ -59,20 +59,12 @@ void Hardware::HPlayerMP3::Wake () {
 	this->_cmd((byte)0x0B, (byte)0x00, (byte)0x00, (byte)0x00);
 }
 
-bool Hardware::HPlayerMP3::HardwareSPI () {
-	return this->_player->HardwareSPI();
-}
-
 void Hardware::HPlayerMP3::HardwareInitPre (Protonix* device) {
 	this->_player->HardwareInitPre(device);
 
 	this->Wake();
 
 	this->_log("InitPre on pins " + String(this->_player->PinRX()) + ":" + String(this->_player->PinRX()));
-}
-
-void Hardware::HPlayerMP3::HardwareInitPost (Protonix* device) {
-	this->_player->HardwareInitPost(device);
 }
 
 void Hardware::HPlayerMP3::HardwarePipe (Protonix* device, short core) {

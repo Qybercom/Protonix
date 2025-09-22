@@ -59,18 +59,10 @@ int Hardware::HPhotoResistor::ValueMapped (int min, int max) {
 	return map(this->_value, this->_min, this->_max, min, max);
 }
 
-bool Hardware::HPhotoResistor::HardwareSPI () {
-	return false;
-}
-
 void Hardware::HPhotoResistor::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	pinMode(this->_pin, INPUT);
-}
-
-void Hardware::HPhotoResistor::HardwareInitPost (Protonix* device) {
-	(void)device;
 }
 
 void Hardware::HPhotoResistor::HardwarePipe (Protonix* device, short core) {

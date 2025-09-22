@@ -14,13 +14,13 @@ bool Hardware::HPhotonix::HardwareSPI () {
 	return true;
 }
 
-void Hardware::HPhotonix::HardwareInitPre (Protonix* device) {
+void Hardware::HPhotonix::HardwareSPIPre (Protonix* device) {
 	(void)device;
 
 
 }
 
-void Hardware::HPhotonix::HardwareInitPost (Protonix* device) {
+void Hardware::HPhotonix::HardwareSPIPost (Protonix* device) {
 	(void)device;
 
 

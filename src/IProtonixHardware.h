@@ -20,11 +20,17 @@ namespace Qybercom {
 				bool HardwareAllowSignal ();
 				IProtonixHardware* HardwareAllowSignal (bool allow);
 
-				virtual bool HardwareSPI () = 0;
-				virtual void HardwareInitPre (Protonix* device) = 0;
-				virtual void HardwareInitPost (Protonix* device) = 0;
-				virtual void HardwarePipe (Protonix* device, short core) = 0;
-				virtual void HardwareOnCommand (Protonix* device, String command) = 0;
+				virtual void HardwareInitPre (Protonix* device) { (void)device; }
+				virtual bool HardwareI2C () { return false; }
+				virtual void HardwareI2CPre (Protonix* device) { (void)device; }
+				virtual void HardwareI2CPost (Protonix* device) { (void)device; }
+				virtual bool HardwareSPI () { return false; }
+				virtual void HardwareSPIPre (Protonix* device) { (void)device; }
+				virtual void HardwareSPIPost (Protonix* device) { (void)device; }
+				virtual void HardwareInitPost (Protonix* device) { (void)device; }
+
+				virtual void HardwarePipe (Protonix* device, short core) { (void)device; (void)core; }
+				virtual void HardwareOnCommand (Protonix* device, String command) { (void)device; (void)command; }
 
 				virtual void HardwarePipeInterrupt (Protonix* device) { (void)device; }
 
@@ -33,8 +39,8 @@ namespace Qybercom {
 
 		class IProtonixBus : public IProtonixHardware {
 			public:
-				virtual bool HardwareBusSend (Protonix* device, String data) = 0;
-				virtual bool HardwareBusCommand (Protonix* device, String command) = 0;
+				virtual bool HardwareBusSend (Protonix* device, String data) { (void)device; (void)data; }
+				virtual bool HardwareBusCommand (Protonix* device, String command) { (void)device; (void)command; }
 		};
 	}
 }

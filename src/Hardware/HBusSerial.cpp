@@ -114,10 +114,6 @@ byte Hardware::HBusSerial::Read () {
 	return this->_started ? this->_port->read() : (byte)'\0';
 }
 
-bool Hardware::HBusSerial::HardwareSPI () {
-	return false;
-}
-
 void Hardware::HBusSerial::HardwareInitPre (Protonix* device) {
 	(void)device;
 
@@ -126,10 +122,6 @@ void Hardware::HBusSerial::HardwareInitPre (Protonix* device) {
 	this->_started = true;
 
 	this->Timeout(this->_timeout);
-}
-
-void Hardware::HBusSerial::HardwareInitPost (Protonix* device) {
-	(void)device;
 }
 
 void Hardware::HBusSerial::HardwarePipe (Protonix* device, short core) {

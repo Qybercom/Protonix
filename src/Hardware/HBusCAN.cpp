@@ -279,11 +279,7 @@ bool Hardware::HBusCAN::HardwareSPI () {
 	return true;
 }
 
-void Hardware::HBusCAN::HardwareInitPre (Protonix* device) {
-	(void)device;
-}
-
-void Hardware::HBusCAN::HardwareInitPost (Protonix* device) {
+void Hardware::HBusCAN::HardwareSPIPost (Protonix* device) {
 	(void)device;
 
 	this->_ready = true;

@@ -27,9 +27,7 @@ namespace Qybercom {
 					void Reset ();
 					void Wake ();
 
-					bool HardwareSPI ();
 					void HardwareInitPre (Protonix* device);
-					void HardwareInitPost (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwareOnCommand (Protonix* device, String command);
 			};
