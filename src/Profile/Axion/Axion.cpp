@@ -24,8 +24,11 @@ Profile::Axion::Axion::Axion (String uriStream, String uriHTTP, unsigned int int
 	this->_dtoOutput = new AxionDTO();
 
 	this->_timerConnectStream = new ProtonixTimer(intervalConnectStream);
+	this->_timerConnectStream->Delayed(true);
 	this->_timerAuthorize = new ProtonixTimer(intervalAuthorize);
+	this->_timerAuthorize->Delayed(true);
 	this->_timerData = new ProtonixTimer(intervalData);
+	this->_timerData->Delayed(true);
 
 	this->_authorized = false;
 	this->_autoConnectStream = true;

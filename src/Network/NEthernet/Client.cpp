@@ -15,6 +15,8 @@ Network::NEthernet::Client::Client () {
 }
 
 bool Network::NEthernet::Client::NetworkClientConnect (ProtonixURI* uri) {
+	if (uri == nullptr || uri->EmptySocket()) return false;
+
 	bool out = this->_client->connect(uri->Host().c_str(), uri->Port());
 
 	if (out) {

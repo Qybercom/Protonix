@@ -39,8 +39,8 @@ namespace Qybercom {
 
 		class IProtonixBus : public IProtonixHardware {
 			public:
-				virtual bool HardwareBusSend (Protonix* device, String data) { (void)device; (void)data; }
-				virtual bool HardwareBusCommand (Protonix* device, String command) { (void)device; (void)command; }
+				virtual bool HardwareBusSend (Protonix* device, String data) { (void)device; (void)data; return false; }
+				virtual bool HardwareBusCommand (Protonix* device, String command) { (void)device; (void)command; return false; }
 		};
 	}
 }

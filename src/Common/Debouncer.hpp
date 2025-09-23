@@ -9,7 +9,7 @@ namespace Qybercom {
 	class Debouncer {
 		private:
 			struct Value {
-				volatile T Data;
+				T Data;
 				volatile unsigned long Count;
 
 				Value (const T &data) : Data(data), Count(0) { }
@@ -90,6 +90,15 @@ namespace Qybercom {
 
 			List<Value> &Values () {
 				return this->_values;
+			}
+
+			Debouncer<T> &Debug () {
+				Serial.println("[debouncer] Debug:");
+
+				for (Value &val : this->_values)
+					Serial.println(" - '" + String(val.Data) + "' : " + String(val.Count));
+
+				return *this;
 			}
 	};
 }

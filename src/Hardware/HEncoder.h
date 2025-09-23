@@ -23,7 +23,7 @@ namespace Qybercom {
 					volatile bool _changedButton;
 					volatile bool _withButton;
 					volatile bool _allowZero;
-					Qybercom::Debouncer<short> _debouncer;
+					Qybercom::Debouncer<short> _debouncer; // use ~75
 					Qybercom::Debouncer<bool> _debouncerButton;
 
 					bool _changedPipe ();

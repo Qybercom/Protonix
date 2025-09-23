@@ -19,6 +19,8 @@ Network::NWiFi::Client::Client () {
 }
 
 bool Network::NWiFi::Client::NetworkClientConnect (ProtonixURI* uri) {
+	if (uri == nullptr || uri->EmptySocket()) return false;
+
 	#if defined(ESP32) || defined(ESP8266)
 		#if defined(ESP32)
 		bool out = this->_client->connect(uri->Host().c_str(), uri->Port(), 10);

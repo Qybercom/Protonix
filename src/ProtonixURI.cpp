@@ -7,10 +7,26 @@ using namespace Qybercom::Protonix;
 
 
 ProtonixURI::ProtonixURI () {
-
+	this->Scheme("");
+	this->Username("");
+	this->Password("");
+	this->Host("");
+	this->Port(0);
+	this->Path("");
+	this->Query("");
+	this->Fragment("");
 }
 
 ProtonixURI::ProtonixURI (String uri) {
+	this->Scheme("");
+	this->Username("");
+	this->Password("");
+	this->Host("");
+	this->Port(0);
+	this->Path("");
+	this->Query("");
+	this->Fragment("");
+
 	int posScheme = uri.indexOf("://");
 	if (posScheme == -1) return; // TODO: handle incomplete
 
@@ -49,14 +65,25 @@ ProtonixURI::ProtonixURI (String uri) {
 }
 
 ProtonixURI::ProtonixURI (String host, unsigned int port) {
+	this->Scheme("");
+	this->Username("");
+	this->Password("");
 	this->Host(host);
 	this->Port(port);
+	this->Path("");
+	this->Query("");
+	this->Fragment("");
 }
 
 ProtonixURI::ProtonixURI (String host, unsigned int port, String path) {
+	this->Scheme("");
+	this->Username("");
+	this->Password("");
 	this->Host(host);
 	this->Port(port);
 	this->Path(path);
+	this->Query("");
+	this->Fragment("");
 }
 
 void ProtonixURI::Scheme (String scheme) {
@@ -149,4 +176,8 @@ String ProtonixURI::URI () {
 	// TODO: handle trailing slash
 
 	return this->_fragment;
+}
+
+bool ProtonixURI::EmptySocket () {
+	return this->_host == "" || this->_port == 0;
 }

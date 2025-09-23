@@ -48,6 +48,8 @@ namespace Qybercom {
 				String Fragment ();
 
 				String URI ();
+
+				bool EmptySocket ();
 		};
 	}
 }
