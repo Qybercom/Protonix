@@ -49,7 +49,7 @@ bool Command::CStdHardware::CommandRecognize (Protonix* device, String command, 
 	while (i < l) {
 		if (setID) cmd += command[i];
 		else {
-			if (command[i] != ';') id += command[i];
+			if (command[i] != ':') id += command[i];
 			else {
 				setID = true;
 

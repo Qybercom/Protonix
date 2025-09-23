@@ -10,20 +10,21 @@
 using namespace Qybercom::Photonix;
 using namespace Qybercom::Protonix;
 
-bool Hardware::HPhotonix::HardwareSPI () {
-	return true;
+Hardware::HPhotonix::HPhotonix (unsigned short pin, unsigned int length) {
+	this->_pin = pin;
+	this->_length = length;
+	this->_photonix = nullptr;
 }
 
-void Hardware::HPhotonix::HardwareSPIPre (Protonix* device) {
-	(void)device;
-
-
+Photonix* Hardware::HPhotonix::Driver () {
+	return this->_photonix;
 }
 
-void Hardware::HPhotonix::HardwareSPIPost (Protonix* device) {
+void Hardware::HPhotonix::HardwareInitPost (Protonix* device) {
 	(void)device;
 
-
+	this->_photonix = new Photonix(this->_pin, this->_length);
+	this->_photonix->Initialized();
 }
 
 void Hardware::HPhotonix::HardwarePipe (Protonix* device, short core) {
@@ -35,7 +36,7 @@ void Hardware::HPhotonix::HardwarePipe (Protonix* device, short core) {
 
 void Hardware::HPhotonix::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
-	(void)command;
 
-
+	if (command == "clear")
+		this->_photonix->Clear();
 }

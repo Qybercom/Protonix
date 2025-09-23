@@ -14,12 +14,16 @@ namespace Qybercom {
 
 			class HPhotonix : public IProtonixHardware {
 				private:
-
+					unsigned short _pin;
+					unsigned int _length;
+					Photonix* _photonix;
 
 				public:
-					bool HardwareSPI ();
-					void HardwareSPIPre (Protonix* device);
-					void HardwareSPIPost (Protonix* device);
+					HPhotonix (unsigned short pin, unsigned int length);
+
+					Photonix* Driver ();
+
+					void HardwareInitPost (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwareOnCommand (Protonix* device, String command);
 			};
