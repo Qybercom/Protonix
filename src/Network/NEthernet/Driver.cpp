@@ -15,10 +15,10 @@ using namespace Qybercom::Protonix;
 
 String Network::NEthernet::Driver::_statusRecognize (EthernetLinkStatus code) {
 	switch (code) {
-		case Unknown: return "UNKNOWN";
-		case LinkON:  return "LINK_ON";
-		case LinkOFF: return "LINK_OFF";
-		default:      return "__unknown__";
+		case Unknown: return "UNKNOWN"; break;
+		case LinkON: return "LINK_ON"; break;
+		case LinkOFF: return "LINK_OFF"; break;
+		default: return "__unknown__"; break;
 	}
 }
 

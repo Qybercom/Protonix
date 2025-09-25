@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+#include "Common/KeyValuePair.hpp"
+
 namespace Qybercom {
 	namespace Protonix {
 		class ProtonixSignal {
@@ -12,6 +14,8 @@ namespace Qybercom {
 				int _valueInt;
 				float _valueFloat;
 				String _valueString;
+				KeyValuePair* _valueKV;
+				void* _valueAny;
 
 			public:
 				ProtonixSignal (String id);
@@ -37,6 +41,14 @@ namespace Qybercom {
 
 				String ValueString ();
 				ProtonixSignal* ValueString (String value);
+
+				KeyValuePair* ValueKV ();
+				ProtonixSignal* ValueKV (KeyValuePair* value);
+
+				void* ValueAny ();
+				ProtonixSignal* ValueAny (void* value);
+
+				~ProtonixSignal ();
 		};
 	}
 }

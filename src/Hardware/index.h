@@ -42,6 +42,7 @@
  * spi bus
  * gps
  * gsm
+ * phone dialer (rotary/keypad)
  * ...
  *
  * button switch handling - not working for the moment

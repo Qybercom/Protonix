@@ -14,87 +14,44 @@ namespace Qybercom {
 		namespace Hardware {
 			// https://github.com/autowp/arduino-mcp2515
 
-			using Qybercom::List;
+			struct HBusCANMessage {
+				byte From;
+				byte To;
+				byte Priority;
+				String Data;
 
-			struct HBusCANCommand {
-				uint8_t cmd;
-				uint8_t priority;
-
-				HBusCANCommand (uint8_t c = 0, uint8_t p = 7) : cmd(c), priority(p & 0x07) { }
-			};
-
-			struct HBusCANBuffer {
-				uint8_t cmd;
-				uint8_t srcID;
-				uint8_t priority;
-				unsigned short expectedLen;
-				unsigned short rxLen;
-				uint8_t expectedSeq;
-				unsigned int lastRxTime;
-				uint8_t* buffer;
-
-				HBusCANBuffer (uint8_t c, uint8_t s, uint8_t p, unsigned short len)
-					: cmd(c), srcID(s), priority(p), expectedLen(len), rxLen(0),
-					  expectedSeq(0), lastRxTime(0), buffer(nullptr)
-				{
-					if (expectedLen > 0)
-						buffer = new uint8_t[expectedLen];
-				}
-
-				~HBusCANBuffer () {
-					if (buffer)
-						delete[] buffer;
-				}
-			};
-
-			class HBusCANMessage {
-				public:
-					bool custom = false;
-					uint8_t cmd = 0;
-					uint8_t srcID = 0;
-					uint8_t priority = 0;
-					String payload;
-					struct can_frame raw;
-
-					HBusCANMessage () { }
-
-					String toHexString (bool delim = false);
+				HBusCANMessage (
+					byte from = 0xf,
+					byte to = 0xf,
+					byte priority = 0x03,
+					String data = ""
+				):
+					From(from),
+					To(to),
+					Priority(priority),
+					Data(data) { }
 			};
 
 			class HBusCAN : public IProtonixBus {
 				private:
 					bool _ready;
-					unsigned short _pinCS;
-					uint8_t _sourceID;
-					unsigned int _timeout;
+					bool _parse;
+					byte _address;
 					CAN_SPEED _bitrate;
 					CAN_CLOCK _clock;
-					unsigned short _payloadMax;
 					MCP2515* _driver;
-					List<HBusCANCommand*> _commands;
-					List<HBusCANBuffer*> _buffers;
-					List<HBusCANMessage*> _input;
-					List<struct can_frame*> _output;
+					String _buffers[16];
+					unsigned int _bufferMax;
 
 					void _settings ();
-					uint8_t _commandPriority (uint8_t cmd);
-					HBusCANBuffer* _buffer (uint8_t cmd, uint8_t src);
-					void _bufferRemove (HBusCANBuffer* buffer);
-					void _inputRaw (const struct can_frame &frame);
-					void _inputFull (HBusCANBuffer* buffer, const struct can_frame &lastFrame);
-					void _inputFrame (const struct can_frame &frame, uint8_t cmd, uint8_t src, uint8_t priority);
+					static String _statusRecognize (MCP2515::ERROR code);
 
 				public:
-					HBusCAN (unsigned short pinCS, uint8_t sourceID, unsigned int timeout = 1000, CAN_SPEED bitrate = CAN_500KBPS, CAN_CLOCK clock = MCP_8MHZ, unsigned short payloadMax = 1024);
-					static HBusCAN* Init (unsigned short pinCS, uint8_t sourceID, unsigned int timeout = 1000, CAN_SPEED bitrate = CAN_500KBPS, CAN_CLOCK clock = MCP_8MHZ, unsigned short payloadMax = 1024);
+					HBusCAN (unsigned short pinCS, byte address, CAN_SPEED bitrate = CAN_125KBPS, CAN_CLOCK clock = MCP_16MHZ, bool parse = true, unsigned int bufferMax = 128);
+					static HBusCAN* Init (unsigned short pinCS, byte address, CAN_SPEED bitrate = CAN_125KBPS, CAN_CLOCK clock = MCP_16MHZ, bool parse = true, unsigned int bufferMax = 128);
 
-					unsigned short PinCS ();
-
-					uint8_t SourceID ();
-					HBusCAN* SourceID (uint8_t sourceID);
-
-					unsigned long Timeout ();
-					HBusCAN* Timeout (unsigned long timeout);
+					byte Address ();
+					HBusCAN* Address (byte address);
 
 					CAN_SPEED Bitrate ();
 					HBusCAN* Bitrate (CAN_SPEED bitrate);
@@ -102,19 +59,20 @@ namespace Qybercom {
 					CAN_CLOCK Clock ();
 					HBusCAN* Clock (CAN_CLOCK clock);
 
-					unsigned short PayloadMax ();
-					HBusCAN* PayloadMax (unsigned short size);
+					bool Parse ();
+					HBusCAN* Parse (bool parse);
 
-					HBusCAN* FilterID (const unsigned int value);
+					unsigned int BufferMax ();
+					HBusCAN* BufferMax (unsigned int size);
 
-					List<HBusCANCommand*> &Commands ();
-					HBusCAN* CommandAdd (uint8_t cmd, uint8_t priority = 7);
+					// Format: [priority:2][truncated:1][destination:4][source:4]
+					unsigned short ID (byte priority, byte address = 0x03, bool truncated = false);
+
+					bool Validate (byte src, byte dst, byte priority, byte truncated);
 
 					bool Send (struct can_frame* frame);
-					bool Send (unsigned int id, const String &hexData);
-
-					bool Enqueue (struct can_frame* frame);
-					bool Enqueue (unsigned int cmd, const String &payload);
+					bool Send (unsigned short id, String data);
+					bool Send (String data, byte priority = 0x03, byte address = 0x0F);
 
 					bool HardwareSPI ();
 					void HardwareSPIPost (Protonix* device);
@@ -122,10 +80,6 @@ namespace Qybercom {
 					void HardwareOnCommand (Protonix* device, String command);
 					bool HardwareBusSend (Protonix* device, String data);
 					bool HardwareBusCommand (Protonix* device, String command);
-
-					static canid_t ID (uint8_t id, uint8_t cmd, uint8_t priority = 7);
-					static can_frame* Frame (canid_t id, uint8_t* buf, unsigned short offset, unsigned short length, unsigned short remaining, uint8_t seq = 0, bool first = true, bool last = true);
-					static String Status (MCP2515::ERROR status);
 			};
 		}
 	}

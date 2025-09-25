@@ -18,21 +18,21 @@ using namespace Qybercom::Protonix;
 
 String Network::NWiFi::Driver::_statusRecognize (int code) {
 	switch (code) {
-		case -1:  return "__init__";
-		case 0:   return "WL_IDLE_STATUS";
-		case 1:   return "WL_NO_SSID_AVAIL";
-		case 2:   return "WL_SCAN_COMPLETED";
-		case 3:   return "WL_CONNECTED";
-		case 4:   return "WL_CONNECT_FAILED";
-		case 5:   return "WL_CONNECTION_LOST";
-		case 6:   return "WL_DISCONNECTED";
+		case -1: return "__init__"; break;
+		case 0: return "WL_IDLE_STATUS"; break;
+		case 1: return "WL_NO_SSID_AVAIL"; break;
+		case 2: return "WL_SCAN_COMPLETED"; break;
+		case 3: return "WL_CONNECTED"; break;
+		case 4: return "WL_CONNECT_FAILED"; break;
+		case 5: return "WL_CONNECTION_LOST"; break;
+		case 6: return "WL_DISCONNECTED"; break;
 		// WiFiNINA/WiFi101
-		case 7:   return "WL_AP_LISTENING";
-		case 8:   return "WL_AP_CONNECTED";
-		case 9:   return "WL_AP_FAILED";
-		case 254: return "WL_STOPPED";
-		case 255: return "WL_NO_SHIELD";
-		default:  return "__unknown__";
+		case 7: return "WL_AP_LISTENING"; break;
+		case 8: return "WL_AP_CONNECTED"; break;
+		case 9: return "WL_AP_FAILED"; break;
+		case 254: return "WL_STOPPED"; break;
+		case 255: return "WL_NO_SHIELD"; break;
+		default: return "__unknown__"; break;
 	}
 }
 

@@ -118,6 +118,25 @@ namespace Qybercom {
 		return 0;
 	}
 
+	inline String hexString (String data, bool delim = true) {
+		String s = "";
+		short length = data.length();
+		int i = 0;
+
+		while (i < length) {
+			uint8_t b = data[i];
+			if (b < 16) s += '0';
+
+			s += String(b, HEX);
+
+			if (delim && i + 1 < length) s += ' ';
+
+			i++;
+		}
+
+		return s;
+	}
+
 	inline List<uint8_t> hexToBytes (const String &hex) {
 		List<uint8_t> out;
 
