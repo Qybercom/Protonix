@@ -1,19 +1,19 @@
 #pragma once
 
 #if defined(ARDUINO_ARCH_AVR)
-	#define QYBERCOM_LIST_COUNT_MAx 32
+	#define QYBERCOM_LIST_COUNT_MAX 32
 #elif defined(ARDUINO_ARCH_SAMD)
-	#define QYBERCOM_LIST_COUNT_MAx 32
+	#define QYBERCOM_LIST_COUNT_MAX 32
 #elif defined(ARDUINO_ARCH_SAM)
-	#define QYBERCOM_LIST_COUNT_MAx 64
+	#define QYBERCOM_LIST_COUNT_MAX 64
 #elif defined(ARDUINO_ARCH_STM32)
-	#define QYBERCOM_LIST_COUNT_MAx 64
+	#define QYBERCOM_LIST_COUNT_MAX 64
 #elif defined(ESP8266)
-	#define QYBERCOM_LIST_COUNT_MAx 256
+	#define QYBERCOM_LIST_COUNT_MAX 256
 #elif defined(ESP32)
-	#define QYBERCOM_LIST_COUNT_MAx 1024
+	#define QYBERCOM_LIST_COUNT_MAX 1024
 #else
-	#define QYBERCOM_LIST_COUNT_MAx 32
+	#define QYBERCOM_LIST_COUNT_MAX 32
 #endif
 
 namespace Qybercom {
@@ -69,12 +69,14 @@ namespace Qybercom {
 			}
 
 		public:
-			List () : _head(0), _tail(0), _count(0), _iNode(0), _iStarted(false), _countMax(QYBERCOM_LIST_COUNT_MAx) { }
+			List () : _head(0), _tail(0), _count(0), _iNode(0), _iStarted(false), _countMax(QYBERCOM_LIST_COUNT_MAX) { }
 
 			Node* Head () { return _head; }
 			T &First () { return _head->Data; }
 			Node* Tail () { return _tail; }
 			T &Last () { return _tail->Data; }
+
+			bool Empty () { return _count == 0; }
 
 			unsigned int Count () const { return _count; }
 

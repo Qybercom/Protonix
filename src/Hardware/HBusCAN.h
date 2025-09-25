@@ -8,6 +8,7 @@
 
 #include "../IProtonixHardware.h"
 #include "../Protonix.h"
+#include "../ProtonixTimer.h"
 
 namespace Qybercom {
 	namespace Protonix {
@@ -40,15 +41,21 @@ namespace Qybercom {
 					CAN_SPEED _bitrate;
 					CAN_CLOCK _clock;
 					MCP2515* _driver;
-					String _buffers[16];
 					unsigned int _bufferMax;
+					List<String>* _inBuffer[15];
+					List<struct can_frame> _outBuffer;
+					ProtonixTimer* _outTimer;
 
 					void _settings ();
+					struct can_frame _frame (unsigned short id, String data);
+					void _process (Protonix* device, byte src, byte dst, byte priority, String data);
 					static String _statusRecognize (MCP2515::ERROR code);
 
 				public:
-					HBusCAN (unsigned short pinCS, byte address, CAN_SPEED bitrate = CAN_125KBPS, CAN_CLOCK clock = MCP_16MHZ, bool parse = true, unsigned int bufferMax = 128);
-					static HBusCAN* Init (unsigned short pinCS, byte address, CAN_SPEED bitrate = CAN_125KBPS, CAN_CLOCK clock = MCP_16MHZ, bool parse = true, unsigned int bufferMax = 128);
+					HBusCAN (unsigned short pinCS, byte address, CAN_SPEED bitrate = CAN_125KBPS, CAN_CLOCK clock = MCP_16MHZ, bool parse = true, unsigned int bufferMax = 70);
+					static HBusCAN* Init (unsigned short pinCS, byte address, CAN_SPEED bitrate = CAN_125KBPS, CAN_CLOCK clock = MCP_16MHZ, bool parse = true, unsigned int bufferMax = 70);
+
+					ProtonixTimer* OutTimer ();
 
 					byte Address ();
 					HBusCAN* Address (byte address);
@@ -72,7 +79,7 @@ namespace Qybercom {
 
 					bool Send (struct can_frame* frame);
 					bool Send (unsigned short id, String data);
-					bool Send (String data, byte priority = 0x03, byte address = 0x0F);
+					bool Send (String data, byte priority = 0x03, byte address = 0x0F, bool truncate = false);
 
 					bool HardwareSPI ();
 					void HardwareSPIPost (Protonix* device);

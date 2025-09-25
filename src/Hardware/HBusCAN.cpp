@@ -4,6 +4,9 @@
 
 #include "../Common/index.h"
 
+#include "../Protonix.h"
+#include "../ProtonixTimer.h"
+
 #include "HBusCAN.h"
 
 using namespace Qybercom::Protonix;
@@ -13,6 +16,33 @@ void Hardware::HBusCAN::_settings () {
 
 	this->_driver->setBitrate(this->_bitrate, this->_clock);
 	this->_driver->setNormalMode();
+}
+
+struct can_frame Hardware::HBusCAN::_frame (unsigned short id, String data) {
+	int length = data.length();
+	if (length > 8) length = 8;
+
+	struct can_frame frame;
+
+	frame.can_id = id;
+	frame.can_dlc = length;
+
+	int i = 0;
+	while (i < length) {
+		frame.data[i] = (byte)data[i];
+
+		i++;
+	}
+
+	return frame;
+}
+
+void Hardware::HBusCAN::_process (Protonix* device, byte src, byte dst, byte priority, String data) {
+	device->Signal(this->_id, "parsed")->ValueAny(
+		new Hardware::HBusCANMessage(src, dst, priority, data)
+	);
+
+	device->CommandRecognizeAndProcess(data, this);
 }
 
 String Hardware::HBusCAN::_statusRecognize (MCP2515::ERROR code) {
@@ -37,17 +67,23 @@ Hardware::HBusCAN::HBusCAN (unsigned short pinCS, byte address, CAN_SPEED bitrat
 	this->_driver = new MCP2515(pinCS);
 
 	int i = 0;
-	while (i < 16) {
-		this->_buffers[i] = "";
+	while (i < 15) {
+		this->_inBuffer[i] = nullptr;
 
 		i++;
 	}
 
 	this->_bufferMax = bufferMax;
+
+	this->_outTimer = new ProtonixTimer(1);
 }
 
 Hardware::HBusCAN* Hardware::HBusCAN::Init (unsigned short pinCS, byte address, CAN_SPEED bitrate, CAN_CLOCK clock, bool parse, unsigned int bufferMax) {
 	return new Hardware::HBusCAN(pinCS, address, bitrate, clock, bufferMax);
+}
+
+ProtonixTimer* Hardware::HBusCAN::OutTimer () {
+	return this->_outTimer;
 }
 
 byte Hardware::HBusCAN::Address () {
@@ -114,53 +150,54 @@ unsigned short Hardware::HBusCAN::ID (byte priority, byte address, bool truncate
 }
 
 bool Hardware::HBusCAN::Send (struct can_frame* frame) {
-	return this->_ready && this->_driver->sendMessage(frame) == MCP2515::ERROR_OK;
+	if (!this->_ready) return false;
+
+	MCP2515::ERROR result = this->_driver->sendMessage(frame);
+	bool out = true;
+
+	if (result != MCP2515::ERROR_OK) {
+		out = false;
+
+		this->_log("Send error: " + Hardware::HBusCAN::_statusRecognize(result));
+	}
+
+	return out;
 }
 
 bool Hardware::HBusCAN::Send (unsigned short id, String data) {
-	struct can_frame frame;
-	int length = data.length();
-	if (length > 8) length = 8;
-
-	frame.can_id = id;
-	frame.can_dlc = length;
-
-	int i = 0;
-	while (i < length) {
-		frame.data[i] = (byte)data[i];
-
-		i++;
-	}
+	struct can_frame frame = this->_frame(id, data);
 
 	return this->Send(&frame);
 }
 
-bool Hardware::HBusCAN::Send (String data, byte priority, byte address) {
-	if (priority > 7) priority = 7;
-
+bool Hardware::HBusCAN::Send (String data, byte priority, byte address, bool truncate) {
+	if (priority > 3) priority = 3;
 	int length = data.length();
-	int offset = 0;
+
+	if (length <= 8)
+		return this->Send(this->ID(priority, address, false), data);
+
+	List<String>* chunks = strChunks(data, 7);
 	int i = 0;
+	int c = chunks->Count();
 
-	while (offset < length) {
-		struct can_frame frame;
-		int chunk = (length - offset > 8) ? 8 : (length - offset);
-		bool truncated = (offset + chunk < length);
+	if (!truncate && c > 10) {
+		this->_log("Can not send data with length greater than 70, current: " + String(length) + " (" + String(c) + " chunks)");
 
-		frame.can_id = this->ID(priority, address, truncated);
-		frame.can_dlc = chunk;
-
-		i = 0;
-		while (i < chunk) {
-			frame.data[i] = (byte)data[offset + i];
-
-			i++;
-		}
-
-		if (!this->Send(&frame)) return false;
-
-		offset += chunk;
+		return false;
 	}
+
+	for (String& chunk : *chunks) {
+		this->_outBuffer.Add(this->_frame(
+			this->ID(priority, address, i != (c - 1)),
+			String(i) + chunk
+		));
+
+		i++;
+	}
+
+	delete chunks;
+	chunks = nullptr;
 
 	return true;
 }
@@ -187,55 +224,89 @@ void Hardware::HBusCAN::HardwarePipe (Protonix* device, short core) {
 	struct can_frame frame;
 	MCP2515::ERROR result = this->_driver->readMessage(&frame);
 
-	if (result == MCP2515::ERROR_NOMSG) return;
 	if (result != MCP2515::ERROR_OK) {
-		this->_log("Receive error: " + Hardware::HBusCAN::_statusRecognize(result));
-
-		return;
+		if (result == MCP2515::ERROR_NOMSG) { }
+		else this->_log("Receive error: " + Hardware::HBusCAN::_statusRecognize(result));
 	}
+	else {
+		//this->_log("frame: " + Hardware::HBusCAN::_statusRecognize(result) + " : " + String(frame.can_id, HEX));
 
-	//this->_log("frame: " + Hardware::HBusCAN::_statusRecognize(result) + " : " + String(frame.can_id, HEX));
+		String frame_data = "";
+		int i = 0;
+		while (i < frame.can_dlc && i < 8) {
+			frame_data += (char)frame.data[i];
 
-	String frame_data = "";
-	int i = 0;
-	while (i < frame.can_dlc && i < 8) {
-		frame_data += (char)frame.data[i];
+			i++;
+		}
 
-		i++;
-	}
+		device->Signal(this->_id, "raw")->ValueKV(new KeyValuePair(
+			String(frame.can_id, HEX),
+			String(frame_data)
+		));
 
-	device->Signal(this->_id, "raw")->ValueKV(new KeyValuePair(
-		String(frame.can_id, HEX),
-		String(frame_data)
-	));
+		if (this->_parse) {
+			unsigned short id = frame.can_id & 0x7FF;
+			byte priority = (id >> 9) & 0x03;
+			byte truncated = ((id >> 8) & 0x01);
+			byte dst = (id >> 4) & 0x0F;
+			byte src = id & 0x0F;
 
-	if (this->_parse) {
-		unsigned short id = frame.can_id & 0x7FF;
-		byte priority = (id >> 9) & 0x03;
-		byte truncated = ((id >> 8) & 0x01);
-		byte dst = (id >> 4) & 0x0F;
-		byte src = id & 0x0F;
+			if (this->Validate(src, dst, priority, truncated)) {
+				if (dst != this->_address && dst != 0x0F) return;
 
-		if (this->Validate(src, dst, priority, truncated)) {
-			if (dst != this->_address && dst != 0x0F) return;
+				String raw = "";
+				int i = 0;
+				while (i < frame.can_dlc) {
+					raw += (char)frame.data[i];
 
-			int i = 0;
-			while (i < frame.can_dlc) {
-				this->_buffers[src] += (char)frame.data[i];
+					i++;
+				}
 
-				i++;
-			}
+				bool empty = this->_inBuffer[src] == nullptr;
 
-			if (truncated == 0 || this->_buffers[src].length() > this->_bufferMax) {
-				device->Signal(this->_id, "parsed")->ValueAny(
-					new Hardware::HBusCANMessage(src, dst, priority, this->_buffers[src])
-				);
+				if (truncated == 0 && empty) this->_process(device, src, dst, priority, raw);
+				else {
+					if (empty)
+						this->_inBuffer[src] = new List<String>();
 
-				device->CommandRecognizeAndProcess(this->_buffers[src], this);
+					if (truncated != 0) this->_inBuffer[src]->Add(raw);
+					else {
+						unsigned int size = this->_inBuffer[src]->Count();
+						String* out = new String[size];
 
-				this->_buffers[src] = "";
+						for (String &chunk : *this->_inBuffer[src])
+							out[(int)(chunk[0] - '0')] = chunk.substring(1);
+
+						this->_inBuffer[src]->Clear();
+						delete this->_inBuffer[src];
+						this->_inBuffer[src] = nullptr;
+
+						String data = "";
+						int i = 0;
+						while (i < size) {
+							data += out[i];
+
+							i++;
+						}
+
+						delete[] out;
+
+						data += raw.substring(1);
+						this->_process(device, src, dst, priority, data);
+					}
+				}
 			}
 		}
+	}
+
+	unsigned int queued = this->_outBuffer.Count();
+
+	if (this->_outTimer->Pipe() && queued != 0) {
+		//this->_log("Queued: " + String(queued));
+
+		struct can_frame frame = this->_outBuffer.PopFirst();
+
+		this->Send(&frame);
 	}
 }
 
@@ -246,16 +317,14 @@ void Hardware::HBusCAN::HardwareOnCommand (Protonix* device, String command) {
 
 bool Hardware::HBusCAN::HardwareBusSend (Protonix* device, String data) {
 	(void)device;
-	(void)data;
 
-	return false;
+	return this->Send(data);
 }
 
 bool Hardware::HBusCAN::HardwareBusCommand (Protonix* device, String command) {
 	(void)device;
-	(void)command;
 
-	return false;
+	return this->Send(command);
 }
 
 bool Hardware::HBusCAN::Validate (byte src, byte dst, byte priority, byte truncated) {
