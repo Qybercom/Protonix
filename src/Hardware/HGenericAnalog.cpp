@@ -13,6 +13,10 @@ Hardware::HGenericAnalog::HGenericAnalog (unsigned short pin, bool init) {
 	this->_value = -1;
 }
 
+unsigned short Hardware::HGenericAnalog::Pin () {
+	return this->_pin;
+}
+
 bool Hardware::HGenericAnalog::Init () {
 	return this->_init;
 }

@@ -6,6 +6,8 @@
 #include "HButton.h"
 #include "HBuzzer.h"
 #include "HEncoder.h"
+#include "HGenericAnalog.h"
+#include "HJoystick.h"
 #include "HPhotonix.h"
 #include "HPhotoResistor.h"
 #include "HPlayerMP3.h"
@@ -34,17 +36,14 @@
  * audio output
  * SD card reader
  * camera
- * joystick
  * audio sensor
  * infrared sensor/trigger/bus
  * bluetooth
- * genericAnalog
  * spi bus
  * gps
  * gsm
  * phone dialer (rotary/keypad)
  * ...
  *
- * button switch handling - not working for the moment
  * recognizing UX gestures (double-click etc. for buttons, touch etc.)
  */

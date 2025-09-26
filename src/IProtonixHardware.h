@@ -20,6 +20,7 @@ namespace Qybercom {
 				bool HardwareAllowSignal ();
 				IProtonixHardware* HardwareAllowSignal (bool allow);
 
+				virtual String HardwareSummary () { return ""; }
 				virtual void HardwareInitPre (Protonix* device) { (void)device; }
 				virtual bool HardwareI2C () { return false; }
 				virtual void HardwareI2CPre (Protonix* device) { (void)device; }

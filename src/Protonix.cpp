@@ -512,6 +512,24 @@ ProtonixSignal* Protonix::Signal (String from, String id) {
 	return signal;
 }
 
+bool Protonix::SignalSpawned (String id) {
+	if (this->_signals.Count() == 0) return false;
+
+	for (ProtonixSignal* signal : this->_signals)
+		if (signal->Is(id)) return true;
+
+	return false;
+}
+
+bool Protonix::SignalSpawned (String from, String id) {
+	if (this->_signals.Count() == 0) return false;
+
+	for (ProtonixSignal* signal : this->_signals)
+		if (signal->Is(from, id)) return true;
+
+	return false;
+}
+
 
 
 Qybercom::List<ProtonixAction*> &Protonix::Actions () {

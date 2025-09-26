@@ -9,22 +9,63 @@
 
 using namespace Qybercom::Protonix;
 
-Hardware::HTrigger::HTrigger (bool input, unsigned short pin, unsigned int checkInterval, unsigned short mode) {
+bool Hardware::HTrigger::_inputChangedHandler () {
+	if (!this->_allowSignal) return false;
+
+	bool out = false;
+
+	if (this->_inputChangedSignal) {
+		out = true;
+		this->_inputChangedSignal = false;
+	}
+
+	return out;
+}
+
+bool Hardware::HTrigger::_pipe () {
+	if (!this->_input) return false;
+
+	unsigned short value = digitalRead(this->_pin);
+
+	this->_debouncer.Use(value);
+
+	if (this->_debouncer.Pipe()) {
+		value = this->_debouncer.Empty() ? 0 : this->_debouncer.Actual();
+
+		bool val = (value == HIGH) != (this->_inputMode == HIGH);
+
+		if (this->_inputValue != val) {
+			this->_inputValue = val;
+			this->_inputChanged = true;
+			this->_inputChangedSignal = true;
+		}
+
+		this->_debouncer.Reset();
+	}
+
+	return true;
+}
+
+Hardware::HTrigger::HTrigger (bool input, unsigned short pin, unsigned int checkInterval, unsigned short mode, bool interrupt) {
 	this->_pin = pin;
+	this->_interrupt = interrupt;
 	this->_input = input;
 	this->_inputMode = mode;
 	this->_inputChanged = false;
+	this->_inputChangedSignal = false;
 	this->_inputValue = false;
 
 	this->_debouncer.CheckInterval(checkInterval);
+
+	this->_signalInputChanged = "inputChanged";
 }
 
-Hardware::HTrigger* Hardware::HTrigger::Input (unsigned short pin, unsigned short mode, unsigned int checkInterval) {
-	return new Hardware::HTrigger(true, pin, checkInterval, mode);
+Hardware::HTrigger* Hardware::HTrigger::Input (unsigned short pin, unsigned short mode, unsigned int checkInterval, bool interrupt) {
+	return new Hardware::HTrigger(true, pin, checkInterval, mode, interrupt);
 }
 
 Hardware::HTrigger* Hardware::HTrigger::Output (unsigned short pin) {
-	return new Hardware::HTrigger(false, pin, 0, LOW);
+	return new Hardware::HTrigger(false, pin, 0, LOW, false);
 }
 
 unsigned short Hardware::HTrigger::Pin () {
@@ -33,6 +74,30 @@ unsigned short Hardware::HTrigger::Pin () {
 
 unsigned short Hardware::HTrigger::InputMode () {
 	return this->_inputMode;
+}
+
+Qybercom::Debouncer<unsigned short> &Hardware::HTrigger::Debouncer () {
+	return this->_debouncer;
+}
+
+bool Hardware::HTrigger::Interrupt () {
+	return this->_interrupt;
+}
+
+Hardware::HTrigger* Hardware::HTrigger::Interrupt (bool interrupt) {
+	this->_interrupt = interrupt;
+
+	return this;
+}
+
+String Hardware::HTrigger::SignalInputChanged () {
+	return this->_signalInputChanged;
+}
+
+Hardware::HTrigger* Hardware::HTrigger::SignalInputChanged (String signal) {
+	this->_signalInputChanged = signal;
+
+	return this;
 }
 
 bool Hardware::HTrigger::InputChanged () {
@@ -66,6 +131,9 @@ void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
 	if (this->_input) {
 		digitalWrite(this->_pin, this->_inputMode);
 		pinMode(this->_pin, INPUT_PULLUP);
+
+		if (this->_interrupt)
+			device->InterruptAttach(this->_pin, CHANGE);
 	}
 	else {
 		pinMode(this->_pin, OUTPUT);
@@ -76,24 +144,20 @@ void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
 void Hardware::HTrigger::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
-	if (!this->_input) return;
 
-	unsigned short value = digitalRead(this->_pin);
+	if (!this->_interrupt)
+		this->_pipe();
 
-	this->_debouncer.Use(value);
+	if (this->_inputChangedHandler())
+		device->Signal(this->_id, this->_signalInputChanged)->ValueBool(this->_inputValue);
+}
 
-	if (this->_debouncer.Pipe()) {
-		value = this->_debouncer.Empty() ? 0 : this->_debouncer.Actual();
+void Hardware::HTrigger::HardwarePipeInterrupt (Protonix* device) {
+	(void)device;
 
-		bool val = (value == HIGH) != (this->_inputMode == HIGH);
+	if (!this->_interrupt) return;
 
-		if (this->_inputValue != val) {
-			this->_inputValue = val;
-			this->_inputChanged = true;
-		}
-
-		this->_debouncer.Reset();
-	}
+	this->_pipe();
 }
 
 void Hardware::HTrigger::HardwareOnCommand (Protonix* device, String command) {

@@ -5,36 +5,28 @@
 #include "../IProtonixHardware.h"
 #include "../Protonix.h"
 
+#include "HButton.h"
+
 #include "HEncoder.h"
 
 using namespace Qybercom::Protonix;
 
-bool Hardware::HEncoder::_changedPipe () {
-	bool out = false;
-
-	if (this->_changed) {
-		if (this->_allowZero || this->_dir != 0) out = true;
-
-		this->_changed = false;
-	}
-
-	return out;
-}
-
 Hardware::HEncoder::HEncoder (unsigned short pinA, unsigned short pinB, unsigned int checkInterval) {
 	this->_pinA = pinA;
 	this->_pinB = pinB;
-	this->_pinButton = 0;
 	this->_valA = false;
 	this->_valB = false;
 	this->_dir = 0;
-	this->_clicked = false;
 	this->_changed = false;
-	this->_changedButton = false;
-	this->_withButton = false;
 	this->_allowZero = false;
 
 	this->_debouncer.CheckInterval(checkInterval);
+
+	this->_button = nullptr;
+}
+
+Hardware::HEncoder* Hardware::HEncoder::Init (unsigned short pinA, unsigned short pinB, unsigned int checkInterval) {
+	return new Hardware::HEncoder(pinA, pinB, checkInterval);
 }
 
 Hardware::HEncoder* Hardware::HEncoder::WithButton (unsigned short pinA, unsigned short pinB, unsigned short pinButton) {
@@ -48,9 +40,7 @@ Hardware::HEncoder* Hardware::HEncoder::WithButton (unsigned short pinA, unsigne
 Hardware::HEncoder* Hardware::HEncoder::WithButton (unsigned short pinA, unsigned short pinB, unsigned short pinButton, unsigned int checkInterval, unsigned int checkIntervalButton) {
 	Hardware::HEncoder* out = new Hardware::HEncoder(pinA, pinB, checkInterval);
 
-	out->_pinButton = pinButton;
-	out->_withButton = true;
-	out->_debouncerButton.CheckInterval(checkIntervalButton);
+	out->_button = new Hardware::HButton(pinButton, checkIntervalButton);
 
 	return out;
 }
@@ -61,10 +51,6 @@ unsigned short Hardware::HEncoder::PinA () {
 
 unsigned short Hardware::HEncoder::PinB () {
 	return this->_pinB;
-}
-
-unsigned short Hardware::HEncoder::PinButton () {
-	return this->_pinButton;
 }
 
 bool Hardware::HEncoder::ValA () {
@@ -79,27 +65,16 @@ short Hardware::HEncoder::Dir () {
 	return this->_dir;
 }
 
-bool Hardware::HEncoder::Clicked () {
-	return this->_clicked;
-}
-
 bool Hardware::HEncoder::Changed () {
-	return this->_changedPipe();
-}
-
-bool Hardware::HEncoder::ChangedButton () {
 	bool out = false;
 
-	if (this->_changedButton) {
-		out = true;
-		this->_changedButton = false;
+	if (this->_changed) {
+		if (this->_allowZero || this->_dir != 0) out = true;
+
+		this->_changed = false;
 	}
 
 	return out;
-}
-
-bool Hardware::HEncoder::WithButton () {
-	return this->_withButton;
 }
 
 bool Hardware::HEncoder::AllowZero () {
@@ -116,10 +91,6 @@ Qybercom::Debouncer<short> &Hardware::HEncoder::Debouncer () {
 	return this->_debouncer;
 }
 
-Qybercom::Debouncer<bool> &Hardware::HEncoder::DebouncerButton () {
-	return this->_debouncerButton;
-}
-
 void Hardware::HEncoder::HardwareInitPre (Protonix* device) {
 	pinMode(this->_pinA, INPUT_PULLUP);
 	device->InterruptAttach(this->_pinA, CHANGE);
@@ -127,33 +98,24 @@ void Hardware::HEncoder::HardwareInitPre (Protonix* device) {
 	pinMode(this->_pinB, INPUT_PULLUP);
 	device->InterruptAttach(this->_pinB, CHANGE);
 
-	if (this->_withButton) {
-		pinMode(this->_pinButton, INPUT_PULLUP);
-		//device->InterruptAttach(this->_pinButton, CHANGE);
+	if (this->_button != nullptr) {
+		this->_button->SignalChanged("buttonChanged");
+		this->_button->SignalPressed("buttonPressed");
+		this->_button->SignalReleased("buttonReleased");
+
+		this->_button->HardwareID(this->_id);
+		this->_button->HardwareAllowSignal(this->_allowSignal);
+		this->_button->HardwareInitPre(device);
 	}
 }
 
 void Hardware::HEncoder::HardwarePipe (Protonix* device, short core) {
 	(void)core;
 
-	if (this->_withButton) {
-		bool clicked = digitalRead(this->_pinButton);
+	if (this->_button != nullptr)
+		this->_button->HardwarePipe(device, core);
 
-		this->_debouncerButton.Use(clicked);
-
-		if (this->_debouncerButton.Pipe()) {
-			clicked = this->_debouncerButton.Empty() ? false : this->_debouncerButton.Actual();
-
-			if (this->_clicked != clicked) {
-				this->_clicked = clicked;
-				this->_changedButton = true;
-			}
-
-			this->_debouncerButton.Reset();
-		}
-	}
-
-	if (this->_allowSignal && this->_changedPipe())
+	if (this->_allowSignal && this->Changed())
 		device->Signal(this->_id, "dir")->ValueInt(this->_dir);
 }
 
@@ -183,6 +145,9 @@ void Hardware::HEncoder::HardwarePipeInterrupt (Protonix* device) {
 
 	this->_valA = valA;
 	this->_valB = valB;
+
+	if (this->_button != nullptr)
+		this->_button->HardwarePipeInterrupt(device);
 }
 
 void Hardware::HEncoder::HardwareOnCommand (Protonix* device, String command) {

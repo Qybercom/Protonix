@@ -13,11 +13,24 @@ namespace Qybercom {
 			class HButton : public IProtonixHardware {
 				private:
 					HTrigger* _trigger;
+					String _signalChanged;
+					String _signalPressed;
+					String _signalReleased;
 
 				public:
 					HButton (unsigned short pin, unsigned int checkInterval = 0);
+					static HButton* Init (unsigned short pin, unsigned int checkInterval = 0);
 
 					HTrigger* Trigger ();
+
+					String SignalChanged ();
+					HButton* SignalChanged (String signal);
+
+					String SignalPressed ();
+					HButton* SignalPressed (String signal);
+
+					String SignalReleased ();
+					HButton* SignalReleased (String signal);
 
 					bool Changed ();
 					bool Active ();
@@ -26,6 +39,7 @@ namespace Qybercom {
 
 					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
+					void HardwarePipeInterrupt (Protonix* device);
 					void HardwareOnCommand (Protonix* device, String command);
 			};
 		}

@@ -256,7 +256,7 @@ void Profile::Axion::Axion::_onStreamEvent (Protonix* device) {
 		dto->AxionDTOPopulate(this->_dtoInput);
 
 		String cmd = dto->Command();
-		//if (this->_debug)
+		if (this->_debug)
 			Serial.println("[Axion:OnStreamEvent:Command] " + cmd);
 
 		bool ok = device->CommandRecognizeAndProcess(cmd);

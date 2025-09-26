@@ -136,6 +136,8 @@ namespace Qybercom {
 				Protonix* Signal (ProtonixSignal* signal);
 				ProtonixSignal* Signal (String id);
 				ProtonixSignal* Signal (String from, String id);
+				bool SignalSpawned (String id);
+				bool SignalSpawned (String from, String id);
 
 				List<ProtonixAction*> &Actions ();
 				ProtonixAction* Action (String name);

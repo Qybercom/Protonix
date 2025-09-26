@@ -17,6 +17,7 @@ namespace Qybercom {
 				public:
 					HGenericAnalog (unsigned short pin, bool init = false);
 
+					unsigned short Pin ();
 					bool Init ();
 					int Value ();
 
