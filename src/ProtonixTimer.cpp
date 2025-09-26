@@ -28,6 +28,19 @@ ProtonixTimer::ProtonixTimer (unsigned int interval, ProtonixTimer::ProtonixTime
 	this->Unit(unit);
 }
 
+ProtonixTimer* ProtonixTimer::Timeout (unsigned int interval, bool enabled) {
+	return ProtonixTimer::Timeout(interval, ProtonixTimer::ProtonixTimerUnit::MILLISECONDS, enabled);
+}
+
+ProtonixTimer* ProtonixTimer::Timeout (unsigned int interval, ProtonixTimer::ProtonixTimerUnit unit, bool enabled) {
+	ProtonixTimer* timer = new ProtonixTimer(interval, unit, enabled);
+
+	timer->_timeout = true;
+	timer->_delayed = true;
+
+	return timer;
+}
+
 unsigned long ProtonixTimer::Previous () {
 	return this->_previous;
 }
@@ -137,6 +150,11 @@ bool ProtonixTimer::Pipe () {
 
 	if (elapsed)
 		this->_previous = current;
+
+	if (this->_timeout && this->_delayedConsumed) {
+		this->_enabled = false;
+		this->Reset();
+	}
 
 	bool pass = true;
 	if (this->_delayed && !this->_delayedConsumed) {

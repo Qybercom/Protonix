@@ -4,6 +4,7 @@
 
 #include "../IProtonixHardware.h"
 #include "../Protonix.h"
+#include "../ProtonixTimer.h"
 
 #include "HTrigger.h"
 
@@ -21,7 +22,18 @@ namespace Qybercom {
 					int _minX;
 					int _maxY;
 					int _minY;
+					int _positionX;
+					int _positionY;
+					bool _positionChanged;
 					HButton* _button;
+					bool _calibrateAuto;
+					ProtonixTimer* _calibrateTimeout;
+					bool _calibrated;
+					int _gapMaxX;
+					int _gapMinX;
+					int _gapMaxY;
+					int _gapMinY;
+					bool _allowSignalValue;
 
 				public:
 					HJoystick (short pinX = -1, short pinY = -1, short pinButton = -1, bool init = false);
@@ -44,18 +56,29 @@ namespace Qybercom {
 					int MinY ();
 					HJoystick* MinY (int min);
 
+					bool CalibrateAuto ();
+					HJoystick* CalibrateAuto (bool calibrate);
+					HJoystick* Calibrate ();
+					ProtonixTimer* CalibrateTimeout ();
+					HJoystick* Calibrate (int gapMinX, int gapMaxX, int gapMinY, int gapMaxY);
+
+					bool AllowSignalValue ();
+					HJoystick* AllowSignalValue (bool allow);
+
 					HButton* Button ();
 
 					int ValueX ();
 					int ValueY ();
 
-					int PositionX (int min = -100, int max = 100);
-					int PositionY (int min = -100, int max = 100);
+					int PositionX ();
+					int PositionY ();
 
 					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwarePipeInterrupt (Protonix* device);
 					void HardwareOnCommand (Protonix* device, String command);
+
+					static int Position (int value, int valMin, int valMax, int gapMin, int gapMax);
 			};
 		}
 	}

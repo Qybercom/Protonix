@@ -9,6 +9,10 @@
 
 using namespace Qybercom::Protonix;
 
+bool ProtonixNetworkClient::_valid () {
+	return this->_network != nullptr && this->_network->NetworkDriverConnected() && this->_client != nullptr;
+}
+
 ProtonixNetworkClient::ProtonixNetworkClient (String uri) {
 	this->_uri = new ProtonixURI(uri);
 	this->_uriOwn = true;
@@ -50,23 +54,23 @@ bool ProtonixNetworkClient::Connect () {
 	if (this->_network == nullptr)
 		this->Network(Protonix::Instance()->NetworkDefault());
 
-	return this->_client == nullptr ? false : this->_client->NetworkClientConnect(this->_uri);
+	return this->_valid() ? this->_client->NetworkClientConnect(this->_uri) : false;
 }
 
 bool ProtonixNetworkClient::Connected () {
-	return this->_client == nullptr ? false : this->_client->NetworkClientConnected();
+	return this->_valid() ? this->_client->NetworkClientConnected() : false;
 }
 
 String ProtonixNetworkClient::Receive () {
-	return this->_client == nullptr ? "" : this->_client->NetworkClientReceive();
+	return this->_valid() ? this->_client->NetworkClientReceive() : "";
 }
 
 bool ProtonixNetworkClient::Send (String data) {
-	return this->_client == nullptr ? false : this->_client->NetworkClientSend(data);
+	return this->_valid() ? this->_client->NetworkClientSend(data) : false;
 }
 
 bool ProtonixNetworkClient::Close () {
-	return this->_client == nullptr ? false : this->_client->NetworkClientClose();
+	return this->_valid() ? this->_client->NetworkClientClose() : false;
 }
 
 ProtonixNetworkClient::~ProtonixNetworkClient () {

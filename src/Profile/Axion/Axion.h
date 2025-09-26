@@ -36,7 +36,7 @@ namespace Qybercom {
 						void _onStreamEvent (Protonix* device);
 
 					public:
-						Axion (String uriStream, String uriHTTP, unsigned int intervalData = 100, unsigned int intervalConnectStream = 1000, unsigned int intervalAuthorize = 1000);
+						Axion (String uriStream, String uriHTTP, unsigned int intervalData = 100, unsigned int intervalConnectStream = 3000, unsigned int intervalAuthorize = 1000);
 
 						void ProfilePipe (Protonix* device);
 						String ProfileFirmwareURI (Protonix* device, String platform, String version);

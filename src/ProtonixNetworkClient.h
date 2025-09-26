@@ -15,6 +15,8 @@ namespace Qybercom {
 				IProtonixNetworkDriver* _network;
 				IProtonixNetworkClient* _client;
 
+				bool _valid ();
+
 			public:
 				ProtonixNetworkClient (String uri);
 				ProtonixNetworkClient (ProtonixURI* uri);

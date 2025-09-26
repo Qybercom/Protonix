@@ -16,6 +16,9 @@ namespace Qybercom {
 				ProtonixTimer (unsigned int interval, bool enabled = true);
 				ProtonixTimer (unsigned int interval, ProtonixTimerUnit unit, bool enabled = true);
 
+				static ProtonixTimer* Timeout (unsigned int interval, bool enabled = false);
+				static ProtonixTimer* Timeout (unsigned int interval, ProtonixTimerUnit unit, bool enabled = false);
+
 				unsigned long Previous ();
 
 				unsigned long long TotalMilliseconds ();
@@ -47,6 +50,7 @@ namespace Qybercom {
 				bool _enabled;
 				bool _delayed;
 				bool _delayedConsumed;
+				bool _timeout;
 				unsigned long _previous;
 				unsigned int _interval;
 				ProtonixTimerUnit _unit;
