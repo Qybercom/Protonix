@@ -79,7 +79,7 @@ Hardware::HBusCAN::HBusCAN (unsigned short pinCS, byte address, CAN_SPEED bitrat
 }
 
 Hardware::HBusCAN* Hardware::HBusCAN::Init (unsigned short pinCS, byte address, CAN_SPEED bitrate, CAN_CLOCK clock, bool parse, unsigned int bufferMax) {
-	return new Hardware::HBusCAN(pinCS, address, bitrate, clock, bufferMax);
+	return new Hardware::HBusCAN(pinCS, address, bitrate, clock, parse, bufferMax);
 }
 
 ProtonixTimer* Hardware::HBusCAN::OutTimer () {
@@ -271,7 +271,7 @@ void Hardware::HBusCAN::HardwarePipe (Protonix* device, short core) {
 						this->_inBuffer[src] = nullptr;
 
 						String data = "";
-						int i = 0;
+						unsigned int i = 0;
 						while (i < size) {
 							data += out[i];
 
