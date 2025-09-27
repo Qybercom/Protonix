@@ -52,14 +52,10 @@ void Profile::Axion::Axion::ProfilePipe (Protonix* device) {
 
 		String sep = Random::AZaz09(16);
 		raw.replace("}{", "}" + sep + "{");
-		//Serial.println("[debug] 1: " + raw);
 
 		List<String>* cmds = explode(sep, raw);
-		//Serial.println("[debug] 2: " + String(cmds->Count()));
 
 		for (String& cmd : *cmds) {
-			//Serial.println("[debug] 3: " + cmd);
-
 			this->_dtoInput->BufferRaw(cmd);
 			this->_dtoInput->Deserialize();
 

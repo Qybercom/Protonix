@@ -12,6 +12,13 @@
 namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
+			struct HEncoderState {
+				short Dir;
+				bool Button;
+
+				HEncoderState (short dir, bool button) : Dir(dir), Button(button) { }
+			};
+
 			class HEncoder : public IProtonixHardware {
 				private:
 					unsigned short _pinA;

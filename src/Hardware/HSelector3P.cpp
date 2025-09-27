@@ -79,7 +79,7 @@ void Hardware::HSelector3P::HardwarePipe (Protonix* device, short core) {
 	}
 
 	if (this->_allowSignal && this->_changedPipe())
-		device->Signal(this->_id, "changed")->ValueInt(value);
+		device->Signal(this->_id, "changed")->Value(value);
 }
 
 void Hardware::HSelector3P::HardwareOnCommand (Protonix* device, String command) {

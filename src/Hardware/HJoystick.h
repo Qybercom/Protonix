@@ -6,11 +6,20 @@
 #include "../Protonix.h"
 #include "../ProtonixTimer.h"
 
+#include "../Common/Data.hpp"
+
 #include "HTrigger.h"
 
 namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
+			struct HJoystickState {
+				Vector2 Position;
+				bool Button;
+
+				HJoystickState (int x, int y, bool button) : Position(Vector2(x, y)), Button(button) { }
+			};
+
 			class HJoystick : public IProtonixHardware {
 				private:
 					short _pinX;

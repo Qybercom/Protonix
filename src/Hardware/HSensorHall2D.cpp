@@ -112,6 +112,8 @@ void Hardware::HSensorHall2D::HardwarePipe (Protonix* device, short core) {
 	int y = analogRead(this->_pinY);
 
 	this->_value = angleByXY(x, y, this->_minX, this->_maxX, this->_minY, this->_maxY);
+
+	// TODO: add signal
 }
 
 void Hardware::HSensorHall2D::HardwareOnCommand (Protonix* device, String command) {

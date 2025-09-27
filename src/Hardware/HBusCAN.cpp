@@ -38,8 +38,8 @@ struct can_frame Hardware::HBusCAN::_frame (unsigned short id, String data) {
 }
 
 void Hardware::HBusCAN::_process (Protonix* device, byte src, byte dst, byte priority, String data) {
-	device->Signal(this->_id, "parsed")->ValueAny(
-		new Hardware::HBusCANMessage(src, dst, priority, data)
+	device->Signal(this->_id, "parsed")->Value(
+		Hardware::HBusCANMessage(src, dst, priority, data)
 	);
 
 	device->CommandRecognizeAndProcess(data, this);
@@ -229,20 +229,9 @@ void Hardware::HBusCAN::HardwarePipe (Protonix* device, short core) {
 		else this->_log("Receive error: " + Hardware::HBusCAN::_statusRecognize(result));
 	}
 	else {
-		//this->_log("frame: " + Hardware::HBusCAN::_statusRecognize(result) + " : " + String(frame.can_id, HEX));
+		//this->_log("Raw frame: " + Hardware::HBusCAN::_statusRecognize(result) + " : " + String(frame.can_id, HEX));
 
-		String frame_data = "";
-		int i = 0;
-		while (i < frame.can_dlc && i < 8) {
-			frame_data += (char)frame.data[i];
-
-			i++;
-		}
-
-		device->Signal(this->_id, "raw")->ValueKV(new KeyValuePair(
-			String(frame.can_id, HEX),
-			String(frame_data)
-		));
+		device->Signal(this->_id, "raw")->Value(frame);
 
 		if (this->_parse) {
 			unsigned short id = frame.can_id & 0x7FF;

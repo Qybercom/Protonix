@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#include "Common/KeyValuePair.hpp"
+#include "Common/Data.hpp"
 
 namespace Qybercom {
 	namespace Protonix {
@@ -10,12 +10,7 @@ namespace Qybercom {
 			private:
 				String _id;
 				String _from;
-				bool _valueBool;
-				int _valueInt;
-				float _valueFloat;
-				String _valueString;
-				KeyValuePair* _valueKV;
-				void* _valueAny;
+				Any _value;
 
 			public:
 				ProtonixSignal (String id);
@@ -30,23 +25,16 @@ namespace Qybercom {
 				bool Is (String id);
 				bool Is (String from, String id);
 
-				bool ValueBool ();
-				ProtonixSignal* ValueBool (bool value);
-
-				int ValueInt ();
-				ProtonixSignal* ValueInt (int value);
-
-				float ValueFloat ();
-				ProtonixSignal* ValueFloat (float value);
-
-				String ValueString ();
-				ProtonixSignal* ValueString (String value);
-
-				KeyValuePair* ValueKV ();
-				ProtonixSignal* ValueKV (KeyValuePair* value);
-
-				void* ValueAny ();
-				ProtonixSignal* ValueAny (void* value);
+				Any Value ();
+				template<typename T>
+			 	T Value () {
+			 		return this->_value.As<T>();
+			 	}
+				ProtonixSignal* Value (Any value);
+				template<typename T>
+				ProtonixSignal* Value (const T& value) {
+					return this->Value(Any(value));
+				}
 
 				~ProtonixSignal ();
 		};

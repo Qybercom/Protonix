@@ -4,7 +4,7 @@
 #include "../Protonix.h"
 #include "../ProtonixTimer.h"
 
-#include "Common//KeyValuePair.hpp"
+#include "Common/Data.hpp"
 
 #include "HButton.h"
 
@@ -24,8 +24,7 @@ Hardware::HJoystick::HJoystick (short pinX, short pinY, short pinButton, bool in
 	this->_maxY = QYBERCOM_PROTONIX_ANALOG_MAX;
 	this->_minY = 0;
 
-	if (pinButton > -1)
-		this->_button = new Hardware::HButton(pinButton);
+	this->_button = pinButton < 0 ? nullptr : new Hardware::HButton(pinButton);
 
 	this->_positionChanged = false;
 	this->_positionX = 0;
@@ -191,18 +190,22 @@ void Hardware::HJoystick::HardwarePipe (Protonix* device, short core) {
 	if (this->_pinY > -1)
 		rawY = analogRead(this->_pinY);
 
+	if (this->_button != nullptr)
+		this->_button->HardwarePipe(device, core);
+
 	if (this->_calibrateAuto && !this->_calibrated) {
 		this->_calibrateTimeout->Enabled(true);
 
 		if (this->_calibrateTimeout->Pipe()) {
 			this->_calibrated = true;
 
-			Serial.println(String("calibrate:")
-				+ String(" maxX:") + String(this->_gapMaxX)
-				+ String(" minX:") + String(this->_gapMinX)
-				+ String(" maxY:") + String(this->_gapMaxY)
-				+ String(" minY:") + String(this->_gapMinY)
-			);
+			if (this->_allowSignal)
+				device->Signal(this->_id, "calibrated")->Value(Vector4(
+					this->_gapMaxX,
+					this->_gapMinX,
+					this->_gapMaxY,
+					this->_gapMinY
+				));
 		}
 		else {
 			if (rawX > this->_gapMaxX) this->_gapMaxX = rawX;
@@ -235,16 +238,13 @@ void Hardware::HJoystick::HardwarePipe (Protonix* device, short core) {
 			|| positionX != this->_positionX
 			|| positionY != this->_positionY;
 
-		//Serial.println(String(positionX) + ":" + String(positionY));
-
 		if (this->_allowSignal) {
 			if (this->_allowSignalValue) {
-				String valX = String(this->_valueX);
-				String valY = String(this->_valueY);
-
 				device->Signal(this->_id, "value")
-					->ValueKV(new KeyValuePair(valX, valY))
-					->ValueString(valX + ":" + valY);
+					->Value(Hardware::HJoystickState(
+						this->_valueX, this->_valueY,
+						this->_button != nullptr && this->_button->Active()
+					));
 			}
 
 			if (positionChanged) {
@@ -252,18 +252,14 @@ void Hardware::HJoystick::HardwarePipe (Protonix* device, short core) {
 				this->_positionX = positionX;
 				this->_positionY = positionY;
 
-				String posX = String(this->_positionX);
-				String posY = String(this->_positionY);
-
 				device->Signal(this->_id, "position")
-					->ValueKV(new KeyValuePair(posX, posY))
-					->ValueString(posX + ":" + posY);
+					->Value(Hardware::HJoystickState(
+						this->_positionX, this->_positionY,
+						this->_button != nullptr && this->_button->Active()
+					));
 			}
 		}
 	}
-
-	if (this->_button != nullptr)
-		this->_button->HardwarePipe(device, core);
 }
 
 void Hardware::HJoystick::HardwarePipeInterrupt (Protonix* device) {

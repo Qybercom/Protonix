@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#include "Common/KeyValuePair.hpp"
+#include "Common/Data.hpp"
 
 #include "ProtonixSignal.h"
 
@@ -10,24 +10,11 @@ using namespace Qybercom::Protonix;
 ProtonixSignal::ProtonixSignal (String id) {
 	this->_id = id;
 	this->_from = "";
-
-	this->_valueBool = false;
-	this->_valueInt = 0;
-	this->_valueFloat = 0;
-	this->_valueString = "";
-	this->_valueKV = nullptr;
-	this->_valueAny = nullptr;
 }
 
 ProtonixSignal::ProtonixSignal (String from, String id) {
 	this->_id = id;
 	this->_from = from;
-
-	this->_valueBool = false;
-	this->_valueInt = 0;
-	this->_valueFloat = 0;
-	this->_valueString = "";
-	this->_valueKV = nullptr;
 }
 
 String ProtonixSignal::ID () {
@@ -58,67 +45,15 @@ bool ProtonixSignal::Is (String from, String id) {
 	return this->_id == id && this->_from == from;
 }
 
-bool ProtonixSignal::ValueBool () {
-	return this->_valueBool;
+Any ProtonixSignal::Value () {
+	return this->_value;
 }
 
-ProtonixSignal* ProtonixSignal::ValueBool (bool value) {
-	this->_valueBool = value;
-
-	return this;
-}
-
-int ProtonixSignal::ValueInt () {
-	return this->_valueInt;
-}
-
-ProtonixSignal* ProtonixSignal::ValueInt (int value) {
-	this->_valueInt = value;
-
-	return this;
-}
-
-float ProtonixSignal::ValueFloat () {
-	return this->_valueFloat;
-}
-
-ProtonixSignal* ProtonixSignal::ValueFloat (float value) {
-	this->_valueFloat = value;
-
-	return this;
-}
-
-String ProtonixSignal::ValueString () {
-	return this->_valueString;
-}
-
-ProtonixSignal* ProtonixSignal::ValueString (String value) {
-	this->_valueString = value;
-
-	return this;
-}
-
-KeyValuePair* ProtonixSignal::ValueKV () {
-	return this->_valueKV;
-}
-
-ProtonixSignal* ProtonixSignal::ValueKV (KeyValuePair* value) {
-	this->_valueKV = value;
-
-	return this;
-}
-
-void* ProtonixSignal::ValueAny () {
-	return this->_valueAny;
-}
-
-ProtonixSignal* ProtonixSignal::ValueAny (void* value) {
-	this->_valueAny = value;
+ProtonixSignal* ProtonixSignal::Value (Any value) {
+	this->_value = value;
 
 	return this;
 }
 
 ProtonixSignal::~ProtonixSignal () {
-	delete this->_valueKV;
-	this->_valueKV = nullptr;
 }

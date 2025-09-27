@@ -15,7 +15,6 @@ void Hardware::HReaderNFC::_channel (unsigned short channel) {
 	Wire.beginTransmission(0x70);
 	Wire.write(1 << channel);
 	Wire.endTransmission();
-	//delay(20);
 }
 
 Hardware::HReaderNFC::HReaderNFC (unsigned short pinSS, unsigned short pinRST, unsigned int uuidReadDebounce, short dedicatedCore) {
@@ -90,9 +89,7 @@ void Hardware::HReaderNFC::HardwareI2CPost (Protonix* device) {
 	Hardware::HReaderNFC::_channel(this->_pinSS);
 	this->_i2cReader->PCD_Init();
 
-	//byte v = this->_i2cReader->PCD_ReadRegister(this->_i2cReader->VersionReg);
-
-	this->_init = true;//(v != 0x00) && (v != 0xFF);
+	this->_init = true;
 }
 
 bool Hardware::HReaderNFC::HardwareSPI () {
@@ -172,10 +169,10 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 			this->_uuidChanged = true;
 
 			if (this->_allowSignal) {
-				device->Signal(this->_id, "uuidChanged")->ValueString(this->_uuid);
+				device->Signal(this->_id, "uuidChanged")->Value(this->_uuid);
 
 				if (current == "" && value != "")
-					device->Signal(this->_id, "tagIn")->ValueString(value);
+					device->Signal(this->_id, "tagIn")->Value(value);
 
 				if (current != "" && value == "")
 					device->Signal(this->_id, "tagOut");

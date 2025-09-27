@@ -116,7 +116,7 @@ void Hardware::HEncoder::HardwarePipe (Protonix* device, short core) {
 		this->_button->HardwarePipe(device, core);
 
 	if (this->_allowSignal && this->Changed())
-		device->Signal(this->_id, "dir")->ValueInt(this->_dir);
+		device->Signal(this->_id, "dir")->Value(Hardware::HEncoderState(this->_dir, this->_button != nullptr && this->_button->Active()));
 }
 
 void Hardware::HEncoder::HardwarePipeInterrupt (Protonix* device) {

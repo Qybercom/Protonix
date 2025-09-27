@@ -149,7 +149,7 @@ void Hardware::HTrigger::HardwarePipe (Protonix* device, short core) {
 		this->_pipe();
 
 	if (this->_inputChangedHandler())
-		device->Signal(this->_id, this->_signalInputChanged)->ValueBool(this->_inputValue);
+		device->Signal(this->_id, this->_signalInputChanged)->Value(this->_inputValue);
 }
 
 void Hardware::HTrigger::HardwarePipeInterrupt (Protonix* device) {

@@ -40,7 +40,7 @@ void Hardware::HTouchButton::HardwarePipe (Protonix* device, short core) {
 	this->_active = active;
 
 	if (this->_allowSignal && changed) {
-		device->Signal(this->_id, "changed")->ValueBool(active);
+		device->Signal(this->_id, "changed")->Value(active);
 		device->Signal(this->_id, String(active ? "touch" : "release"));
 	}
 }
