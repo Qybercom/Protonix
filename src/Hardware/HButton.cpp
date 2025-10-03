@@ -82,7 +82,8 @@ void Hardware::HButton::HardwareInitPre (Protonix* device) {
 	this->_trigger->HardwareAllowSignal(this->_allowSignal);
 	this->_trigger->HardwareInitPre(device);
 
-	this->_capability("value", "open:bool", "State of the button");
+	this->_capability("value", "active:bool", "State of the button");
+	this->_capability("active:bool", "0");
 }
 
 void Hardware::HButton::HardwarePipe (Protonix* device, short core) {
@@ -93,7 +94,7 @@ void Hardware::HButton::HardwarePipe (Protonix* device, short core) {
 
 		device->Signal(this->_id, String(active ? this->_signalPressed : this->_signalReleased));
 
-		this->_capability("open:bool", String(active ? "1" : "0"));
+		this->_capability("active:bool", String(active ? "1" : "0"));
 	}
 }
 

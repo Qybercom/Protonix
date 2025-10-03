@@ -40,11 +40,11 @@ void Hardware::HRelay::HardwareInitPre (Protonix* device) {
 
 	pinMode(this->_pin, OUTPUT);
 
-	this->Close();
-
 	this->_capability("command", "open", "Activate relay");
 	this->_capability("command", "close", "Deactivate relay");
 	this->_capability("value", "open:bool", "State of the relay");
+
+	this->Close();
 }
 
 void Hardware::HRelay::HardwareOnCommand (Protonix* device, String command) {

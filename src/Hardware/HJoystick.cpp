@@ -163,18 +163,18 @@ void Hardware::HJoystick::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	if (this->_init) {
-		if (this->_pinX > -1) {
+		if (this->_pinX > -1)
 			pinMode(this->_pinX, INPUT);
-			this->_capability("value", "valueX:int", "Raw value of X-axis");
-			this->_capability("value", "positionX:int", "Interpolated X-axis position (0..100%)");
-		}
 
-		if (this->_pinY > -1) {
+		if (this->_pinY > -1)
 			pinMode(this->_pinY, INPUT);
-			this->_capability("value", "valueY:int", "Raw value of Y-axis");
-			this->_capability("value", "positionY:int", "Interpolated Y-axis position (0..100%)");
-		}
 	}
+
+	this->_capability("value", "valueX:int", "Raw value of X-axis");
+	this->_capability("value", "valueY:int", "Raw value of Y-axis");
+
+	this->_capability("value", "positionX:int", "Interpolated X-axis position (0..100%)");
+	this->_capability("value", "positionY:int", "Interpolated Y-axis position (0..100%)");
 
 	if (this->_button != nullptr) {
 		this->_button->SignalChanged("buttonChanged");

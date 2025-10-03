@@ -150,6 +150,7 @@ void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
 		digitalWrite(this->_pin, LOW);
 
 		this->_capability("command", "output:<bool>", "Set trigger' output value");
+		this->_capability("active:bool", "0");
 	}
 }
 

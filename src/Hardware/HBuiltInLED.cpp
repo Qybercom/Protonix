@@ -17,7 +17,7 @@ void Hardware::HBuiltInLED::Active (bool active) {
 		: QYBERCOM_PROTONIX_LED_OFF
 	);
 
-	this->_capability("open:bool", String(active ? "1" : "0"));
+	this->_capability("active:bool", String(active ? "1" : "0"));
 }
 
 String Hardware::HBuiltInLED::HardwareSummary () {
@@ -29,11 +29,11 @@ void Hardware::HBuiltInLED::HardwareInitPre (Protonix* device) {
 
 	pinMode(this->_pin, OUTPUT);
 
-	this->Active(false);
+	this->_capability("command", "on", "Activate LED");
+	this->_capability("command", "off", "Deactivate LED");
+	this->_capability("value", "active:bool", "State of the LED");
 
-	this->_capability("command", "open", "Activate LED");
-	this->_capability("command", "close", "Deactivate LED");
-	this->_capability("value", "open:bool", "State of the LED");
+	this->Active(false);
 }
 
 void Hardware::HBuiltInLED::HardwareOnCommand (Protonix* device, String command) {
