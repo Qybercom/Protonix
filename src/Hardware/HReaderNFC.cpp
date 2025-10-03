@@ -153,7 +153,7 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 		this->_spiReader->PCD_Init();
 
 		card = this->_spiReader->PICC_IsNewCardPresent();
-		value = "";
+		value = String("");
 
 		if (card && this->_spiReader->PICC_ReadCardSerial()) {
 			i = 0;
@@ -171,7 +171,7 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 	this->_debouncer.Use(value);
 
 	if (this->_debouncer.Pipe()) {
-		value = this->_debouncer.Empty() ? "" : String(this->_debouncer.Actual());
+		value = String(this->_debouncer.Empty() ? String("") : String(this->_debouncer.Actual()));
 
 		if (this->_uuid != value) {
 			String current = this->_uuid;
@@ -179,7 +179,7 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 			this->_uuidChanged = true;
 
 			if (this->_allowSignal) {
-				device->Signal(this->_id, "uuidChanged")->Value(this->_uuid);
+				device->Signal(this->_id, "uuidChanged")->Value(value);
 
 				if (current == "" && value != "")
 					device->Signal(this->_id, "tagIn")->Value(value);

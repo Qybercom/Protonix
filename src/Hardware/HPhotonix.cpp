@@ -16,6 +16,10 @@ Hardware::HPhotonix::HPhotonix (unsigned short pin, unsigned int length) {
 	this->_photonix = nullptr;
 }
 
+Hardware::HPhotonix* Hardware::HPhotonix::Init (unsigned short pin, unsigned int length) {
+	return new Hardware::HPhotonix(pin, length);
+}
+
 Photonix* Hardware::HPhotonix::Driver () {
 	return this->_photonix;
 }

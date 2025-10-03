@@ -20,6 +20,7 @@ namespace Qybercom {
 
 				public:
 					HPhotonix (unsigned short pin, unsigned int length);
+					static HPhotonix* Init (unsigned short pin, unsigned int length);
 
 					Photonix* Driver ();
 

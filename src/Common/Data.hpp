@@ -162,7 +162,11 @@ namespace Qybercom {
 			}
 
 			template<typename T>
-			T As () { return *static_cast<T*>(Data); }
+			T As (T fallback) {
+				T* out = static_cast<T*>(Data);
+
+				return out == nullptr ? fallback : *out;
+			}
 	};
 
 	struct Pixel {

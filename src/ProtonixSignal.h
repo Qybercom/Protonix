@@ -27,8 +27,8 @@ namespace Qybercom {
 
 				Any Value ();
 				template<typename T>
-			 	T Value () {
-			 		return this->_value.As<T>();
+			 	T ValueAs (T fallback) {
+			 		return this->_value.As<T>(fallback);
 			 	}
 				ProtonixSignal* Value (Any value);
 				template<typename T>

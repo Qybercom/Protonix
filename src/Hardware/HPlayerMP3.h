@@ -14,18 +14,21 @@ namespace Qybercom {
 				private:
 					HBusSerial* _player;
 
-					void _cmd (byte a1, byte a2, byte a3, byte a4);
+					bool _cmd (byte a1, byte a2, byte a3, byte a4);
 
 				public:
 					HPlayerMP3 (unsigned short pinRX, unsigned short pinTX);
 
 					HBusSerial* Port ();
 
-					void Play (int file, int dir = 0x00);
-					void Pause ();
-					void Stop ();
-					void Reset ();
-					void Wake ();
+					bool Play (int file, int dir = 0x00);
+					bool Pause ();
+					bool Stop ();
+					bool VolumeUp ();
+					bool VolumeDown ();
+					bool Volume (short value);
+					bool Reset ();
+					bool Wake ();
 
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);

@@ -259,6 +259,8 @@ Protonix* Protonix::Pipe () {
 
 	if (this->_signals.Count() != 0) {
 		for (ProtonixSignal* signal : this->_signals) {
+			Serial.println("[debug] " + signal->From() + ":" + signal->ID());
+
 			this->_device->DeviceOnSignal(this, signal);
 
 			delete signal;
@@ -386,7 +388,11 @@ ProtonixTimer* Protonix::TimerTick () {
 }
 
 unsigned long Protonix::CPUFrequency () {
+	#if defined(ESP32)
 	return getCpuFrequencyMhz();
+	#else
+	return 0;
+	#endif
 }
 
 ProtonixMemory* Protonix::Memory () {
