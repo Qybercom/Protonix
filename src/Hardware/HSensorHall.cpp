@@ -59,11 +59,23 @@ int Hardware::HSensorHall::ValueMapped (int min, int max) {
 	return map(this->_value, this->_min, this->_max, min, max);
 }
 
+String Hardware::HSensorHall::HardwareSummary () {
+	return "Hall-effect sensor";
+}
+
+void Hardware::HSensorHall::HardwareInitPre (Protonix* device) {
+	(void)device;
+
+	this->_capability("value", "value:int", "Raw value");
+}
+
 void Hardware::HSensorHall::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
 
 	this->_value = analogRead(this->_pin);
+
+	this->_capability("value:int", String(this->_value));
 }
 
 void Hardware::HSensorHall::HardwareOnCommand (Protonix* device, String command) {

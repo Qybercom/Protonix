@@ -2,6 +2,10 @@
 
 #include <Arduino.h>
 
+#include "Common/List.hpp"
+
+#include "ProtonixHardwareCapability.h"
+
 namespace Qybercom {
 	namespace Protonix {
 		class Protonix;
@@ -11,6 +15,10 @@ namespace Qybercom {
 				String _id;
 				bool _allowSignal;
 				short _dedicatedCore = -1;
+				List<ProtonixHardwareCapability*> _capabilities;
+
+				ProtonixHardwareCapability* _capability (String kind, String id, String comment);
+				bool _capability (String id, String value);
 				bool _log (String message, bool ret = true);
 
 			public:
@@ -21,7 +29,7 @@ namespace Qybercom {
 				IProtonixHardware* HardwareAllowSignal (bool allow);
 
 				virtual String HardwareSummary () { return ""; }
-				// virtual List<ProtonixHardwareCapability*> &HardwareCapabilities () { return this->_capabilities; }
+				virtual List<ProtonixHardwareCapability*> &HardwareCapabilities () { return this->_capabilities; }
 				virtual void HardwareInitPre (Protonix* device) { (void)device; }
 				virtual bool HardwareI2C () { return false; }
 				virtual void HardwareI2CPre (Protonix* device) { (void)device; }

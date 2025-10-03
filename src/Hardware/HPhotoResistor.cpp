@@ -59,10 +59,16 @@ int Hardware::HPhotoResistor::ValueMapped (int min, int max) {
 	return map(this->_value, this->_min, this->_max, min, max);
 }
 
+String Hardware::HPhotoResistor::HardwareSummary () {
+	return "Photoresistor";
+}
+
 void Hardware::HPhotoResistor::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	pinMode(this->_pin, INPUT);
+
+	this->_capability("value", "value:int", "Raw value");
 }
 
 void Hardware::HPhotoResistor::HardwarePipe (Protonix* device, short core) {
@@ -70,6 +76,8 @@ void Hardware::HPhotoResistor::HardwarePipe (Protonix* device, short core) {
 	(void)core;
 
 	this->_value = analogRead(this->_pin);
+
+	this->_capability("value:int", String(this->_value));
 }
 
 void Hardware::HPhotoResistor::HardwareOnCommand (Protonix* device, String command) {

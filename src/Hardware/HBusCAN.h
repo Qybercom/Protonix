@@ -81,6 +81,8 @@ namespace Qybercom {
 					bool Send (unsigned short id, String data);
 					bool Send (String data, byte priority = 0x03, byte address = 0x0F, bool truncate = false);
 
+					String HardwareSummary ();
+					void HardwareInitPre (Protonix* device);
 					bool HardwareSPI ();
 					void HardwareSPIPost (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);

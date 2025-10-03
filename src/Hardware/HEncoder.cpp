@@ -91,6 +91,10 @@ Qybercom::Debouncer<short> &Hardware::HEncoder::Debouncer () {
 	return this->_debouncer;
 }
 
+String Hardware::HEncoder::HardwareSummary () {
+	return "Encoder";
+}
+
 void Hardware::HEncoder::HardwareInitPre (Protonix* device) {
 	pinMode(this->_pinA, INPUT_PULLUP);
 	device->InterruptAttach(this->_pinA, CHANGE);
@@ -107,6 +111,8 @@ void Hardware::HEncoder::HardwareInitPre (Protonix* device) {
 		this->_button->HardwareAllowSignal(this->_allowSignal);
 		this->_button->HardwareInitPre(device);
 	}
+
+	this->_capability("value", "dir:int", "The rotation direction");
 }
 
 void Hardware::HEncoder::HardwarePipe (Protonix* device, short core) {
@@ -117,6 +123,8 @@ void Hardware::HEncoder::HardwarePipe (Protonix* device, short core) {
 
 	if (this->_allowSignal && this->Changed())
 		device->Signal(this->_id, "dir")->Value(Hardware::HEncoderState(this->_dir, this->_button != nullptr && this->_button->Active()));
+
+	this->_capability("dir:int", String(this->_dir));
 }
 
 void Hardware::HEncoder::HardwarePipeInterrupt (Protonix* device) {

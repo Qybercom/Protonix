@@ -58,6 +58,7 @@ namespace Qybercom {
 
 					Qybercom::Debouncer<short> &Debouncer ();
 
+					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwarePipeInterrupt (Protonix* device);

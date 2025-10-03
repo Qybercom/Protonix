@@ -38,6 +38,8 @@ bool Hardware::HTrigger::_pipe () {
 			this->_inputValue = val;
 			this->_inputChanged = true;
 			this->_inputChangedSignal = true;
+
+			this->_capability("active:bool", String(val ? "1" : "0"));
 		}
 
 		this->_debouncer.Reset();
@@ -122,7 +124,13 @@ bool Hardware::HTrigger::OutputValue (unsigned short value) {
 
 	digitalWrite(this->_pin, value);
 
+	this->_capability("active:bool", String(value));
+
 	return true;
+}
+
+String Hardware::HTrigger::HardwareSummary () {
+	return "Trigger " + String(this->_input ? "input" : "output");
 }
 
 void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
@@ -134,10 +142,14 @@ void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
 
 		if (this->_interrupt)
 			device->InterruptAttach(this->_pin, CHANGE);
+
+		this->_capability("value", "active:bool", "State of the trigger");
 	}
 	else {
 		pinMode(this->_pin, OUTPUT);
 		digitalWrite(this->_pin, LOW);
+
+		this->_capability("command", "output:<bool>", "Set trigger' output value");
 	}
 }
 

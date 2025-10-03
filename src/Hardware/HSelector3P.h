@@ -32,6 +32,7 @@ namespace Qybercom {
 					bool AllowZero ();
 					HSelector3P* AllowZero (bool allow);
 
+					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwareOnCommand (Protonix* device, String command);

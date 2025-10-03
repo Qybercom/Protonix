@@ -32,6 +32,8 @@ namespace Qybercom {
 
 					int ValueMapped (int min, int max);
 
+					String HardwareSummary ();
+					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwareOnCommand (Protonix* device, String command);
 			};

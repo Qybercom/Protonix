@@ -82,6 +82,7 @@ namespace Qybercom {
 					int PositionX ();
 					int PositionY ();
 
+					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwarePipeInterrupt (Protonix* device);

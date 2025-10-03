@@ -114,6 +114,10 @@ byte Hardware::HBusSerial::Read () {
 	return this->_started ? this->_port->read() : (byte)'\0';
 }
 
+String Hardware::HBusSerial::HardwareSummary () {
+	return "Serial bus";
+}
+
 void Hardware::HBusSerial::HardwareInitPre (Protonix* device) {
 	(void)device;
 

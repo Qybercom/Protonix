@@ -71,6 +71,16 @@ Qybercom::Debouncer<String> &Hardware::HReaderNFC::Debouncer () {
 	return this->_debouncer;
 }
 
+String Hardware::HReaderNFC::HardwareSummary () {
+	return "NFC reader";
+}
+
+void Hardware::HReaderNFC::HardwareInitPre (Protonix* device) {
+	(void)device;
+
+	this->_capability("value", "uuid:string", "Current' card UUID");
+}
+
 bool Hardware::HReaderNFC::HardwareI2C () {
 	return this->_i2c;
 }
@@ -177,6 +187,8 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 				if (current != "" && value == "")
 					device->Signal(this->_id, "tagOut");
 			}
+
+			this->_capability("uuid:string", String(this->_uuid));
 		}
 
 		this->_debouncer.Reset();

@@ -59,12 +59,22 @@ void Hardware::HPlayerMP3::Wake () {
 	this->_cmd((byte)0x0B, (byte)0x00, (byte)0x00, (byte)0x00);
 }
 
+String Hardware::HPlayerMP3::HardwareSummary () {
+	return "MP3 player";
+}
+
 void Hardware::HPlayerMP3::HardwareInitPre (Protonix* device) {
 	this->_player->HardwareInitPre(device);
 
 	this->Wake();
 
 	this->_log("InitPre on pins " + String(this->_player->PinRX()) + ":" + String(this->_player->PinRX()));
+
+	this->_capability("command", "play:<file>:<dir>", "Play file in dir");
+	this->_capability("command", "pause", "Pause");
+	this->_capability("command", "stop", "Stop");
+	this->_capability("command", "reset", "Reset");
+	this->_capability("command", "wake", "Wake");
 }
 
 void Hardware::HPlayerMP3::HardwarePipe (Protonix* device, short core) {

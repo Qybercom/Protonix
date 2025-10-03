@@ -45,6 +45,7 @@ namespace Qybercom {
 
 					bool OutputValue (unsigned short value);
 
+					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwarePipeInterrupt (Protonix* device);

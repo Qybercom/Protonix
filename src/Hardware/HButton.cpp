@@ -71,22 +71,30 @@ bool Hardware::HButton::Released (bool changed) {
 	return (changed ? this->Changed() : true) && !this->_trigger->InputValue();
 }
 
+String Hardware::HButton::HardwareSummary () {
+	return "Button";
+}
+
 void Hardware::HButton::HardwareInitPre (Protonix* device) {
 	this->_trigger->SignalInputChanged(this->_signalChanged);
 
 	this->_trigger->HardwareID(this->_id);
 	this->_trigger->HardwareAllowSignal(this->_allowSignal);
 	this->_trigger->HardwareInitPre(device);
+
+	this->_capability("value", "open:bool", "State of the button");
 }
 
 void Hardware::HButton::HardwarePipe (Protonix* device, short core) {
 	this->_trigger->HardwarePipe(device, core);
 
-	if (this->_allowSignal && device->SignalSpawned(this->_id, this->_signalChanged))
-		device->Signal(this->_id, String(this->_trigger->InputValue()
-			? this->_signalPressed
-			: this->_signalReleased
-		));
+	if (this->_allowSignal && device->SignalSpawned(this->_id, this->_signalChanged)) {
+		bool active = this->_trigger->InputValue();
+
+		device->Signal(this->_id, String(active ? this->_signalPressed : this->_signalReleased));
+
+		this->_capability("open:bool", String(active ? "1" : "0"));
+	}
 }
 
 void Hardware::HButton::HardwarePipeInterrupt (Protonix* device) {

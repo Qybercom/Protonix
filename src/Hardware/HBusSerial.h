@@ -48,6 +48,7 @@ namespace Qybercom {
 					bool Write (byte b);
 					byte Read ();
 
+					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwareOnCommand (Protonix* device, String command);

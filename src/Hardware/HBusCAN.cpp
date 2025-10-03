@@ -202,6 +202,14 @@ bool Hardware::HBusCAN::Send (String data, byte priority, byte address, bool tru
 	return true;
 }
 
+String Hardware::HBusCAN::HardwareSummary () {
+	return "CAN bus";
+}
+
+void Hardware::HBusCAN::HardwareInitPre (Protonix* device) {
+	(void)device;
+}
+
 bool Hardware::HBusCAN::HardwareSPI () {
 	return true;
 }

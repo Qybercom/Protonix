@@ -20,6 +20,10 @@ Photonix* Hardware::HPhotonix::Driver () {
 	return this->_photonix;
 }
 
+String Hardware::HPhotonix::HardwareSummary () {
+	return "Photonix";
+}
+
 void Hardware::HPhotonix::HardwareInitPost (Protonix* device) {
 	(void)device;
 

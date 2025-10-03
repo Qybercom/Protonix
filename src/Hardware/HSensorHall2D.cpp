@@ -104,6 +104,18 @@ bool Hardware::HSensorHall2D::ValueIntMatch (int offset, int min, int max, bool 
 	return matchRange(angleOffset(this->ValueInt(), offset), min, max, minEQ, maxEQ);
 }
 
+String Hardware::HSensorHall2D::HardwareSummary () {
+	return "Hall-effect 2-axis sensor";
+}
+
+void Hardware::HSensorHall2D::HardwareInitPre (Protonix* device) {
+	(void)device;
+
+	this->_capability("value", "valueX:int", "Raw X-axis value");
+	this->_capability("value", "valueY:int", "Raw Y-axis value");
+	this->_capability("value", "angle:int", "Interpolated angle (0..360deg)");
+}
+
 void Hardware::HSensorHall2D::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
@@ -111,9 +123,19 @@ void Hardware::HSensorHall2D::HardwarePipe (Protonix* device, short core) {
 	int x = analogRead(this->_pinX);
 	int y = analogRead(this->_pinY);
 
-	this->_value = angleByXY(x, y, this->_minX, this->_maxX, this->_minY, this->_maxY);
+	this->_capability("valueX:int", String(x));
+	this->_capability("valueY:int", String(y));
 
-	// TODO: add signal
+	float angle = angleByXY(x, y, this->_minX, this->_maxX, this->_minY, this->_maxY);
+
+	if (angle != this->_value) {
+		this->_value = angle;
+
+		if (this->_allowSignal)
+			device->Signal(this->_id, "angle")->Value(this->_value);
+	}
+
+	this->_capability("angle:int", String(angle));
 }
 
 void Hardware::HSensorHall2D::HardwareOnCommand (Protonix* device, String command) {

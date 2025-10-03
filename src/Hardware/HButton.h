@@ -37,6 +37,7 @@ namespace Qybercom {
 					bool Pressed (bool changed = true);
 					bool Released (bool changed = true);
 
+					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwarePipeInterrupt (Protonix* device);

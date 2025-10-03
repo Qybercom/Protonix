@@ -385,6 +385,10 @@ ProtonixTimer* Protonix::TimerTick () {
 	return this->_timerTick;
 }
 
+unsigned long Protonix::CPUFrequency () {
+	return getCpuFrequencyMhz();
+}
+
 ProtonixMemory* Protonix::Memory () {
 	return this->_memory;
 }

@@ -27,10 +27,16 @@ bool Hardware::HSensorMicrophone::Active () {
 	return this->_active;
 }
 
+String Hardware::HSensorMicrophone::HardwareSummary () {
+	return "Microphone sensor";
+}
+
 void Hardware::HSensorMicrophone::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	this->Pin(this->_pin);
+
+	this->_capability("value", "active:bool", "State of the microphone");
 }
 
 void Hardware::HSensorMicrophone::HardwarePipe (Protonix* device, short core) {
@@ -38,7 +44,16 @@ void Hardware::HSensorMicrophone::HardwarePipe (Protonix* device, short core) {
 	(void)core;
 
 	// TODO: refactor for analogRead
-	this->_active = digitalRead(this->_pin);
+	bool active = digitalRead(this->_pin);
+
+	if (active != this->_active) {
+		this->_active = active;
+
+		if (this->_allowSignal)
+			device->Signal(this->_id, "active")->Value(this->_active);
+	}
+
+	this->_capability("active:bool", String(active));
 }
 
 void Hardware::HSensorMicrophone::HardwareOnCommand (Protonix* device, String command) {

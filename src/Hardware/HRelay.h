@@ -22,6 +22,7 @@ namespace Qybercom {
 					void Open ();
 					void Close ();
 
+					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					void HardwareOnCommand (Protonix* device, String command);
 			};

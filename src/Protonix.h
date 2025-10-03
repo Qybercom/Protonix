@@ -107,6 +107,7 @@ namespace Qybercom {
 				ProtonixTimer* TimerUptime ();
 				ProtonixTimer* TimerTick ();
 
+				unsigned long CPUFrequency ();
 				ProtonixMemory* Memory ();
 				ProtonixRegistry* Registry ();
 

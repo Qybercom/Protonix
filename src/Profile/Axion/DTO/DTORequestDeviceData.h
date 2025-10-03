@@ -16,9 +16,11 @@ namespace Qybercom {
 					class DTORequestDeviceData : public IAxionDTORequest {
 						private:
 							Protonix* _device;
+							bool _includeMemory;
+							bool _includeHardware;
 
 						public:
-							DTORequestDeviceData (Protonix* device);
+							DTORequestDeviceData (Protonix* device, bool includeMemory = true, bool includeHardware = true);
 
 							void AxionDTOPopulate (AxionDTO* dto);
 							void AxionDTOSerialize (JsonDocument& dto);

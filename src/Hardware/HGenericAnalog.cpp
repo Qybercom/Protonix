@@ -25,11 +25,17 @@ int Hardware::HGenericAnalog::Value () {
 	return this->_value;
 }
 
+String Hardware::HGenericAnalog::HardwareSummary () {
+	return "Generic analog";
+}
+
 void Hardware::HGenericAnalog::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	if (this->_init)
 		pinMode(this->_pin, INPUT);
+
+	this->_capability("value", "value:int", "Raw value");
 }
 
 void Hardware::HGenericAnalog::HardwarePipe (Protonix* device, short core) {
@@ -37,6 +43,8 @@ void Hardware::HGenericAnalog::HardwarePipe (Protonix* device, short core) {
 	(void)core;
 
 	this->_value = analogRead(this->_pin);
+
+	this->_capability("value:int", String(this->_value));
 }
 
 void Hardware::HGenericAnalog::HardwareOnCommand (Protonix* device, String command) {

@@ -55,9 +55,15 @@ Hardware::HSelector3P* Hardware::HSelector3P::AllowZero (bool allow) {
 	return this;
 }
 
+String Hardware::HSelector3P::HardwareSummary () {
+	return "Selector with 3 positions";
+}
+
 void Hardware::HSelector3P::HardwareInitPre (Protonix* device) {
 	this->_trigger1->HardwareInitPre(device);
 	this->_trigger2->HardwareInitPre(device);
+
+	this->_capability("value", "value:int", "Current position");
 }
 
 void Hardware::HSelector3P::HardwarePipe (Protonix* device, short core) {
@@ -80,6 +86,8 @@ void Hardware::HSelector3P::HardwarePipe (Protonix* device, short core) {
 
 	if (this->_allowSignal && this->_changedPipe())
 		device->Signal(this->_id, "changed")->Value(value);
+
+	this->_capability("value:int", String(this->_value));
 }
 
 void Hardware::HSelector3P::HardwareOnCommand (Protonix* device, String command) {

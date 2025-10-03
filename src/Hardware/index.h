@@ -37,12 +37,13 @@
  * SD card reader
  * camera
  * audio sensor
- * infrared sensor/trigger/bus
+ * infrared sensor/trigger/bus (PIR)
  * bluetooth
  * spi bus
  * gps
  * gsm
  * phone dialer (rotary/keypad)
+ * ultrasonic sensor
  * ...
  *
  * recognizing UX gestures (double-click etc. for buttons, touch etc.)

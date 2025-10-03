@@ -59,8 +59,14 @@ int Hardware::HPotentiometer::ValueMapped (int min, int max) {
 	return map(this->_value, this->_min, this->_max, min, max);
 }
 
+String Hardware::HPotentiometer::HardwareSummary () {
+	return "Potentiometer";
+}
+
 void Hardware::HPotentiometer::HardwareInitPre (Protonix* device) {
 	(void)device;
+
+	this->_capability("value", "value:int", "Raw value");
 }
 
 void Hardware::HPotentiometer::HardwarePipe (Protonix* device, short core) {
@@ -68,6 +74,8 @@ void Hardware::HPotentiometer::HardwarePipe (Protonix* device, short core) {
 	(void)core;
 
 	this->_value = analogRead(this->_pin);
+
+	this->_capability("value:int", String(this->_value));
 }
 
 void Hardware::HPotentiometer::HardwareOnCommand (Protonix* device, String command) {

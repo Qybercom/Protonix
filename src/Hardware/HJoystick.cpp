@@ -155,15 +155,25 @@ int Hardware::HJoystick::PositionY () {
 	return this->_positionY;
 }
 
+String Hardware::HJoystick::HardwareSummary () {
+	return "Joystick";
+}
+
 void Hardware::HJoystick::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	if (this->_init) {
-		if (this->_pinX > -1)
+		if (this->_pinX > -1) {
 			pinMode(this->_pinX, INPUT);
+			this->_capability("value", "valueX:int", "Raw value of X-axis");
+			this->_capability("value", "positionX:int", "Interpolated X-axis position (0..100%)");
+		}
 
-		if (this->_pinY > -1)
+		if (this->_pinY > -1) {
 			pinMode(this->_pinY, INPUT);
+			this->_capability("value", "valueY:int", "Raw value of Y-axis");
+			this->_capability("value", "positionY:int", "Interpolated Y-axis position (0..100%)");
+		}
 	}
 
 	if (this->_button != nullptr) {
@@ -174,6 +184,8 @@ void Hardware::HJoystick::HardwareInitPre (Protonix* device) {
 		this->_button->HardwareID(this->_id);
 		this->_button->HardwareAllowSignal(this->_allowSignal);
 		this->_button->HardwareInitPre(device);
+
+		this->_capability("value", "active:bool", "State of the joystick button");
 	}
 }
 
@@ -190,8 +202,11 @@ void Hardware::HJoystick::HardwarePipe (Protonix* device, short core) {
 	if (this->_pinY > -1)
 		rawY = analogRead(this->_pinY);
 
-	if (this->_button != nullptr)
+	if (this->_button != nullptr) {
 		this->_button->HardwarePipe(device, core);
+
+		this->_capability("active:bool", String(this->_button->Active() ? "1" : "0"));
+	}
 
 	if (this->_calibrateAuto && !this->_calibrated) {
 		this->_calibrateTimeout->Enabled(true);
@@ -218,6 +233,9 @@ void Hardware::HJoystick::HardwarePipe (Protonix* device, short core) {
 		this->_valueX = rawX;
 		this->_valueY = rawY;
 
+		this->_capability("valueX:int", String(rawX));
+		this->_capability("valueY:int", String(rawY));
+
 		int positionX = Hardware::HJoystick::Position(
 			this->_valueX,
 			this->_minX,
@@ -233,6 +251,9 @@ void Hardware::HJoystick::HardwarePipe (Protonix* device, short core) {
 			this->_gapMinY,
 			this->_gapMaxY
 		);
+
+		this->_capability("positionX:int", String(positionX));
+		this->_capability("positionY:int", String(positionY));
 
 		bool positionChanged = false
 			|| positionX != this->_positionX

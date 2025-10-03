@@ -164,4 +164,14 @@ namespace Qybercom {
 			template<typename T>
 			T As () { return *static_cast<T*>(Data); }
 	};
+
+	struct Pixel {
+		unsigned long Index;
+		byte R;
+		byte G;
+		byte B;
+
+		Pixel (byte r = 0, byte g = 0, byte b = 0, unsigned long index = 0)
+			: Index(index), R(r), G(g), B(b) { }
+	};
 }

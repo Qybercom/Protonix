@@ -30,6 +30,9 @@ void Hardware::HBuzzer::Play (short value, unsigned long duration) {
 
 	noTone(this->_pin);
 	tone(this->_pin, value);
+
+	this->_capability("active:bool", "1");
+	this->_capability("tone:int", String(value));
 }
 
 void Hardware::HBuzzer::Stop () {
@@ -37,6 +40,13 @@ void Hardware::HBuzzer::Stop () {
 	this->_duration = 0;
 
 	noTone(this->_pin);
+
+	this->_capability("active:bool", "0");
+	this->_capability("tone:int", "0");
+}
+
+String Hardware::HBuzzer::HardwareSummary () {
+	return "Buzzer";
 }
 
 void Hardware::HBuzzer::HardwareInitPre (Protonix* device) {
@@ -45,6 +55,9 @@ void Hardware::HBuzzer::HardwareInitPre (Protonix* device) {
 	pinMode(this->_pin, OUTPUT);
 
 	this->Stop();
+
+	this->_capability("value", "active:bool", "State of the buzzer");
+	this->_capability("value", "tone:int", "Tone value");
 }
 
 void Hardware::HBuzzer::HardwarePipe (Protonix* device, short core) {
