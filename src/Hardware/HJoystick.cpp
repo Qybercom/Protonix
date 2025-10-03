@@ -37,6 +37,7 @@ Hardware::HJoystick::HJoystick (short pinX, short pinY, short pinButton, bool in
 	this->_gapMaxY = this->_minY;
 	this->_gapMinY = this->_maxY;
 	this->_allowSignalValue = false;
+	this->_first = false;
 }
 
 Hardware::HJoystick* Hardware::HJoystick::Init (short pinX, short pinY, short pinButton, bool init) {
@@ -255,16 +256,20 @@ void Hardware::HJoystick::HardwarePipe (Protonix* device, short core) {
 		this->_capability("positionX:int", String(positionX));
 		this->_capability("positionY:int", String(positionY));
 
-		bool positionChanged = false
+		bool positionChanged = !this->_first
 			|| positionX != this->_positionX
 			|| positionY != this->_positionY;
+
+		if (!this->_first)
+			this->_first = true;
 
 		if (this->_allowSignal) {
 			if (this->_allowSignalValue) {
 				device->Signal(this->_id, "value")
 					->Value(Hardware::HJoystickState(
 						this->_valueX, this->_valueY,
-						this->_button != nullptr && this->_button->Active()
+						this->_button != nullptr && this->_button->Active(),
+						this->_calibrated
 					));
 			}
 
@@ -276,7 +281,8 @@ void Hardware::HJoystick::HardwarePipe (Protonix* device, short core) {
 				device->Signal(this->_id, "position")
 					->Value(Hardware::HJoystickState(
 						this->_positionX, this->_positionY,
-						this->_button != nullptr && this->_button->Active()
+						this->_button != nullptr && this->_button->Active(),
+						this->_calibrated
 					));
 			}
 		}

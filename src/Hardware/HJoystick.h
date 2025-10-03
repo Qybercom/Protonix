@@ -16,8 +16,9 @@ namespace Qybercom {
 			struct HJoystickState {
 				Vector2 Position;
 				bool Button;
+				bool Calibrated;
 
-				HJoystickState (int x, int y, bool button) : Position(Vector2(x, y)), Button(button) { }
+				HJoystickState (int x, int y, bool button, bool calibrated) : Position(Vector2(x, y)), Button(button), Calibrated(calibrated) { }
 			};
 
 			class HJoystick : public IProtonixHardware {
@@ -43,6 +44,7 @@ namespace Qybercom {
 					int _gapMaxY;
 					int _gapMinY;
 					bool _allowSignalValue;
+					bool _first;
 
 				public:
 					HJoystick (short pinX = -1, short pinY = -1, short pinButton = -1, bool init = false);
