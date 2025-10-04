@@ -42,6 +42,7 @@ namespace Qybercom {
 					Qybercom::Debouncer<String> &Debouncer ();
 
 					String HardwareSummary ();
+
 					void HardwareInitPre (Protonix* device);
 
 					bool HardwareI2C ();
@@ -51,6 +52,8 @@ namespace Qybercom {
 					bool HardwareSPI ();
 					void HardwareSPIPre (Protonix* device);
 					void HardwareSPIPost (Protonix* device);
+
+					void HardwareInitPost (Protonix* device);
 
 					void HardwarePipe (Protonix* device, short core);
 					void HardwareOnCommand (Protonix* device, String command);

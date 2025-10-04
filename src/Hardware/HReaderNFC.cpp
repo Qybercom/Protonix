@@ -95,11 +95,6 @@ void Hardware::HReaderNFC::HardwareI2CPre (Protonix* device) {
 void Hardware::HReaderNFC::HardwareI2CPost (Protonix* device) {
 	(void)device;
 	if (!this->_i2c) return;
-
-	Hardware::HReaderNFC::_channel(this->_pinSS);
-	this->_i2cReader->PCD_Init();
-
-	this->_init = true;
 }
 
 bool Hardware::HReaderNFC::HardwareSPI () {
@@ -122,6 +117,15 @@ void Hardware::HReaderNFC::HardwareSPIPost (Protonix* device) {
 	if (!this->_spi) return;
 
 	this->_init = true;
+}
+
+void Hardware::HReaderNFC::HardwareInitPost (Protonix* device) {
+	if (this->_i2c) {
+		Hardware::HReaderNFC::_channel(this->_pinSS);
+		this->_i2cReader->PCD_Init();
+
+		this->_init = true;
+	}
 }
 
 void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
