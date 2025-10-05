@@ -22,7 +22,7 @@ bool Hardware::HSelector3P::_changedPipe () {
 }
 
 void Hardware::HSelector3P::_signal (Protonix* device, short value) {
-	if (this->_allowSignal && this->_changedPipe())
+	if (this->_allowSignal)
 		device->Signal(this->_id, "changed")->Value(value);
 }
 
@@ -89,7 +89,8 @@ void Hardware::HSelector3P::HardwarePipe (Protonix* device, short core) {
 		this->_changed = true;
 	}
 
-	this->_signal(device, value);
+	if (this->_changedPipe())
+		this->_signal(device, value);
 
 	this->_capability("value:int", String(this->_value));
 }
