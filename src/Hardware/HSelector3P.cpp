@@ -21,6 +21,11 @@ bool Hardware::HSelector3P::_changedPipe () {
 	return out;
 }
 
+void Hardware::HSelector3P::_signal (Protonix* device, short value) {
+	if (this->_allowSignal && this->_changedPipe())
+		device->Signal(this->_id, "changed")->Value(value);
+}
+
 Hardware::HSelector3P::HSelector3P (unsigned short pin1, unsigned short pin2, unsigned int checkInterval) {
 	this->_trigger1 = Hardware::HTrigger::Input(pin1, HIGH, checkInterval);
 	this->_trigger2 = Hardware::HTrigger::Input(pin2, HIGH, checkInterval);
@@ -84,10 +89,13 @@ void Hardware::HSelector3P::HardwarePipe (Protonix* device, short core) {
 		this->_changed = true;
 	}
 
-	if (this->_allowSignal && this->_changedPipe())
-		device->Signal(this->_id, "changed")->Value(value);
+	this->_signal(device, value);
 
 	this->_capability("value:int", String(this->_value));
+}
+
+void Hardware::HSelector3P::HardwareOnReset (Protonix* device) {
+	this->_signal(device, this->_value);
 }
 
 void Hardware::HSelector3P::HardwareOnCommand (Protonix* device, String command) {

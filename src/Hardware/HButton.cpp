@@ -9,6 +9,16 @@
 
 using namespace Qybercom::Protonix;
 
+void Hardware::HButton::_signal (Protonix* device) {
+	if (!this->_allowSignal || !device->SignalSpawned(this->_id, this->_signalChanged)) return;
+
+	bool active = this->_trigger->InputValue();
+
+	device->Signal(this->_id, String(active ? this->_signalPressed : this->_signalReleased));
+
+	this->_capability("active:bool", String(active ? "1" : "0"));
+}
+
 Hardware::HButton::HButton (unsigned short pin, unsigned int checkInterval) {
 	this->_trigger = Hardware::HTrigger::Input(pin, HIGH, checkInterval);
 
@@ -89,17 +99,15 @@ void Hardware::HButton::HardwareInitPre (Protonix* device) {
 void Hardware::HButton::HardwarePipe (Protonix* device, short core) {
 	this->_trigger->HardwarePipe(device, core);
 
-	if (this->_allowSignal && device->SignalSpawned(this->_id, this->_signalChanged)) {
-		bool active = this->_trigger->InputValue();
-
-		device->Signal(this->_id, String(active ? this->_signalPressed : this->_signalReleased));
-
-		this->_capability("active:bool", String(active ? "1" : "0"));
-	}
+	this->_signal(device);
 }
 
 void Hardware::HButton::HardwarePipeInterrupt (Protonix* device) {
 	this->_trigger->HardwarePipeInterrupt(device);
+}
+
+void Hardware::HButton::HardwareOnReset (Protonix* device) {
+	this->_signal(device);
 }
 
 void Hardware::HButton::HardwareOnCommand (Protonix* device, String command) {

@@ -24,6 +24,7 @@ namespace Qybercom {
 
 					bool _pipe ();
 					bool _inputChangedHandler ();
+					void _signal (Protonix* device);
 					HTrigger (bool input, unsigned short pin, unsigned int checkInterval, unsigned short mode, bool interrupt);
 
 				public:
@@ -49,6 +50,7 @@ namespace Qybercom {
 					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwarePipeInterrupt (Protonix* device);
+					void HardwareOnReset (Protonix* device);
 					void HardwareOnCommand (Protonix* device, String command);
 			};
 		}

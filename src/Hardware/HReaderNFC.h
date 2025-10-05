@@ -28,6 +28,7 @@ namespace Qybercom {
 					Qybercom::Debouncer<String> _debouncer; // use >= 1000
 
 					HReaderNFC (unsigned short pinSS, unsigned short pinRST, unsigned int uuidReadDebounce = 0, short dedicatedCore = -1);
+					void _signal (Protonix* device, String value);
 
 					static void _channel (unsigned short channel);
 
@@ -56,6 +57,7 @@ namespace Qybercom {
 					void HardwareInitPost (Protonix* device);
 
 					void HardwarePipe (Protonix* device, short core);
+					void HardwareOnReset (Protonix* device);
 					void HardwareOnCommand (Protonix* device, String command);
 			};
 		}

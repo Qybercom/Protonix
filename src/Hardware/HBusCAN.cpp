@@ -307,6 +307,10 @@ void Hardware::HBusCAN::HardwarePipe (Protonix* device, short core) {
 	}
 }
 
+void Hardware::HBusCAN::HardwareOnReset (Protonix* device) {
+	(void)device;
+}
+
 void Hardware::HBusCAN::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;

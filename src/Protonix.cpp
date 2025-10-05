@@ -319,6 +319,16 @@ bool Protonix::Reboot () {
 	#endif
 }
 
+Protonix* Protonix::Reset (bool actions) {
+	for (IProtonixHardware* hardware : this->_hardware)
+		hardware->HardwareOnReset(this);
+
+	if (actions)
+		this->ActionReset();
+
+	return this->State("")->SensorReset();
+}
+
 bool Protonix::FirmwareUpdateOTA (String version, String network) {
 	IProtonixNetworkDriver* driver = this->Network(network);
 	if (driver == nullptr) return false;

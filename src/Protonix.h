@@ -94,6 +94,7 @@ namespace Qybercom {
 				Protonix* Pipe ();
 
 				bool Reboot ();
+				Protonix* Reset (bool actions = true);
 
 				bool FirmwareUpdateOTA (String version = "", String network = "");
 

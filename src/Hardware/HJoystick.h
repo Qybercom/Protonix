@@ -46,6 +46,9 @@ namespace Qybercom {
 					bool _allowSignalValue;
 					bool _first;
 
+					void _signalValue (Protonix* device);
+					void _signalPosition (Protonix* device);
+
 				public:
 					HJoystick (short pinX = -1, short pinY = -1, short pinButton = -1, bool init = false);
 					static HJoystick* Init (short pinX = -1, short pinY = -1, short pinButton = -1, bool init = false);
@@ -88,6 +91,7 @@ namespace Qybercom {
 					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwarePipeInterrupt (Protonix* device);
+					void HardwareOnReset (Protonix* device);
 					void HardwareOnCommand (Protonix* device, String command);
 
 					static int Position (int value, int valMin, int valMax, int gapMin, int gapMax);

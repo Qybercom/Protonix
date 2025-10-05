@@ -47,6 +47,12 @@ void Hardware::HRelay::HardwareInitPre (Protonix* device) {
 	this->Close();
 }
 
+void Hardware::HRelay::HardwareOnReset (Protonix* device) {
+	(void)device;
+
+	this->Close();
+}
+
 void Hardware::HRelay::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 

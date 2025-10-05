@@ -48,6 +48,11 @@ bool Hardware::HTrigger::_pipe () {
 	return true;
 }
 
+void Hardware::HTrigger::_signal (Protonix* device) {
+	if (this->_input)
+		device->Signal(this->_id, this->_signalInputChanged)->Value(this->_inputValue);
+}
+
 Hardware::HTrigger::HTrigger (bool input, unsigned short pin, unsigned int checkInterval, unsigned short mode, bool interrupt) {
 	this->_pin = pin;
 	this->_interrupt = interrupt;
@@ -162,7 +167,7 @@ void Hardware::HTrigger::HardwarePipe (Protonix* device, short core) {
 		this->_pipe();
 
 	if (this->_inputChangedHandler())
-		device->Signal(this->_id, this->_signalInputChanged)->Value(this->_inputValue);
+		this->_signal(device);
 }
 
 void Hardware::HTrigger::HardwarePipeInterrupt (Protonix* device) {
@@ -171,6 +176,11 @@ void Hardware::HTrigger::HardwarePipeInterrupt (Protonix* device) {
 	if (!this->_interrupt) return;
 
 	this->_pipe();
+}
+
+void Hardware::HTrigger::HardwareOnReset (Protonix* device) {
+	if (this->_input) this->_signal(device);
+	else this->OutputValue(false);
 }
 
 void Hardware::HTrigger::HardwareOnCommand (Protonix* device, String command) {

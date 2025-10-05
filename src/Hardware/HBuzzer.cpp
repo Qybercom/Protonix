@@ -58,6 +58,7 @@ void Hardware::HBuzzer::HardwareInitPre (Protonix* device) {
 
 	this->_capability("value", "active:bool", "State of the buzzer");
 	this->_capability("value", "tone:int", "Tone value");
+	this->_capability("command", "stop", "Stop");
 }
 
 void Hardware::HBuzzer::HardwarePipe (Protonix* device, short core) {
@@ -71,7 +72,15 @@ void Hardware::HBuzzer::HardwarePipe (Protonix* device, short core) {
 		this->Stop();
 }
 
+void Hardware::HBuzzer::HardwareOnReset (Protonix* device) {
+	(void)device;
+
+	this->Stop();
+}
+
 void Hardware::HBuzzer::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
-	(void)command;
+
+	if (command == "stop")
+		this->Stop();
 }

@@ -78,6 +78,10 @@ void Hardware::HSensorHall::HardwarePipe (Protonix* device, short core) {
 	this->_capability("value:int", String(this->_value));
 }
 
+void Hardware::HSensorHall::HardwareOnReset (Protonix* device) {
+	(void)device;
+}
+
 void Hardware::HSensorHall::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;

@@ -42,6 +42,12 @@ void Hardware::HPhotonix::HardwarePipe (Protonix* device, short core) {
 
 }
 
+void Hardware::HPhotonix::HardwareOnReset (Protonix* device) {
+	(void)device;
+
+	this->_photonix->Clear();
+}
+
 void Hardware::HPhotonix::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 

@@ -11,6 +11,20 @@
 
 using namespace Qybercom::Protonix;
 
+void Hardware::HReaderNFC::_signal (Protonix* device, String value) {
+	if (!this->_allowSignal) return;
+
+	String current = this->_uuid;
+
+	device->Signal(this->_id, "uuidChanged")->Value(value);
+
+	if (current == "" && value != "")
+		device->Signal(this->_id, "tagIn")->Value(value);
+
+	if (current != "" && value == "")
+		device->Signal(this->_id, "tagOut");
+}
+
 void Hardware::HReaderNFC::_channel (unsigned short channel) {
 	Wire.beginTransmission(0x70);
 	Wire.write(1 << channel);
@@ -181,25 +195,21 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 		value = String(String(this->_debouncer.Actual()));
 
 		if (this->_uuid != value) {
-			String current = this->_uuid;
-			this->_uuid = value;
+			this->_signal(device, value);
+
 			this->_uuidChanged = true;
-
-			if (this->_allowSignal) {
-				device->Signal(this->_id, "uuidChanged")->Value(value);
-
-				if (current == "" && value != "")
-					device->Signal(this->_id, "tagIn")->Value(value);
-
-				if (current != "" && value == "")
-					device->Signal(this->_id, "tagOut");
-			}
-
-			this->_capability("uuid:string", String(this->_uuid));
 		}
+
+		this->_uuid = value;
+
+		this->_capability("uuid:string", String(this->_uuid));
 
 		this->_debouncer.Reset();
 	}
+}
+
+void Hardware::HReaderNFC::HardwareOnReset (Protonix* device) {
+	this->_signal(device, this->_uuid);
 }
 
 void Hardware::HReaderNFC::HardwareOnCommand (Protonix* device, String command) {

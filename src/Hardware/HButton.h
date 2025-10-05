@@ -17,6 +17,8 @@ namespace Qybercom {
 					String _signalPressed;
 					String _signalReleased;
 
+					void _signal (Protonix* device);
+
 				public:
 					HButton (unsigned short pin, unsigned int checkInterval = 0);
 					static HButton* Init (unsigned short pin, unsigned int checkInterval = 0);
@@ -41,6 +43,7 @@ namespace Qybercom {
 					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwarePipeInterrupt (Protonix* device);
+					void HardwareOnReset (Protonix* device);
 					void HardwareOnCommand (Protonix* device, String command);
 			};
 		}

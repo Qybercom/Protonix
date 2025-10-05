@@ -176,6 +176,10 @@ void Hardware::HBusSerial::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 }
 
+void Hardware::HBusSerial::HardwareOnReset (Protonix* device) {
+	(void)device;
+}
+
 void Hardware::HBusSerial::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;

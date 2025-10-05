@@ -80,6 +80,10 @@ void Hardware::HPhotoResistor::HardwarePipe (Protonix* device, short core) {
 	this->_capability("value:int", String(this->_value));
 }
 
+void Hardware::HPhotoResistor::HardwareOnReset (Protonix* device) {
+	(void)device;
+}
+
 void Hardware::HPhotoResistor::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;

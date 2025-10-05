@@ -87,12 +87,21 @@ void Hardware::HPlayerMP3::HardwareInitPre (Protonix* device) {
 	this->_capability("command", "play:<file>:<dir>", "Play file in dir");
 	this->_capability("command", "pause", "Pause");
 	this->_capability("command", "stop", "Stop");
+	this->_capability("command", "volumeUp", "Volume up");
+	this->_capability("command", "volumeDown", "Volume down");
+	this->_capability("command", "volume:<percent>", "Set volume in percents");
 	this->_capability("command", "reset", "Reset");
 	this->_capability("command", "wake", "Wake");
 }
 
 void Hardware::HPlayerMP3::HardwarePipe (Protonix* device, short core) {
 	this->_player->HardwarePipe(device, core);
+}
+
+void Hardware::HPlayerMP3::HardwareOnReset (Protonix* device) {
+	(void)device;
+
+	this->Stop();
 }
 
 void Hardware::HPlayerMP3::HardwareOnCommand (Protonix* device, String command) {

@@ -19,6 +19,7 @@ namespace Qybercom {
 					bool _allowZero;
 
 					bool _changedPipe ();
+					void _signal (Protonix* device, short value);
 
 				public:
 					HSelector3P (unsigned short pin1, unsigned short pin2, unsigned int checkInterval = 0);
@@ -35,6 +36,7 @@ namespace Qybercom {
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
+					void HardwareOnReset (Protonix* device);
 					void HardwareOnCommand (Protonix* device, String command);
 			};
 		}

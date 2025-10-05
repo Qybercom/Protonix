@@ -13,6 +13,8 @@ namespace Qybercom {
 					unsigned short _pin;
 					bool _active;
 
+					void _signal (Protonix* device);
+
 				public:
 					HSensorMicrophone (unsigned short pin);
 
@@ -24,6 +26,7 @@ namespace Qybercom {
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
+					void HardwareOnReset (Protonix* device);
 					void HardwareOnCommand (Protonix* device, String command);
 			};
 		}

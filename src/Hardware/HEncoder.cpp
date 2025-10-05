@@ -11,6 +11,16 @@
 
 using namespace Qybercom::Protonix;
 
+void Hardware::HEncoder::_signal (Protonix* device) {
+	if (this->_allowSignal)
+		device->Signal(this->_id, "dir")->Value(
+			Hardware::HEncoderState(
+				this->_dir,
+				this->_button != nullptr && this->_button->Active()
+			)
+		);
+}
+
 Hardware::HEncoder::HEncoder (unsigned short pinA, unsigned short pinB, unsigned int checkInterval) {
 	this->_pinA = pinA;
 	this->_pinB = pinB;
@@ -121,8 +131,8 @@ void Hardware::HEncoder::HardwarePipe (Protonix* device, short core) {
 	if (this->_button != nullptr)
 		this->_button->HardwarePipe(device, core);
 
-	if (this->_allowSignal && this->Changed())
-		device->Signal(this->_id, "dir")->Value(Hardware::HEncoderState(this->_dir, this->_button != nullptr && this->_button->Active()));
+	if (this->Changed())
+		this->_signal(device);
 
 	this->_capability("dir:int", String(this->_dir));
 }
@@ -156,6 +166,10 @@ void Hardware::HEncoder::HardwarePipeInterrupt (Protonix* device) {
 
 	if (this->_button != nullptr)
 		this->_button->HardwarePipeInterrupt(device);
+}
+
+void Hardware::HEncoder::HardwareOnReset (Protonix* device) {
+	this->_signal(device);
 }
 
 void Hardware::HEncoder::HardwareOnCommand (Protonix* device, String command) {

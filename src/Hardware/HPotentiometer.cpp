@@ -78,6 +78,10 @@ void Hardware::HPotentiometer::HardwarePipe (Protonix* device, short core) {
 	this->_capability("value:int", String(this->_value));
 }
 
+void Hardware::HPotentiometer::HardwareOnReset (Protonix* device) {
+	(void)device;
+}
+
 void Hardware::HPotentiometer::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;

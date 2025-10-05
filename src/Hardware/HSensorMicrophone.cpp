@@ -7,6 +7,11 @@
 
 using namespace Qybercom::Protonix;
 
+void Hardware::HSensorMicrophone::_signal (Protonix* device) {
+	if (this->_allowSignal)
+		device->Signal(this->_id, "active")->Value(this->_active);
+}
+
 Hardware::HSensorMicrophone::HSensorMicrophone (unsigned short pin) {
 	this->_active = false;
 	this->_pin = pin;
@@ -49,11 +54,14 @@ void Hardware::HSensorMicrophone::HardwarePipe (Protonix* device, short core) {
 	if (active != this->_active) {
 		this->_active = active;
 
-		if (this->_allowSignal)
-			device->Signal(this->_id, "active")->Value(this->_active);
+		this->_signal(device);
 	}
 
 	this->_capability("active:bool", String(active));
+}
+
+void Hardware::HSensorMicrophone::HardwareOnReset (Protonix* device) {
+	this->_signal(device);
 }
 
 void Hardware::HSensorMicrophone::HardwareOnCommand (Protonix* device, String command) {

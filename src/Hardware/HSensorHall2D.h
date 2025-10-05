@@ -18,6 +18,8 @@ namespace Qybercom {
 					int _minX;
 					int _minY;
 
+					void _signal (Protonix* device);
+
 				public:
 					HSensorHall2D (unsigned short pinX, unsigned short pinY, int maxX = QYBERCOM_PROTONIX_ANALOG_MAX, int maxY = QYBERCOM_PROTONIX_ANALOG_MAX, int minX = 0, int minY = 0);
 
@@ -50,6 +52,7 @@ namespace Qybercom {
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
+					void HardwareOnReset (Protonix* device);
 					void HardwareOnCommand (Protonix* device, String command);
 			};
 		}

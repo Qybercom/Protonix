@@ -7,6 +7,11 @@
 
 using namespace Qybercom::Protonix;
 
+void Hardware::HTouchButton::_signal (Protonix* device) {
+	device->Signal(this->_id, "changed")->Value(this->_active);
+	device->Signal(this->_id, String(this->_active ? "touch" : "release"));
+}
+
 Hardware::HTouchButton::HTouchButton (unsigned short pin) {
 	this->_active = false;
 	this->_pin = pin;
@@ -50,11 +55,14 @@ void Hardware::HTouchButton::HardwarePipe (Protonix* device, short core) {
 	this->_active = active;
 
 	if (this->_allowSignal && changed) {
-		device->Signal(this->_id, "changed")->Value(active);
-		device->Signal(this->_id, String(active ? "touch" : "release"));
+		this->_signal(device);
 	}
 
 	this->_capability("active:bool", String(this->_active ? "1" : "0"));
+}
+
+void Hardware::HTouchButton::HardwareOnReset (Protonix* device) {
+	this->_signal(device);
 }
 
 void Hardware::HTouchButton::HardwareOnCommand (Protonix* device, String command) {

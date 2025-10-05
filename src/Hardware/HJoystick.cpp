@@ -13,6 +13,29 @@
 using namespace Qybercom;
 using namespace Qybercom::Protonix;
 
+void Hardware::HJoystick::_signalValue (Protonix* device) {
+	if (this->_allowSignal && this->_allowSignalValue) {
+		device
+			->Signal(this->_id, "value")
+			->Value(Hardware::HJoystickState(
+				this->_valueX, this->_valueY,
+				this->_button != nullptr && this->_button->Active(),
+				this->_calibrated
+			));
+	}
+}
+
+void Hardware::HJoystick::_signalPosition (Protonix* device) {
+	if (this->_allowSignal)
+		device
+			->Signal(this->_id, "position")
+			->Value(Hardware::HJoystickState(
+				this->_positionX, this->_positionY,
+				this->_button != nullptr && this->_button->Active(),
+				this->_calibrated
+			));
+}
+
 Hardware::HJoystick::HJoystick (short pinX, short pinY, short pinButton, bool init) {
 	this->_pinX = pinX;
 	this->_pinY = pinY;
@@ -263,28 +286,14 @@ void Hardware::HJoystick::HardwarePipe (Protonix* device, short core) {
 		if (!this->_first)
 			this->_first = true;
 
-		if (this->_allowSignal) {
-			if (this->_allowSignalValue) {
-				device->Signal(this->_id, "value")
-					->Value(Hardware::HJoystickState(
-						this->_valueX, this->_valueY,
-						this->_button != nullptr && this->_button->Active(),
-						this->_calibrated
-					));
-			}
+		this->_signalValue(device);
 
-			if (positionChanged) {
-				this->_positionChanged = false;
-				this->_positionX = positionX;
-				this->_positionY = positionY;
+		if (positionChanged) {
+			this->_positionChanged = false;
+			this->_positionX = positionX;
+			this->_positionY = positionY;
 
-				device->Signal(this->_id, "position")
-					->Value(Hardware::HJoystickState(
-						this->_positionX, this->_positionY,
-						this->_button != nullptr && this->_button->Active(),
-						this->_calibrated
-					));
-			}
+			this->_signalPosition(device);
 		}
 	}
 }
@@ -292,6 +301,11 @@ void Hardware::HJoystick::HardwarePipe (Protonix* device, short core) {
 void Hardware::HJoystick::HardwarePipeInterrupt (Protonix* device) {
 	if (this->_button != nullptr)
 		this->_button->HardwarePipeInterrupt(device);
+}
+
+void Hardware::HJoystick::HardwareOnReset (Protonix* device) {
+	this->_signalValue(device);
+	this->_signalPosition(device);
 }
 
 void Hardware::HJoystick::HardwareOnCommand (Protonix* device, String command) {
