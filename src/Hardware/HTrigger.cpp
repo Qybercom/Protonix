@@ -29,8 +29,8 @@ bool Hardware::HTrigger::_pipe () {
 
 	this->_debouncer.Use(value);
 
-	if (this->_debouncer.Pipe()) {
-		value = this->_debouncer.Empty() ? 0 : this->_debouncer.Actual();
+	if (this->_debouncer.Pipe() && !this->_debouncer.Empty()) {
+		value = this->_debouncer.Actual();
 
 		bool val = (value == HIGH) != (this->_inputMode == HIGH);
 
@@ -38,9 +38,9 @@ bool Hardware::HTrigger::_pipe () {
 			this->_inputValue = val;
 			this->_inputChanged = true;
 			this->_inputChangedSignal = true;
-
-			this->_capability("active:bool", String(val ? "1" : "0"));
 		}
+
+		this->_capability("active:bool", String(val ? "1" : "0"));
 
 		this->_debouncer.Reset();
 	}
