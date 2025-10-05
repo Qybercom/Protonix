@@ -138,6 +138,7 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 
 	if (this->_i2c && this->_i2cReader != nullptr) {
 		Hardware::HReaderNFC::_channel(this->_pinSS);
+		this->_i2cReader->PCD_Init();
 
 		card = this->_i2cReader->PICC_IsNewCardPresent();
 		value = "";
@@ -151,13 +152,15 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 				i++;
 			}
 		}
+
+		this->_debouncer.Use(value);
 	}
 
 	if (this->_spi && this->_spiReader != nullptr) {
 		this->_spiReader->PCD_Init();
 
 		card = this->_spiReader->PICC_IsNewCardPresent();
-		value = String("");
+		value = "";
 
 		if (card && this->_spiReader->PICC_ReadCardSerial()) {
 			i = 0;
@@ -168,14 +171,14 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 				i++;
 			}
 		}
+
+		this->_debouncer.Use(value);
 	}
 
 	this->_uuidActual = value;
 
-	this->_debouncer.Use(value);
-
-	if (this->_debouncer.Pipe()) {
-		value = String(this->_debouncer.Empty() ? String("") : String(this->_debouncer.Actual()));
+	if (this->_debouncer.Pipe() && !this->_debouncer.Empty()) {
+		value = String(String(this->_debouncer.Actual()));
 
 		if (this->_uuid != value) {
 			String current = this->_uuid;
