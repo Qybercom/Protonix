@@ -25,7 +25,8 @@ bool Hardware::HTrigger::_inputChangedHandler () {
 bool Hardware::HTrigger::_pipe () {
 	if (!this->_input) return false;
 
-	unsigned short value = digitalRead(this->_pin);
+	//unsigned short value = digitalRead(this->_pin);
+	unsigned short value = this->_bridge->BridgeDigitalRead(this->_pin);
 
 	this->_debouncer.Use(value);
 
@@ -127,7 +128,8 @@ bool Hardware::HTrigger::OutputValue (unsigned short value) {
 
 	this->_log("OutputValue " + String(value));
 
-	digitalWrite(this->_pin, value);
+	//digitalWrite(this->_pin, value);
+	this->_bridge->BridgeDigitalWrite(this->_pin, value);
 
 	this->_capability("active:bool", String(value));
 
@@ -142,8 +144,10 @@ void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	if (this->_input) {
-		digitalWrite(this->_pin, this->_inputMode);
-		pinMode(this->_pin, INPUT_PULLUP);
+		//digitalWrite(this->_pin, this->_inputMode);
+		//pinMode(this->_pin, INPUT_PULLUP);
+		this->_bridge->BridgeDigitalWrite(this->_pin, this->_inputMode);
+		this->_bridge->BridgePinMode(this->_pin, INPUT_PULLUP);
 
 		if (this->_interrupt)
 			device->InterruptAttach(this->_pin, CHANGE);
@@ -151,8 +155,10 @@ void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
 		this->_capability("value", "active:bool", "State of the trigger");
 	}
 	else {
-		pinMode(this->_pin, OUTPUT);
-		digitalWrite(this->_pin, LOW);
+		//pinMode(this->_pin, OUTPUT);
+		//digitalWrite(this->_pin, LOW);
+		this->_bridge->BridgePinMode(this->_pin, OUTPUT);
+		this->_bridge->BridgeDigitalWrite(this->_pin, LOW);
 
 		this->_capability("command", "output:<bool>", "Set trigger' output value");
 		this->_capability("active:bool", "0");

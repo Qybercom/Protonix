@@ -1,5 +1,7 @@
 #pragma once
 
+#include "HBridgeDefault.h"
+#include "HBridgePCF8574.h"
 #include "HBuiltInLED.h"
 #include "HBusCAN.h"
 #include "HBusSerial.h"
@@ -27,9 +29,8 @@
  * 7seg
  * clock7seg (https://github.com/AKJ7/TM1637)
  * led text display (LiquidCrystal_I2C.h)
- * velostat
+ * velostat (through Adafruit_ADS1X15.h)
  * weight (HX711)
- * i2cExpander (pcf8574)
  * radio module (RCSwitch.h)
  * servo motor (Stepper.h)
  * gas/particle sensor

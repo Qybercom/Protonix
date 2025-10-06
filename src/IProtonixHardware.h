@@ -4,17 +4,22 @@
 
 #include "Common/List.hpp"
 
+#include "../../../AppData/Roaming/JetBrains/CLion2025.2/extensions/old/IProtonixBridge.h"
+
 #include "ProtonixHardwareCapability.h"
 
 namespace Qybercom {
 	namespace Protonix {
 		class Protonix;
 
+		class IProtonixBridge;
+
 		class IProtonixHardware {
 			protected:
 				String _id;
 				bool _allowSignal;
 				short _dedicatedCore = -1;
+				IProtonixBridge* _bridge;
 				List<ProtonixHardwareCapability*> _capabilities;
 
 				ProtonixHardwareCapability* _capability (String kind, String id, String comment);
@@ -27,6 +32,8 @@ namespace Qybercom {
 				short HardwareDedicatedCore ();
 				bool HardwareAllowSignal ();
 				IProtonixHardware* HardwareAllowSignal (bool allow);
+				IProtonixBridge* HardwareBridge ();
+				IProtonixHardware* HardwareBridge (IProtonixBridge* bridge);
 
 				virtual String HardwareSummary () { return ""; }
 				virtual List<ProtonixHardwareCapability*> &HardwareCapabilities () { return this->_capabilities; }
@@ -50,8 +57,19 @@ namespace Qybercom {
 
 		class IProtonixBus : public IProtonixHardware {
 			public:
-				virtual bool HardwareBusSend (Protonix* device, String data) { (void)device; (void)data; return false; }
-				virtual bool HardwareBusCommand (Protonix* device, String command) { (void)device; (void)command; return false; }
+				virtual bool BusSend (Protonix* device, String data) { (void)device; (void)data; return false; }
+				virtual bool BusCommand (Protonix* device, String command) { (void)device; (void)command; return false; }
+		};
+
+		class IProtonixBridge : public IProtonixHardware {
+			public:
+				virtual bool BridgePinMode (unsigned int pin, int mode);
+
+				virtual bool BridgeDigitalRead (unsigned int pin);
+				virtual bool BridgeDigitalWrite (unsigned int pin, bool value);
+
+				virtual int BridgeAnalogRead (unsigned int pin);
+				virtual bool BridgeAnalogWrite (unsigned int pin, int value);
 		};
 	}
 }

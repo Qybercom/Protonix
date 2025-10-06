@@ -25,6 +25,8 @@
 #include "ProtonixRegistry.h"
 #include "ProtonixSensor.h"
 
+#include "Hardware/HBridgeDefault.h"
+
 #include "Command/index.h"
 
 using namespace Qybercom::Protonix;
@@ -45,6 +47,8 @@ Protonix::Protonix (IProtonixDevice* device, IProtonixProfile* profile) {
 	this->_memory->EEPROMBegin();
 	this->_registry = new ProtonixRegistry(this->_memory);
 	this->_registry->Debug(this->_debug); // TODO: runtime switch for every debuggable component
+
+	this->Hardware("", new Hardware::HBridgeDefault());
 
 	this->_networkDefault = nullptr;
 
@@ -427,8 +431,23 @@ IProtonixHardware* Protonix::Hardware (String id) {
 }
 
 Protonix* Protonix::Hardware (String id, IProtonixHardware* hardware, bool allowSignal) {
+	// TODO: add check for existent id
+
 	hardware->HardwareID(id);
 	hardware->HardwareAllowSignal(allowSignal);
+	hardware->HardwareBridge(this->Hardware(""));
+
+	this->_hardware.Add(hardware);
+
+	return this;
+}
+
+Protonix* Protonix::HardwareOnBridge (String bridge, String id, IProtonixHardware* hardware, bool allowSignal) {
+	// TODO: add check for existent id
+
+	hardware->HardwareID(id);
+	hardware->HardwareAllowSignal(allowSignal);
+	hardware->HardwareBridge(this->Hardware(bridge));
 
 	this->_hardware.Add(hardware);
 
@@ -440,13 +459,13 @@ Protonix* Protonix::Hardware (String id, IProtonixHardware* hardware, bool allow
 bool Protonix::BusSend (String bus, String data) {
 	IProtonixBus* hardware = (IProtonixBus*)this->Hardware(bus);
 
-	return hardware == nullptr ? false : hardware->HardwareBusSend(this, data);
+	return hardware == nullptr ? false : hardware->BusSend(this, data);
 }
 
 bool Protonix::BusCommand (String bus, String command) {
 	IProtonixBus* hardware = (IProtonixBus*)this->Hardware(bus);
 
-	return hardware == nullptr ? false : hardware->HardwareBusCommand(this, command);
+	return hardware == nullptr ? false : hardware->BusCommand(this, command);
 }
 
 bool Protonix::BusCommand (String bus, IProtonixCommand* command) {

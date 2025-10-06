@@ -48,6 +48,10 @@ IProtonixHardware* IProtonixHardware::HardwareID (String id) {
 	return this;
 }
 
+short IProtonixHardware::HardwareDedicatedCore () {
+	return this->_dedicatedCore;
+}
+
 bool IProtonixHardware::HardwareAllowSignal () {
 	return this->_allowSignal;
 }
@@ -58,6 +62,12 @@ IProtonixHardware* IProtonixHardware::HardwareAllowSignal (bool allow) {
 	return this;
 }
 
-short IProtonixHardware::HardwareDedicatedCore () {
-	return this->_dedicatedCore;
+IProtonixBridge* IProtonixHardware::HardwareBridge () {
+	return this->_bridge;
+}
+
+IProtonixHardware* IProtonixHardware::HardwareBridge (IProtonixBridge* bridge) {
+	this->_bridge = bridge;
+
+	return this;
 }

@@ -65,6 +65,9 @@ String Hardware::HSelector3P::HardwareSummary () {
 }
 
 void Hardware::HSelector3P::HardwareInitPre (Protonix* device) {
+	this->_trigger1->HardwareBridge(this->_bridge);
+	this->_trigger2->HardwareBridge(this->_bridge);
+
 	this->_trigger1->HardwareInitPre(device);
 	this->_trigger2->HardwareInitPre(device);
 

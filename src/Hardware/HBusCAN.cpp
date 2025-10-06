@@ -316,13 +316,13 @@ void Hardware::HBusCAN::HardwareOnCommand (Protonix* device, String command) {
 	(void)command;
 }
 
-bool Hardware::HBusCAN::HardwareBusSend (Protonix* device, String data) {
+bool Hardware::HBusCAN::BusSend (Protonix* device, String data) {
 	(void)device;
 
 	return this->Send(data);
 }
 
-bool Hardware::HBusCAN::HardwareBusCommand (Protonix* device, String command) {
+bool Hardware::HBusCAN::BusCommand (Protonix* device, String command) {
 	(void)device;
 
 	return this->Send(command);

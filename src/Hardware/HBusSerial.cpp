@@ -185,13 +185,13 @@ void Hardware::HBusSerial::HardwareOnCommand (Protonix* device, String command) 
 	(void)command;
 }
 
-bool Hardware::HBusSerial::HardwareBusSend (Protonix* device, String data) {
+bool Hardware::HBusSerial::BusSend (Protonix* device, String data) {
 	(void)device;
 
 	return this->Send(data);
 }
 
-bool Hardware::HBusSerial::HardwareBusCommand (Protonix* device, String command) {
+bool Hardware::HBusSerial::BusCommand (Protonix* device, String command) {
 	(void)device;
 
 	return this->SendCommand(command);
