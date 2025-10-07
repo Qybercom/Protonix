@@ -20,17 +20,19 @@ Profile::Axion::Axion::Axion (String uriStream, String uriHTTP, unsigned int int
 
 	this->_clientStream = new ProtonixNetworkClient(this->_uriStream);
 
-	this->_dtoInput = new AxionDTO();
-	this->_dtoOutput = new AxionDTO();
-
 	this->_timerConnectStream = new ProtonixTimer(intervalConnectStream);
 	this->_timerAuthorize = new ProtonixTimer(intervalAuthorize);
 	this->_timerData = new ProtonixTimer(intervalData);
 
+	this->_dtoInput = new AxionDTO();
+	this->_dtoOutput = new AxionDTO();
+
 	this->_authorized = false;
 	this->_autoConnectStream = true;
-	this->_autoData = true;
 	this->_autoAuthorize = true;
+	this->_autoData = true;
+	this->_dataMemory = false;
+	this->_dataHardware = false;
 
 	this->_debug = false;
 }
@@ -193,7 +195,11 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 	if (this->_debug)
 		Serial.println("[Axion:RequestStreamDeviceData]");
 
-	this->RequestStream(device, "/api/mechanism/status", new Profile::Axion::DTO::DTORequestDeviceData(device));
+	this->RequestStream(device, "/api/mechanism/status", new Profile::Axion::DTO::DTORequestDeviceData(
+		device,
+		this->_dataMemory,
+		this->_dataHardware
+	));
 }
 
 void Profile::Axion::Axion::_onStreamURL (Protonix* device) {
@@ -255,9 +261,29 @@ void Profile::Axion::Axion::_onStreamEvent (Protonix* device) {
 		if (this->_debug)
 			Serial.println("[Axion:OnStreamEvent:Command] " + cmd);
 
-		bool ok = device->CommandRecognizeAndProcess(cmd);
-		if (this->_debug || !ok)
-			Serial.println("[Axion:OnStreamEvent:Command] Result: " + String(ok));
+		if (cmd.startsWith("axion:")) {
+			String trail = cmd.substring(6, cmd.length());
+
+			Serial.println("[debug] Axion command: " + trail);
+
+			if (trail == "dataMemory:1")
+				this->_dataMemory = true;
+
+			if (trail == "dataMemory:0")
+				this->_dataMemory = false;
+
+			if (trail == "dataHardware:1")
+				this->_dataHardware = true;
+
+			if (trail == "dataHardware:0")
+				this->_dataHardware = false;
+		}
+		else {
+			bool ok = device->CommandRecognizeAndProcess(cmd);
+
+			if (this->_debug || !ok)
+				Serial.println("[Axion:OnStreamEvent:Command] Result: " + String(ok));
+		}
 
 		delete dto;
 		dto = nullptr;

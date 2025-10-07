@@ -20,15 +20,17 @@ namespace Qybercom {
 						String _uriStream;
 						String _uriHTTP;
 						ProtonixNetworkClient* _clientStream;
-						AxionDTO* _dtoInput;
-						AxionDTO* _dtoOutput;
 						ProtonixTimer* _timerConnectStream;
 						ProtonixTimer* _timerAuthorize;
 						ProtonixTimer* _timerData;
+						AxionDTO* _dtoInput;
+						AxionDTO* _dtoOutput;
 						bool _authorized;
 						bool _autoConnectStream;
-						bool _autoData;
 						bool _autoAuthorize;
+						bool _autoData;
+						bool _dataMemory;
+						bool _dataHardware;
 						bool _debug;
 
 						void _onStreamURL (Protonix* device);
@@ -60,6 +62,12 @@ namespace Qybercom {
 
 						bool AutoData ();
 						Axion* AutoData (bool value);
+
+						bool DataMemory ();
+						Axion* DataMemory (bool value);
+
+						bool DataHardware ();
+						Axion* DataHardware (bool value);
 
 						void RequestStream (Protonix* device, String url, IAxionDTORequest* request);
 						void RequestStreamAuthorize (Protonix* device);

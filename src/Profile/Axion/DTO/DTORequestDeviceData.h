@@ -20,7 +20,7 @@ namespace Qybercom {
 							bool _includeHardware;
 
 						public:
-							DTORequestDeviceData (Protonix* device, bool includeMemory = true, bool includeHardware = true);
+							DTORequestDeviceData (Protonix* device, bool includeMemory = false, bool includeHardware = false);
 
 							void AxionDTOPopulate (AxionDTO* dto);
 							void AxionDTOSerialize (JsonDocument& dto);
