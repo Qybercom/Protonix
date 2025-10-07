@@ -62,11 +62,11 @@ IProtonixHardware* IProtonixHardware::HardwareAllowSignal (bool allow) {
 	return this;
 }
 
-IProtonixBridge* IProtonixHardware::HardwareBridge () {
+String IProtonixHardware::HardwareBridge () {
 	return this->_bridge;
 }
 
-IProtonixHardware* IProtonixHardware::HardwareBridge (IProtonixBridge* bridge) {
+IProtonixHardware* IProtonixHardware::HardwareBridge (String bridge) {
 	this->_bridge = bridge;
 
 	return this;

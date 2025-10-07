@@ -26,7 +26,7 @@ bool Hardware::HTrigger::_pipe () {
 	if (!this->_input) return false;
 
 	//unsigned short value = digitalRead(this->_pin);
-	unsigned short value = this->_bridge->BridgeDigitalRead(this->_pin);
+	unsigned short value = this->_bridgePtr->BridgeDigitalRead(this->_pin);
 
 	this->_debouncer.Use(value);
 
@@ -66,6 +66,8 @@ Hardware::HTrigger::HTrigger (bool input, unsigned short pin, unsigned int check
 	this->_debouncer.CheckInterval(checkInterval);
 
 	this->_signalInputChanged = "inputChanged";
+
+	this->_bridgePtr = nullptr;
 }
 
 Hardware::HTrigger* Hardware::HTrigger::Input (unsigned short pin, unsigned short mode, unsigned int checkInterval, bool interrupt) {
@@ -129,7 +131,7 @@ bool Hardware::HTrigger::OutputValue (unsigned short value) {
 	this->_log("OutputValue " + String(value));
 
 	//digitalWrite(this->_pin, value);
-	this->_bridge->BridgeDigitalWrite(this->_pin, value);
+	this->_bridgePtr->BridgeDigitalWrite(this->_pin, value);
 
 	this->_capability("active:bool", String(value));
 
@@ -141,13 +143,23 @@ String Hardware::HTrigger::HardwareSummary () {
 }
 
 void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
-	(void)device;
+	this->_bridgePtr = (IProtonixBridge*)device->Hardware(this->_bridge);
+}
 
+bool Hardware::HTrigger::HardwareI2C () {
+	return this->_bridgePtr->HardwareI2C();
+}
+
+bool Hardware::HTrigger::HardwareSPI () {
+	return this->_bridgePtr->HardwareSPI();
+}
+
+void Hardware::HTrigger::HardwareInitPost (Protonix* device) {
 	if (this->_input) {
 		//digitalWrite(this->_pin, this->_inputMode);
 		//pinMode(this->_pin, INPUT_PULLUP);
-		this->_bridge->BridgeDigitalWrite(this->_pin, this->_inputMode);
-		this->_bridge->BridgePinMode(this->_pin, INPUT_PULLUP);
+		this->_bridgePtr->BridgeDigitalWrite(this->_pin, this->_inputMode);
+		this->_bridgePtr->BridgePinMode(this->_pin, INPUT_PULLUP);
 
 		if (this->_interrupt)
 			device->InterruptAttach(this->_pin, CHANGE);
@@ -157,8 +169,8 @@ void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
 	else {
 		//pinMode(this->_pin, OUTPUT);
 		//digitalWrite(this->_pin, LOW);
-		this->_bridge->BridgePinMode(this->_pin, OUTPUT);
-		this->_bridge->BridgeDigitalWrite(this->_pin, LOW);
+		this->_bridgePtr->BridgePinMode(this->_pin, OUTPUT);
+		this->_bridgePtr->BridgeDigitalWrite(this->_pin, LOW);
 
 		this->_capability("command", "output:<bool>", "Set trigger' output value");
 		this->_capability("active:bool", "0");

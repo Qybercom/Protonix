@@ -2,6 +2,8 @@
 
 #include "PCF8574.h"
 
+#include "../Protonix.h"
+
 #include "HBridgePCF8574.h"
 
 using namespace Qybercom::Protonix;
@@ -9,6 +11,7 @@ using namespace Qybercom::Protonix;
 Hardware::HBridgePCF8574::HBridgePCF8574 (int address) {
 	this->_address = address;
 	this->_driver = nullptr;
+	this->_init = false;
 }
 
 Hardware::HBridgePCF8574* Hardware::HBridgePCF8574::Init (int address) {
@@ -43,19 +46,26 @@ void Hardware::HBridgePCF8574::HardwareI2CPost (Protonix* device) {
 	(void)device;
 
 	this->_driver->begin();
+	this->_init = true;
 }
 
 bool Hardware::HBridgePCF8574::BridgePinMode (unsigned int pin, int mode) {
+	if (!this->_init) return false;
+
 	this->_driver->pinMode(pin, mode);
 
 	return true;
 }
 
 bool Hardware::HBridgePCF8574::BridgeDigitalRead (unsigned int pin) {
+	if (!this->_init) return false;
+
 	return (bool)this->_driver->digitalRead(pin);
 }
 
 bool Hardware::HBridgePCF8574::BridgeDigitalWrite (unsigned int pin, bool value) {
+	if (!this->_init) return false;
+
 	this->_driver->digitalWrite(pin, value);
 
 	return true;

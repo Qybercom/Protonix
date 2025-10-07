@@ -4,22 +4,18 @@
 
 #include "Common/List.hpp"
 
-#include "../../../AppData/Roaming/JetBrains/CLion2025.2/extensions/old/IProtonixBridge.h"
-
 #include "ProtonixHardwareCapability.h"
 
 namespace Qybercom {
 	namespace Protonix {
 		class Protonix;
 
-		class IProtonixBridge;
-
 		class IProtonixHardware {
 			protected:
 				String _id;
 				bool _allowSignal;
 				short _dedicatedCore = -1;
-				IProtonixBridge* _bridge;
+				String _bridge;
 				List<ProtonixHardwareCapability*> _capabilities;
 
 				ProtonixHardwareCapability* _capability (String kind, String id, String comment);
@@ -32,8 +28,8 @@ namespace Qybercom {
 				short HardwareDedicatedCore ();
 				bool HardwareAllowSignal ();
 				IProtonixHardware* HardwareAllowSignal (bool allow);
-				IProtonixBridge* HardwareBridge ();
-				IProtonixHardware* HardwareBridge (IProtonixBridge* bridge);
+				String HardwareBridge ();
+				IProtonixHardware* HardwareBridge (String bridge);
 
 				virtual String HardwareSummary () { return ""; }
 				virtual List<ProtonixHardwareCapability*> &HardwareCapabilities () { return this->_capabilities; }
@@ -63,13 +59,13 @@ namespace Qybercom {
 
 		class IProtonixBridge : public IProtonixHardware {
 			public:
-				virtual bool BridgePinMode (unsigned int pin, int mode);
+				virtual bool BridgePinMode (unsigned int pin, int mode) { (void)pin; (void)mode; return false; }
 
-				virtual bool BridgeDigitalRead (unsigned int pin);
-				virtual bool BridgeDigitalWrite (unsigned int pin, bool value);
+				virtual bool BridgeDigitalRead (unsigned int pin) { (void)pin; return false; }
+				virtual bool BridgeDigitalWrite (unsigned int pin, bool value) { (void)pin; (void)value; return false; }
 
-				virtual int BridgeAnalogRead (unsigned int pin);
-				virtual bool BridgeAnalogWrite (unsigned int pin, int value);
+				virtual int BridgeAnalogRead (unsigned int pin) { (void)pin; return -1; }
+				virtual bool BridgeAnalogWrite (unsigned int pin, int value) { (void)pin; (void)value; return false; }
 		};
 	}
 }

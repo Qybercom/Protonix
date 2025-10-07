@@ -207,8 +207,7 @@ Protonix* Protonix::Pipe () {
 		#endif
 
 		for (IProtonixHardware* hardware : this->_hardware) {
-			i2c |= hardware->HardwareI2C();
-			spi |= hardware->HardwareSPI();
+			hardware->HardwareInitPre(this);
 
 			#if defined(ESP32)
 			core = hardware->HardwareDedicatedCore();
@@ -216,7 +215,8 @@ Protonix* Protonix::Pipe () {
 			if (core == 1) this->DedicateTaskCore1();
 			#endif
 
-			hardware->HardwareInitPre(this);
+			i2c |= hardware->HardwareI2C();
+			spi |= hardware->HardwareSPI();
 		}
 
 		if (i2c) {
@@ -431,15 +431,7 @@ IProtonixHardware* Protonix::Hardware (String id) {
 }
 
 Protonix* Protonix::Hardware (String id, IProtonixHardware* hardware, bool allowSignal) {
-	// TODO: add check for existent id
-
-	hardware->HardwareID(id);
-	hardware->HardwareAllowSignal(allowSignal);
-	hardware->HardwareBridge(this->Hardware(""));
-
-	this->_hardware.Add(hardware);
-
-	return this;
+	return this->HardwareOnBridge("", id, hardware, allowSignal);
 }
 
 Protonix* Protonix::HardwareOnBridge (String bridge, String id, IProtonixHardware* hardware, bool allowSignal) {
@@ -447,7 +439,7 @@ Protonix* Protonix::HardwareOnBridge (String bridge, String id, IProtonixHardwar
 
 	hardware->HardwareID(id);
 	hardware->HardwareAllowSignal(allowSignal);
-	hardware->HardwareBridge(this->Hardware(bridge));
+	hardware->HardwareBridge(bridge);
 
 	this->_hardware.Add(hardware);
 

@@ -14,6 +14,7 @@ namespace Qybercom {
 				private:
 					int _address;
 					PCF8574* _driver;
+					bool _init;
 
 				public:
 					HBridgePCF8574 (int address);

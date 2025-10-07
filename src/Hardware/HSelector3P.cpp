@@ -65,13 +65,34 @@ String Hardware::HSelector3P::HardwareSummary () {
 }
 
 void Hardware::HSelector3P::HardwareInitPre (Protonix* device) {
+	this->_trigger1->HardwareID(this->_id + ":1");
+	this->_trigger1->HardwareAllowSignal(this->_allowSignal);
 	this->_trigger1->HardwareBridge(this->_bridge);
-	this->_trigger2->HardwareBridge(this->_bridge);
-
 	this->_trigger1->HardwareInitPre(device);
+
+	this->_trigger2->HardwareID(this->_id + ":2");
+	this->_trigger2->HardwareAllowSignal(this->_allowSignal);
+	this->_trigger2->HardwareBridge(this->_bridge);
 	this->_trigger2->HardwareInitPre(device);
 
 	this->_capability("value", "value:int", "Current position");
+}
+
+bool Hardware::HSelector3P::HardwareI2C () {
+	return false
+		|| this->_trigger1->HardwareI2C()
+		|| this->_trigger2->HardwareI2C();
+}
+
+bool Hardware::HSelector3P::HardwareSPI () {
+	return false
+		|| this->_trigger1->HardwareSPI()
+		|| this->_trigger2->HardwareSPI();
+}
+
+void Hardware::HSelector3P::HardwareInitPost (Protonix* device) {
+	this->_trigger1->HardwareInitPost(device);
+	this->_trigger2->HardwareInitPost(device);
 }
 
 void Hardware::HSelector3P::HardwarePipe (Protonix* device, short core) {
