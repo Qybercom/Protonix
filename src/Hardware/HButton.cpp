@@ -19,16 +19,16 @@ void Hardware::HButton::_signal (Protonix* device) {
 	this->_capability("active:bool", String(active ? "1" : "0"));
 }
 
-Hardware::HButton::HButton (unsigned short pin, unsigned int checkInterval) {
-	this->_trigger = Hardware::HTrigger::Input(pin, HIGH, checkInterval);
+Hardware::HButton::HButton (unsigned short pin, unsigned short mode, unsigned int checkInterval) {
+	this->_trigger = Hardware::HTrigger::Input(pin, mode, checkInterval);
 
 	this->_signalChanged = "changed";
 	this->_signalPressed = "pressed";
 	this->_signalReleased = "released";
 }
 
-Hardware::HButton* Hardware::HButton::Init (unsigned short pin, unsigned int checkInterval) {
-	return new Hardware::HButton(pin, checkInterval);
+Hardware::HButton* Hardware::HButton::Init (unsigned short pin, unsigned short mode, unsigned int checkInterval) {
+	return new Hardware::HButton(pin, mode, checkInterval);
 }
 
 Hardware::HTrigger* Hardware::HButton::Trigger () {
@@ -94,6 +94,10 @@ void Hardware::HButton::HardwareInitPre (Protonix* device) {
 
 	this->_capability("value", "active:bool", "State of the button");
 	this->_capability("active:bool", "0");
+}
+
+void Hardware::HButton::HardwareInitPost (Protonix* device) {
+	this->_trigger->HardwareInitPost(device);
 }
 
 void Hardware::HButton::HardwarePipe (Protonix* device, short core) {
