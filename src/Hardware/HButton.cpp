@@ -90,6 +90,7 @@ void Hardware::HButton::HardwareInitPre (Protonix* device) {
 
 	this->_trigger->HardwareID(this->_id);
 	this->_trigger->HardwareAllowSignal(this->_allowSignal);
+	this->_trigger->HardwareBridge(this->_bridge);
 	this->_trigger->HardwareInitPre(device);
 
 	this->_capability("value", "active:bool", "State of the button");
