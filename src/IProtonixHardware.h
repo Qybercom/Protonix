@@ -59,7 +59,14 @@ namespace Qybercom {
 
 		class IProtonixBridge : public IProtonixHardware {
 			public:
+				virtual bool BridgePinInitInput (unsigned int pin, int initial = 0) { (void)pin; (void)initial; return false; }
+				virtual bool BridgePinInitInputUp (unsigned int pin, int initial = 0) { (void)pin; (void)initial; return false; }
+				virtual bool BridgePinInitInputDown (unsigned int pin, int initial = 0) { (void)pin; (void)initial; return false; }
+				virtual bool BridgePinInitOutput (unsigned int pin) { (void)pin; return false; }
+
 				virtual bool BridgePinMode (unsigned int pin, int mode) { (void)pin; (void)mode; return false; }
+
+				virtual bool BridgePinAvailable (unsigned int pin) { (void)pin; return false; }
 
 				virtual bool BridgeDigitalRead (unsigned int pin) { (void)pin; return false; }
 				virtual bool BridgeDigitalWrite (unsigned int pin, bool value) { (void)pin; (void)value; return false; }

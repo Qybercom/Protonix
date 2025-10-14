@@ -15,7 +15,7 @@ namespace Qybercom {
 					unsigned short _pin;
 					bool _interrupt;
 					bool _input;
-					unsigned short _inputMode;
+					unsigned short _inputInitial;
 					bool _inputChanged;
 					bool _inputChangedSignal;
 					bool _inputValue;
@@ -26,15 +26,17 @@ namespace Qybercom {
 					bool _pipe ();
 					bool _inputChangedHandler ();
 					void _signal (Protonix* device);
-					HTrigger (bool input, unsigned short pin, unsigned int checkInterval, unsigned short mode, bool interrupt);
+					HTrigger (bool input, unsigned short pin, unsigned int checkInterval, unsigned short inputInitial, bool interrupt);
 
 				public:
-					static HTrigger* Input (unsigned short pin, unsigned short mode = LOW, unsigned int checkInterval = 0, bool interrupt = false);
+					static HTrigger* Input (unsigned short pin, unsigned short inputInitial = LOW, unsigned int checkInterval = 0, bool interrupt = false);
 					static HTrigger* Output (unsigned short pin);
 
 					unsigned short Pin ();
-					unsigned short InputMode ();
 					Qybercom::Debouncer<unsigned short> &Debouncer ();
+
+					unsigned short InputInitial ();
+					HTrigger* InputInitial (unsigned short value);
 
 					bool Interrupt ();
 					HTrigger* Interrupt (bool interrupt);

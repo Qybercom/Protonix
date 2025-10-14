@@ -102,11 +102,11 @@ void Hardware::HSelector3P::HardwarePipe (Protonix* device, short core) {
 	short value1 = this->_trigger1->InputValue();
 	short value2 = this->_trigger2->InputValue();
 
-	if (value1 && value2) return; // abnormal
+	//if (value1 && value2) return; // abnormal
 
 	short value = 0;
-	if (value1) value = 1;
-	if (value2) value = -1;
+	if (value1 && !value2) value = 1;
+	if (value2 && !value1) value = -1;
 
 	if (this->_value != value) {
 		this->_value = value;

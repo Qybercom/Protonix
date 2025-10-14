@@ -8,8 +8,36 @@ Hardware::HBridgeDefault::HBridgeDefault () {
 
 }
 
+bool Hardware::HBridgeDefault::BridgePinInitInput (unsigned int pin, int initial) {
+	return true
+		&& this->BridgeDigitalWrite(pin, initial)
+		&& this->BridgePinMode(pin, INPUT);
+}
+
+bool Hardware::HBridgeDefault::BridgePinInitInputUp (unsigned int pin, int initial) {
+	return true
+		&& this->BridgeDigitalWrite(pin, initial)
+		&& this->BridgePinMode(pin, INPUT_PULLUP);
+}
+
+bool Hardware::HBridgeDefault::BridgePinInitInputDown (unsigned int pin, int initial) {
+	return true
+		&& this->BridgeDigitalWrite(pin, initial)
+		&& this->BridgePinMode(pin, INPUT_PULLDOWN);
+}
+
+bool Hardware::HBridgeDefault::BridgePinInitOutput (unsigned int pin) {
+	return this->BridgePinMode(pin, OUTPUT);
+}
+
 bool Hardware::HBridgeDefault::BridgePinMode (unsigned int pin, int mode) {
 	pinMode(pin, mode);
+
+	return true;
+}
+
+bool Hardware::HBridgeDefault::BridgePinAvailable (unsigned int pin) {
+	(void)pin;
 
 	return true;
 }

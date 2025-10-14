@@ -96,6 +96,14 @@ void Hardware::HButton::HardwareInitPre (Protonix* device) {
 	this->_capability("active:bool", "0");
 }
 
+bool Hardware::HButton::HardwareI2C () {
+	return this->_trigger->HardwareI2C();
+}
+
+bool Hardware::HButton::HardwareSPI () {
+	return this->_trigger->HardwareSPI();
+}
+
 void Hardware::HButton::HardwareInitPost (Protonix* device) {
 	this->_trigger->HardwareInitPost(device);
 }
