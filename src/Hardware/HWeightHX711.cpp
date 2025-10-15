@@ -112,7 +112,6 @@ void Hardware::HWeightHX711::HardwarePipe (Protonix* device, short core) {
 	// расширяем знак до 32 бит
 	if (value & 0x800000UL) value |= 0xFF000000UL;
 
-	return (long) value;
 	/*unsigned long value = 0;
 	unsigned short i = 0;
 
