@@ -10,7 +10,7 @@ using namespace Qybercom::Protonix;
 Hardware::HWeightHX711::HWeightHX711 (unsigned short pinDT, unsigned short pinSCK, float scale, unsigned short readings) {
 	this->_pinDT = pinDT;
 	this->_pinSCK = pinSCK;
-	this->_value = -1;
+	this->_value = 0;
 	this->_weight = 0;
 	this->_scale = scale;
 	this->_readings = readings;
@@ -86,9 +86,34 @@ void Hardware::HWeightHX711::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
 
-	if (this->_bridge->BridgeDigitalRead(this->_pinDT) != HIGH) return;
+	if (this->_bridge->BridgeDigitalRead(this->_pinDT) == HIGH) return;
 
 	unsigned long value = 0;
+
+	noInterrupts();
+	for (uint8_t i = 0; i < 24; i++) {
+		this->_bridge->BridgeDigitalWrite(this->_pinSCK, HIGH);
+		delayMicroseconds(1);
+
+		value = (value << 1) | this->_bridge->BridgeDigitalRead(this->_pinDT);
+
+		this->_bridge->BridgeDigitalWrite(this->_pinSCK, LOW);
+		delayMicroseconds(1);
+	}
+
+	// select channel/gain - 1 iteration for gain = 128
+	this->_bridge->BridgeDigitalWrite(this->_pinSCK, HIGH);
+	delayMicroseconds(1);
+
+	this->_bridge->BridgeDigitalWrite(this->_pinSCK, LOW);
+	delayMicroseconds(1);
+	interrupts();
+
+	// расширяем знак до 32 бит
+	if (value & 0x800000UL) value |= 0xFF000000UL;
+
+	return (long) value;
+	/*unsigned long value = 0;
 	unsigned short i = 0;
 
 	while (i < 24) {
@@ -114,7 +139,7 @@ void Hardware::HWeightHX711::HardwarePipe (Protonix* device, short core) {
 	delayMicroseconds(1);
 
 	if (value & 0x800000)
-		value |= 0xFF000000;
+		value |= 0xFF000000;*/
 
 	this->_value = value;
 	this->_capability("value:int", String(this->_value));
