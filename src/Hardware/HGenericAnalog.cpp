@@ -13,8 +13,8 @@ Hardware::HGenericAnalog::HGenericAnalog (unsigned short pin, bool init) {
 	this->_value = -1;
 }
 
-unsigned short Hardware::HGenericAnalog::Pin () {
-	return this->_pin;
+Hardware::HGenericAnalog* Hardware::HGenericAnalog::Init (unsigned short pin, bool init) {
+	return new Hardware::HGenericAnalog(pin, init);
 }
 
 bool Hardware::HGenericAnalog::Init () {
@@ -23,6 +23,16 @@ bool Hardware::HGenericAnalog::Init () {
 
 int Hardware::HGenericAnalog::Value () {
 	return this->_value;
+}
+
+unsigned short Hardware::HGenericAnalog::Pin () {
+	return this->_pin;
+}
+
+Hardware::HGenericAnalog* Hardware::HGenericAnalog::Pin (unsigned short pin) {
+	this->_pin = pin;
+
+	return this;
 }
 
 String Hardware::HGenericAnalog::HardwareSummary () {

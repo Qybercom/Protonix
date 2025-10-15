@@ -23,6 +23,7 @@
 #include "HSensorMicrophone.h"
 #include "HTouchButton.h"
 #include "HTrigger.h"
+#include "HWeightHX711.h"
 /*
  * awaiting implementation
  *

@@ -8,22 +8,23 @@
 namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
-			class HGenericAnalog : public IProtonixHardware {
+			class HWeightHX711 : public IProtonixHardware {
 				private:
-					unsigned short _pin;
-					bool _init;
-					int _value;
+					unsigned short _pinDT;
+					unsigned short _pinSCK;
+					long _value;
 
 				public:
-					HGenericAnalog (unsigned short pin, bool init = false);
-					static HGenericAnalog* Init (unsigned short pin, bool init = false);
+					HWeightHX711 (unsigned short pinDT, unsigned short pinSCK);
+					static HWeightHX711* Init (unsigned short pinDT, unsigned short pinSCK);
 
-					bool Init ();
+					long Value ();
 
-					int Value ();
+					unsigned short PinDT ();
+					HWeightHX711* PinDT (unsigned short pin);
 
-					unsigned short Pin ();
-					HGenericAnalog* Pin (unsigned short pin);
+					unsigned short PinSCK ();
+					HWeightHX711* PinSCK (unsigned short pin);
 
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
