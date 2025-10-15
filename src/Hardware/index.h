@@ -1,5 +1,6 @@
 #pragma once
 
+#include "HBridgeADS1115.h"
 #include "HBridgeDefault.h"
 #include "HBridgePCF8574.h"
 #include "HBuiltInLED.h"
@@ -29,7 +30,6 @@
  * 7seg
  * clock7seg (https://github.com/AKJ7/TM1637)
  * led text display (LiquidCrystal_I2C.h)
- * velostat (through Adafruit_ADS1X15.h)
  * weight (HX711)
  * radio module (RCSwitch.h)
  * servo motor (Stepper.h)

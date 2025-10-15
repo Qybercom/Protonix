@@ -10,12 +10,14 @@ namespace Qybercom {
 	namespace Protonix {
 		class Protonix;
 
+		class IProtonixBridge;
+
 		class IProtonixHardware {
 			protected:
 				String _id;
 				bool _allowSignal;
 				short _dedicatedCore = -1;
-				String _bridge;
+				IProtonixBridge* _bridge;
 				List<ProtonixHardwareCapability*> _capabilities;
 
 				ProtonixHardwareCapability* _capability (String kind, String id, String comment);
@@ -28,8 +30,8 @@ namespace Qybercom {
 				short HardwareDedicatedCore ();
 				bool HardwareAllowSignal ();
 				IProtonixHardware* HardwareAllowSignal (bool allow);
-				String HardwareBridge ();
-				IProtonixHardware* HardwareBridge (String bridge);
+				IProtonixBridge* HardwareBridge ();
+				IProtonixHardware* HardwareBridge (IProtonixBridge* bridge);
 
 				virtual String HardwareSummary () { return ""; }
 				virtual List<ProtonixHardwareCapability*> &HardwareCapabilities () { return this->_capabilities; }

@@ -439,7 +439,7 @@ IProtonixHardware* Protonix::HardwareOnBridge (String bridge, String id, IProton
 
 	hardware->HardwareID(id);
 	hardware->HardwareAllowSignal(allowSignal);
-	hardware->HardwareBridge(bridge);
+	hardware->HardwareBridge((IProtonixBridge*)this->Hardware(bridge));
 
 	this->_hardware.Add(hardware);
 

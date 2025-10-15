@@ -21,7 +21,6 @@ namespace Qybercom {
 					bool _inputValue;
 					Qybercom::Debouncer<unsigned short> _debouncer;
 					String _signalInputChanged;
-					IProtonixBridge* _bridgePtr;
 
 					bool _pipe ();
 					bool _inputChangedHandler ();

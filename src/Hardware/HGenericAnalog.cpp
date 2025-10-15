@@ -33,7 +33,7 @@ void Hardware::HGenericAnalog::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	if (this->_init)
-		pinMode(this->_pin, INPUT);
+		this->_bridge->BridgePinInitInput(this->_pin);
 
 	this->_capability("value", "value:int", "Raw value");
 }
@@ -42,7 +42,7 @@ void Hardware::HGenericAnalog::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
 
-	this->_value = analogRead(this->_pin);
+	this->_value = this->_bridge->BridgeAnalogRead(this->_pin);
 
 	this->_capability("value:int", String(this->_value));
 }
