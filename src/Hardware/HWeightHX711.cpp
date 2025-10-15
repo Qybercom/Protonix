@@ -71,6 +71,16 @@ Hardware::HWeightHX711* Hardware::HWeightHX711::Scale (float scale) {
 	return this;
 }
 
+unsigned short Hardware::HWeightHX711::Reading () {
+	return this->_readings;
+}
+
+Hardware::HWeightHX711* Hardware::HWeightHX711::Reading (unsigned short count) {
+	this->_readings = count;
+
+	return this;
+}
+
 String Hardware::HWeightHX711::HardwareSummary () {
 	return "Weight sensor through HX711 DAC";
 }
