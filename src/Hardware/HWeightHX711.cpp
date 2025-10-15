@@ -151,6 +151,7 @@ void Hardware::HWeightHX711::HardwarePipe (Protonix* device, short core) {
 		this->_readingsCounter = 0;
 
 		long average = this->_readingsValue / this->_readings;
+		this->_readingsValue = 0;
 
 		if (this->_init) {
 			this->_weight = (average - this->_zero) / (this->_scale == 0.0 ? 1.0 : this->_scale);
