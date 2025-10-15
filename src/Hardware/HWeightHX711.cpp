@@ -154,7 +154,7 @@ void Hardware::HWeightHX711::HardwarePipe (Protonix* device, short core) {
 
 		if (this->_init) {
 			this->_weight = (average - this->_zero) / (this->_scale == 0.0 ? 1.0 : this->_scale);
-			this->_weight *= 0.035274;
+			//this->_weight *= 0.035274;
 
 			device->Signal(this->_id, "weight")->Value(this->_weight);
 		}
