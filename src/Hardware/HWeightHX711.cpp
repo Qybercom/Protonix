@@ -71,11 +71,11 @@ Hardware::HWeightHX711* Hardware::HWeightHX711::Scale (float scale) {
 	return this;
 }
 
-unsigned short Hardware::HWeightHX711::Reading () {
+unsigned short Hardware::HWeightHX711::Readings () {
 	return this->_readings;
 }
 
-Hardware::HWeightHX711* Hardware::HWeightHX711::Reading (unsigned short count) {
+Hardware::HWeightHX711* Hardware::HWeightHX711::Readings (unsigned short count) {
 	this->_readings = count;
 
 	return this;
