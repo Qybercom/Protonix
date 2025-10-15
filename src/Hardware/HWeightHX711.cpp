@@ -136,6 +136,7 @@ void Hardware::HWeightHX711::HardwarePipe (Protonix* device, short core) {
 		}
 		else {
 			//this->_zero = average;
+			this->_init = true;
 
 			device->Signal(this->_id, "calibrated")->Value(this->_zero);
 		}
