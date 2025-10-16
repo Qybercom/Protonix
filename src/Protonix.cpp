@@ -291,7 +291,8 @@ Protonix* Protonix::Pipe () {
 			if (action->Completed()) {
 				action->Reset();
 
-				this->_actionQueue.PopFirst();
+				if (this->_actionQueue.Count() != 0)
+					this->_actionQueue.PopFirst();
 			}
 		}
 	}
