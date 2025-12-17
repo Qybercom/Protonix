@@ -21,9 +21,13 @@ bool Hardware::HBridgeDefault::BridgePinInitInputUp (unsigned int pin, int initi
 }
 
 bool Hardware::HBridgeDefault::BridgePinInitInputDown (unsigned int pin, int initial) {
+	#if defined(ESP8266)
+	return false;
+	#else
 	return true
 		&& this->BridgeDigitalWrite(pin, initial)
 		&& this->BridgePinMode(pin, INPUT_PULLDOWN);
+	#endif
 }
 
 bool Hardware::HBridgeDefault::BridgePinInitOutput (unsigned int pin) {
