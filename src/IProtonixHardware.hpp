@@ -2,7 +2,9 @@
 
 #include <Arduino.h>
 
+#include "Common/Data.hpp"
 #include "Common/List.hpp"
+#include "Common/Dictionary.hpp"
 
 #include "ProtonixHardwareCapability.h"
 
@@ -19,22 +21,93 @@ namespace Qybercom {
 				short _dedicatedCore = -1;
 				IProtonixBridge* _bridge;
 				List<ProtonixHardwareCapability*> _capabilities;
+				Dictionary<String, Any> _config;
 
-				ProtonixHardwareCapability* _capability (String kind, String id, String comment);
-				bool _capability (String id, String value);
-				bool _log (String message, bool ret = true);
+				ProtonixHardwareCapability* _capability (String kind, String id, String comment) {
+					for (ProtonixHardwareCapability* capability : this->_capabilities)
+						if (capability->ID() == id) return capability;
+
+					ProtonixHardwareCapability* capability = new ProtonixHardwareCapability(kind, id, comment);
+
+					this->_capabilities.Add(capability);
+
+					return capability;
+				}
+
+				bool _capability (String id, String value) {
+					for (ProtonixHardwareCapability* capability : this->_capabilities) {
+						if (capability->ID() != id) continue;
+
+						capability->Value(value);
+
+						return true;
+					}
+
+					return false;
+				}
+
+				bool _log (String message, bool ret = true) {
+					Serial.println("[hardware:" + this->_id + "] " + message);
+
+					return ret;
+				}
 
 			public:
-				String HardwareID ();
-				IProtonixHardware* HardwareID (String id);
-				short HardwareDedicatedCore ();
-				bool HardwareAllowSignal ();
-				IProtonixHardware* HardwareAllowSignal (bool allow);
-				IProtonixBridge* HardwareBridge ();
-				IProtonixHardware* HardwareBridge (IProtonixBridge* bridge);
+				String HardwareID () {
+					return this->_id;
+				}
+
+				IProtonixHardware* HardwareID (String id) {
+					this->_id = id;
+
+					return this;
+				}
+
+				short HardwareDedicatedCore () {
+					return this->_dedicatedCore;
+				}
+
+				bool HardwareAllowSignal () {
+					return this->_allowSignal;
+				}
+
+				IProtonixHardware* HardwareAllowSignal (bool allow) {
+					this->_allowSignal = allow;
+
+					return this;
+				}
+
+				IProtonixBridge* HardwareBridge () {
+					return this->_bridge;
+				}
+
+				IProtonixHardware* HardwareBridge (IProtonixBridge* bridge) {
+					this->_bridge = bridge;
+
+					return this;
+				}
+
+				List<ProtonixHardwareCapability*> &HardwareCapabilities () {
+					return this->_capabilities;
+				}
+
+				Dictionary<String, Any> &HardwareConfig () {
+					return this->_config;
+				}
+
+				Any HardwareConfig (String key) {
+					return this->_config.Get(key);
+				}
+
+				template<typename T>
+				Dictionary<String, Any> &HardwareConfig (String key, T value) {
+					this->_config.Set(key, Any(value));
+
+					return this->_config;
+				}
 
 				virtual String HardwareSummary () { return ""; }
-				virtual List<ProtonixHardwareCapability*> &HardwareCapabilities () { return this->_capabilities; }
+
 				virtual void HardwareInitPre (Protonix* device) { (void)device; }
 				virtual bool HardwareI2C () { return false; }
 				virtual void HardwareI2CPre (Protonix* device) { (void)device; }

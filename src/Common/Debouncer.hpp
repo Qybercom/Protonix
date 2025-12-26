@@ -2,103 +2,66 @@
 
 #include <Arduino.h>
 
-#include "List.hpp"
-
 namespace Qybercom {
 	template<typename T>
 	class Debouncer {
 		private:
-			struct Value {
-				T Data;
-				volatile unsigned long Count;
-
-				Value (const T &data) : Data(data), Count(0) { }
-			};
-
-			volatile unsigned long _checkLast;
-			volatile unsigned int _checkInterval;
-			List<Value> _values;
+			T _current;
+			T _target;
+			unsigned int _targetCount;
+			unsigned int _threshold;
 
 		public:
-			Debouncer (unsigned int checkInterval = 0) {
-				this->_checkLast = 0;
-				this->_checkInterval = checkInterval;
+			Debouncer (T initial, unsigned int threshold = 0) {
+				this->_current = initial;
+				this->_target = initial;
+				this->_targetCount = 0;
+				this->_threshold = threshold;
 			}
 
-			unsigned long CheckLast () {
-				return this->_checkLast;
+			T Current () {
+				return this->_current;
 			}
 
-			unsigned int CheckInterval () {
-				return this->_checkInterval;
+			T Target () {
+				return this->_target;
 			}
 
-			Debouncer<T> &CheckInterval (unsigned int checkInterval) {
-				this->_checkInterval = checkInterval;
-
-				return *this;
+			unsigned int TargetCount () {
+				return this->_targetCount;
 			}
 
-			Debouncer<T> &Use (T value) {
-				for (Value &val : this->_values) {
-					if (val.Data != value) continue;
+			unsigned int Threshold () {
+				return this->_threshold;
+			}
 
-					val.Count = val.Count + 1; // required by compiler
+			Debouncer<T>* Threshold (unsigned int threshold) {
+				this->_threshold = threshold;
 
-					return *this;
+				return this;
+			}
+
+			T Value (T value) {
+				T out = this->_current;
+
+				if (value == this->_current) {
+					this->_target = this->_current;
+					this->_targetCount = 0;
+				}
+				else {
+					if (value != this->_target)
+						this->_targetCount = 0;
+
+					this->_target = value;
+					this->_targetCount = this->_targetCount + 1;
+
+					if (this->_targetCount >= this->_threshold) {
+						this->_current = value;
+						this->_targetCount = 0;
+					}
 				}
 
-				Value val{value};
-				val.Count = 1;
-
-				this->_values.Add(val);
-
-				return *this;
-			}
-
-			bool Pipe () {
-				unsigned long now = micros();
-				bool out = (now - this->_checkLast) > this->_checkInterval;
-
-				if (out)
-					this->_checkLast = now;
-
 				return out;
-			}
-
-			T Actual () {
-				Value out = this->_values.First();
-
-				for (Value &val : this->_values)
-					if (val.Count > out.Count)
-						out = val;
-
-				return out.Data;
-			}
-
-			bool Empty () {
-				return this->_values.Count() == 0;
-			}
-
-			Debouncer<T> &Reset () {
-				//this->_values.Clear();
-				for (Value &val : this->_values)
-					val.Count = 0;
-
-				return *this;
-			}
-
-			List<Value> &Values () {
-				return this->_values;
-			}
-
-			Debouncer<T> &Debug () {
-				Serial.println("[debouncer] Debug:");
-
-				for (Value &val : this->_values)
-					Serial.println(" - '" + String(val.Data) + "' : " + String(val.Count));
-
-				return *this;
 			}
 	};
 }

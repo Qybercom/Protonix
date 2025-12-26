@@ -2,9 +2,9 @@
 
 #include <Arduino.h>
 
-#include "Common/Debouncer.hpp"
+#include "Common/Filter.hpp"
 
-#include "../IProtonixHardware.h"
+#include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 
 namespace Qybercom {
@@ -12,6 +12,7 @@ namespace Qybercom {
 		namespace Hardware {
 			class HTrigger : public IProtonixHardware {
 				private:
+					bool _init;
 					unsigned short _pin;
 					bool _interrupt;
 					bool _input;
@@ -19,7 +20,7 @@ namespace Qybercom {
 					bool _inputChanged;
 					bool _inputChangedSignal;
 					bool _inputValue;
-					Qybercom::Debouncer<unsigned short> _debouncer;
+					Qybercom::Filter<unsigned short> _filter;
 					String _signalInputChanged;
 
 					bool _pipe ();
@@ -32,7 +33,7 @@ namespace Qybercom {
 					static HTrigger* Output (unsigned short pin);
 
 					unsigned short Pin ();
-					Qybercom::Debouncer<unsigned short> &Debouncer ();
+					Qybercom::Filter<unsigned short> &Filter ();
 
 					unsigned short InputInitial ();
 					HTrigger* InputInitial (unsigned short value);

@@ -6,7 +6,7 @@
 
 #include "Common/List.hpp"
 
-#include "IProtonixHardware.h"
+#include "IProtonixHardware.hpp"
 #include "IProtonixNetworkDriver.h"
 #include "IProtonixCommand.h"
 #include "IProtonixDevice.h"
@@ -32,6 +32,7 @@ namespace Qybercom {
 
 				ProtonixTimer* _timerUptime;
 				ProtonixTimer* _timerTick;
+				ProtonixTimer* _timerInitDelay; // will be obsolete
 
 				bool _ready;
 				bool _debug;
@@ -107,6 +108,7 @@ namespace Qybercom {
 
 				ProtonixTimer* TimerUptime ();
 				ProtonixTimer* TimerTick ();
+				ProtonixTimer* TimerInitDelay ();
 
 				unsigned long CPUFrequency ();
 				ProtonixMemory* Memory ();

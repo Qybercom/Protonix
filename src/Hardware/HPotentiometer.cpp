@@ -2,7 +2,7 @@
 
 #include "Common/Utils.hpp"
 
-#include "../IProtonixHardware.h"
+#include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 
 #include "HPotentiometer.h"

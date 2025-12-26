@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#include "IProtonixHardware.h"
+#include "IProtonixHardware.hpp"
 #include "IProtonixCommand.h"
 #include "ProtonixSignal.h"
 #include "ProtonixAction.h"

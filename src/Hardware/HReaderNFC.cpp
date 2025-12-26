@@ -4,7 +4,7 @@
 #include <MFRC522.h>
 #include "MFRC522_I2C_Library.h"
 
-#include "../IProtonixHardware.h"
+#include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 
 #include "HReaderNFC.h"
@@ -40,7 +40,7 @@ Hardware::HReaderNFC::HReaderNFC (unsigned short pinSS, unsigned short pinRST, u
 	this->_uuidChanged = false;
 	this->_dedicatedCore = dedicatedCore;
 
-	this->_debouncer.CheckInterval(uuidReadDebounce);
+	this->_filter.CheckInterval(uuidReadDebounce);
 
 	this->_i2c = false;
 	this->_i2cReader = nullptr;
@@ -81,8 +81,8 @@ bool Hardware::HReaderNFC::UUIDChanged () {
 	return out;
 }
 
-Qybercom::Debouncer<String> &Hardware::HReaderNFC::Debouncer () {
-	return this->_debouncer;
+Qybercom::Filter<String> &Hardware::HReaderNFC::Filter () {
+	return this->_filter;
 }
 
 String Hardware::HReaderNFC::HardwareSummary () {
@@ -167,7 +167,7 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 			}
 		}
 
-		this->_debouncer.Use(value);
+		this->_filter.Use(value);
 	}
 
 	if (this->_spi && this->_spiReader != nullptr) {
@@ -186,13 +186,13 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 			}
 		}
 
-		this->_debouncer.Use(value);
+		this->_filter.Use(value);
 	}
 
 	this->_uuidActual = value;
 
-	if (this->_debouncer.Pipe() && !this->_debouncer.Empty()) {
-		value = String(String(this->_debouncer.Actual()));
+	if (this->_filter.Pipe() && !this->_filter.Empty()) {
+		value = String(String(this->_filter.Actual()));
 
 		if (this->_uuid != value) {
 			this->_signal(device, value);
@@ -204,7 +204,7 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 
 		this->_capability("uuid:string", String(this->_uuid));
 
-		this->_debouncer.Reset();
+		this->_filter.Reset();
 	}
 }
 

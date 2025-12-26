@@ -1,8 +1,8 @@
 #include <Arduino.h>
 
-#include "Common/Debouncer.hpp"
+#include "Common/Filter.hpp"
 
-#include "../IProtonixHardware.h"
+#include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 
 #include "HTrigger.h"
@@ -23,14 +23,15 @@ bool Hardware::HTrigger::_inputChangedHandler () {
 }
 
 bool Hardware::HTrigger::_pipe () {
+	if (!this->_init) return false;
 	if (!this->_input) return false;
 
 	unsigned short value = this->_bridge->BridgeDigitalRead(this->_pin);
 
-	this->_debouncer.Use(value);
+	this->_filter.Use(value);
 
-	if (this->_debouncer.Pipe() && !this->_debouncer.Empty()) {
-		value = this->_debouncer.Actual();
+	if (this->_filter.Pipe() && !this->_filter.Empty()) {
+		value = this->_filter.Actual();
 
 		if (this->_inputValue != value) {
 			this->_inputValue = value;
@@ -40,7 +41,7 @@ bool Hardware::HTrigger::_pipe () {
 
 		this->_capability("active:bool", String(value ? "1" : "0"));
 
-		this->_debouncer.Reset();
+		this->_filter.Reset();
 	}
 
 	return true;
@@ -52,6 +53,7 @@ void Hardware::HTrigger::_signal (Protonix* device) {
 }
 
 Hardware::HTrigger::HTrigger (bool input, unsigned short pin, unsigned int checkInterval, unsigned short inputInitial, bool interrupt) {
+	this->_init = false;
 	this->_pin = pin;
 	this->_interrupt = interrupt;
 	this->_input = input;
@@ -60,7 +62,7 @@ Hardware::HTrigger::HTrigger (bool input, unsigned short pin, unsigned int check
 	this->_inputChangedSignal = false;
 	this->_inputValue = false;
 
-	this->_debouncer.CheckInterval(checkInterval);
+	this->_filter.CheckInterval(checkInterval);
 
 	this->_signalInputChanged = "inputChanged";
 }
@@ -87,8 +89,8 @@ Hardware::HTrigger* Hardware::HTrigger::InputInitial (unsigned short value) {
 	return this;
 }
 
-Qybercom::Debouncer<unsigned short> &Hardware::HTrigger::Debouncer () {
-	return this->_debouncer;
+Qybercom::Filter<unsigned short> &Hardware::HTrigger::Filter () {
+	return this->_filter;
 }
 
 bool Hardware::HTrigger::Interrupt () {
@@ -169,6 +171,8 @@ void Hardware::HTrigger::HardwareInitPost (Protonix* device) {
 		this->_capability("command", "output:<bool>", "Set trigger' output value");
 		this->_capability("active:bool", "0");
 	}
+
+	this->_init = true;
 }
 
 void Hardware::HTrigger::HardwarePipe (Protonix* device, short core) {

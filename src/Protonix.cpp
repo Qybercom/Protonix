@@ -38,6 +38,7 @@ Protonix::Protonix (IProtonixDevice* device, IProtonixProfile* profile) {
 
 	this->_timerUptime = new ProtonixTimer(0);
 	this->_timerTick = new ProtonixTimer(0);
+	this->_timerInitDelay = new ProtonixTimer(0);
 
 	this->_ready = false;
 
@@ -197,8 +198,9 @@ Protonix* Protonix::InterruptDetach (unsigned short pin) {
 Protonix* Protonix::Pipe () {
 	this->_timerUptime->Pipe();
 
-	if (!this->_ready) {
+	if (!this->_ready && this->_timerInitDelay->Pipe()) {
 		this->_ready = true;
+		this->_timerInitDelay->Enabled(false);
 
 		bool i2c = false;
 		bool spi = false;
@@ -400,6 +402,10 @@ ProtonixTimer* Protonix::TimerUptime () {
 
 ProtonixTimer* Protonix::TimerTick () {
 	return this->_timerTick;
+}
+
+ProtonixTimer* Protonix::TimerInitDelay () {
+	return this->_timerInitDelay;
 }
 
 unsigned long Protonix::CPUFrequency () {

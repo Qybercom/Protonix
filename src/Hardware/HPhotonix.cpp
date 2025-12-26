@@ -2,7 +2,7 @@
 
 #include <QybercomPhotonix.h>
 
-#include "../IProtonixHardware.h"
+#include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 
 #include "HPhotonix.h"

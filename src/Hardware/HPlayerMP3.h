@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#include "../IProtonixHardware.h"
+#include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 
 #include "HBusSerial.h"

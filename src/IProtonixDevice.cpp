@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 #include "IProtonixDevice.h"
-#include "IProtonixHardware.h"
+#include "IProtonixHardware.hpp"
 
 #include "Protonix.h"
 

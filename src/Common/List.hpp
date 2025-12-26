@@ -19,7 +19,7 @@
 namespace Qybercom {
 	template<typename T>
 	class List {
-		private:
+		public:
 			struct Node {
 				T Data;
 				Node* Prev;
@@ -49,6 +49,7 @@ namespace Qybercom {
 					}
 			};
 
+		private:
 			Node* _head;
 			Node* _tail;
 			unsigned int _count;

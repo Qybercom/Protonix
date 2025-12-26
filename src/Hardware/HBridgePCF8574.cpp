@@ -7,6 +7,12 @@
 
 using namespace Qybercom::Protonix;
 
+bool Hardware::HBridgePCF8574::_probe () {
+	Wire.beginTransmission(this->_address);
+
+	return Wire.endTransmission() == 0;
+}
+
 byte Hardware::HBridgePCF8574::_read () {
 	if (!this->_init) return 0x00;
 
@@ -56,6 +62,7 @@ void Hardware::HBridgePCF8574::HardwareI2CPre (Protonix* device) {
 
 void Hardware::HBridgePCF8574::HardwareI2CPost (Protonix* device) {
 	(void)device;
+	if (!this->_probe()) return;
 
 	this->_write(0xFF);
 
@@ -105,7 +112,7 @@ bool Hardware::HBridgePCF8574::BridgePinAvailable (unsigned int pin) {
 }
 
 bool Hardware::HBridgePCF8574::BridgeDigitalRead (unsigned int pin) {
-	if (pin > 7) return 0;
+	if (pin > 7) return false;
 
 	byte val = this->_read();
 

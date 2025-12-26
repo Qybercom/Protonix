@@ -4,9 +4,9 @@
 #include <MFRC522.h>
 #include "MFRC522_I2C_Library.h"
 
-#include "Common/Debouncer.hpp"
+#include "Common/Filter.hpp"
 
-#include "../IProtonixHardware.h"
+#include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 
 namespace Qybercom {
@@ -25,7 +25,7 @@ namespace Qybercom {
 					String _uuid;
 					String _uuidActual;
 					bool _uuidChanged;
-					Qybercom::Debouncer<String> _debouncer; // use >= 1000
+					Qybercom::Filter<String> _filter; // use >= 1000
 
 					HReaderNFC (unsigned short pinSS, unsigned short pinRST, unsigned int uuidReadDebounce = 0, short dedicatedCore = -1);
 					void _signal (Protonix* device, String value);
@@ -40,7 +40,7 @@ namespace Qybercom {
 					String UUIDActual ();
 					bool UUIDChanged ();
 
-					Qybercom::Debouncer<String> &Debouncer ();
+					Qybercom::Filter<String> &Filter ();
 
 					String HardwareSummary ();
 

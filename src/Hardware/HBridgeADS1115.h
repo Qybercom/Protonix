@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#include "../IProtonixHardware.h"
+#include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 #include "../ProtonixTimer.h"
 

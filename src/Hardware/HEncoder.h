@@ -2,9 +2,9 @@
 
 #include <Arduino.h>
 
-#include "Common/Debouncer.hpp"
+#include "Common/Filter.hpp"
 
-#include "../IProtonixHardware.h"
+#include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 
 #include "HButton.h"
@@ -28,7 +28,7 @@ namespace Qybercom {
 					volatile short _dir;
 					volatile bool _changed;
 					volatile bool _allowZero;
-					Qybercom::Debouncer<short> _debouncer; // use ~75
+					Qybercom::Filter<short> _filter; // use ~75
 					HButton* _button;
 
 					bool _changedPipe ();
@@ -57,7 +57,7 @@ namespace Qybercom {
 					bool AllowZero ();
 					HEncoder* AllowZero (bool allow);
 
-					Qybercom::Debouncer<short> &Debouncer ();
+					Qybercom::Filter<short> &Filter ();
 
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);

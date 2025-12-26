@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#include "../IProtonixHardware.h"
+#include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 
 namespace Qybercom {
@@ -16,6 +16,7 @@ namespace Qybercom {
 					byte _modeMask;
 					bool _init;
 
+					bool _probe ();
 					byte _read ();
 					bool _write (byte value);
 

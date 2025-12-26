@@ -4,7 +4,7 @@
 
 #include <SoftwareSerial.h>
 
-#include "../IProtonixHardware.h"
+#include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 
 namespace Qybercom {

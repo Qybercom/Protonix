@@ -1,8 +1,8 @@
 #include <Arduino.h>
 
-#include "Common/Debouncer.hpp"
+#include "Common/Filter.hpp"
 
-#include "../IProtonixHardware.h"
+#include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 
 #include "HButton.h"
@@ -30,7 +30,7 @@ Hardware::HEncoder::HEncoder (unsigned short pinA, unsigned short pinB, unsigned
 	this->_changed = false;
 	this->_allowZero = false;
 
-	this->_debouncer.CheckInterval(checkInterval);
+	this->_filter.CheckInterval(checkInterval);
 
 	this->_button = nullptr;
 }
@@ -97,8 +97,8 @@ Hardware::HEncoder* Hardware::HEncoder::AllowZero (bool allow) {
 	return this;
 }
 
-Qybercom::Debouncer<short> &Hardware::HEncoder::Debouncer () {
-	return this->_debouncer;
+Qybercom::Filter<short> &Hardware::HEncoder::Filter () {
+	return this->_filter;
 }
 
 String Hardware::HEncoder::HardwareSummary () {
@@ -148,17 +148,17 @@ void Hardware::HEncoder::HardwarePipeInterrupt (Protonix* device) {
 		dir = valB == false ? -1 : 1;
 	}
 
-	this->_debouncer.Use(dir);
+	this->_filter.Use(dir);
 
-	if (this->_debouncer.Pipe()) {
-		dir = this->_debouncer.Empty() ? 0 : this->_debouncer.Actual();
+	if (this->_filter.Pipe()) {
+		dir = this->_filter.Empty() ? 0 : this->_filter.Actual();
 
 		if (this->_dir != dir) {
 			this->_dir = dir;
 			this->_changed = true;
 		}
 
-		this->_debouncer.Reset();
+		this->_filter.Reset();
 	}
 
 	this->_valA = valA;

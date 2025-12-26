@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#include "../IProtonixHardware.h"
+#include "../IProtonixHardware.hpp"
 
 #include "HBuzzer.h"
 

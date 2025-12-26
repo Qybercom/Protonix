@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#include "IProtonixHardware.h"
+#include "IProtonixHardware.hpp"
 
 namespace Qybercom {
 	namespace Protonix {
