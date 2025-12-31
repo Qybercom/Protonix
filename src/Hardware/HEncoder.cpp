@@ -50,7 +50,7 @@ Hardware::HEncoder* Hardware::HEncoder::WithButton (unsigned short pinA, unsigne
 Hardware::HEncoder* Hardware::HEncoder::WithButton (unsigned short pinA, unsigned short pinB, unsigned short pinButton, unsigned int checkInterval, unsigned int checkIntervalButton) {
 	Hardware::HEncoder* out = new Hardware::HEncoder(pinA, pinB, checkInterval);
 
-	out->_button = new Hardware::HButton(pinButton, checkIntervalButton);
+	out->_button = new Hardware::HButton(pinButton);//, checkIntervalButton);
 
 	return out;
 }
@@ -113,9 +113,9 @@ void Hardware::HEncoder::HardwareInitPre (Protonix* device) {
 	device->InterruptAttach(this->_pinB, CHANGE);
 
 	if (this->_button != nullptr) {
-		this->_button->SignalChanged("buttonChanged");
-		this->_button->SignalPressed("buttonPressed");
-		this->_button->SignalReleased("buttonReleased");
+		this->_button->HardwareConfig("signal:Changed", String("buttonChanged"));
+		this->_button->HardwareConfig("signal:Pressed", String("buttonPressed"));
+		this->_button->HardwareConfig("signal:Released", String("buttonReleased"));
 
 		this->_button->HardwareID(this->_id);
 		this->_button->HardwareAllowSignal(this->_allowSignal);

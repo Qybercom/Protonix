@@ -201,9 +201,9 @@ void Hardware::HJoystick::HardwareInitPre (Protonix* device) {
 	this->_capability("value", "positionY:int", "Interpolated Y-axis position (0..100%)");
 
 	if (this->_button != nullptr) {
-		this->_button->SignalChanged("buttonChanged");
-		this->_button->SignalPressed("buttonPressed");
-		this->_button->SignalReleased("buttonReleased");
+		this->_button->HardwareConfig("signal:Changed", String("buttonChanged"));
+		this->_button->HardwareConfig("signal:Pressed", String("buttonPressed"));
+		this->_button->HardwareConfig("signal:Released", String("buttonReleased"));
 
 		this->_button->HardwareID(this->_id);
 		this->_button->HardwareAllowSignal(this->_allowSignal);

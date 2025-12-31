@@ -10,32 +10,39 @@
 using namespace Qybercom::Protonix;
 
 void Hardware::HButton::_signal (Protonix* device) {
-	if (!this->_allowSignal || !device->SignalSpawned(this->_id, this->_signalChanged)) return;
+	String signalChanged = this->_config.Get<String>("signal:Changed", "");
+	if (!this->_allowSignal || !device->SignalSpawned(this->_id, signalChanged)) return;
 
 	bool active = this->_trigger->InputValue();
+	String signalPressed = this->_config.Get<String>("signal:Pressed", "");
+	String signalReleased = this->_config.Get<String>("signal:Released", "");
 
-	device->Signal(this->_id, String(active ? this->_signalPressed : this->_signalReleased));
+	device->Signal(this->_id, String(active ? signalPressed : signalReleased));
 
 	this->_capability("active:bool", String(active ? "1" : "0"));
 }
 
-Hardware::HButton::HButton (unsigned short pin, unsigned short mode, unsigned int checkInterval) {
-	this->_trigger = Hardware::HTrigger::Input(pin, mode, checkInterval);
+Hardware::HButton::HButton (unsigned short pin) {
+	this->_trigger = Hardware::HTrigger::Input(pin);
 
-	this->_signalChanged = "changed";
+	this->_config
+		.Set("signal:Changed", String("changed"))
+		.Set("signal:Pressed", String("pressed"))
+		.Set("signal:Released", String("released"));
+	/*this->_signalChanged = "changed";
 	this->_signalPressed = "pressed";
-	this->_signalReleased = "released";
+	this->_signalReleased = "released";*/
 }
 
-Hardware::HButton* Hardware::HButton::Init (unsigned short pin, unsigned short mode, unsigned int checkInterval) {
-	return new Hardware::HButton(pin, mode, checkInterval);
+Hardware::HButton* Hardware::HButton::Init (unsigned short pin) {
+	return new Hardware::HButton(pin);
 }
 
 Hardware::HTrigger* Hardware::HButton::Trigger () {
 	return this->_trigger;
 }
 
-String Hardware::HButton::SignalChanged () {
+/*String Hardware::HButton::SignalChanged () {
 	return this->_signalChanged;
 }
 
@@ -63,7 +70,7 @@ Hardware::HButton* Hardware::HButton::SignalReleased (String signal) {
 	this->_signalReleased = signal;
 
 	return this;
-}
+}*/
 
 bool Hardware::HButton::Changed () {
 	return this->_trigger->InputChanged();
@@ -81,12 +88,16 @@ bool Hardware::HButton::Released (bool changed) {
 	return (changed ? this->Changed() : true) && !this->_trigger->InputValue();
 }
 
+void Hardware::HButton::HardwareConfigSet (String key, Any value) {
+	//this->_trigger->HardwareConfig()->Set(key, value);
+}
+
 String Hardware::HButton::HardwareSummary () {
 	return "Button";
 }
 
 void Hardware::HButton::HardwareInitPre (Protonix* device) {
-	this->_trigger->SignalInputChanged(this->_signalChanged);
+	//this->_trigger->HardwareConfig()->Set("signal:InputChanged", this->_signalChanged);
 
 	this->_trigger->HardwareID(this->_id);
 	this->_trigger->HardwareAllowSignal(this->_allowSignal);

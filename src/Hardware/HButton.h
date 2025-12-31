@@ -20,11 +20,12 @@ namespace Qybercom {
 					void _signal (Protonix* device);
 
 				public:
-					HButton (unsigned short pin, unsigned short mode = HIGH, unsigned int checkInterval = 0);
-					static HButton* Init (unsigned short pin, unsigned short mode = HIGH, unsigned int checkInterval = 0);
+					HButton (unsigned short pin);
+					static HButton* Init (unsigned short pin);
 
 					HTrigger* Trigger ();
 
+					/*
 					String SignalChanged ();
 					HButton* SignalChanged (String signal);
 
@@ -33,12 +34,14 @@ namespace Qybercom {
 
 					String SignalReleased ();
 					HButton* SignalReleased (String signal);
+					*/
 
 					bool Changed ();
 					bool Active ();
 					bool Pressed (bool changed = true);
 					bool Released (bool changed = true);
 
+					void HardwareConfigSet (String key, Any value);
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					bool HardwareI2C ();

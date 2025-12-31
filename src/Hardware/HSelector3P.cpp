@@ -27,8 +27,8 @@ void Hardware::HSelector3P::_signal (Protonix* device, short value) {
 }
 
 Hardware::HSelector3P::HSelector3P (unsigned short pin1, unsigned short pin2, unsigned int checkInterval) {
-	this->_trigger1 = Hardware::HTrigger::Input(pin1, HIGH, checkInterval);
-	this->_trigger2 = Hardware::HTrigger::Input(pin2, HIGH, checkInterval);
+	this->_trigger1 = Hardware::HTrigger::Input(pin1);//, HIGH, checkInterval);
+	this->_trigger2 = Hardware::HTrigger::Input(pin2);//, HIGH, checkInterval);
 	this->_value = 0;
 	this->_changed = false;
 	this->_allowZero = true;

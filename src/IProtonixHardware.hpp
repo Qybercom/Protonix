@@ -4,7 +4,7 @@
 
 #include "Common/Data.hpp"
 #include "Common/List.hpp"
-#include "Common/Dictionary.hpp"
+#include "Common/Map.hpp"
 
 #include "ProtonixHardwareCapability.h"
 
@@ -21,7 +21,7 @@ namespace Qybercom {
 				short _dedicatedCore = -1;
 				IProtonixBridge* _bridge;
 				List<ProtonixHardwareCapability*> _capabilities;
-				Dictionary<String, Any> _config;
+				Map _config;
 
 				ProtonixHardwareCapability* _capability (String kind, String id, String comment) {
 					for (ProtonixHardwareCapability* capability : this->_capabilities)
@@ -91,20 +91,20 @@ namespace Qybercom {
 					return this->_capabilities;
 				}
 
-				Dictionary<String, Any> &HardwareConfig () {
+				Map &HardwareConfig () {
 					return this->_config;
-				}
-
-				Any HardwareConfig (String key) {
-					return this->_config.Get(key);
 				}
 
 				template<typename T>
-				Dictionary<String, Any> &HardwareConfig (String key, T value) {
-					this->_config.Set(key, Any(value));
+				IProtonixHardware* HardwareConfig (String key, const T &value) {
+					this->_config.Set(key, value);
 
-					return this->_config;
+					return this;
 				}
+
+				virtual void HardwareConfigInit () { }
+				virtual void HardwareConfigGet (String key, Any value) { }
+				virtual void HardwareConfigSet (String key, Any value) { }
 
 				virtual String HardwareSummary () { return ""; }
 
