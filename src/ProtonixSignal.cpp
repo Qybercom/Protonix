@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#include "Common/Data.hpp"
+#include "Common/index.h"
 
 #include "ProtonixSignal.h"
 

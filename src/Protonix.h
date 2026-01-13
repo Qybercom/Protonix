@@ -4,7 +4,7 @@
 
 #include "_platforms.h"
 
-#include "Common/List.hpp"
+#include "Common/index.h"
 
 #include "IProtonixHardware.hpp"
 #include "IProtonixNetworkDriver.h"
@@ -37,6 +37,8 @@ namespace Qybercom {
 				bool _ready;
 				bool _debug;
 				bool _active;
+				String _platform;
+				String _build;
 				String _state;
 				String _firmware;
 				String _summary;
@@ -82,6 +84,10 @@ namespace Qybercom {
 
 				Protonix* Active (bool active);
 				bool Active ();
+
+				String Platform ();
+
+				String Build ();
 
 				Protonix* State (String state);
 				String State ();

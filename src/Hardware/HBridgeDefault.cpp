@@ -21,7 +21,7 @@ bool Hardware::HBridgeDefault::BridgePinInitInputUp (unsigned int pin, int initi
 }
 
 bool Hardware::HBridgeDefault::BridgePinInitInputDown (unsigned int pin, int initial) {
-	#if defined(ESP8266)
+	#if defined(ESP8266) || !defined(INPUT_PULLDOWN)
 	return false;
 	#else
 	return true

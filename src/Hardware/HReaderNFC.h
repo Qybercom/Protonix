@@ -4,7 +4,7 @@
 #include <MFRC522.h>
 #include "MFRC522_I2C_Library.h"
 
-#include "Common/Filter.hpp"
+#include "../Common/index.h"
 
 #include "../IProtonixHardware.hpp"
 #include "../Protonix.h"

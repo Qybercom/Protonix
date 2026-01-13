@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#include "Common/Data.hpp"
+#include "Common/index.h"
 
 namespace Qybercom {
 	namespace Protonix {
@@ -29,6 +29,10 @@ namespace Qybercom {
 				template<typename T>
 			 	T ValueAs (T fallback) {
 			 		return this->_value.As<T>(fallback);
+			 	}
+				template<typename T>
+			 	T* ValueAs () {
+			 		return this->_value.As<T>();
 			 	}
 				ProtonixSignal* Value (Any value);
 				template<typename T>

@@ -65,6 +65,71 @@ Protonix::Protonix (IProtonixDevice* device, IProtonixProfile* profile) {
 	this->_commands.Add(new Command::CStdSensor());
 
 	this->_active = true;
+
+	#if defined(ARDUINO_ARCH_ESP32)
+		// @note - seems like on average board the result is always generic `esp32`
+	    #if defined(CONFIG_IDF_TARGET_ESP32)
+	        this->_platform = "esp32";
+	    #elif defined(CONFIG_IDF_TARGET_ESP32S2)
+	        this->_platform = "esp32_s2";
+	    #elif defined(CONFIG_IDF_TARGET_ESP32S3)
+	        this->_platform = "esp32_s3";
+	    #elif defined(CONFIG_IDF_TARGET_ESP32C3)
+	        this->_platform = "esp32_c3";
+	    #elif defined(CONFIG_IDF_TARGET_ESP32C6)
+	        this->_platform = "esp32_c6";
+	    #elif defined(CONFIG_IDF_TARGET_ESP32H2)
+	        this->_platform = "esp32_h2";
+	    #else
+	        this->_platform = "esp32";
+	    #endif
+	#elif defined(ARDUINO_ARCH_ESP8266)
+	    this->_platform = "esp8266";
+	#elif defined(ARDUINO_ARCH_AVR)
+	    #if defined(ARDUINO_AVR_UNO)
+	        this->_platform = "arduino_uno";
+	    #elif defined(ARDUINO_AVR_NANO)
+	        this->_platform = "arduino_nano";
+	    #elif defined(ARDUINO_AVR_MEGA2560)
+	        this->_platform = "arduino_mega";
+	    #elif defined(ARDUINO_AVR_LEONARDO)
+	        this->_platform = "arduino_leonardo";
+	    #elif defined(__AVR_ATmega328P__)
+	        this->_platform = "arduino_atmega328p";
+	    #else
+	        this->_platform = "arduino_avr";
+	    #endif
+	#elif defined(ARDUINO_ARCH_SAM)
+	    this->_platform = "arduino_due";
+	#elif defined(ARDUINO_ARCH_SAMD)
+	    this->_platform = "arduino_samd";
+	#elif defined(ARDUINO_ARCH_RP2040)
+	    this->_platform = "rp2040";
+	#else
+		this->_platform = "";
+	#endif
+
+	String month = String(__DATE__).substring(0, 3);
+
+	if (month == "Jan") month = "01";
+	if (month == "Feb") month = "02";
+	if (month == "Mar") month = "03";
+	if (month == "Apr") month = "04";
+	if (month == "May") month = "05";
+	if (month == "Jun") month = "06";
+	if (month == "Jul") month = "07";
+	if (month == "Aug") month = "08";
+	if (month == "Sep") month = "09";
+	if (month == "Oct") month = "10";
+	if (month == "Nov") month = "11";
+	if (month == "Dec") month = "12";
+
+	this->_build = ""
+		+ String(__DATE__).substring(7, 11) + "-"
+		+ month + "-"
+		+ String(__DATE__).substring(4, 6) + " "
+		+ String(__TIME__);
+
 	this->_state = "";
 	this->_firmware = "";
 	this->_summary = "";
@@ -159,6 +224,14 @@ Protonix* Protonix::Active (bool active) {
 
 bool Protonix::Active () {
 	return this->_active;
+}
+
+String Protonix::Platform () {
+	return this->_platform;
+}
+
+String Protonix::Build () {
+	return this->_build;
 }
 
 Protonix* Protonix::State (String state) {

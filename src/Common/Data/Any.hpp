@@ -3,43 +3,7 @@
 #include <Arduino.h>
 
 namespace Qybercom {
-	struct Vector2 {
-		int X;
-		int Y;
-
-		Vector2 (int x = 0, int y = 0) : X(x), Y(y) {}
-
-		String Serialize () {
-			return String(X) + "," + String(Y);
-		}
-	};
-
-	struct Vector3 {
-		int X;
-		int Y;
-		int Z;
-
-		Vector3 (int x = 0, int y = 0, int z = 0) : X(x), Y(y), Z(z) {}
-
-		String Serialize () {
-			return String(X) + "," + String(Y) + "," + String(Z);
-		}
-	};
-
-	struct Vector4 {
-		int A;
-		int B;
-		int C;
-		int D;
-
-		Vector4 (int a = 0, int b = 0, int c = 0, int d = 0) : A(a), B(b), C(c), D(d) {}
-
-		String Serialize () {
-			return String(A) + "," + String(B) + "," + String(C) + "," + String(D);
-		}
-	};
-
-	class Any {
+	/**/class Any {
 		public:
 			void* Data;
 			size_t Size;
@@ -157,7 +121,7 @@ namespace Qybercom {
 			}
 
 			template<typename T>
-			T* AsPtr () {
+			T* As () {
 				return static_cast<T*>(Data);
 			}
 
@@ -167,15 +131,10 @@ namespace Qybercom {
 
 				return out == nullptr ? fallback : *out;
 			}
-	};
 
-	struct Pixel {
-		unsigned long Index;
-		byte R;
-		byte G;
-		byte B;
-
-		Pixel (byte r = 0, byte g = 0, byte b = 0, unsigned long index = 0)
-			: Index(index), R(r), G(g), B(b) { }
+			// maybe not working as expected...
+			String ToString () {
+				return String(As<String>(""));
+			}
 	};
 }

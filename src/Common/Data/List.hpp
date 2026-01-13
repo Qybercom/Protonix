@@ -27,19 +27,26 @@ namespace Qybercom {
 				int Index;
 
 				Node (const T &data) : Data(data), Prev(0), Next(0), Index(-1) { }
+				bool IsLast () { return Next == nullptr; }
 			};
 
 			class Iterator {
 				private:
+					List* _owner;
 					Node* _node;
 
 				public:
-					Iterator (Node* node) : _node(node) { }
+					Iterator (List* owner, Node* node) : _owner(owner), _node(node) { }
 
-					T &operator* () { return _node->Data; }
+					T &operator* () {
+						_owner->_current = _node;
+
+						return _node->Data;
+					}
 
 					Iterator &operator++ () {
 						_node = _node->Next;
+						_owner->_current = _node;
 
 						return *this;
 					}
@@ -54,8 +61,10 @@ namespace Qybercom {
 			Node* _tail;
 			unsigned int _count;
 
-			Node* _iNode;
-			bool _iStarted;
+			Node* _current;
+
+			/*Node* _iNode;
+			bool _iStarted;*/
 
 			unsigned int _countMax;
 
@@ -70,7 +79,7 @@ namespace Qybercom {
 			}
 
 		public:
-			List () : _head(0), _tail(0), _count(0), _iNode(0), _iStarted(false), _countMax(QYBERCOM_LIST_COUNT_MAX) { }
+			List () : _head(nullptr), _tail(nullptr), _count(0), _current(nullptr),/* _iNode(nullptr), _iStarted(false),*/ _countMax(QYBERCOM_LIST_COUNT_MAX) { }
 
 			Node* Head () { return _head; }
 			T &First () { return _head->Data; }
@@ -84,7 +93,11 @@ namespace Qybercom {
 			unsigned int CountMax () const { return _countMax; }
 			List<T> &CountMax (unsigned int countMax) { _countMax = countMax; return *this; }
 
-			Node* INode () { return _iNode; }
+			Node* Current () { return _current; }
+
+			bool End () { return _current != nullptr && _current->IsLast(); }
+
+			//Node* INode () { return _iNode; }
 
 			List<T> &Add (const T &data, bool before = false, bool maxBypass = false) {
 				if (!maxBypass && _countMax > 0 && _count >= _countMax) {
@@ -172,10 +185,10 @@ namespace Qybercom {
 					cur = next;
 				}
 
-				_head = _tail = 0;
+				_head = _tail = nullptr;
 				_count = 0;
-				_iNode = 0;
-				_iStarted = false;
+				/*_iNode = nullptr;
+				_iStarted = false;*/
 
 				return *this;
 			}
@@ -214,7 +227,7 @@ namespace Qybercom {
 			}
 
 			Node* GetNode (unsigned int index) {
-				if (index >= _count) return 0;
+				if (index >= _count) return nullptr;
 
 				Node* cur = _head;
 				for (unsigned int i = 0; i < index; i++) cur = cur->Next;
@@ -273,8 +286,8 @@ namespace Qybercom {
 				return data;
 			}
 
-			List<T> &Reset () {
-				_iNode = 0;
+			/*List<T> &Reset () {
+				_iNode = nullptr;
 				_iStarted = false;
 
 				return *this;
@@ -300,20 +313,20 @@ namespace Qybercom {
 				}
 
 				return _iNode != nullptr;
-			}
+			}*/
 
 			// `for (item : list) {...}`
-			Iterator begin () { return Iterator(_head); }
+			Iterator begin () { return Iterator(this, _head); }
 
-			Iterator end () { return Iterator(0); }
+			Iterator end () { return Iterator(this, nullptr); }
 
-			T& operator[](unsigned int index) {
+			T& operator[] (unsigned int index) {
 				Node* node = GetNode(index);
 
 				return node == nullptr ? (*(T*) 0) : node->Data;
 			}
 
-			const T& operator[](unsigned int index) const {
+			const T& operator[] (unsigned int index) const {
 				Node* node = const_cast<List*>(this)->GetNode(index);
 
 				return node == nullptr ? (*(T*) 0) : node->Data;

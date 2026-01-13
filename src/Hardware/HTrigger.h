@@ -2,8 +2,7 @@
 
 #include <Arduino.h>
 
-#include "Common/Data.hpp"
-#include "Common/Debouncer.hpp"
+#include "../Common/index.h"
 
 #include "../IProtonixHardware.hpp"
 #include "../Protonix.h"

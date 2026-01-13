@@ -10,6 +10,7 @@
 #include "HBuzzer.h"
 #include "HEncoder.h"
 #include "HGenericAnalog.h"
+#include "HGenericPWM.h"
 #include "HJoystick.h"
 #include "HPhotonix.h"
 #include "HPhotoResistor.h"
@@ -31,17 +32,18 @@
  * 7seg
  * clock7seg (https://github.com/AKJ7/TM1637)
  * led text display (LiquidCrystal_I2C.h)
- * weight (HX711)
  * radio module (RCSwitch.h)
- * servo motor (Stepper.h)
+ * servo motor (Stepper.h) (check HGenericPWM)
  * gas/particle sensor
- * audio output
+ * audio output (i2s output)
  * SD card reader
  * camera
  * audio sensor
  * infrared sensor/trigger/bus (PIR)
- * bluetooth
+ * bluetooth (maybe bus)
  * spi bus
+ * i2c bus
+ * usb bus
  * gps
  * gsm
  * phone dialer (rotary/keypad)

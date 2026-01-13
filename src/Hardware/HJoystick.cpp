@@ -1,10 +1,10 @@
 #include <Arduino.h>
 
+#include "../Common/index.h"
+
 #include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 #include "../ProtonixTimer.h"
-
-#include "Common/Data.hpp"
 
 #include "HButton.h"
 

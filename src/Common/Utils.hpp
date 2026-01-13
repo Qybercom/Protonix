@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <math.h>
 
-#include "List.hpp"
+#include "Data/List.hpp"
 
 namespace Qybercom {
 	inline List<String>* explode (String delimiter, String input) {
@@ -165,6 +165,19 @@ namespace Qybercom {
 			char c2 = hex[i++];
 			uint8_t b = (hexNibble(c1) << 4) | hexNibble(c2);
 			out.Add(b);
+		}
+
+		return out;
+	}
+
+	inline String indent (unsigned int size) {
+		String out = "";
+		unsigned int i = 0;
+
+		while (i < size) {
+			out += "  ";
+
+			i++;
 		}
 
 		return out;

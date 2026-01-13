@@ -2,9 +2,7 @@
 
 #include <Arduino.h>
 
-#include "Common/Data.hpp"
-#include "Common/List.hpp"
-#include "Common/Map.hpp"
+#include "Common/index.h"
 
 #include "ProtonixHardwareCapability.h"
 

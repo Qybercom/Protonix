@@ -78,7 +78,7 @@ bool Hardware::HBridgePCF8574::BridgePinInitInputUp (unsigned int pin, int initi
 }
 
 bool Hardware::HBridgePCF8574::BridgePinInitInputDown (unsigned int pin, int initial) {
-	#if defined(ESP8266)
+	#if defined(ESP8266) || !defined(INPUT_PULLDOWN)
 	return false;
 	#else
 	return this->BridgePinMode(pin, INPUT_PULLDOWN);
@@ -99,7 +99,7 @@ bool Hardware::HBridgePCF8574::BridgePinMode (unsigned int pin, int mode) {
 	if (mode == INPUT || mode == INPUT_PULLUP)
 		this->_dataOut |= (1 << pin);
 
-	#if !defined(ESP8266)
+	#if !defined(ESP8266) && defined(INPUT_PULLDOWN)
 	if (mode == INPUT_PULLDOWN)
 		this->_dataOut &= ~(1 << pin);
 	#endif

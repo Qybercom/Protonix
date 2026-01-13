@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#include "Data.hpp"
+#include "Any.hpp"
 #include "List.hpp"
 
 namespace Qybercom {
@@ -25,6 +25,10 @@ namespace Qybercom {
 
 		public:
 			Map () { }
+
+			List<Entry*> &Items () {
+				return _items;
+			}
 
 			template<typename T>
 			Map &Set (String key, const T &value) {
@@ -59,22 +63,27 @@ namespace Qybercom {
 				return fallback;
 			}
 
-			/*template<typename T>
+			template<typename T>
 			T* Get (String key) {
 				for (Entry* entry : this->_items)
 					if (entry->Key == key)
-						return entry->Value.AsPtr<T>();
+						return entry->Value.As<T>();
 
 				return nullptr;
-			}*/
+			}
 
 			bool Remove (String key) {
-				/*int idx = _indexOf(key);
-				if (idx == -1) return false;
+				unsigned int count = _items.Count();
 
-				_items.Remove(idx);*/
+				for (unsigned int i = 0; i < count; i++) {
+					if (_items[i]->Key == key) {
+						_items.Remove(i);
 
-				return true;
+						return true;
+					}
+				}
+
+				return false;
 			}
 
 			unsigned int Count () const {
@@ -84,5 +93,12 @@ namespace Qybercom {
 			void Clear () {
 				_items.Clear();
 			}
+
+			using Iterator = List<Entry*>::Iterator;
+
+			Iterator begin () { return _items.begin(); }
+			Iterator end () { return _items.end(); }
+
+			~Map () { Clear(); }
 	};
 }

@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#include "Common/Filter.hpp"
+#include "../Common/index.h"
 
 #include "../IProtonixHardware.hpp"
 #include "../Protonix.h"

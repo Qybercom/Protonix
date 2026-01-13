@@ -6,7 +6,7 @@
 #include "../Protonix.h"
 #include "../ProtonixTimer.h"
 
-#include "../Common/Data.hpp"
+#include "../Common/index.h"
 
 #include "HTrigger.h"
 

@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Data.hpp"
-#include "Debouncer.hpp"
-#include "Filter.hpp"
-#include "Gate.hpp"
-#include "List.hpp"
-#include "Map.hpp"
+#include "Data/index.h"
+#include "Formats/index.h"
+#include "Pipes/index.h"
+
 #include "Random.h"
 #include "Utils.hpp"
