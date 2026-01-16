@@ -16,12 +16,6 @@ namespace Qybercom {
 					unsigned short _resolution;
 					unsigned int _max;
 					bool _started;
-					short _channel;
-
-					static bool _channels[16];
-					static bool _init;
-
-					static short _allocate ();
 
 				public:
 					HGenericPWM (unsigned short pin, bool inverted = false, unsigned int frequency = 1000, unsigned resolution = 8);

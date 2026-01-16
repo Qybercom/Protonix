@@ -9,21 +9,6 @@
 
 using namespace Qybercom::Protonix;
 
-short Hardware::HGenericPWM::_allocate () {
-	unsigned short i = 0;
-
-	while (i < 16) {
-		if (!Hardware::HGenericPWM::_channels[i]) {
-			Hardware::HGenericPWM::_channels[i] = true;
-			return i;
-		}
-
-		i++;
-	}
-
-	return -1;
-}
-
 Hardware::HGenericPWM::HGenericPWM (unsigned short pin, bool inverted, unsigned int frequency, unsigned resolution) {
 	this->_pin = pin;
 	this->_inverted = inverted;
@@ -32,18 +17,6 @@ Hardware::HGenericPWM::HGenericPWM (unsigned short pin, bool inverted, unsigned 
 
 	this->_max = (1 << this->_resolution) - 1;
 	this->_started = false;
-	this->_channel = -1;
-
-	if (!Hardware::HGenericPWM::_init) {
-		Hardware::HGenericPWM::_init = true;
-
-		unsigned short i =0;
-		while (i < 16) {
-			Hardware::HGenericPWM::_channels[i] = false;
-
-			i++;
-		}
-	}
 }
 
 Hardware::HGenericPWM* Hardware::HGenericPWM::Max (unsigned int max) {
@@ -63,11 +36,8 @@ Hardware::HGenericPWM* Hardware::HGenericPWM::Frequency (unsigned int frequency)
 		#if defined(__AVR__)
 
 		#elif defined(ESP8266)
-		//if (this->_started)
 			analogWriteFreq(this->_frequency);
 		#elif defined(ESP32)
-		//if (this->_started && this->_channel >= 0)
-			//ledcSetup(this->_channel, this->_frequency, this->_resolution);
 			ledcAttach(this->_pin, this->_frequency, this->_resolution);
 		#endif
 	}
@@ -90,11 +60,8 @@ Hardware::HGenericPWM* Hardware::HGenericPWM::Resolution (unsigned short resolut
 		#if defined(__AVR__)
 
 		#elif defined(ESP8266)
-		//if (this->_started)
 			analogWriteRange(this->_max);
 		#elif defined(ESP32)
-		//if (this->_started && this->_channel >= 0)
-			//ledcSetup(this->_channel, this->_frequency, this->_resolution);
 			ledcAttach(this->_pin, this->_frequency, this->_resolution);
 		#endif
 	}
@@ -127,12 +94,6 @@ bool Hardware::HGenericPWM::Start () {
 
 		return true;
 	#elif defined(ESP32)
-		/*this->_channel = Hardware::HGenericPWM::_allocate();
-		if (this->_channel < 0) return false;
-
-		ledcSetup(this->_channel, this->_frequency, this->_resolution);
-		ledcAttachPin(this->_pin, this->_channel);
-		ledcWrite(this->_channel, this->_inverted ? this->_max : 0);*/
 		ledcAttach(this->_pin, this->_frequency, this->_resolution);
 		ledcWrite(this->_pin, this->_inverted ? this->_max : 0);
 
@@ -155,7 +116,6 @@ bool Hardware::HGenericPWM::Write (unsigned int value) {
 	#elif defined(ESP8266)
 	analogWrite(this->_pin, value);
 	#elif defined(ESP32)
-	//ledcWrite(this->_channel, value);
 	ledcWrite(this->_pin, value);
 	#endif
 

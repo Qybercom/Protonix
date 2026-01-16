@@ -55,9 +55,9 @@ void Profile::Axion::Axion::ProfilePipe (Protonix* device) {
 		String sep = Random::AZaz09(16);
 		raw.replace("}{", "}" + sep + "{");
 
-		List<String>* cmds = explode(sep, raw);
+		List<String> cmds = explode(sep, raw);
 
-		for (String& cmd : *cmds) {
+		for (String& cmd : cmds) {
 			this->_dtoInput->BufferRaw(cmd);
 			this->_dtoInput->Deserialize();
 
@@ -72,9 +72,6 @@ void Profile::Axion::Axion::ProfilePipe (Protonix* device) {
 
 			this->_dtoInput->Reset();
 		}
-
-		delete cmds;
-		cmds = nullptr;
 	}
 
 	if (this->_timerData->Pipe()) {

@@ -7,6 +7,6 @@
 #include "Raw.hpp"
 #include "Pixel.hpp"
 #include "List.hpp"
-#include "Bucket.hpp"
+#include "Bucket.h"
 #include "Map.hpp"
 #include "Any.hpp"

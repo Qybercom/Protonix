@@ -196,8 +196,12 @@ namespace Qybercom {
 				}
 			}
 
-			String Trace () {
-				return "(" + TypeName() + ")" + ToString();
+			String Trace (bool type = false) {
+				String edge = String(_type == TYPE::STRING ? "\"" : "");
+
+				return type
+					? String("(" + TypeName() + ")" + ToString())
+					: String(edge + ToString() + edge);
 			}
 
 			bool Equals (const Value& other) const {

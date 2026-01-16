@@ -177,9 +177,9 @@ bool Hardware::HBusCAN::Send (String data, byte priority, byte address, bool tru
 	if (length <= 8)
 		return this->Send(this->ID(priority, address, false), data);
 
-	List<String>* chunks = strChunks(data, 7);
+	List<String> chunks = strChunks(data, 7);
 	int i = 0;
-	int c = chunks->Count();
+	int c = chunks.Count();
 
 	if (!truncate && c > 10) {
 		this->_log("Can not send data with length greater than 70, current: " + String(length) + " (" + String(c) + " chunks)");
@@ -187,7 +187,7 @@ bool Hardware::HBusCAN::Send (String data, byte priority, byte address, bool tru
 		return false;
 	}
 
-	for (String& chunk : *chunks) {
+	for (String& chunk : chunks) {
 		this->_outBuffer.Add(this->_frame(
 			this->ID(priority, address, i != (c - 1)),
 			String(i) + chunk
@@ -195,9 +195,6 @@ bool Hardware::HBusCAN::Send (String data, byte priority, byte address, bool tru
 
 		i++;
 	}
-
-	delete chunks;
-	chunks = nullptr;
 
 	return true;
 }

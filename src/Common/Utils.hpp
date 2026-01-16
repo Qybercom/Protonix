@@ -6,28 +6,28 @@
 #include "Data/List.hpp"
 
 namespace Qybercom {
-	inline List<String>* explode (String delimiter, String input) {
-		List<String>* out = new List<String>();
+	inline List<String> explode (String delimiter, String input) {
+		List<String> out;
 
 		unsigned int start = 0;
 		int pos = input.indexOf(delimiter, start);
 
 		while (pos >= 0) {
 			String token = input.substring(start, pos);
-			out->Add(token);
+			out.Add(token);
 
 			start = pos + delimiter.length();
 			pos = input.indexOf(delimiter, start);
 		}
 
 		if (start <= input.length())
-			out->Add(input.substring(start));
+			out.Add(input.substring(start));
 
 		return out;
 	}
 
-	inline List<String>* strChunks (String input, unsigned int chunkSize) {
-		List<String>* out = new List<String>();
+	inline List<String> strChunks (String input, unsigned int chunkSize) {
+		List<String> out;
 
 		if (chunkSize > 0) {
 			int length = input.length();
@@ -37,7 +37,7 @@ namespace Qybercom {
 				int end = start + chunkSize;
 				if (end > length) end = length;
 
-				out->Add(input.substring(start, end));
+				out.Add(input.substring(start, end));
 
 				start += chunkSize;
 			}
@@ -181,5 +181,37 @@ namespace Qybercom {
 		}
 
 		return out;
+	}
+
+	inline bool isNumeric (const String &s) {
+		int l = s.length();
+		if (l == 0) return false;
+
+		int i = 0;
+
+		while (i < l) {
+			char c = s[i];
+
+			if (c < '0' || c > '9')
+				return false;
+
+			i++;
+		}
+
+		return true;
+	}
+
+	inline int toNumeric (const String &s) {
+		int v = 0;
+		int i = 0;
+		int l = s.length();
+
+		while (i < l) {
+			v = v * 10 + (s[i] - '0');
+
+			i++;
+		}
+
+		return v;
 	}
 }
