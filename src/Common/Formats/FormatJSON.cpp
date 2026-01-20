@@ -94,6 +94,10 @@ int Formats::FormatJSON::_parseNumber (const String &s, int &pos) {
 	return num.indexOf('.') >= 0 ? num.toFloat() : num.toInt();
 }
 
+String Formats::FormatJSON::BucketFormatMIME () {
+	return "application/json";
+}
+
 String Formats::FormatJSON::BucketFormatSerialize (Bucket &bucket) {
 	String out = "";
 

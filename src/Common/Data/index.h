@@ -1,11 +1,10 @@
 #pragma once
 
-#include "Vector2.hpp"
-#include "Vector3.hpp"
-#include "Vector4.hpp"
-#include "Value.hpp"
+#include "Color.h"
+#include "Position.h"
+#include "Pixel.h"
+#include "Value.h"
 #include "Raw.hpp"
-#include "Pixel.hpp"
 #include "List.hpp"
 #include "Bucket.h"
 #include "Map.hpp"

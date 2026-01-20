@@ -2,7 +2,6 @@
 
 #include <Arduino.h>
 
-#include "../Utils.hpp"
 #include "../Data/index.h"
 
 namespace Qybercom {
@@ -12,6 +11,7 @@ namespace Qybercom {
 				static String _serialize (Bucket &bucket, int indentSize = 0, bool first = true);
 			
 			public:
+				String BucketFormatMIME ();
 				String BucketFormatSerialize (Bucket &bucket);
 				Bucket BucketFormatDeserialize (const String &raw);
 		};

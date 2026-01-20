@@ -13,13 +13,13 @@
 namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
-			struct HJoystickState {
+			/*struct HJoystickState {
 				Vector2 Position;
 				bool Button;
 				bool Calibrated;
 
 				HJoystickState (int x, int y, bool button, bool calibrated) : Position(Vector2(x, y)), Button(button), Calibrated(calibrated) { }
-			};
+			};*/
 
 			class HJoystick : public IProtonixHardware {
 				private:

@@ -16,6 +16,7 @@ namespace Qybercom {
 				static int _parseNumber (const String &s, int &pos);
 
 			public:
+				String BucketFormatMIME ();
 				String BucketFormatSerialize (Bucket &bucket);
 				Bucket BucketFormatDeserialize (const String &raw);
 		};

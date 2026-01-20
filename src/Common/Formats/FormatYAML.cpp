@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "../Data/index.h"
+#include "../Utils.h"
 
 #include "FormatYAML.h"
 
@@ -33,6 +34,10 @@ String Formats::FormatYAML::_serialize (Bucket &bucket, int indentSize, bool fir
 	}
 
 	return out;
+}
+
+String Formats::FormatYAML::BucketFormatMIME () {
+	return "application/yaml";
 }
 
 String Formats::FormatYAML::BucketFormatSerialize (Bucket &bucket) {

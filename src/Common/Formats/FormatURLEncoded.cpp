@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "../Data/index.h"
+#include "../Utils.h"
 
 #include "FormatURLEncoded.h"
 
@@ -162,6 +163,10 @@ void Formats::FormatURLEncoded::_deserialize (Bucket &root, String &raw) {
 
 		Formats::FormatURLEncoded::_path(root, keys, value);
 	}
+}
+
+String Formats::FormatURLEncoded::BucketFormatMIME () {
+	return "x-wwww/form-url-encoded";
 }
 
 String Formats::FormatURLEncoded::BucketFormatSerialize (Bucket &bucket) {

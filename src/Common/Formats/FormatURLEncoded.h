@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+
 #include "../Data/index.h"
 
 namespace Qybercom {
@@ -19,6 +20,7 @@ namespace Qybercom {
 				static void _deserialize (Bucket &root, String &raw);
 
 			public:
+				String BucketFormatMIME ();
 				String BucketFormatSerialize (Bucket &bucket);
 				Bucket BucketFormatDeserialize (const String &raw);
 			};

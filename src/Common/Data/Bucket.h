@@ -2,15 +2,16 @@
 
 #include <Arduino.h>
 
-#include "../Utils.hpp"
+#include "../Utils.h"
 #include "List.hpp"
-#include "Value.hpp"
+#include "Value.h"
 
 namespace Qybercom {
 	class Bucket;
 
 	class IBucketFormat {
 		public:
+			virtual String BucketFormatMIME ();
 			virtual String BucketFormatSerialize (Bucket &bucket) = 0;
 			virtual Bucket BucketFormatDeserialize (const String &raw) = 0;
 	};

@@ -17,11 +17,11 @@ void Hardware::HJoystick::_signalValue (Protonix* device) {
 	if (this->_allowSignal && this->_allowSignalValue) {
 		device
 			->Signal(this->_id, "value")
-			->Value(Hardware::HJoystickState(
+			/*->Value(Hardware::HJoystickState(
 				this->_valueX, this->_valueY,
 				this->_button != nullptr && this->_button->Active(),
 				this->_calibrated
-			));
+			))*/;
 	}
 }
 
@@ -29,11 +29,11 @@ void Hardware::HJoystick::_signalPosition (Protonix* device) {
 	if (this->_allowSignal)
 		device
 			->Signal(this->_id, "position")
-			->Value(Hardware::HJoystickState(
+			/*->Value(Hardware::HJoystickState(
 				this->_positionX, this->_positionY,
 				this->_button != nullptr && this->_button->Active(),
 				this->_calibrated
-			));
+			))*/;
 }
 
 Hardware::HJoystick::HJoystick (short pinX, short pinY, short pinButton, bool init) {
@@ -238,13 +238,13 @@ void Hardware::HJoystick::HardwarePipe (Protonix* device, short core) {
 		if (this->_calibrateTimeout->Pipe()) {
 			this->_calibrated = true;
 
-			if (this->_allowSignal)
+			/*if (this->_allowSignal)
 				device->Signal(this->_id, "calibrated")->Value(Vector4(
 					this->_gapMaxX,
 					this->_gapMinX,
 					this->_gapMaxY,
 					this->_gapMinY
-				));
+				));*/
 		}
 		else {
 			if (rawX > this->_gapMaxX) this->_gapMaxX = rawX;

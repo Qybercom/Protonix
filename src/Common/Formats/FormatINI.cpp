@@ -6,6 +6,10 @@
 
 using namespace Qybercom;
 
+String Formats::FormatINI::BucketFormatMIME () {
+	return "application/ini";
+}
+
 String Formats::FormatINI::BucketFormatSerialize (Bucket &bucket) {
 	String out = "";
 
@@ -63,13 +67,11 @@ Bucket Formats::FormatINI::BucketFormatDeserialize (const String &raw) {
 			String sectionName = line.substring(1, line.length() - 1);
 			sectionName.trim();
 
-			*currentSection = root[sectionName];
 			currentSection = &root[sectionName];
 
 			continue;
 		}
 
-		// key=value
 		int eq = line.indexOf('=');
 		if (eq < 0) continue;
 
@@ -78,17 +80,15 @@ Bucket Formats::FormatINI::BucketFormatDeserialize (const String &raw) {
 		key.trim();
 		value.trim();
 
-		// массив key[]
-		if (key.endsWith("[]")) {
+		// TODO: review key[]=value syntax
+		/*if (key.endsWith("[]")) {
 			String baseKey = key.substring(0, key.length() - 2);
 			Bucket &arrBucket = (*currentSection)[baseKey];
 			if (!arrBucket.IsArray()) arrBucket = Bucket::Array();
 
 			arrBucket.AsArray().Add(Bucket::Value(Formats::FormatINI::_parseValue(value)));
-		}
-		else {
-			(*currentSection)[key] = Bucket::Value(Formats::FormatINI::_parseValue(value));
-		}
+		}*/
+		(*currentSection)[key] = Bucket::Value(Formats::FormatINI::_parseValue(value));
 	}
 
 	return root;

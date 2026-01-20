@@ -1,5 +1,7 @@
 #include <Arduino.h>
 
+#include "../Utils.h"
+
 #include "Bucket.h"
 
 using namespace Qybercom;
