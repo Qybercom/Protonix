@@ -5,13 +5,11 @@
 #include "Value.h"
 
 namespace Qybercom {
-	struct Color : public IValue {
-		short R;
-		short G;
-		short B;
-		float A;
+	struct Range : public IValue {
+		double Min;
+		double Max;
 
-		Color (short r = 0, short g = 0, short b = 0, float a = 1.0);
+		Range (double min = 0.0, double max = 0.0);
 
 		void ValueDeserialize (const String &raw);
 		String ValueSerialize () const;

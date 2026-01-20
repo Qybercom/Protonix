@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <ArduinoJson.h>
+//#include <ArduinoJson.h>
 
 #include "../../../Protonix.h"
 #include "../../../ProtonixSensor.h"
@@ -21,7 +21,7 @@ void Profile::Axion::DTO::DTORequestDeviceData::AxionDTOPopulate (Profile::Axion
 	(void)dto;
 }
 
-void Profile::Axion::DTO::DTORequestDeviceData::AxionDTOSerialize (JsonDocument& dto) {
+/*void Profile::Axion::DTO::DTORequestDeviceData::AxionDTOSerialize (JsonDocument& dto) {
 	bool first = this->_first;
 	if (first) this->_first = false;
 
@@ -69,14 +69,14 @@ void Profile::Axion::DTO::DTORequestDeviceData::AxionDTOSerialize (JsonDocument&
 			hwItem["id"] = hw->HardwareID();
 			hwItem["summary"] = hw->HardwareSummary();
 
-			JsonArray config_out = hwItem["config"].to<JsonArray>();
+			/*JsonArray config_out = hwItem["config"].to<JsonArray>();
 			Map &config = hw->HardwareConfig();
 			for (Map::Entry* entry : config) {
 				JsonObject configItem = config_out.add<JsonObject>();
 
 				configItem["key"] = entry->Key;
 				//configItem["value"] = entry->Value;//.ToString();
-			}
+			}*
 
 			JsonArray capabilities_out = hwItem["capabilities"].to<JsonArray>();
 			List<ProtonixHardwareCapability*> &capabilities = hw->HardwareCapabilities();
@@ -93,4 +93,4 @@ void Profile::Axion::DTO::DTORequestDeviceData::AxionDTOSerialize (JsonDocument&
 
 	dto["data"]["registry"] = String(this->_device->Registry()->Raw());
 	#endif
-}
+}*/

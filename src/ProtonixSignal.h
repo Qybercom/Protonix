@@ -10,7 +10,8 @@ namespace Qybercom {
 			private:
 				String _id;
 				String _from;
-				Any _value;
+				//Any _value;
+				Bucket _data;
 
 			public:
 				ProtonixSignal (String id);
@@ -25,7 +26,7 @@ namespace Qybercom {
 				bool Is (String id);
 				bool Is (String from, String id);
 
-				Any Value ();
+				/*Any Value ();
 				template<typename T>
 			 	T ValueAs (T fallback) {
 			 		return this->_value.As<T>(fallback);
@@ -38,7 +39,9 @@ namespace Qybercom {
 				template<typename T>
 				ProtonixSignal* Value (const T& value) {
 					return this->Value(Any(value));
-				}
+				}*/
+				ProtonixSignal* Data (Bucket data);
+				Bucket &Data ();
 
 				~ProtonixSignal ();
 		};

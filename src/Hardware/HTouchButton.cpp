@@ -8,8 +8,8 @@
 using namespace Qybercom::Protonix;
 
 void Hardware::HTouchButton::_signal (Protonix* device) {
-	device->Signal(this->_id, "changed")->Value(this->_active);
-	device->Signal(this->_id, String(this->_active ? "touch" : "release"));
+	//device->Signal(this->_id, "changed")->Value(this->_active);
+	//device->Signal(this->_id, String(this->_active ? "touch" : "release"));
 }
 
 Hardware::HTouchButton::HTouchButton (unsigned short pin) {

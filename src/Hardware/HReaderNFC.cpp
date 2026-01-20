@@ -16,13 +16,13 @@ void Hardware::HReaderNFC::_signal (Protonix* device, String value) {
 
 	String current = this->_uuid;
 
-	device->Signal(this->_id, "uuidChanged")->Value(value);
+	//device->Signal(this->_id, "uuidChanged")->Value(value);
 
-	if (current == "" && value != "")
-		device->Signal(this->_id, "tagIn")->Value(value);
+	/*if (current == "" && value != "")
+		device->Signal(this->_id, "tagIn")->Value(value);*/
 
-	if (current != "" && value == "")
-		device->Signal(this->_id, "tagOut");
+	/*if (current != "" && value == "")
+		device->Signal(this->_id, "tagOut");*/
 }
 
 void Hardware::HReaderNFC::_channel (unsigned short channel) {

@@ -22,8 +22,8 @@ bool Hardware::HSelector3P::_changedPipe () {
 }
 
 void Hardware::HSelector3P::_signal (Protonix* device, short value) {
-	if (this->_allowSignal)
-		device->Signal(this->_id, "changed")->Value(value);
+	/*if (this->_allowSignal)
+		device->Signal(this->_id, "changed")->Value(value);*/
 }
 
 Hardware::HSelector3P::HSelector3P (unsigned short pin1, unsigned short pin2, unsigned int checkInterval) {

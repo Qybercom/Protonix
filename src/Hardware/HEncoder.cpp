@@ -12,13 +12,13 @@
 using namespace Qybercom::Protonix;
 
 void Hardware::HEncoder::_signal (Protonix* device) {
-	if (this->_allowSignal)
+	/*if (this->_allowSignal)
 		device->Signal(this->_id, "dir")->Value(
 			Hardware::HEncoderState(
 				this->_dir,
 				this->_button != nullptr && this->_button->Active()
 			)
-		);
+		);*/
 }
 
 Hardware::HEncoder::HEncoder (unsigned short pinA, unsigned short pinB, unsigned int checkInterval) {
@@ -113,9 +113,9 @@ void Hardware::HEncoder::HardwareInitPre (Protonix* device) {
 	device->InterruptAttach(this->_pinB, CHANGE);
 
 	if (this->_button != nullptr) {
-		this->_button->HardwareConfig("signal:Changed", String("buttonChanged"));
+		/*this->_button->HardwareConfig("signal:Changed", String("buttonChanged"));
 		this->_button->HardwareConfig("signal:Pressed", String("buttonPressed"));
-		this->_button->HardwareConfig("signal:Released", String("buttonReleased"));
+		this->_button->HardwareConfig("signal:Released", String("buttonReleased"));*/
 
 		this->_button->HardwareID(this->_id);
 		this->_button->HardwareAllowSignal(this->_allowSignal);

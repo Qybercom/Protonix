@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <ArduinoJson.h>
+//#include <ArduinoJson.h>
 
 #include "../IAxionDTO.h"
 #include "../AxionDTO.h"
@@ -14,7 +14,7 @@ namespace Qybercom {
 					class DTOResponseAuthorization : public IAxionDTOResponse {
 						public:
 							void AxionDTOPopulate (AxionDTO* dto);
-							void AxionDTOSerialize (JsonDocument& dto);
+							//void AxionDTOSerialize (JsonDocument& dto);
 					};
 				}
 			}

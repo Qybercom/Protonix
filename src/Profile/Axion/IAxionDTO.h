@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <ArduinoJson.h>
+//#include <ArduinoJson.h>
 
 namespace Qybercom {
 	namespace Protonix {
@@ -12,7 +12,7 @@ namespace Qybercom {
 				class IAxionDTO {
 					public:
 						virtual void AxionDTOPopulate (AxionDTO* dto) = 0;
-						virtual void AxionDTOSerialize (JsonDocument& dto) = 0;
+						//virtual void AxionDTOSerialize (JsonDocument& dto) = 0;
 
 						virtual ~IAxionDTO () { };
 				};

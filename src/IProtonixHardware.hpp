@@ -19,7 +19,7 @@ namespace Qybercom {
 				short _dedicatedCore = -1;
 				IProtonixBridge* _bridge;
 				List<ProtonixHardwareCapability*> _capabilities;
-				Map _config;
+				//Map _config;
 
 				ProtonixHardwareCapability* _capability (String kind, String id, String comment) {
 					for (ProtonixHardwareCapability* capability : this->_capabilities)
@@ -89,7 +89,7 @@ namespace Qybercom {
 					return this->_capabilities;
 				}
 
-				Map &HardwareConfig () {
+				/*Map &HardwareConfig () {
 					return this->_config;
 				}
 
@@ -102,7 +102,7 @@ namespace Qybercom {
 
 				virtual void HardwareConfigInit () { }
 				virtual void HardwareConfigGet (String key, Any value) { }
-				virtual void HardwareConfigSet (String key, Any value) { }
+				virtual void HardwareConfigSet (String key, Any value) { }*/
 
 				virtual String HardwareSummary () { return ""; }
 

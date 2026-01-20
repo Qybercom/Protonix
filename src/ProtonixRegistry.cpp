@@ -1,6 +1,10 @@
 #include <Arduino.h>
 
 #include "_platforms.h"
+
+#include "Common/index.h"
+
+#include "Protonix.h"
 #include "ProtonixRegistry.h"
 #include "ProtonixMemory.h"
 
@@ -8,9 +12,14 @@ using namespace Qybercom::Protonix;
 
 ProtonixRegistry::ProtonixRegistry (ProtonixMemory* memory) {
 	this->_memory = memory;
-	this->_bufferRaw = "";
-	this->_bufferLoaded = false;
+	this->_format = Protonix::Instance()->Format("application/json");
+	this->_raw = "";
+	this->_loaded = false;
 	this->_debug = false;
+}
+
+Qybercom::Bucket &ProtonixRegistry::Data () {
+	return this->_data;
 }
 
 ProtonixRegistry* ProtonixRegistry::Debug (bool debug) {
@@ -23,13 +32,13 @@ bool ProtonixRegistry::Debug () {
 	return this->_debug;
 }
 
-bool ProtonixRegistry::_bufferLoad () {
-	if (this->_bufferLoaded) {
+bool ProtonixRegistry::_load () {
+	if (this->_loaded) return true;/*{
 		if (this->_debug)
-			Serial.println("[registry:eeprom] Loaded: `" + this->_bufferRaw + "`");
+			Serial.println("[registry:eeprom] Loaded: `" + this->_buffer + "`");//Raw + "`");
 
 		return true;
-	}
+	}*/
 
 	const unsigned int size = QYBERCOM_PROTONIX_MEMORY_EEPROM_SIZE - QYBERCOM_PROTONIX_REGISTRY_START;
 
@@ -37,35 +46,40 @@ bool ProtonixRegistry::_bufferLoad () {
 
 	this->_memory->EEPROMGet(QYBERCOM_PROTONIX_REGISTRY_START, raw);
 
-	String rawS = String(raw);
-	rawS.trim();
+	this->_raw = String(raw);
+	this->_raw.trim();
 
 	if (this->_debug)
-		Serial.println("[registry:eeprom] Ready: `" + rawS + "`");
+		Serial.println("[registry:eeprom] Ready: `" + this->_raw + "`");
 
-	DeserializationError err = deserializeJson(this->_buffer, rawS);
+	this->_data = Qybercom::Bucket::Deserialize(this->_format, this->_raw);
 
+	if (this->_debug || true)
+		this->_data.Dump();
+	/*DeserializationError err = deserializeJson(this->_buffer, rawS);
+	bool err = false;//
 	if (err) {
-		Serial.println("[registry:eeprom] Load: JSON deserialize error: " + String(err.f_str()));
+		Serial.println("[registry:eeprom] Load: JSON deserialize error: ");// + String(err.f_str()));
 
-		this->_bufferRaw = "{}";
-		deserializeJson(this->_buffer, this->_bufferRaw);
+		this->_buffer = "{}";//Raw = "{}";
+		//deserializeJson(this->_buffer, this->_bufferRaw);
 	}
 	else {
-		if (serializeJson(this->_buffer, this->_bufferRaw) == 0) {
+		/*if (serializeJson(this->_buffer, this->_bufferRaw) == 0) {
 			Serial.println("[registry:eeprom] Load: JSON serialize error");
 
 			return false;
-		}
-	}
+		}*
 
-	this->_bufferObj = this->_buffer.as<JsonObject>();
-	this->_bufferLoaded = true;
+	}*/
+
+	//this->_bufferObj = this->_buffer.as<JsonObject>();
+	this->_loaded = true;
 
 	return true;
 }
 
-String ProtonixRegistry::_tuple (String key, bool min) {
+/*String ProtonixRegistry::_tuple (String key, bool min) {
 	String value = this->GetRaw(key, "");
 	String out = "";
 	bool delimeter = false;
@@ -86,13 +100,13 @@ String ProtonixRegistry::_tuple (String key, bool min) {
 	}
 
 	return out;
+};*/
+
+String &ProtonixRegistry::Raw () {
+	return this->_raw;
 }
 
-String ProtonixRegistry::Raw () {
-	return this->_bufferRaw;
-}
-
-String ProtonixRegistry::GetRaw (String key, String defaultValue) {
+/*String ProtonixRegistry::GetRaw (String key, String defaultValue) {
 	if (!this->_bufferLoad()) return defaultValue;
 
 	String value = this->_bufferObj[key].as<String>();
@@ -258,22 +272,23 @@ bool ProtonixRegistry::SetList (String key, ProtonixRegistryList &list, bool com
 	}
 
 	return this->SetRaw(key, String(raw), commit);
-}
+}*/
 
 bool ProtonixRegistry::Commit () {
-	if (serializeJson(this->_buffer, this->_bufferRaw) == 0) {
+	/*if (serializeJson(this->_buffer, this->_bufferRaw) == 0) {
 		Serial.println("[registry:eeprom] Commit: JSON serialize error");
 
 		return false;
-	}
+	}*/
+	this->_raw = this->_data.Serialize(this->_format);
 
 	const unsigned int size = QYBERCOM_PROTONIX_MEMORY_EEPROM_SIZE - QYBERCOM_PROTONIX_REGISTRY_START;
-	unsigned int sizeActual = this->_bufferRaw.length();
+	unsigned int sizeActual = this->_raw.length();//Raw.length();
 	char raw[size];
 	unsigned int i = 0;
 
 	while (i < size) {
-		raw[i] = i < sizeActual ? this->_bufferRaw[i] : ' ';
+		raw[i] = i < sizeActual ? this->_raw[i] : ' ';//Raw[i] : ' ';
 
 		i++;
 	}

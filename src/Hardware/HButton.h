@@ -41,7 +41,7 @@ namespace Qybercom {
 					bool Pressed (bool changed = true);
 					bool Released (bool changed = true);
 
-					void HardwareConfigSet (String key, Any value);
+					//void HardwareConfigSet (String key, Any value);
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					bool HardwareI2C ();

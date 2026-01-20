@@ -5,6 +5,14 @@
 #include "Raw.hpp"
 
 namespace Qybercom {
+	class IValue {
+		public:
+			virtual void ValueDeserialize (const String &raw) = 0;
+			virtual String ValueSerialize () const = 0;
+
+			virtual ~IValue () {}
+	};
+
 	class Value {
 		public:
 			enum TYPE {
@@ -41,6 +49,13 @@ namespace Qybercom {
 			Value (const char* v);
 			Value (const String &v);
 			Value (const Raw &v);
+			template<typename T>
+			Value (const T &value) {
+				IValue *check = static_cast<IValue*>(const_cast<T*>(&value));
+				(void)check;
+
+				_v_string = value.ValueSerialize();
+			}
 
 			Value &Set (decltype(nullptr) v);
 			Value &Set (bool v);
@@ -60,6 +75,15 @@ namespace Qybercom {
 			Value &operator= (const char* v);
 			Value &operator= (const String &v);
 			Value &operator= (const Raw &v);
+			template<typename T>
+			Value &operator= (const T &value) {
+				IValue *check = static_cast<IValue*>(const_cast<T*>(&value));
+				(void)check;
+
+				_v_string = value.ValueSerialize();
+
+				return *this;
+			}
 
 			operator bool () const;
 			operator int () const;
@@ -85,6 +109,18 @@ namespace Qybercom {
 			bool IsRaw () const;
 
 			bool IsNumeric () const;
+
+			template<typename T>
+			T As () const {
+				IValue *check = static_cast<T*>(nullptr);
+				(void)check;
+
+				T value;
+
+				value.ValueDeserialize(_v_string);
+
+				return value;
+			}
 
 			bool operator== (const Value &other) const;
 			bool operator!= (const Value &other) const;

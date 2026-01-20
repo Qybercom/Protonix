@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <ArduinoJson.h>
+//#include <ArduinoJson.h>
 
 #include "../AxionDTO.h"
 #include "DTOEventCommand.h"
@@ -15,12 +15,12 @@ String Profile::Axion::DTO::DTOEventCommand::Command () {
 }
 
 void Profile::Axion::DTO::DTOEventCommand::AxionDTOPopulate (Profile::Axion::AxionDTO* dto) {
-	JsonObject data = dto->Data();
+	/*JsonObject data = dto->Data();
 
 	if (data["command"].is<const char*>())
-		this->Command(data["command"]);
+		this->Command(data["command"]);*/
 }
 
-void Profile::Axion::DTO::DTOEventCommand::AxionDTOSerialize (JsonDocument& dto) {
+/*void Profile::Axion::DTO::DTOEventCommand::AxionDTOSerialize (JsonDocument& dto) {
 	dto["data"]["command"] = this->_command;
-}
+}*/

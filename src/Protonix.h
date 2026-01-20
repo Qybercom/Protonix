@@ -50,6 +50,8 @@ namespace Qybercom {
 				List<IProtonixNetworkDriver*> _networks;
 				IProtonixNetworkDriver* _networkDefault;
 
+				List<Qybercom::IBucketFormat*> _formats;
+
 				List<ProtonixSignal*> _signals;
 
 				List<ProtonixAction*> _actions;
@@ -142,6 +144,9 @@ namespace Qybercom {
 				IProtonixNetworkDriver* Network (String name);
 				IProtonixNetworkDriver* NetworkDefault ();
 				IProtonixNetworkDriver* NetworkDefault (String name);
+
+				List<Qybercom::IBucketFormat*> &Formats ();
+				Qybercom::IBucketFormat* Format (String mime);
 
 				List<ProtonixSignal*> &Signals ();
 				Protonix* Signal (ProtonixSignal* signal);

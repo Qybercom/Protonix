@@ -55,7 +55,7 @@ namespace Qybercom {
 
 					bool OutputValue (unsigned short value);
 
-					void HardwareConfigSet (String key, Any value);
+					//void HardwareConfigSet (String key, Any value);
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					bool HardwareI2C ();

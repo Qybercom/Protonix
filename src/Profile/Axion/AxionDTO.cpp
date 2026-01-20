@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <ArduinoJson.h>
+//#include <ArduinoJson.h>
 
 #include "IAxionDTO.h"
 
@@ -47,13 +47,13 @@ Profile::Axion::IAxionDTO* Profile::Axion::AxionDTO::DTO () {
 	return this->_dto;
 }
 
-void Profile::Axion::AxionDTO::Data (JsonObject data) {
+/*void Profile::Axion::AxionDTO::Data (JsonObject data) {
 	this->_data = data;
 }
 
 JsonObject Profile::Axion::AxionDTO::Data () {
 	return this->_data;
-}
+}*/
 
 bool Profile::Axion::AxionDTO::IsURL () {
 	return this->_url.length() != 0;
@@ -68,7 +68,7 @@ bool Profile::Axion::AxionDTO::IsEvent () {
 }
 
 bool Profile::Axion::AxionDTO::Serialize () {
-	if (this->IsURL())
+	/*if (this->IsURL())
 		this->_buffer["url"] = this->_url;
 
 	if (this->IsResponse())
@@ -77,15 +77,16 @@ bool Profile::Axion::AxionDTO::Serialize () {
 	if (this->IsEvent())
 		this->_buffer["event"] = this->_event;
 
-	this->_dto->AxionDTOSerialize(this->_buffer);
+	this->_dto->AxionDTOSerialize(this->_buffer);*/
 
-	bool ok = serializeJson(this->_buffer, this->_bufferRaw) != 0;
+	/*bool ok = serializeJson(this->_buffer, this->_bufferRaw) != 0;
 
-	return ok;
+	return ok;*/
+	return true;
 }
 
 bool Profile::Axion::AxionDTO::Deserialize () {
-	DeserializationError err = deserializeJson(this->_buffer, this->_bufferRaw);
+	/*DeserializationError err = deserializeJson(this->_buffer, this->_bufferRaw);
 
 	if (err) {
 		Serial.println("[AxionDTO] JSON deserialize error: " + String(err.f_str()));
@@ -104,7 +105,7 @@ bool Profile::Axion::AxionDTO::Deserialize () {
 	if (u) this->_url = (String) u;
 	if (r) this->_response = (String) r;
 	if (e) this->_event = (String) e;
-	if (d) this->_data = d;
+	if (d) this->_data = d;*/
 
 	return true;
 }
@@ -122,6 +123,6 @@ void Profile::Axion::AxionDTO::Reset () {
 	this->_response = "";
 	this->_event = "";
 
-	this->_buffer.clear();
+	//this->_buffer.clear();
 	this->_bufferRaw = "";
 }

@@ -90,6 +90,11 @@ namespace Qybercom {
 			Bucket &operator= (const String &v);
 			Bucket &operator= (const Qybercom::Value &v);
 			Bucket &operator= (const Bucket &other);
+			template<typename T>
+			Bucket &operator= (const T &value) {
+				return _bucketValue(TYPE::VALUE, new Qybercom::Value(value));
+			}
+
 			Bucket &operator[] (const String &key);
 			Bucket &operator[] (const char* key);
 			Bucket &operator[] (int index);

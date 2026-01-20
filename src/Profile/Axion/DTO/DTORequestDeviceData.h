@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <ArduinoJson.h>
+//#include <ArduinoJson.h>
 
 #include "../IAxionDTO.h"
 #include "../AxionDTO.h"
@@ -24,7 +24,7 @@ namespace Qybercom {
 							DTORequestDeviceData (Protonix* device, bool includeMemory = false, bool includeHardware = false, bool first = true);
 
 							void AxionDTOPopulate (AxionDTO* dto);
-							void AxionDTOSerialize (JsonDocument& dto);
+							//void AxionDTOSerialize (JsonDocument& dto);
 					};
 				}
 			}

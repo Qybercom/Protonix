@@ -45,12 +45,12 @@ bool ProtonixSignal::Is (String from, String id) {
 	return this->_id == id && this->_from == from;
 }
 
-Any ProtonixSignal::Value () {
-	return this->_value;
+Bucket &ProtonixSignal::Data () {
+	return this->_data;
 }
 
-ProtonixSignal* ProtonixSignal::Value (Any value) {
-	this->_value = value;
+ProtonixSignal* ProtonixSignal::Data (Bucket data) {
+	this->_data = data;
 
 	return this;
 }

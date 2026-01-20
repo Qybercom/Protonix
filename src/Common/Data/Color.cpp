@@ -11,14 +11,7 @@ Color::Color (short r, short g, short b, float a) {
 	A = a;
 }
 
-String Color::Serialize () {
-	return String(R)
-		+ "," + String(G)
-		+ "," + String(B)
-		+ "," + String(A);
-}
-
-Color Color::Deserialize (String &raw) {
+void Color::ValueDeserialize (const String &raw) {
 	int i = 0;
 	int length = raw.length();
 	String clr[4] = {"", "", "", ""};
@@ -36,10 +29,15 @@ Color Color::Deserialize (String &raw) {
 		i++;
 	}
 
-	return Color(
-		clr[0].toInt(),
-		clr[1].toInt(),
-		clr[2].toInt(),
-		clr[4].toFloat()
-	);
+	R = clr[0].toInt();
+	G = clr[1].toInt();
+	B = clr[2].toInt();
+	A = clr[4].toFloat();
+}
+
+String Color::ValueSerialize () const {
+	return String(R)
+		+ "," + String(G)
+		+ "," + String(B)
+		+ "," + String(A);
 }

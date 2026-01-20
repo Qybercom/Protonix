@@ -10,12 +10,12 @@
 using namespace Qybercom::Protonix;
 
 void Hardware::HButton::_signal (Protonix* device) {
-	String signalChanged = this->_config.Get<String>("signal:Changed", "");
+	String signalChanged = "";//this->_config.Get<String>("signal:Changed", "");
 	if (!this->_allowSignal || !device->SignalSpawned(this->_id, signalChanged)) return;
 
 	bool active = this->_trigger->InputValue();
-	String signalPressed = this->_config.Get<String>("signal:Pressed", "");
-	String signalReleased = this->_config.Get<String>("signal:Released", "");
+	String signalPressed = "";//this->_config.Get<String>("signal:Pressed", "");
+	String signalReleased = "";//this->_config.Get<String>("signal:Released", "");
 
 	device->Signal(this->_id, String(active ? signalPressed : signalReleased));
 
@@ -25,13 +25,14 @@ void Hardware::HButton::_signal (Protonix* device) {
 Hardware::HButton::HButton (unsigned short pin) {
 	this->_trigger = Hardware::HTrigger::Input(pin);
 
-	this->_config
+	/*this->_config
 		.Set("signal:Changed", String("changed"))
 		.Set("signal:Pressed", String("pressed"))
-		.Set("signal:Released", String("released"));
-	/*this->_signalChanged = "changed";
-	this->_signalPressed = "pressed";
-	this->_signalReleased = "released";*/
+		.Set("signal:Released", String("released"));*/
+
+	//this->_signalChanged = "changed";
+	//this->_signalPressed = "pressed";
+	//this->_signalReleased = "released";
 }
 
 Hardware::HButton* Hardware::HButton::Init (unsigned short pin) {
@@ -88,9 +89,9 @@ bool Hardware::HButton::Released (bool changed) {
 	return (changed ? this->Changed() : true) && !this->_trigger->InputValue();
 }
 
-void Hardware::HButton::HardwareConfigSet (String key, Any value) {
+/*void Hardware::HButton::HardwareConfigSet (String key, Any value) {
 	//this->_trigger->HardwareConfig()->Set(key, value);
-}
+}*/
 
 String Hardware::HButton::HardwareSummary () {
 	return "Button";

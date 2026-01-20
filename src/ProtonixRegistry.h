@@ -1,13 +1,15 @@
 #pragma once
 
 #include <Arduino.h>
-#include <ArduinoJson.h>
+//#include <ArduinoJson.h>
+
+#include "Common/index.h"
 
 #include "ProtonixMemory.h"
 
 namespace Qybercom {
 	namespace Protonix {
-		struct ProtonixRegistryColor {
+		/*struct ProtonixRegistryColor {
 			int r;
 			int g;
 			int b;
@@ -15,22 +17,26 @@ namespace Qybercom {
 
 		struct ProtonixRegistryList {
 			String items[20];
-		};
+		};*/
 
 		class ProtonixRegistry {
 			private:
 				ProtonixMemory* _memory;
-				JsonDocument _buffer;
-				String _bufferRaw;
-				JsonObject _bufferObj;
-				bool _bufferLoaded;
+				Qybercom::IBucketFormat* _format;
+				Qybercom::Bucket _data;
+				String _raw;
+				bool _loaded;
 				bool _debug;
 
-				bool _bufferLoad ();
-				String _tuple (String key, bool min);
+				bool _load ();
+				/*JsonDocument _buffer;
+				String _bufferRaw;
+				JsonObject _bufferObj;*/
+				//String _buffer;
+				//String _tuple (String key, bool min);
 
 			public:
-				enum class ValueType {
+				/*enum class ValueType {
 					BOOLEAN,
 					INTEGER,
 					FLOAT,
@@ -38,16 +44,18 @@ namespace Qybercom {
 					COLOR,
 					INTEGER_INTERVAL,
 					FLOAT_INTERVAL
-				};
+				};*/
 
 				ProtonixRegistry (ProtonixMemory* memory);
+
+				Qybercom::Bucket &Data ();
 
 				ProtonixRegistry* Debug (bool debug);
 				bool Debug ();
 
-				String Raw ();
+				String &Raw ();
 
-				String GetRaw (String key, String defaultValue = "");
+				/*String GetRaw (String key, String defaultValue = "");
 				bool SetRaw (String key, String value, bool commit);
 
 				int GetInt (String key, int defaultValue = 0);
@@ -70,7 +78,7 @@ namespace Qybercom {
 				int GetIntervalMin (String key, int defaultValue = 0);
 				int GetIntervalMax (String key, int defaultValue = 0);
 				float GetIntervalMin_f (String key, float defaultValue = 0.0);
-				float GetIntervalMax_f (String key, float defaultValue = 0.0);
+				float GetIntervalMax_f (String key, float defaultValue = 0.0);*/
 
 				bool Commit ();
 		};

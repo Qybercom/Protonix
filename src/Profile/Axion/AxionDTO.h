@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <ArduinoJson.h>
+//#include <ArduinoJson.h>
 
 #include "IAxionDTO.h"
 
@@ -15,11 +15,11 @@ namespace Qybercom {
 						String _response;
 						String _event;
 						IAxionDTO* _dto;
-						JsonObject _data;
-						JsonDocument _buffer;
+						//JsonObject _data;
+						//JsonDocument _buffer;
 						bool _bufferInit;
 						String _bufferRaw;
-						JsonObject _bufferObj;
+						//JsonObject _bufferObj;
 
 					public:
 						AxionDTO ();
@@ -36,8 +36,8 @@ namespace Qybercom {
 						void DTO (IAxionDTO* dto);
 						IAxionDTO* DTO ();
 
-						void Data (JsonObject data);
-						JsonObject Data ();
+						/*void Data (JsonObject data);
+						JsonObject Data ();*/
 
 						bool IsURL ();
 						bool IsResponse ();

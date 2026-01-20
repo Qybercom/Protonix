@@ -44,6 +44,8 @@ Protonix::Protonix (IProtonixDevice* device, IProtonixProfile* profile) {
 
 	this->Debug(false);
 
+	this->_formats.Add(new Qybercom::Formats::FormatJSON());
+
 	this->_memory = new ProtonixMemory();
 	this->_memory->EEPROMBegin();
 	this->_registry = new ProtonixRegistry(this->_memory);
@@ -593,6 +595,19 @@ IProtonixNetworkDriver* Protonix::NetworkDefault (String name) {
 		this->_networkDefault = network;
 
 	return network;
+}
+
+
+
+List<Qybercom::IBucketFormat*> &Protonix::Formats () {
+	return this->_formats;
+}
+
+Qybercom::IBucketFormat* Protonix::Format (String mime) {
+	for (Qybercom::IBucketFormat* format : this->_formats)
+		if (format->BucketFormatMIME() == mime) return format;
+
+	return nullptr;
 }
 
 

@@ -63,7 +63,7 @@ void IProtonixDevice::DeviceHandleStdCommand (Protonix* device, IProtonixCommand
 	if (name == "std:registry") {
 		Command::CStdRegistry* cmd = (Command::CStdRegistry*)command;
 
-		device->Registry()->SetRaw(cmd->Key(), cmd->Value(), true);
+		//device->Registry()->SetRaw(cmd->Key(), cmd->Value(), true);
 	}
 
 	if (name == "std:sensor") {

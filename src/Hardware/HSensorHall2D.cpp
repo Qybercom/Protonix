@@ -11,8 +11,8 @@ using namespace Qybercom;
 using namespace Qybercom::Protonix;
 
 void Hardware::HSensorHall2D::_signal (Protonix* device) {
-	if (this->_allowSignal)
-		device->Signal(this->_id, "angle")->Value(this->_value);
+	/*if (this->_allowSignal)
+		device->Signal(this->_id, "angle")->Value(this->_value);*/
 }
 
 Hardware::HSensorHall2D::HSensorHall2D (unsigned short pinX, unsigned short pinY, int maxX, int maxY, int minX, int minY) {

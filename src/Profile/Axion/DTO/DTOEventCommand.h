@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <ArduinoJson.h>
+//#include <ArduinoJson.h>
 
 #include "../IAxionDTO.h"
 #include "../AxionDTO.h"
@@ -20,7 +20,7 @@ namespace Qybercom {
 							String Command ();
 
 							void AxionDTOPopulate (AxionDTO* dto);
-							void AxionDTOSerialize (JsonDocument& dto);
+							//void AxionDTOSerialize (JsonDocument& dto);
 					};
 				}
 			}

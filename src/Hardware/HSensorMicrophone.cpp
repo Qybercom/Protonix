@@ -8,8 +8,8 @@
 using namespace Qybercom::Protonix;
 
 void Hardware::HSensorMicrophone::_signal (Protonix* device) {
-	if (this->_allowSignal)
-		device->Signal(this->_id, "active")->Value(this->_active);
+	/*if (this->_allowSignal)
+		device->Signal(this->_id, "active")->Value(this->_active);*/
 }
 
 Hardware::HSensorMicrophone::HSensorMicrophone (unsigned short pin) {

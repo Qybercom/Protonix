@@ -26,10 +26,10 @@ bool Hardware::HTrigger::_inputChangedHandler () {
 bool Hardware::HTrigger::_pipe () {
 	if (!this->_init) return false;
 
-	String mode = this->_config.Get<String>("mode", "");
+	String mode = "";//this->_config.Get<String>("mode", "");
 	if (mode != "input") return false;
 
-	unsigned short pin = this->_config.Get<unsigned short>("pin", 0);
+	unsigned short pin = 0;//this->_config.Get<unsigned short>("pin", 0);
 	bool value = this->_bridge->BridgeDigitalRead(pin);
 	value = this->_debouncer->Value(value);
 
@@ -45,13 +45,13 @@ bool Hardware::HTrigger::_pipe () {
 }
 
 void Hardware::HTrigger::_signal (Protonix* device) {
-	String mode = this->_config.Get<String>("mode", "");
+	/*String mode = this->_config.Get<String>("mode", "");
 
 	if (mode == "input") {
 		String signal = this->_config.Get<String>("signal:InputChanged", "");
 
 		device->Signal(this->_id, signal)->Value(this->_inputValue);
-	}
+	}*/
 }
 
 Hardware::HTrigger::HTrigger (String mode, unsigned short pin) {
@@ -62,13 +62,13 @@ Hardware::HTrigger::HTrigger (String mode, unsigned short pin) {
 
 	this->_debouncer = new Qybercom::Debouncer<bool>(false);
 
-	this->_config
+	/*this->_config
 		.Set("mode", mode)
 		.Set("pin", pin)
 		.Set("debounce", 0)
 		.Set("initial", true)
 		.Set("interrupt", false)
-		.Set("signal:InputChanged", String("inputChanged"));
+		.Set("signal:InputChanged", String("inputChanged"));*/
 
 	//this->_interrupt = interrupt;
 	//this->_pin = pin;
@@ -146,13 +146,13 @@ bool Hardware::HTrigger::InputValue () {
 
 bool Hardware::HTrigger::OutputValue (unsigned short value) {
 	Serial.println("[debug] trigger:OutputValue:1");
-	String mode = this->_config.Get<String>("mode", "");
+	String mode = "";//this->_config.Get<String>("mode", "");
 	Serial.println("[debug] trigger:OutputValue:2");
 	if (mode != "output") return false;
 
 	this->_log("OutputValue " + String(value));
 
-	unsigned short pin = this->_config.Get<unsigned short>("pin", 0);
+	unsigned short pin = 0;//this->_config.Get<unsigned short>("pin", 0);
 
 	this->_bridge->BridgeDigitalWrite(pin, value);
 
@@ -161,13 +161,13 @@ bool Hardware::HTrigger::OutputValue (unsigned short value) {
 	return true;
 }
 
-void Hardware::HTrigger::HardwareConfigSet (String key, Any value) {
+/*void Hardware::HTrigger::HardwareConfigSet (String key, Any value) {
 	if (key == "debounce")
 		this->_debouncer->Threshold(value.As<unsigned int>(0));
-}
+}*/
 
 String Hardware::HTrigger::HardwareSummary () {
-	return "Trigger " + this->_config.Get<String>("mode", "");
+	return "Trigger ";//this->_config.Get<String>("mode", "");
 }
 
 void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
@@ -182,14 +182,14 @@ bool Hardware::HTrigger::HardwareSPI () {
 }
 
 void Hardware::HTrigger::HardwareInitPost (Protonix* device) {
-	unsigned short pin = this->_config.Get<unsigned short>("pin", 0);
-	String mode = this->_config.Get<String>("mode", "");
+	unsigned short pin = 0;//this->_config.Get<unsigned short>("pin", 0);
+	String mode = "";//this->_config.Get<String>("mode", "");
 
 	if (mode == "input") {
-		this->_bridge->BridgePinInitInputUp(pin, this->_config.Get<bool>("initial", true));
+		this->_bridge->BridgePinInitInputUp(pin, 0);//this->_config.Get<bool>("initial", true));
 
-		if (this->_config.Get<bool>("interrupt", false))
-			device->InterruptAttach(pin, CHANGE);
+		/*if (this->_config.Get<bool>("interrupt", false))
+			device->InterruptAttach(pin, CHANGE);*/
 
 		this->_capability("value", "active:bool", "State of the trigger");
 	}
@@ -209,8 +209,8 @@ void Hardware::HTrigger::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
 
-	if (!this->_config.Get<bool>("interrupt", false))
-		this->_pipe();
+	/*if (!this->_config.Get<bool>("interrupt", false))
+		this->_pipe();*/
 
 	if (this->_inputChangedHandler())
 		this->_signal(device);
@@ -219,13 +219,14 @@ void Hardware::HTrigger::HardwarePipe (Protonix* device, short core) {
 void Hardware::HTrigger::HardwarePipeInterrupt (Protonix* device) {
 	(void)device;
 
-	if (!this->_config.Get<bool>("interrupt", false)) return;
+	//if (!this->_config.Get<bool>("interrupt", false)) return;
+	return;
 
 	this->_pipe();
 }
 
 void Hardware::HTrigger::HardwareOnReset (Protonix* device) {
-	String mode = this->_config.Get<String>("mode", "");
+	String mode = "";//this->_config.Get<String>("mode", "");
 
 	if (mode == "input")
 		this->_signal(device);
