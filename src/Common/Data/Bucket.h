@@ -14,6 +14,7 @@ namespace Qybercom {
 			virtual String BucketFormatMIME ();
 			virtual String BucketFormatSerialize (Bucket &bucket) = 0;
 			virtual Bucket BucketFormatDeserialize (const String &raw) = 0;
+			//virtual Bucket BucketFormatDeserialize (const char* raw) = 0;
 	};
 
 	class Bucket {
@@ -27,11 +28,21 @@ namespace Qybercom {
 
 			struct Entry {
 				String Key;
+				//const char* Key;
 				Bucket* Value;
 
 				Entry ();
 				Entry (const String &k);
 				Entry (const String &k, Bucket* v);
+				//Entry (const char* k);
+				//Entry (const char* k, Bucket* v);
+
+				~Entry () {
+					/*if (Value != nullptr) {
+						delete Value;
+						Value = nullptr;
+					}*/
+				}
 			};
 
 			class Iterator {
@@ -49,6 +60,7 @@ namespace Qybercom {
 		private:
 			TYPE _type;
 			const String* _key;
+			//const char* _key;
 			bool _end;
 
 			Qybercom::Value* _value;
@@ -58,8 +70,10 @@ namespace Qybercom {
 			Bucket (TYPE type, Value* v = nullptr);
 			void _clear ();
 			Bucket* _bucket (const String &key);
+			//Bucket* _bucket (const char* key);
 			Bucket &_bucketValue (TYPE t, Value* v);
 			Bucket &_associate (const String &key);
+			//Bucket &_associate (const char* key);
 
 		public:
 			Bucket ();
@@ -74,7 +88,9 @@ namespace Qybercom {
 
 			void Add (const Bucket &value);
 			bool HasKey () const;
+			bool HasKey (String key) const;
 			const String Key () const;
+			//const char* Key () const;
 			bool End () const;
 
 			Iterator begin ();
@@ -82,8 +98,12 @@ namespace Qybercom {
 
 			Bucket &operator= (decltype(nullptr) v);
 			Bucket &operator= (bool v);
+			Bucket &operator= (short v);
+			Bucket &operator= (unsigned short v);
 			Bucket &operator= (int v);
+			Bucket &operator= (unsigned int v);
 			Bucket &operator= (long v);
+			Bucket &operator= (unsigned long v);
 			Bucket &operator= (float v);
 			Bucket &operator= (double v);
 			Bucket &operator= (const char* v);
@@ -100,8 +120,12 @@ namespace Qybercom {
 			Bucket &operator[] (int index);
 		
 			operator bool () const;
+			operator short () const;
+			operator unsigned short () const;
 			operator int () const;
+			operator unsigned int () const;
 			operator long () const;
+			operator unsigned long () const;
 			operator float () const;
 			operator double () const;
 			operator String () const;

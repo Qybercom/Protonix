@@ -12,11 +12,13 @@ Bucket::Entry::Entry () {
 }
 
 Bucket::Entry::Entry (const String &k) {
+//Bucket::Entry::Entry (const char* k) {
 	Bucket::Entry::Key = k;
 	Bucket::Entry::Value = nullptr;
 }
 
 Bucket::Entry::Entry (const String &k, Bucket* v) {
+//Bucket::Entry::Entry (const char* k, Bucket* v) {
 	Bucket::Entry::Key = k;
 	Bucket::Entry::Value = v;
 }
@@ -40,6 +42,7 @@ Bucket &Bucket::Iterator::operator* () {
 	if (_owner->_type == Bucket::TYPE::OBJECT) {
 		Entry &e = (*_owner->_object)[_index];
 		e.Value->_key = &e.Key;
+		//e.Value->_key = e.Key;
 		e.Value->_end = (_index == _owner->_object->Count() - 1);
 
 		return *e.Value;
@@ -57,9 +60,34 @@ Bucket &Bucket::Iterator::operator* () {
 }
 
 void Bucket::_clear () {
-	if (_type == Bucket::TYPE::VALUE && _value != nullptr) { delete _value; _value = nullptr; }
+	/*if (_type == Bucket::TYPE::VALUE && _value != nullptr) { delete _value; _value = nullptr; }
 	if (_type == Bucket::TYPE::OBJECT && _object != nullptr) { delete _object; _object = nullptr; }
 	if (_type == Bucket::TYPE::ARRAY && _array != nullptr) { delete _array; _array = nullptr; }
+
+	_type = Bucket::TYPE::UNDEFINED;
+	_key = nullptr;
+	_end = true;*/
+	if (_type == Bucket::TYPE::VALUE && _value != nullptr) {
+		delete _value;
+		_value = nullptr;
+	}
+
+	if (_type == Bucket::TYPE::OBJECT && _object != nullptr) {
+		for (Bucket::Entry &e : *_object) {
+			if (e.Value) {
+				delete e.Value;
+				e.Value = nullptr;
+			}
+		}
+
+		delete _object;
+		_object = nullptr;
+	}
+
+	if (_type == Bucket::TYPE::ARRAY && _array != nullptr) {
+		delete _array;
+		_array = nullptr;
+	}
 
 	_type = Bucket::TYPE::UNDEFINED;
 	_key = nullptr;
@@ -83,6 +111,7 @@ Bucket::Bucket (Bucket::TYPE type, Qybercom::Value* v) {
 }
 
 Bucket* Bucket::_bucket (const String &key) {
+//Bucket* Bucket::_bucket (const char* key) {
 	for (Bucket::Entry &entry : (*_object))
 		if (entry.Key == key)
 			return entry.Value;
@@ -99,6 +128,7 @@ Bucket &Bucket::_bucketValue (Bucket::TYPE t, Qybercom::Value* v) {
 }
 
 Bucket &Bucket::_associate (const String &key) {
+//Bucket &Bucket::_associate (const char* key) {
 	if (_type != Bucket::TYPE::OBJECT) {
 		_clear();
 		_type = Bucket::TYPE::OBJECT;
@@ -164,8 +194,20 @@ bool Bucket::HasKey () const {
 	return _key != nullptr;
 }
 
+bool Bucket::HasKey (String key) const {
+	if (_type == Bucket::TYPE::OBJECT)
+		for (Bucket::Entry &entry : (*_object))
+			if (String(entry.Key) == key) return true;
+
+	return false;
+}
+
+/*const char* Bucket::Key () const {
+	return _key;// == nullptr ? "" : *_key;
+}*/
+
 const String Bucket::Key () const {
-	return _key == nullptr ? "" : *_key;
+	return String(_key == nullptr ? "" : *_key);
 }
 
 bool Bucket::End () const {
@@ -200,11 +242,27 @@ Bucket &Bucket::operator= (bool v) {
 	return _bucketValue(Bucket::TYPE::VALUE, new Qybercom::Value(v));
 }
 
+Bucket &Bucket::operator= (short v) {
+	return _bucketValue(Bucket::TYPE::VALUE, new Qybercom::Value(v));
+}
+
+Bucket &Bucket::operator= (unsigned short v) {
+	return _bucketValue(Bucket::TYPE::VALUE, new Qybercom::Value(v));
+}
+
 Bucket &Bucket::operator= (int v) {
 	return _bucketValue(Bucket::TYPE::VALUE, new Qybercom::Value(v));
 }
 
+Bucket &Bucket::operator= (unsigned int v) {
+	return _bucketValue(Bucket::TYPE::VALUE, new Qybercom::Value(v));
+}
+
 Bucket &Bucket::operator= (long v) {
+	return _bucketValue(Bucket::TYPE::VALUE, new Qybercom::Value(v));
+}
+
+Bucket &Bucket::operator= (unsigned long v) {
 	return _bucketValue(Bucket::TYPE::VALUE, new Qybercom::Value(v));
 }
 
@@ -268,13 +326,13 @@ Bucket &Bucket::operator= (const Bucket &other) {
 }
 
 Bucket &Bucket::operator[] (const String &key) {
-	return _associate(key);
+	return _associate(key);//.c_str());
 }
 
 Bucket &Bucket::operator[] (const char* key) {
 	String k = String(key);
 
-	return _associate(k);
+	return _associate(k);//ey);
 }
 
 Bucket &Bucket::operator[] (int index) {
@@ -295,11 +353,27 @@ Bucket::operator bool () const {
 	return _type == Bucket::TYPE::VALUE && _value != nullptr ? (bool)(*_value) : false;
 }
 
+Bucket::operator short () const {
+	return _type == Bucket::TYPE::VALUE && _value != nullptr ? (int)(*_value) : 0;
+}
+
+Bucket::operator unsigned short () const {
+	return _type == Bucket::TYPE::VALUE && _value != nullptr ? (int)(*_value) : 0;
+}
+
 Bucket::operator int () const {
 	return _type == Bucket::TYPE::VALUE && _value != nullptr ? (int)(*_value) : 0;
 }
 
+Bucket::operator unsigned int () const {
+	return _type == Bucket::TYPE::VALUE && _value != nullptr ? (int)(*_value) : 0;
+}
+
 Bucket::operator long () const {
+	return _type == Bucket::TYPE::VALUE && _value != nullptr ? (long)(*_value) : 0;
+}
+
+Bucket::operator unsigned long () const {
 	return _type == Bucket::TYPE::VALUE && _value != nullptr ? (long)(*_value) : 0;
 }
 

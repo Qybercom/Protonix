@@ -2,14 +2,16 @@
 
 #include <Arduino.h>
 
+#include "../../Common/index.h"
+
 #include "../../IProtonixProfile.h"
 #include "../../Protonix.h"
 #include "../../ProtonixTimer.h"
 #include "../../ProtonixNetworkClient.h"
 
-#include "IAxionDTO.h"
+/*#include "IAxionDTO.h"
 
-#include "AxionDTO.h"
+#include "AxionDTO.h"*/
 
 namespace Qybercom {
 	namespace Protonix {
@@ -23,19 +25,21 @@ namespace Qybercom {
 						ProtonixTimer* _timerConnectStream;
 						ProtonixTimer* _timerAuthorize;
 						ProtonixTimer* _timerData;
-						AxionDTO* _dtoInput;
-						AxionDTO* _dtoOutput;
+						/*AxionDTO* _dtoInput;
+						AxionDTO* _dtoOutput;*/
+						Qybercom::IBucketFormat* _format;
 						bool _authorized;
 						bool _autoConnectStream;
 						bool _autoAuthorize;
 						bool _autoData;
+						bool _dataFirst;
 						bool _dataMemory;
 						bool _dataHardware;
 						bool _debug;
 
-						void _onStreamURL (Protonix* device);
+						/*void _onStreamURL (Protonix* device);
 						void _onStreamResponse (Protonix* device);
-						void _onStreamEvent (Protonix* device);
+						void _onStreamEvent (Protonix* device);*/
 
 					public:
 						Axion (String uriStream, String uriHTTP, unsigned int intervalData = 100, unsigned int intervalConnectStream = 1000, unsigned int intervalAuthorize = 1000);
@@ -49,8 +53,8 @@ namespace Qybercom {
 						ProtonixTimer* TimerAuthorize ();
 						ProtonixTimer* TimerData ();
 
-						AxionDTO* DTOInput ();
-						AxionDTO* DTOOutput ();
+						/*AxionDTO* DTOInput ();
+						AxionDTO* DTOOutput ();*/
 
 						bool Authorized ();
 
@@ -69,7 +73,8 @@ namespace Qybercom {
 						bool DataHardware ();
 						Axion* DataHardware (bool value);
 
-						void RequestStream (Protonix* device, String url, IAxionDTORequest* request);
+						//void RequestStream (Protonix* device, String url, IAxionDTORequest* request);
+						void RequestStream (Protonix* device, String url, const Qybercom::Bucket &request);
 						void RequestStreamAuthorize (Protonix* device);
 						void RequestStreamDeviceData (Protonix* device);
 

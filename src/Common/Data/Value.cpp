@@ -18,11 +18,27 @@ Value::Value (bool v) {
 	Set(v);
 }
 
+Value::Value (short v) {
+	Set(v);
+}
+
+Value::Value (unsigned short v) {
+	Set(v);
+}
+
 Value::Value (int v) {
 	Set(v);
 }
 
+Value::Value (unsigned int v) {
+	Set(v);
+}
+
 Value::Value (long v) {
+	Set(v);
+}
+
+Value::Value (unsigned long v) {
 	Set(v);
 }
 
@@ -64,6 +80,24 @@ Value &Value::Set (bool v) {
 	return *this;
 }
 
+Value &Value::Set (short v) {
+	Clear();
+
+	_v_int = v;
+	_type = Value::TYPE::INT;
+
+	return *this;
+}
+
+Value &Value::Set (unsigned short v) {
+	Clear();
+
+	_v_int = v;
+	_type = Value::TYPE::INT;
+
+	return *this;
+}
+
 Value &Value::Set (int v) {
 	Clear();
 
@@ -73,7 +107,25 @@ Value &Value::Set (int v) {
 	return *this;
 }
 
+Value &Value::Set (unsigned int v) {
+	Clear();
+
+	_v_int = v;
+	_type = Value::TYPE::INT;
+
+	return *this;
+}
+
 Value &Value::Set (long v) {
+	Clear();
+
+	_v_int = v;
+	_type = Value::TYPE::INT;
+
+	return *this;
+}
+
+Value &Value::Set (unsigned long v) {
 	Clear();
 
 	_v_int = v;
@@ -126,11 +178,27 @@ Value &Value::operator= (bool v) {
 	return Set(v);
 }
 
+Value &Value::operator= (short v) {
+	return Set(v);
+}
+
+Value &Value::operator= (unsigned short v) {
+	return Set(v);
+}
+
 Value &Value::operator= (int v) {
 	return Set(v);
 }
 
+Value &Value::operator= (unsigned int v) {
+	return Set(v);
+}
+
 Value &Value::operator= (long v) {
+	return Set(v);
+}
+
+Value &Value::operator= (unsigned long v) {
 	return Set(v);
 }
 
@@ -164,6 +232,26 @@ Value::operator bool () const {
 	return false;
 }
 
+Value::operator short () const {
+	if (_type == Value::TYPE::NULLPTR) return 0;
+	if (_type == Value::TYPE::INT) return (int)_v_int;
+	if (_type == Value::TYPE::BOOL) return _v_bool ? 1 : 0;
+	if (_type == Value::TYPE::FLOAT) return (int)_v_float;
+	if (_type == Value::TYPE::STRING) return _v_string.toInt();
+
+	return 0;
+}
+
+Value::operator unsigned short () const {
+	if (_type == Value::TYPE::NULLPTR) return 0;
+	if (_type == Value::TYPE::INT) return (int)_v_int;
+	if (_type == Value::TYPE::BOOL) return _v_bool ? 1 : 0;
+	if (_type == Value::TYPE::FLOAT) return (int)_v_float;
+	if (_type == Value::TYPE::STRING) return _v_string.toInt();
+
+	return 0;
+}
+
 Value::operator int () const {
 	if (_type == Value::TYPE::NULLPTR) return 0;
 	if (_type == Value::TYPE::INT) return (int)_v_int;
@@ -174,7 +262,27 @@ Value::operator int () const {
 	return 0;
 }
 
+Value::operator unsigned int () const {
+	if (_type == Value::TYPE::NULLPTR) return 0;
+	if (_type == Value::TYPE::INT) return (int)_v_int;
+	if (_type == Value::TYPE::BOOL) return _v_bool ? 1 : 0;
+	if (_type == Value::TYPE::FLOAT) return (int)_v_float;
+	if (_type == Value::TYPE::STRING) return _v_string.toInt();
+
+	return 0;
+}
+
 Value::operator long () const {
+	if (_type == Value::TYPE::NULLPTR) return 0;
+	if (_type == Value::TYPE::INT) return (long)_v_int;
+	if (_type == Value::TYPE::BOOL) return _v_bool ? 1 : 0;
+	if (_type == Value::TYPE::FLOAT) return (long)_v_float;
+	if (_type == Value::TYPE::STRING) return (long)_v_string.toInt();
+
+	return 0;
+}
+
+Value::operator unsigned long () const {
 	if (_type == Value::TYPE::NULLPTR) return 0;
 	if (_type == Value::TYPE::INT) return (long)_v_int;
 	if (_type == Value::TYPE::BOOL) return _v_bool ? 1 : 0;

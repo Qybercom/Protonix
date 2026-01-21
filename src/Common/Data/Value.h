@@ -35,6 +35,7 @@ namespace Qybercom {
 			};
 
 			String _v_string;
+			//char* _v_string;
 			Raw _v_raw;
 
 		public:
@@ -42,8 +43,12 @@ namespace Qybercom {
 
 			Value (decltype(nullptr) v);
 			Value (bool v);
+			Value (short v);
+			Value (unsigned short v);
 			Value (int v);
+			Value (unsigned int v);
 			Value (long v);
+			Value (unsigned long v);
 			Value (float v);
 			Value (double v);
 			Value (const char* v);
@@ -59,8 +64,12 @@ namespace Qybercom {
 
 			Value &Set (decltype(nullptr) v);
 			Value &Set (bool v);
+			Value &Set (short v);
+			Value &Set (unsigned short v);
 			Value &Set (int v);
+			Value &Set (unsigned int v);
 			Value &Set (long v);
+			Value &Set (unsigned long v);
 			Value &Set (float v);
 			Value &Set (double v);
 			Value &Set (const String &v);
@@ -68,8 +77,12 @@ namespace Qybercom {
 
 			Value &operator= (decltype(nullptr) v);
 			Value &operator= (bool v);
+			Value &operator= (short v);
+			Value &operator= (unsigned short v);
 			Value &operator= (int v);
+			Value &operator= (unsigned int v);
 			Value &operator= (long v);
+			Value &operator= (unsigned long v);
 			Value &operator= (float v);
 			Value &operator= (double v);
 			Value &operator= (const char* v);
@@ -86,8 +99,12 @@ namespace Qybercom {
 			}
 
 			operator bool () const;
+			operator short () const;
+			operator unsigned short () const;
 			operator int () const;
+			operator unsigned int () const;
 			operator long () const;
+			operator unsigned long () const;
 			operator float () const;
 			operator double () const;
 			operator String () const;

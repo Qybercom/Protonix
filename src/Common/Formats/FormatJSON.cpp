@@ -69,16 +69,40 @@ Bucket Formats::FormatJSON::_parseArray (const String &s, int &pos) {
 	return arr;
 }
 
-String Formats::FormatJSON::_parseString (const String &s, int &pos) {
+String Formats::FormatJSON::_parseString(const String &s, int &pos) {
 	pos++; // skip opening "
 	String str;
 	int length = s.length();
 
-	while (pos < length && s[pos] != '"') {
-		str += s[pos++];
-	}
+	while (pos < length) {
+		char c = s[pos++];
 
-	pos++; // skip closing "
+		if (c == '"') {
+			// closing quote
+			break;
+		}
+
+		if (c == '\\' && pos < length) {
+			// escape sequence
+			char next = s[pos++];
+			switch (next) {
+				case '"':  str += '"';  break;
+				case '\\': str += '\\'; break;
+				case '/':  str += '/';  break;
+				case 'b':  str += '\b'; break;
+				case 'f':  str += '\f'; break;
+				case 'n':  str += '\n'; break;
+				case 'r':  str += '\r'; break;
+				case 't':  str += '\t'; break;
+				default:
+					// неизвестный экранированный символ, просто вставляем как есть
+					str += next;
+					break;
+			}
+		} else {
+			str += c;
+		}
+	}
 
 	return str;
 }

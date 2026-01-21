@@ -12,7 +12,7 @@ using namespace Qybercom::Protonix;
 
 ProtonixRegistry::ProtonixRegistry (ProtonixMemory* memory) {
 	this->_memory = memory;
-	this->_format = Protonix::Instance()->Format("application/json");
+	this->_format = nullptr;
 	this->_raw = "";
 	this->_loaded = false;
 	this->_debug = false;
@@ -39,9 +39,9 @@ bool ProtonixRegistry::_load () {
 
 		return true;
 	}*/
+	this->_format = Protonix::Instance()->Format("application/json");
 
 	const unsigned int size = QYBERCOM_PROTONIX_MEMORY_EEPROM_SIZE - QYBERCOM_PROTONIX_REGISTRY_START;
-
 	char raw[size];
 
 	this->_memory->EEPROMGet(QYBERCOM_PROTONIX_REGISTRY_START, raw);
