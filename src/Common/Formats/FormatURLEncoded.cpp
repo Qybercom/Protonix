@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#include "../Data/index.h"
+#include "../Value.h"
 #include "../Utils.h"
 
 #include "FormatURLEncoded.h"
@@ -36,19 +36,19 @@ void Formats::FormatURLEncoded::_decode (String &s) {
 	}
 }
 
-void Formats::FormatURLEncoded::_serialize (Bucket &bucket, String &out, String &prefix) {
-	if (bucket.IsObject()) {
-		for (Bucket &v : bucket) {
+void Formats::FormatURLEncoded::_serialize (Value &value, String &out, String &prefix) {
+	if (value.IsObject()) {
+		for (Value &v : value) {
 			String key = v.Key();
 			String newPrefix = prefix.length() ? prefix + "[" + key + "]" : key;
 
 			Formats::FormatURLEncoded::_serialize(v, out, newPrefix);
 		}
 	}
-	else if (bucket.IsArray()) {
+	else if (value.IsArray()) {
 		int idx = 0;
 
-		for (Bucket &v : bucket) {
+		for (Value &v : value) {
 			String newPrefix = prefix + "[" + String(idx) + "]";
 
 			Formats::FormatURLEncoded::_serialize(v, out, newPrefix);
@@ -56,21 +56,21 @@ void Formats::FormatURLEncoded::_serialize (Bucket &bucket, String &out, String 
 			idx++;
 		}
 	}
-	else if (bucket.IsValue() || bucket.IsNull()) {
+	else {
 		if (out.length()) out += "&";
 
-		String key = prefix;
-		String value = String(bucket.IsNull() ? "" : bucket.AsValue());
+		String k = prefix;
+		String v = value.ToString();//String(value.IsNull() ? "" : value.AsValue());
 
-		Formats::FormatURLEncoded::_encode(key);
-		Formats::FormatURLEncoded::_encode(value);
+		Formats::FormatURLEncoded::_encode(k);
+		Formats::FormatURLEncoded::_encode(v);
 
-		out += key + "=" + value;
+		out += k + "=" + v;
 	}
 }
 
-void Formats::FormatURLEncoded::_path (Bucket &node, List<String> &keys, String &value) {
-	Bucket *current = &node;
+void Formats::FormatURLEncoded::_path (Value &node, List<String> &keys, String &value) {
+	Value current = node;
 
 	int keysCount = keys.Count();
 	int i = 0;
@@ -80,24 +80,25 @@ void Formats::FormatURLEncoded::_path (Bucket &node, List<String> &keys, String 
 		bool last = (i == keysCount - 1);
 
 		if (key.length() == 0 || isNumeric(key)) {
-			current->AsArray();
+			//current->AsArray();
+			current = Value::Array();
 
 			// a[]=...
 			if (key.length() == 0) {
 				if (last) {
-					Bucket v;
+					Value v;
 					v = value;
 
-					current->Add(v);
+					current.Add(v);
 
 					return;
 				}
 
-				Bucket next;
-				current->Add(next);
+				Value next;
+				current.Add(next);
 
-				int lastIndex = current->AsArray().Count() - 1;
-				current = &current->AsArray()[lastIndex];
+				int lastIndex = current.Count() - 1;
+				current = &current[lastIndex];
 
 				i++;
 
@@ -107,11 +108,12 @@ void Formats::FormatURLEncoded::_path (Bucket &node, List<String> &keys, String 
 			// a[NUM]=...
 			int index = toNumeric(key);
 
-			List<Bucket> &arr = current->AsArray();
+			// TODO: refactor
+			/*List<Value> &arr = current->AsArray();
 			int arrCount = arr.Count();
 
 			while (arrCount <= index) {
-				arr.Add(Bucket());
+				arr.Add(Value());
 
 				arrCount++;
 			}
@@ -122,27 +124,29 @@ void Formats::FormatURLEncoded::_path (Bucket &node, List<String> &keys, String 
 				return;
 			}
 
-			current = &arr[index];
+			current = &arr[index];*/
 
 			i++;
 
 			continue;
 		}
 
-		current->AsObject();
+		//current->AsObject();
 
 		if (last) {
-			(*current)[key] = value;
+			//(*current)[key] = value;
+			current[key] = value;
 			return;
 		}
 
-		current = &(*current)[key];
+		//current = &(*current)[key];
+		current = current[key];
 
 		i++;
 	}
 }
 
-void Formats::FormatURLEncoded::_deserialize (Bucket &root, String &raw) {
+void Formats::FormatURLEncoded::_deserialize (Value &root, String &raw) {
 	List<String> pairs = explode("&", raw);
 
 	for (String &pair : pairs) {
@@ -165,21 +169,21 @@ void Formats::FormatURLEncoded::_deserialize (Bucket &root, String &raw) {
 	}
 }
 
-String Formats::FormatURLEncoded::BucketFormatMIME () {
+String Formats::FormatURLEncoded::ValueFormatMIME () {
 	return "x-wwww/form-url-encoded";
 }
 
-String Formats::FormatURLEncoded::BucketFormatSerialize (Bucket &bucket) {
+String Formats::FormatURLEncoded::ValueFormatSerialize (Value &value) {
 	String out;
 	String prefix = "";
 
-	Formats::FormatURLEncoded::_serialize(bucket, out, prefix);
+	Formats::FormatURLEncoded::_serialize(value, out, prefix);
 
 	return out;
 }
 
-Bucket Formats::FormatURLEncoded::BucketFormatDeserialize (const String &raw) {
-	Bucket root = Bucket::Object();
+Value Formats::FormatURLEncoded::ValueFormatDeserialize (const String &raw) {
+	Value root = Value::Object();
 	String in = String(raw);
 
 	Formats::FormatURLEncoded::_deserialize(root, in);

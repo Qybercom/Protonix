@@ -1,19 +1,19 @@
 #include <Arduino.h>
 
-#include "../Data/index.h"
+#include "../Value.h"
 
 #include "FormatINI.h"
 
 using namespace Qybercom;
 
-String Formats::FormatINI::BucketFormatMIME () {
+String Formats::FormatINI::ValueFormatMIME () {
 	return "application/ini";
 }
 
-String Formats::FormatINI::BucketFormatSerialize (Bucket &bucket) {
+String Formats::FormatINI::ValueFormatSerialize (Value &value) {
 	String out = "";
 
-	for (Bucket &entry : bucket) {
+	for (Value &entry : value) {
 		String key = entry.HasKey() ? entry.Key() : "";
 
 		if (entry.IsArray()) {
@@ -24,27 +24,27 @@ String Formats::FormatINI::BucketFormatSerialize (Bucket &bucket) {
 		if (entry.IsObject()) {
 			out += "[" + key + "]\r\n";
 
-			for (Bucket &item : entry) {
+			for (Value &item : entry) {
 				if (item.IsObject() || item.IsArray()) {
 					// TODO: think about nested
 					continue;
 				}
 
-				out += item.Key() + "=" + item.AsValue().ToString() + "\r\n";
+				out += item.Key() + "=" + item.ToString() + "\r\n";
 			}
 
 			continue;
 		}
 
-		out += entry.Key() + "=" + entry.AsValue().ToString() + "\r\n";
+		out += entry.Key() + "=" + entry.ToString() + "\r\n";
 	}
 
 	return out;
 }
 
-Bucket Formats::FormatINI::BucketFormatDeserialize (const String &raw) {
-	Bucket root = Bucket::Object();
-	Bucket *currentSection = &root;
+Value Formats::FormatINI::ValueFormatDeserialize (const String &raw) {
+	Value root = Value::Object();
+	Value *currentSection = &root;
 
 	int i = 0;
 	int len = raw.length();
@@ -83,12 +83,12 @@ Bucket Formats::FormatINI::BucketFormatDeserialize (const String &raw) {
 		// TODO: review key[]=value syntax
 		/*if (key.endsWith("[]")) {
 			String baseKey = key.substring(0, key.length() - 2);
-			Bucket &arrBucket = (*currentSection)[baseKey];
-			if (!arrBucket.IsArray()) arrBucket = Bucket::Array();
+			Value &arrValue = (*currentSection)[baseKey];
+			if (!arrValue.IsArray()) arrValue = Value::Array();
 
-			arrBucket.AsArray().Add(Bucket::Value(Formats::FormatINI::_parseValue(value)));
+			arrValue.AsArray().Add(Value::Value(Formats::FormatINI::_parseValue(value)));
 		}*/
-		(*currentSection)[key] = Bucket::Value(Formats::FormatINI::_parseValue(value));
+		(*currentSection)[key] = Value(Formats::FormatINI::_parseValue(value));
 	}
 
 	return root;
@@ -124,8 +124,8 @@ Value Formats::FormatINI::_parseValue (const String &value) {
 		i++;
 	}
 
-	if (isInt && !isFloat) return Value(value.toInt());
-	if (isInt && isFloat) return Value(value.toFloat());
+	if (isInt && !isFloat) return Value((int)value.toInt());
+	if (isInt && isFloat) return Value((float)value.toFloat());
 
 	return Value(value);
 }

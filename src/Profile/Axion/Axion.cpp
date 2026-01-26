@@ -7,8 +7,6 @@
 #include "../../ProtonixNetworkClient.h"
 
 #include "IAxionDevice.h"
-/*#include "AxionDTO.h"
-#include "DTO/index.h"*/
 
 #include "Axion.h"
 
@@ -24,16 +22,18 @@ Profile::Axion::Axion::Axion (String uriStream, String uriHTTP, unsigned int int
 	this->_timerAuthorize = new ProtonixTimer(intervalAuthorize);
 	this->_timerData = new ProtonixTimer(intervalData);
 
-	/*this->_dtoInput = new AxionDTO();
-	this->_dtoOutput = new AxionDTO();*/
 	this->_format = nullptr;
 
 	this->_authorized = false;
 	this->_autoConnectStream = true;
 	this->_autoAuthorize = true;
 	this->_autoData = true;
-	this->_dataFirst = false;
+	this->_dataFirst = true;
+	#if defined(ESP32) || defined(ESP8266)
+	this->_dataMemory = true;
+	#else
 	this->_dataMemory = false;
+	#endif
 	this->_dataHardware = false;
 
 	this->_debug = false;
@@ -62,8 +62,8 @@ void Profile::Axion::Axion::ProfilePipe (Protonix* device) {
 		String url = "";
 
 		for (String &cmd : cmds) {
-			Bucket dto = Qybercom::Bucket::Deserialize(this->_format, cmd);
-			dto.Dump();
+			Value dto = Value::Deserialize(this->_format, cmd);
+			//dto.Dump();
 
 			if (dto.HasKey("url")) {
 				// normally should not occur
@@ -131,23 +131,11 @@ void Profile::Axion::Axion::ProfilePipe (Protonix* device) {
 					}
 				}
 			}
-			/*this->_dtoInput->BufferRaw(cmd);
-			this->_dtoInput->Deserialize();
-
-			if (this->_dtoInput->IsURL())
-				this->_onStreamURL(device);
-
-			if (this->_dtoInput->IsResponse())
-				this->_onStreamResponse(device);
-
-			if (this->_dtoInput->IsEvent())
-				this->_onStreamEvent(device);
-
-			this->_dtoInput->Reset();*/
 		}
 	}
 
 	if (this->_timerData->Pipe()) {
+		//Serial.print("[2.3]"); Serial.println(ESP.getFreeHeap());
 		if (this->_authorized) {
 			if (this->_autoData)
 				this->RequestStreamDeviceData(device);
@@ -184,14 +172,6 @@ ProtonixTimer* Profile::Axion::Axion::TimerData () {
 	return this->_timerData;
 }
 
-/*Profile::Axion::AxionDTO* Profile::Axion::Axion::DTOInput () {
-	return this->_dtoInput;
-}
-
-Profile::Axion::AxionDTO* Profile::Axion::Axion::DTOOutput () {
-	return this->_dtoOutput;
-}*/
-
 bool Profile::Axion::Axion::Authorized () {
 	return this->_authorized;
 }
@@ -226,25 +206,19 @@ Profile::Axion::Axion* Profile::Axion::Axion::AutoData (bool value) {
 	return this;
 }
 
-//void Profile::Axion::Axion::RequestStream (Protonix* device, String url, Profile::Axion::IAxionDTORequest* request) {
-void Profile::Axion::Axion::RequestStream (Protonix* device, String url, const Qybercom::Bucket &request) {
+void Profile::Axion::Axion::RequestStream (Protonix* device, String url, const Value &request) {
 	(void)device;
 
 	String error = "";
 
 	if (this->_clientStream->Connected()) {
-		/*this->_dtoOutput->URL(url);
-		this->_dtoOutput->DTO(request);
-
-		if (this->_dtoOutput->Serialize()) this->_clientStream->Send(this->_dtoOutput->BufferRaw());
-		else error = "Cannot serialize request";*/
-		Qybercom::Bucket dto;
+		Value dto = Value::Object();
 
 		dto["url"] = url;
 		dto["data"] = request;
 
 		String raw = dto.Serialize(this->_format);
-		Serial.println("[debug:authorize] " + raw);
+		//Serial.println("[debug:request] " + raw);
 
 		this->_clientStream->Send(raw);
 	}
@@ -252,11 +226,6 @@ void Profile::Axion::Axion::RequestStream (Protonix* device, String url, const Q
 
 	if (this->_debug && error != "")
 		Serial.println("[Axion:RequestStream] Error: " + error);
-
-	/*delete request;
-	request = nullptr;
-
-	this->_dtoOutput->Reset();*/
 }
 
 void Profile::Axion::Axion::RequestStreamAuthorize (Protonix* device) {
@@ -268,8 +237,7 @@ void Profile::Axion::Axion::RequestStreamAuthorize (Protonix* device) {
 	//if (this->_debug)
 		Serial.println("[Axion:RequestStreamAuthorize] '" + id + "':'" + passphrase + "'");
 
-	//this->RequestStream(device, "/api/authorize/mechanism", new Profile::Axion::DTO::DTORequestAuthorization(id, passphrase));
-	Qybercom::Bucket dto;
+	Value dto = Value::Object();
 
 	dto["id"] = id;
 	dto["passphrase"] = passphrase;
@@ -281,14 +249,14 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 	if (this->_debug)
 		Serial.println("[Axion:RequestStreamDeviceData]");
 
-	/*this->RequestStream(device, "/api/mechanism/status", new Profile::Axion::DTO::DTORequestDeviceData(
-		device,
-		this->_dataMemory,
-		this->_dataHardware
-	));*/
-	Qybercom::Bucket dto;
+	//Serial.print("[axion:request:1]"); Serial.println(ESP.getFreeHeap());
+	Value dto = Value::Object();
+	#if defined(ESP32) || defined(ESP8266)
 	bool first = this->_dataFirst;
-	if (!first) this->_dataFirst = true;
+	if (first) this->_dataFirst = false;
+	#else
+	bool first = false;
+	#endif
 
 	dto["active"] = device->Active();
 	dto["platform"] = device->Platform();
@@ -301,27 +269,24 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 	dto["uptime"] = device->TimerUptime()->RunTime();
 	dto["firmware"] = device->Firmware();
 
-	if (this->_dataMemory || first) {
-		//JsonObject memory = dto["data"]["memory"].to<JsonObject>();
-		Qybercom::Bucket memory;
+	if (this->_dataMemory) {
+		Value memory = Value::Object();
 
 		memory["ram_free"] = device->Memory()->RAMFree();
-		memory["ram_used"] = device->Memory()->RAMUsed();
+		//memory["ram_used"] = device->Memory()->RAMUsed();
 		memory["ram_total"] = device->Memory()->RAMTotal();
-		memory["ram_fragmented"] = device->Memory()->RAMFragmented();
+		//memory["ram_fragmented"] = device->Memory()->RAMFragmented();
 		memory["flash_free"] = device->Memory()->FlashFree();
-		memory["flash_used"] = device->Memory()->FlashUsed();
+		//memory["flash_used"] = device->Memory()->FlashUsed();
 		memory["flash_total"] = device->Memory()->FlashTotal();
 
 		dto["memory"] = memory;
 	}
 
-	//JsonArray sensors_out = dto["data"]["sensors"].to<JsonArray>();
 	List<ProtonixSensor*> &sensors = device->Sensors();
-	Qybercom::Bucket sensors_out = Qybercom::Bucket::Array();
+	Value sensors_out = Value::Array();
 	for (ProtonixSensor* sensor : sensors) {
-		//JsonObject sItem = sensors_out.add<JsonObject>();
-		Qybercom::Bucket sItem;
+		Value sItem = Value::Object();
 
 		sItem["id"] = sensor->ID();
 		sItem["value"] = sensor->Value();
@@ -334,31 +299,18 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 	dto["sensors"] = sensors_out;
 
 	if (this->_dataHardware || first) {
-		//JsonArray hardware_out = dto["data"]["hardware"].to<JsonArray>();
 		List<IProtonixHardware*> &hardware = device->Hardware();
-		Qybercom::Bucket hardware_out = Qybercom::Bucket::Array();
+		Value hardware_out = Value::Array();
 		for (IProtonixHardware* hw : hardware) {
-			//JsonObject hwItem = hardware_out.add<JsonObject>();
-			Qybercom::Bucket hwItem;
+			Value hwItem = Value::Object();
 
 			hwItem["id"] = hw->HardwareID();
 			hwItem["summary"] = hw->HardwareSummary();
 
-			/*JsonArray config_out = hwItem["config"].to<JsonArray>();
-			Map &config = hw->HardwareConfig();
-			for (Map::Entry* entry : config) {
-				JsonObject configItem = config_out.add<JsonObject>();
-
-				configItem["key"] = entry->Key;
-				//configItem["value"] = entry->Value;//.ToString();
-			}*/
-
-			//JsonArray capabilities_out = hwItem["capabilities"].to<JsonArray>();
-			Qybercom::Bucket capabilities_out = Qybercom::Bucket::Array();
+			Value capabilities_out = Value::Array();
 			List<ProtonixHardwareCapability*> &capabilities = hw->HardwareCapabilities();
 			for (ProtonixHardwareCapability* capability : capabilities) {
-				//JsonObject capabilityItem = capabilities_out.add<JsonObject>();
-				Qybercom::Bucket capabilityItem;
+				Value capabilityItem = Value::Object();
 
 				capabilityItem["kind"] = capability->Kind();
 				capabilityItem["id"] = capability->ID();
@@ -371,102 +323,15 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 
 			hardware_out.Add(hwItem);
 		}
-		//dto["hardware"] = hardware_out;
+		dto["hardware"] = hardware_out;
 	}
 
 	//dto["registry"] = device->Registry()->Raw();
 	#endif
+	//Serial.print("[axion:request:2]"); Serial.println(ESP.getFreeHeap());
 
 	this->RequestStream(device, "/api/mechanism/status", dto);
 }
-
-/*void Profile::Axion::Axion::_onStreamURL (Protonix* device) {
-	(void)device;
-
-	if (this->_debug)
-		Serial.println("[Axion:OnStreamURL] " + this->_dtoInput->URL());
-}
-
-void Profile::Axion::Axion::_onStreamResponse (Protonix* device) {
-	(void)device;
-
-	if (this->_debug)
-		Serial.println("[Axion:OnStreamResponse] " + this->_dtoInput->Response());
-
-	if (this->_dtoInput->Response().startsWith("/api/authorize/mechanism")) {
-		Profile::Axion::DTO::DTOResponseAuthorization* dto = new Profile::Axion::DTO::DTOResponseAuthorization();
-		dto->AxionDTOPopulate(this->_dtoInput);
-
-		int status = dto->AxionDTOResponseStatus();
-
-		//if (this->_debug)
-			Serial.println("[Axion:OnStreamResponse:Authorization] " + String(status));
-
-		this->_authorized = status == 200;
-
-		delete dto;
-		dto = nullptr;
-	}
-
-	if (this->_dtoInput->Response().startsWith("/api/mechanism/status")) {
-		Profile::Axion::DTO::DTOResponseDeviceData* dto = new Profile::Axion::DTO::DTOResponseDeviceData();
-		dto->AxionDTOPopulate(this->_dtoInput);
-
-		int status = dto->AxionDTOResponseStatus();
-
-		if (this->_debug)
-			Serial.println("[Axion:OnStreamResponse:DeviceData] " + String(status));
-
-		if (status == 403)
-			this->_authorized = false;
-
-		delete dto;
-		dto = nullptr;
-	}
-}
-
-void Profile::Axion::Axion::_onStreamEvent (Protonix* device) {
-	if (this->_debug)
-		Serial.println("[Axion:OnStreamEvent] " + this->_dtoInput->Event());
-
-	Profile::Axion::IAxionDevice* dev = (Profile::Axion::IAxionDevice*)device->Device();
-
-	if (this->_dtoInput->Event().startsWith("/api/mechanism/command/" + dev->AxionDeviceID())) {
-		Profile::Axion::DTO::DTOEventCommand* dto = new Profile::Axion::DTO::DTOEventCommand();
-		dto->AxionDTOPopulate(this->_dtoInput);
-
-		String cmd = dto->Command();
-		if (this->_debug)
-			Serial.println("[Axion:OnStreamEvent:Command] " + cmd);
-
-		if (cmd.startsWith("axion:")) {
-			String trail = cmd.substring(6, cmd.length());
-
-			Serial.println("[debug] Axion command: " + trail);
-
-			if (trail == "dataMemory:1")
-				this->_dataMemory = true;
-
-			if (trail == "dataMemory:0")
-				this->_dataMemory = false;
-
-			if (trail == "dataHardware:1")
-				this->_dataHardware = true;
-
-			if (trail == "dataHardware:0")
-				this->_dataHardware = false;
-		}
-		else {
-			bool ok = device->CommandRecognizeAndProcess(cmd);
-
-			if (this->_debug || !ok)
-				Serial.println("[Axion:OnStreamEvent:Command] Result: " + String(ok));
-		}
-
-		delete dto;
-		dto = nullptr;
-	}
-}*/
 
 bool Profile::Axion::Axion::Debug () {
 	return this->_debug;

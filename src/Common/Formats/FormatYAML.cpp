@@ -1,50 +1,50 @@
 #include <Arduino.h>
 
-#include "../Data/index.h"
+#include "../Value.h"
 #include "../Utils.h"
 
 #include "FormatYAML.h"
 
 using namespace Qybercom;
 
-String Formats::FormatYAML::_serialize (Bucket &bucket, int indentSize, bool first) {
+String Formats::FormatYAML::_serialize (Value &value, int indentSize, bool first) {
 	String out = "";
 	String ind = indent(indentSize);
 
-	if (bucket.IsValue())
-		out += ind + bucket.AsValue().ToString() + "\n";
-
-	if (bucket.IsArray()) {
-		for (Bucket &v : bucket)
+	// TODO: need refactor
+	/*if (value.IsArray()) {
+		for (Value &v : value)
 			out += ind + "- " + String(v.IsValue()
-				? ": " + v.AsValue().ToString() + "\n"
+				? ": " + v.ToString() + "\n"
 				: Formats::FormatYAML::_serialize(v, indentSize + 1, false)
 			);
 	}
 
-	if (bucket.IsObject()) {
-		for (Bucket &v : bucket) {
+	if (value.IsObject()) {
+		for (Value &v : value) {
 			out += String(first ? ind : "") + v.Key() + String(v.IsValue()
-				? ": " + v.AsValue().ToString() + "\n"
+				? ": " + v.ToString() + "\n"
 				: ":\n" + Formats::FormatYAML::_serialize(v, indentSize + 1)
 			);
 
 			first = true;
 		}
-	}
+	}*/
+
+	out += ind + value.ToString() + "\n";
 
 	return out;
 }
 
-String Formats::FormatYAML::BucketFormatMIME () {
+String Formats::FormatYAML::ValueFormatMIME () {
 	return "application/yaml";
 }
 
-String Formats::FormatYAML::BucketFormatSerialize (Bucket &bucket) {
-	return Formats::FormatYAML::_serialize(bucket, 0);
+String Formats::FormatYAML::ValueFormatSerialize (Value &value) {
+	return Formats::FormatYAML::_serialize(value, 0);
 }
 
-Bucket Formats::FormatYAML::BucketFormatDeserialize (const String &raw) {
+Value Formats::FormatYAML::ValueFormatDeserialize (const String &raw) {
 	// TODO: deserialization in progress
-	return Bucket::Null();
+	return Value();
 }

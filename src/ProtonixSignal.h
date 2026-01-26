@@ -11,7 +11,7 @@ namespace Qybercom {
 				String _id;
 				String _from;
 				//Any _value;
-				Bucket _data;
+				Value _data;
 
 			public:
 				ProtonixSignal (String id);
@@ -40,8 +40,8 @@ namespace Qybercom {
 				ProtonixSignal* Value (const T& value) {
 					return this->Value(Any(value));
 				}*/
-				ProtonixSignal* Data (Bucket data);
-				Bucket &Data ();
+				ProtonixSignal* Data (Value data);
+				Value &Data ();
 
 				~ProtonixSignal ();
 		};

@@ -9,10 +9,6 @@
 #include "../../ProtonixTimer.h"
 #include "../../ProtonixNetworkClient.h"
 
-/*#include "IAxionDTO.h"
-
-#include "AxionDTO.h"*/
-
 namespace Qybercom {
 	namespace Protonix {
 		namespace Profile {
@@ -25,9 +21,7 @@ namespace Qybercom {
 						ProtonixTimer* _timerConnectStream;
 						ProtonixTimer* _timerAuthorize;
 						ProtonixTimer* _timerData;
-						/*AxionDTO* _dtoInput;
-						AxionDTO* _dtoOutput;*/
-						Qybercom::IBucketFormat* _format;
+						IValueFormat* _format;
 						bool _authorized;
 						bool _autoConnectStream;
 						bool _autoAuthorize;
@@ -36,10 +30,6 @@ namespace Qybercom {
 						bool _dataMemory;
 						bool _dataHardware;
 						bool _debug;
-
-						/*void _onStreamURL (Protonix* device);
-						void _onStreamResponse (Protonix* device);
-						void _onStreamEvent (Protonix* device);*/
 
 					public:
 						Axion (String uriStream, String uriHTTP, unsigned int intervalData = 100, unsigned int intervalConnectStream = 1000, unsigned int intervalAuthorize = 1000);
@@ -52,9 +42,6 @@ namespace Qybercom {
 						ProtonixTimer* TimerConnectStream ();
 						ProtonixTimer* TimerAuthorize ();
 						ProtonixTimer* TimerData ();
-
-						/*AxionDTO* DTOInput ();
-						AxionDTO* DTOOutput ();*/
 
 						bool Authorized ();
 
@@ -73,8 +60,7 @@ namespace Qybercom {
 						bool DataHardware ();
 						Axion* DataHardware (bool value);
 
-						//void RequestStream (Protonix* device, String url, IAxionDTORequest* request);
-						void RequestStream (Protonix* device, String url, const Qybercom::Bucket &request);
+						void RequestStream (Protonix* device, String url, const Value &request);
 						void RequestStreamAuthorize (Protonix* device);
 						void RequestStreamDeviceData (Protonix* device);
 

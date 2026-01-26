@@ -18,7 +18,7 @@ ProtonixRegistry::ProtonixRegistry (ProtonixMemory* memory) {
 	this->_debug = false;
 }
 
-Qybercom::Bucket &ProtonixRegistry::Data () {
+Qybercom::Value &ProtonixRegistry::Data () {
 	return this->_data;
 }
 
@@ -32,13 +32,16 @@ bool ProtonixRegistry::Debug () {
 	return this->_debug;
 }
 
-bool ProtonixRegistry::_load () {
-	if (this->_loaded) return true;/*{
+bool ProtonixRegistry::Load () {
+	Serial.print("[reg.0]"); Serial.println(ESP.getFreeHeap());
+	if (this->_loaded) {
 		if (this->_debug)
-			Serial.println("[registry:eeprom] Loaded: `" + this->_buffer + "`");//Raw + "`");
+			Serial.println("[registry:eeprom] Loaded: `" + this->_raw + "`");
 
 		return true;
-	}*/
+	}
+
+	Serial.print("[reg.1]"); Serial.println(ESP.getFreeHeap());
 	this->_format = Protonix::Instance()->Format("application/json");
 
 	const unsigned int size = QYBERCOM_PROTONIX_MEMORY_EEPROM_SIZE - QYBERCOM_PROTONIX_REGISTRY_START;
@@ -52,7 +55,7 @@ bool ProtonixRegistry::_load () {
 	if (this->_debug)
 		Serial.println("[registry:eeprom] Ready: `" + this->_raw + "`");
 
-	this->_data = Qybercom::Bucket::Deserialize(this->_format, this->_raw);
+	this->_data = Qybercom::Value::Deserialize(this->_format, this->_raw);
 
 	if (this->_debug || true)
 		this->_data.Dump();
@@ -75,6 +78,7 @@ bool ProtonixRegistry::_load () {
 
 	//this->_bufferObj = this->_buffer.as<JsonObject>();
 	this->_loaded = true;
+	Serial.print("[reg.2]"); Serial.println(ESP.getFreeHeap());
 
 	return true;
 }

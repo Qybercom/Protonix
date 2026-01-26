@@ -2,7 +2,7 @@
 
 #include "Color.h"
 
-using namespace Qybercom;
+using namespace Qybercom::Types;
 
 Color::Color (short r, short g, short b, float a) {
 	R = r;
@@ -11,7 +11,7 @@ Color::Color (short r, short g, short b, float a) {
 	A = a;
 }
 
-void Color::ValueDeserialize (const String &raw) {
+void Color::ValueTypeDeserialize (const String &raw) {
 	int i = 0;
 	int length = raw.length();
 	String clr[4] = {"", "", "", ""};
@@ -35,7 +35,7 @@ void Color::ValueDeserialize (const String &raw) {
 	A = clr[4].toFloat();
 }
 
-String Color::ValueSerialize () const {
+String Color::ValueTypeSerialize () const {
 	return String(R)
 		+ "," + String(G)
 		+ "," + String(B)

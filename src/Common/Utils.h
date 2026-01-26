@@ -3,12 +3,13 @@
 #include <Arduino.h>
 #include <math.h>
 
-#include "Data/List.hpp"
+#include "List.hpp"
 
 namespace Qybercom {
-	List<String> explode (String delimiter, String &input);
+	List<String> explode (String delimiter, String input);
 	List<String> strChunks (String &input, unsigned int chunkSize);
 	uint8_t* strBuf (String &str);
+	char* strDup (const char* s);
 
 	float angleByXY (int x, int y, int minX, int maxX, int minY, int maxY);
 	int angleByXYRounded (int x, int y, int minX, int maxX, int minY, int maxY);

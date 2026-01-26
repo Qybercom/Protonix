@@ -55,6 +55,7 @@ long ProtonixMemory::RAMTotal () {
 		uint32_t mMax = 0;
 		uint8_t mFragmented = 0;
 		ESP.getHeapStats(&mFree, &mMax, &mFragmented);
+		//Serial.printf("free: %7u - max: %7u - frag: %3d%% <- ", mFree, mMax, mFragmented);
 
 		return (long)mMax;
 	#elif defined(ARDUINO_ARCH_AVR)

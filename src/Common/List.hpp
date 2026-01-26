@@ -63,9 +63,6 @@ namespace Qybercom {
 
 			Node* _current;
 
-			/*Node* _iNode;
-			bool _iStarted;*/
-
 			unsigned int _countMax;
 
 			void _reindex () {
@@ -79,7 +76,7 @@ namespace Qybercom {
 			}
 
 		public:
-			List () : _head(nullptr), _tail(nullptr), _count(0), _current(nullptr),/* _iNode(nullptr), _iStarted(false),*/ _countMax(QYBERCOM_LIST_COUNT_MAX) { }
+			List () : _head(nullptr), _tail(nullptr), _count(0), _current(nullptr), _countMax(QYBERCOM_LIST_COUNT_MAX) { }
 
 			Node* Head () { return _head; }
 			T &First () { return _head->Data; }
@@ -96,8 +93,6 @@ namespace Qybercom {
 			Node* Current () { return _current; }
 
 			bool End () { return _current != nullptr && _current->IsLast(); }
-
-			//Node* INode () { return _iNode; }
 
 			List<T> &Add (const T &data, bool before = false, bool maxBypass = false) {
 				if (!maxBypass && _countMax > 0 && _count >= _countMax) {
@@ -187,8 +182,6 @@ namespace Qybercom {
 
 				_head = _tail = nullptr;
 				_count = 0;
-				/*_iNode = nullptr;
-				_iStarted = false;*/
 
 				return *this;
 			}
@@ -236,7 +229,7 @@ namespace Qybercom {
 			}
 
 			T PopFirst () {
-				if (_count == 0 || !_head) return (*(T*) 0);//nullptr;//T();
+				if (_count == 0 || !_head) return (*(T*) 0);
 
 				Node* node = _head;
 				T data = node->Data;
@@ -252,7 +245,7 @@ namespace Qybercom {
 			}
 
 			T PopLast () {
-				if (_count == 0 || !_tail) return (*(T*) 0);//nullptr;//T();
+				if (_count == 0 || !_tail) return (*(T*) 0);
 
 				Node* node = _tail;
 				T data = node->Data;
@@ -286,36 +279,6 @@ namespace Qybercom {
 				return data;
 			}
 
-			/*List<T> &Reset () {
-				_iNode = nullptr;
-				_iStarted = false;
-
-				return *this;
-			}
-
-			T &Current () {
-				return _iNode->Data;
-			}
-
-			T* Next () {
-				_iNode = _iNode ? _iNode->Next : _head;
-
-				return _iNode ? &_iNode->Data : nullptr;
-			}
-
-			bool Iterate () {
-				if (!_iStarted) {
-					_iNode = _head;
-					_iStarted = true;
-				}
-				else if (_iNode) {
-					_iNode = _iNode->Next;
-				}
-
-				return _iNode != nullptr;
-			}*/
-
-			// `for (item : list) {...}`
 			Iterator begin () { return Iterator(this, _head); }
 
 			Iterator end () { return Iterator(this, nullptr); }

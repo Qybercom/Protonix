@@ -2,14 +2,14 @@
 
 #include "Range.h"
 
-using namespace Qybercom;
+using namespace Qybercom::Types;
 
 Range::Range (double min, double max) {
 	Min = min;
 	Max = max;
 }
 
-void Range::ValueDeserialize (const String &raw) {
+void Range::ValueTypeDeserialize (const String &raw) {
 	int delim = raw.indexOf('/');
 	if (delim == -1) return;
 
@@ -17,6 +17,6 @@ void Range::ValueDeserialize (const String &raw) {
 	Max = raw.substring(delim + 1).toDouble();
 }
 
-String Range::ValueSerialize () const {
+String Range::ValueTypeSerialize () const {
 	return String(Min) + "," + String(Max);
 }

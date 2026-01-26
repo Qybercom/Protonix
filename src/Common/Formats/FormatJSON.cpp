@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#include "../Data/index.h"
+#include "../Value.h"
 
 #include "FormatJSON.h"
 
@@ -10,24 +10,24 @@ void Formats::FormatJSON::_skip (const String &s, int &pos) {
 	while (pos < s.length() && (s[pos] == ' ' || s[pos] == '\n' || s[pos] == '\r' || s[pos] == '\t')) pos++;
 }
 
-Bucket Formats::FormatJSON::_parseValue (const String &s, int &pos) {
+Value Formats::FormatJSON::_parseValue (const String &s, int &pos) {
 	Formats::FormatJSON::_skip(s, pos);
-	if (pos >= s.length()) return Bucket::Null();
+	if (pos >= s.length()) return Value();
 
 	char c = s[pos];
 	if (c == '{') return Formats::FormatJSON::_parseObject(s, pos);
 	if (c == '[') return Formats::FormatJSON::_parseArray(s, pos);
-	if (c == '"') return Bucket::Value(Formats::FormatJSON::_parseString(s, pos));
-	if (isDigit(c) || c == '-') return Bucket::Value(Formats::FormatJSON::_parseNumber(s, pos));
-	if (s.substring(pos, pos + 4) == "true") { pos += 4; return Bucket::Value(true); }
-	if (s.substring(pos, pos + 5) == "false") { pos += 5; return Bucket::Value(false); }
-	if (s.substring(pos, pos + 4) == "null") { pos += 4; return Bucket::Null(); }
+	if (c == '"') return Value(Formats::FormatJSON::_parseString(s, pos));
+	if (isDigit(c) || c == '-') return Value(Formats::FormatJSON::_parseNumber(s, pos));
+	if (s.substring(pos, pos + 4) == "true") { pos += 4; return Value(true); }
+	if (s.substring(pos, pos + 5) == "false") { pos += 5; return Value(false); }
+	if (s.substring(pos, pos + 4) == "null") { pos += 4; return Value(); }
 
-	return Bucket::Null();
+	return Value();
 }
 
-Bucket Formats::FormatJSON::_parseObject (const String &s, int &pos) {
-	Bucket obj = Bucket::Object();
+Value Formats::FormatJSON::_parseObject (const String &s, int &pos) {
+	Value obj = Value::Object();
 	pos++; // skip '{'
 	Formats::FormatJSON::_skip(s, pos);
 
@@ -36,7 +36,7 @@ Bucket Formats::FormatJSON::_parseObject (const String &s, int &pos) {
 
 		Formats::FormatJSON::_skip(s, pos);
 		if (s[pos] == ':') pos++;
-		Bucket value = Formats::FormatJSON::_parseValue(s, pos);
+		Value value = Formats::FormatJSON::_parseValue(s, pos);
 		obj[key] = value;
 
 		Formats::FormatJSON::_skip(s, pos);
@@ -50,13 +50,13 @@ Bucket Formats::FormatJSON::_parseObject (const String &s, int &pos) {
 	return obj;
 }
 
-Bucket Formats::FormatJSON::_parseArray (const String &s, int &pos) {
-	Bucket arr = Bucket::Array();
+Value Formats::FormatJSON::_parseArray (const String &s, int &pos) {
+	Value arr = Value::Array();
 	pos++; // skip '['
 	Formats::FormatJSON::_skip(s, pos);
 
 	while (pos < s.length() && s[pos] != ']') {
-		Bucket value = Formats::FormatJSON::_parseValue(s, pos);
+		Value value = Formats::FormatJSON::_parseValue(s, pos);
 		arr.Add(value);
 		Formats::FormatJSON::_skip(s, pos);
 
@@ -99,7 +99,8 @@ String Formats::FormatJSON::_parseString(const String &s, int &pos) {
 					str += next;
 					break;
 			}
-		} else {
+		}
+		else {
 			str += c;
 		}
 	}
@@ -118,45 +119,56 @@ int Formats::FormatJSON::_parseNumber (const String &s, int &pos) {
 	return num.indexOf('.') >= 0 ? num.toFloat() : num.toInt();
 }
 
-String Formats::FormatJSON::BucketFormatMIME () {
+String Formats::FormatJSON::ValueFormatMIME () {
 	return "application/json";
 }
 
-String Formats::FormatJSON::BucketFormatSerialize (Bucket &bucket) {
+String Formats::FormatJSON::ValueFormatSerialize (Value &value) {
 	String out = "";
 
-	if (bucket.HasKey())
-		out += "\"" + bucket.Key() + "\":";
+	if (value.HasKey())
+		out += "\"" + value.Key() + "\":";
 
-	if (bucket.IsValue()) {
-		Value &v = bucket.AsValue();
-		bool s = v.IsString();
-
-		out += (s ? "\"" : "") + v.ToString() + (s ? "\"" : "");
-	}
-
-	if (bucket.IsArray()) {
+	if (value.IsArray()) {
 		out += "[";
+		bool start = false;
 
-		for (Bucket &v : bucket)
-			out += Formats::FormatJSON::BucketFormatSerialize(v) + String(v.End() ? "" : ",");
+		for (Value &v : value) {
+			if (start) out += ",";
+			else start = true;
+
+			out += Formats::FormatJSON::ValueFormatSerialize(v);// + String(v.End() ? "" : ",");
+		}
 
 		out += "]";
+
+		return out;
 	}
 
-	if (bucket.IsObject()) {
+	if (value.IsObject()) {
 		out += "{";
+		bool start = false;
 
-		for (Bucket &v : bucket)
-			out += Formats::FormatJSON::BucketFormatSerialize(v) + String(v.End() ? "" : ",");
+		for (Value &v : value) {
+			if (start) out += ",";
+			else start = true;
+
+			out += Formats::FormatJSON::ValueFormatSerialize(v);// + String(v.End() ? "" : ",");
+		}
 
 		out += "}";
+
+		return out;
 	}
+
+	bool s = value.IsString();
+
+	out += (s ? "\"" : "") + value.ToString() + (s ? "\"" : "");
 
 	return out;
 }
 
-Bucket Formats::FormatJSON::BucketFormatDeserialize (const String &raw) {
+Value Formats::FormatJSON::ValueFormatDeserialize (const String &raw) {
 	int pos = 0;
 
 	return Formats::FormatJSON::_parseValue(raw, pos);

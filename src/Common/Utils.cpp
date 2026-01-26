@@ -4,7 +4,7 @@
 
 using namespace Qybercom;
 
-List<String> Qybercom::explode (String delimiter, String &input) {
+List<String> Qybercom::explode (String delimiter, String input) {
 	List<String> out;
 
 	unsigned int start = 0;
@@ -57,6 +57,22 @@ uint8_t* Qybercom::strBuf (String &str) {
 
 			i++;
 		}
+	}
+
+	return out;
+}
+
+char* Qybercom::strDup (const char* s) {
+	if (!s) return nullptr;
+
+	int len = strlen(s) + 1;
+	char* out = new char[len];
+	int i = 0;
+
+	while (i < len) {
+		out[i] = s[i];
+
+		i++;
 	}
 
 	return out;

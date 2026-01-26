@@ -2,7 +2,11 @@
 
 #include <Arduino.h>
 
+#include "../../Common/index.h"
+#if QYBERCOM_HEADER(<Ethernet.h>)
 #include <Ethernet.h>
+#define QYBERCOM_PROTONIX_NETWORK_ETHERNET
+#endif
 
 #include "../../IProtonixNetworkDriver.h"
 #include "../../IProtonixNetworkClient.h"

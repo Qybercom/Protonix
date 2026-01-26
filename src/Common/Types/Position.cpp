@@ -2,7 +2,7 @@
 
 #include "Position.h"
 
-using namespace Qybercom;
+using namespace Qybercom::Types;
 
 Position::Position (double x, double y, double z) {
 	X = x;
@@ -10,7 +10,7 @@ Position::Position (double x, double y, double z) {
 	Z = z;
 }
 
-void Position::ValueDeserialize (const String &raw) {
+void Position::ValueTypeDeserialize (const String &raw) {
 	int i = 0;
 	int length = raw.length();
 	String pos[4] = {"", "", ""};
@@ -33,7 +33,7 @@ void Position::ValueDeserialize (const String &raw) {
 	Z = pos[2].toInt();
 }
 
-String Position::ValueSerialize () const {
+String Position::ValueTypeSerialize () const {
 	return String(X)
 		+ "," + String(Y)
 		+ "," + String(Z);

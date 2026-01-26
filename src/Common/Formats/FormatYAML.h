@@ -2,18 +2,18 @@
 
 #include <Arduino.h>
 
-#include "../Data/index.h"
+#include "../Value.h"
 
 namespace Qybercom {
 	namespace Formats {
-		class FormatYAML : public IBucketFormat {
+		class FormatYAML : public IValueFormat {
 			private:
-				static String _serialize (Bucket &bucket, int indentSize = 0, bool first = true);
+				static String _serialize (Value &value, int indentSize = 0, bool first = true);
 			
 			public:
-				String BucketFormatMIME ();
-				String BucketFormatSerialize (Bucket &bucket);
-				Bucket BucketFormatDeserialize (const String &raw);
+				String ValueFormatMIME ();
+				String ValueFormatSerialize (Value &value);
+				Value ValueFormatDeserialize (const String &raw);
 		};
 	}
 }

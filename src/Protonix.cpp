@@ -70,43 +70,43 @@ Protonix::Protonix (IProtonixDevice* device, IProtonixProfile* profile) {
 
 	#if defined(ARDUINO_ARCH_ESP32)
 		// @note - seems like on average board the result is always generic `esp32`
-	    #if defined(CONFIG_IDF_TARGET_ESP32)
-	        this->_platform = "esp32";
-	    #elif defined(CONFIG_IDF_TARGET_ESP32S2)
-	        this->_platform = "esp32_s2";
-	    #elif defined(CONFIG_IDF_TARGET_ESP32S3)
-	        this->_platform = "esp32_s3";
-	    #elif defined(CONFIG_IDF_TARGET_ESP32C3)
-	        this->_platform = "esp32_c3";
-	    #elif defined(CONFIG_IDF_TARGET_ESP32C6)
-	        this->_platform = "esp32_c6";
-	    #elif defined(CONFIG_IDF_TARGET_ESP32H2)
-	        this->_platform = "esp32_h2";
-	    #else
-	        this->_platform = "esp32";
-	    #endif
+		#if defined(CONFIG_IDF_TARGET_ESP32)
+			this->_platform = "esp32";
+		#elif defined(CONFIG_IDF_TARGET_ESP32S2)
+			this->_platform = "esp32_s2";
+		#elif defined(CONFIG_IDF_TARGET_ESP32S3)
+			this->_platform = "esp32_s3";
+		#elif defined(CONFIG_IDF_TARGET_ESP32C3)
+			this->_platform = "esp32_c3";
+		#elif defined(CONFIG_IDF_TARGET_ESP32C6)
+			this->_platform = "esp32_c6";
+		#elif defined(CONFIG_IDF_TARGET_ESP32H2)
+			this->_platform = "esp32_h2";
+		#else
+			this->_platform = "esp32";
+		#endif
 	#elif defined(ARDUINO_ARCH_ESP8266)
-	    this->_platform = "esp8266";
+		this->_platform = "esp8266";
 	#elif defined(ARDUINO_ARCH_AVR)
-	    #if defined(ARDUINO_AVR_UNO)
-	        this->_platform = "arduino_uno";
-	    #elif defined(ARDUINO_AVR_NANO)
-	        this->_platform = "arduino_nano";
-	    #elif defined(ARDUINO_AVR_MEGA2560)
-	        this->_platform = "arduino_mega";
-	    #elif defined(ARDUINO_AVR_LEONARDO)
-	        this->_platform = "arduino_leonardo";
-	    #elif defined(__AVR_ATmega328P__)
-	        this->_platform = "arduino_atmega328p";
-	    #else
-	        this->_platform = "arduino_avr";
-	    #endif
+		#if defined(ARDUINO_AVR_UNO)
+			this->_platform = "arduino_uno";
+		#elif defined(ARDUINO_AVR_NANO)
+			this->_platform = "arduino_nano";
+		#elif defined(ARDUINO_AVR_MEGA2560)
+			this->_platform = "arduino_mega";
+		#elif defined(ARDUINO_AVR_LEONARDO)
+			this->_platform = "arduino_leonardo";
+		#elif defined(__AVR_ATmega328P__)
+			this->_platform = "arduino_atmega328p";
+		#else
+			this->_platform = "arduino_avr";
+		#endif
 	#elif defined(ARDUINO_ARCH_SAM)
-	    this->_platform = "arduino_due";
+		this->_platform = "arduino_due";
 	#elif defined(ARDUINO_ARCH_SAMD)
-	    this->_platform = "arduino_samd";
+		this->_platform = "arduino_samd";
 	#elif defined(ARDUINO_ARCH_RP2040)
-	    this->_platform = "rp2040";
+		this->_platform = "rp2040";
 	#else
 		this->_platform = "";
 	#endif
@@ -274,8 +274,11 @@ Protonix* Protonix::Pipe () {
 	this->_timerUptime->Pipe();
 
 	if (!this->_ready && this->_timerInitDelay->Pipe()) {
+		Serial.print("[ready.1]"); Serial.println(ESP.getFreeHeap());
 		this->_ready = true;
 		this->_timerInitDelay->Enabled(false);
+
+		this->_registry->Load();
 
 		bool i2c = false;
 		bool spi = false;
@@ -319,12 +322,14 @@ Protonix* Protonix::Pipe () {
 		for (IProtonixHardware* hardware : this->_hardware)
 			hardware->HardwareInitPost(this);
 
+		Serial.print("[ready.2]"); Serial.println(ESP.getFreeHeap());
 		this->_device->DeviceOnReady(this);
 	}
 
 	for (IProtonixNetworkDriver* network : this->_networks)
 		network->NetworkDriverPipe(this);
 
+	//Serial.print("[hw.1]"); Serial.println(ESP.getFreeHeap());
 	for (IProtonixHardware* hardware : this->_hardware) {
 		#if defined(ESP32)
 		if (hardware->HardwareDedicatedCore() != -1) continue;
@@ -332,13 +337,19 @@ Protonix* Protonix::Pipe () {
 
 		hardware->HardwarePipe(this, -1);
 	}
+	//Serial.print("[hw.2]"); Serial.println(ESP.getFreeHeap());
 
+	//Serial.print("[profile.1]"); Serial.println(ESP.getFreeHeap());
 	if (this->_profile != nullptr)
 		this->_profile->ProfilePipe(this);
+	//Serial.print("[profile.2]"); Serial.println(ESP.getFreeHeap());
 
+	//Serial.print("[device.loop.1]"); Serial.println(ESP.getFreeHeap());
 	this->_device->DeviceOnLoop(this);
+	//Serial.print("[device.loop.2]"); Serial.println(ESP.getFreeHeap());
 
 	if (this->_signals.Count() != 0) {
+		//Serial.print("[signals.1]"); Serial.println(ESP.getFreeHeap());
 		for (ProtonixSignal* signal : this->_signals) {
 			Serial.println("[debug] " + signal->From() + ":" + signal->ID());
 
@@ -349,12 +360,17 @@ Protonix* Protonix::Pipe () {
 		}
 
 		this->_signals.Clear();
+		//Serial.print("[signals.1]"); Serial.println(ESP.getFreeHeap());
 	}
 
-	if (this->_timerTick->Pipe())
+	if (this->_timerTick->Pipe()) {
+		//Serial.print("[device.tick.1]"); Serial.println(ESP.getFreeHeap());
 		this->_device->DeviceOnTick(this);
+		//Serial.print("[device.tick.2]"); Serial.println(ESP.getFreeHeap());
+	}
 
 	if (this->_actionQueue.Count() != 0) {
+		//Serial.print("[actiob.queue.1]"); Serial.println(ESP.getFreeHeap());
 		ProtonixAction* action = this->Action(this->_actionQueue.First());
 
 		if (action != nullptr) {
@@ -372,6 +388,7 @@ Protonix* Protonix::Pipe () {
 					this->_actionQueue.PopFirst();
 			}
 		}
+		//Serial.print("[action.queue.2]"); Serial.println(ESP.getFreeHeap());
 	}
 
 	for (ProtonixAction* action : this->_actions) {
@@ -599,13 +616,13 @@ IProtonixNetworkDriver* Protonix::NetworkDefault (String name) {
 
 
 
-List<Qybercom::IBucketFormat*> &Protonix::Formats () {
+List<Qybercom::IValueFormat*> &Protonix::Formats () {
 	return this->_formats;
 }
 
-Qybercom::IBucketFormat* Protonix::Format (String mime) {
-	for (Qybercom::IBucketFormat* format : this->_formats)
-		if (format->BucketFormatMIME() == mime) return format;
+Qybercom::IValueFormat* Protonix::Format (String mime) {
+	for (Qybercom::IValueFormat* format : this->_formats)
+		if (format->ValueFormatMIME() == mime) return format;
 
 	return nullptr;
 }

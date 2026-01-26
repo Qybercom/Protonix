@@ -2,11 +2,11 @@
 
 #include <Arduino.h>
 
-#include "../Data/index.h"
+#include "../Value.h"
 
 namespace Qybercom {
 	namespace Formats {
-		class FormatURLEncoded : public IBucketFormat {
+		class FormatURLEncoded : public IValueFormat {
 			private:
 				static String SYMBOLS_CLEAR[];
 				static String SYMBOLS_CODES[];
@@ -14,15 +14,15 @@ namespace Qybercom {
 				static void _encode (String &s);
 				static void _decode (String &s);
 
-				static void _path (Bucket &node, List<String> &keys, String &value);
+				static void _path (Value &node, List<String> &keys, String &value);
 
-				static void _serialize (Bucket &bucket, String &out, String &prefix);
-				static void _deserialize (Bucket &root, String &raw);
+				static void _serialize (Value &value, String &out, String &prefix);
+				static void _deserialize (Value &root, String &raw);
 
 			public:
-				String BucketFormatMIME ();
-				String BucketFormatSerialize (Bucket &bucket);
-				Bucket BucketFormatDeserialize (const String &raw);
+				String ValueFormatMIME ();
+				String ValueFormatSerialize (Value &value);
+				Value ValueFormatDeserialize (const String &raw);
 			};
 	}
 }

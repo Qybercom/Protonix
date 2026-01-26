@@ -45,11 +45,11 @@ bool ProtonixSignal::Is (String from, String id) {
 	return this->_id == id && this->_from == from;
 }
 
-Bucket &ProtonixSignal::Data () {
+Value &ProtonixSignal::Data () {
 	return this->_data;
 }
 
-ProtonixSignal* ProtonixSignal::Data (Bucket data) {
+ProtonixSignal* ProtonixSignal::Data (Value data) {
 	this->_data = data;
 
 	return this;

@@ -22,13 +22,13 @@ namespace Qybercom {
 		class ProtonixRegistry {
 			private:
 				ProtonixMemory* _memory;
-				Qybercom::IBucketFormat* _format;
-				Qybercom::Bucket _data;
+				IValueFormat* _format;
+				Value _data;
 				String _raw;
 				bool _loaded;
 				bool _debug;
 
-				bool _load ();
+				//bool _load ();
 				/*JsonDocument _buffer;
 				String _bufferRaw;
 				JsonObject _bufferObj;*/
@@ -48,10 +48,12 @@ namespace Qybercom {
 
 				ProtonixRegistry (ProtonixMemory* memory);
 
-				Qybercom::Bucket &Data ();
+				Value &Data ();
 
 				ProtonixRegistry* Debug (bool debug);
 				bool Debug ();
+
+				bool Load ();
 
 				String &Raw ();
 
