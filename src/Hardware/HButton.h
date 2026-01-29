@@ -10,7 +10,7 @@
 namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
-			class HButton : public IProtonixHardware {
+			class HButton : public IProtonixHardware, public IValueListener {
 				private:
 					HTrigger* _trigger;
 					String _signalChanged;
@@ -51,6 +51,9 @@ namespace Qybercom {
 					void HardwarePipeInterrupt (Protonix* device);
 					void HardwareOnReset (Protonix* device);
 					void HardwareOnCommand (Protonix* device, String command);
+
+					void ValueListenerGet (Value &value);
+					void ValueListenerSet (Value &value);
 			};
 		}
 	}

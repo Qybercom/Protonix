@@ -283,13 +283,13 @@ namespace Qybercom {
 
 			Iterator end () { return Iterator(this, nullptr); }
 
-			T& operator[] (unsigned int index) {
+			T &operator[] (unsigned int index) {
 				Node* node = GetNode(index);
 
 				return node == nullptr ? (*(T*) 0) : node->Data;
 			}
 
-			const T& operator[] (unsigned int index) const {
+			const T &operator[] (unsigned int index) const {
 				Node* node = const_cast<List*>(this)->GetNode(index);
 
 				return node == nullptr ? (*(T*) 0) : node->Data;

@@ -10,7 +10,6 @@ namespace Qybercom {
 			private:
 				String _id;
 				String _from;
-				//Any _value;
 				Value _data;
 
 			public:
@@ -26,20 +25,6 @@ namespace Qybercom {
 				bool Is (String id);
 				bool Is (String from, String id);
 
-				/*Any Value ();
-				template<typename T>
-			 	T ValueAs (T fallback) {
-			 		return this->_value.As<T>(fallback);
-			 	}
-				template<typename T>
-			 	T* ValueAs () {
-			 		return this->_value.As<T>();
-			 	}
-				ProtonixSignal* Value (Any value);
-				template<typename T>
-				ProtonixSignal* Value (const T& value) {
-					return this->Value(Any(value));
-				}*/
 				ProtonixSignal* Data (Value data);
 				Value &Data ();
 

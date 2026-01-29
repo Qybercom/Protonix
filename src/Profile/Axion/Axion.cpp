@@ -65,11 +65,11 @@ void Profile::Axion::Axion::ProfilePipe (Protonix* device) {
 			Value dto = Value::Deserialize(this->_format, cmd);
 			//dto.Dump();
 
-			if (dto.HasKey("url")) {
+			if (dto.Contains("url")) {
 				// normally should not occur
 			}
 
-			if (dto.HasKey("response")) {
+			if (dto.Contains("response")) {
 				url = (String)dto["response"];
 				int status = dto["data"]["status"];
 
@@ -92,7 +92,7 @@ void Profile::Axion::Axion::ProfilePipe (Protonix* device) {
 				}
 			}
 
-			if (dto.HasKey("event")) {
+			if (dto.Contains("event")) {
 				url = (String)dto["event"];
 
 				if (this->_debug)
@@ -249,14 +249,16 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 	if (this->_debug)
 		Serial.println("[Axion:RequestStreamDeviceData]");
 
-	//Serial.print("[axion:request:1]"); Serial.println(ESP.getFreeHeap());
-	Value dto = Value::Object();
 	#if defined(ESP32) || defined(ESP8266)
 	bool first = this->_dataFirst;
 	if (first) this->_dataFirst = false;
 	#else
 	bool first = false;
 	#endif
+	if (first) {
+		Serial.print("[axion:request:1]"); Serial.println(ESP.getFreeHeap());
+	}
+	Value dto = Value::Object();
 
 	dto["active"] = device->Active();
 	dto["platform"] = device->Platform();
@@ -328,7 +330,9 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 
 	//dto["registry"] = device->Registry()->Raw();
 	#endif
-	//Serial.print("[axion:request:2]"); Serial.println(ESP.getFreeHeap());
+	if (first) {
+		Serial.print("[axion:request:2]"); Serial.println(ESP.getFreeHeap());
+	}
 
 	this->RequestStream(device, "/api/mechanism/status", dto);
 }

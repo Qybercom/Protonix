@@ -25,6 +25,8 @@ void Hardware::HButton::_signal (Protonix* device) {
 Hardware::HButton::HButton (unsigned short pin) {
 	this->_trigger = Hardware::HTrigger::Input(pin);
 
+	this->_config.Listener(this);
+
 	/*this->_config
 		.Set("signal:Changed", String("changed"))
 		.Set("signal:Pressed", String("pressed"))
@@ -140,4 +142,13 @@ void Hardware::HButton::HardwareOnCommand (Protonix* device, String command) {
 	(void)command;
 
 	// TODO: send command to trigger
+}
+
+void Hardware::HButton::ValueListenerGet (Value &value) {
+	Serial.println("[debug:hardware:button] Config get '" + value.Key() + "'");
+}
+
+void Hardware::HButton::ValueListenerSet (Value &value) {
+	Serial.print("[debug:hardware:button] Config set '" + value.Key() + "': ");
+	value.Dump();
 }

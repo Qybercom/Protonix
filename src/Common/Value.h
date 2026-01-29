@@ -17,9 +17,15 @@ namespace Qybercom {
 
 	class IValueFormat {
 		public:
-			virtual String ValueFormatMIME ();
+			virtual String ValueFormatMIME () = 0;
 			virtual String ValueFormatSerialize (Value &value) = 0;
 			virtual Value ValueFormatDeserialize (const String &raw) = 0;
+	};
+
+	class IValueListener {
+		public:
+			virtual void ValueListenerGet (Value &value) = 0;
+			virtual void ValueListenerSet (Value &value) = 0;
 	};
 
 	class Value {
@@ -52,42 +58,26 @@ namespace Qybercom {
 			} _value;
 
 			char* _key = nullptr;
+			IValueListener* _listener = nullptr;
 
 			void _allocate ();
 
 		public:
 			Value ();
-			Value (bool v);
-			Value (short v);
-			Value (unsigned short v);
-			Value (int v);
-			Value (unsigned int v);
-			Value (long v);
-			Value (unsigned long v);
-			Value (float v);
-			Value (double v);
-			Value (const char* s);
-			Value (String s);
-			Value (const Value &other);
+			Value (bool value);
+			Value (short value);
+			Value (unsigned short value);
+			Value (int value);
+			Value (unsigned int value);
+			Value (long value);
+			Value (unsigned long value);
+			Value (float value);
+			Value (double value);
+			Value (const char* value);
+			Value (const String &value);
+			Value (const Value &value);
 
 			~Value ();
-
-			Value &operator= (bool v);
-			Value &operator= (short v);
-			Value &operator= (unsigned short v);
-			Value &operator= (int v);
-			Value &operator= (unsigned int v);
-			Value &operator= (long v);
-			Value &operator= (unsigned long v);
-			Value &operator= (float v);
-			Value &operator= (double v);
-			Value &operator= (const char* s);
-			Value &operator= (String s);
-			Value &operator= (const Value &other);
-
-			Value &operator[] (const char* key);
-			Value &operator[] (const String &key);
-			Value &operator[] (int index);
 
 			operator bool () const;
 			operator short () const;
@@ -100,6 +90,60 @@ namespace Qybercom {
 			operator double () const;
 			operator char* () const;
 			operator String () const;
+			template <typename T>
+			T As () const {
+				return static_cast<T>(*this);
+			}
+
+			Value &operator[] (const char* key);
+			Value &operator[] (const String &key);
+			Value &operator[] (int index);
+
+			Value &operator= (bool value);
+			Value &operator= (short value);
+			Value &operator= (unsigned short value);
+			Value &operator= (int value);
+			Value &operator= (unsigned int value);
+			Value &operator= (long value);
+			Value &operator= (unsigned long value);
+			Value &operator= (float value);
+			Value &operator= (double value);
+			Value &operator= (const char* value);
+			Value &operator= (const String &value);
+			Value &operator= (const Value &value);
+
+			Value &Get (const char* key);
+			Value &Get (const String &key);
+			Value &Get (int index);
+			template<typename T>
+			T Get (const char* key) {
+				return (*this)[key];
+			}
+			template<typename T>
+			T Get (const String &key) {
+				return (*this)[key.c_str()];
+			}
+
+			Value &Set (bool value);
+			Value &Set (short value);
+			Value &Set (unsigned short value);
+			Value &Set (int value);
+			Value &Set (unsigned int value);
+			Value &Set (long value);
+			Value &Set (unsigned long value);
+			Value &Set (float value);
+			Value &Set (double value);
+			Value &Set (const char* value);
+			Value &Set (const String &value);
+			Value &Set (const Value &value);
+			template<typename T>
+			Value &Set (const char* key, T value) {
+				return (*this)[key] = value;
+			}
+			template<typename T>
+			Value &Set (const String &key, T value) {
+				return (*this)[key.c_str()] = value;
+			}
 
 			bool IsUndefined () const;
 			bool IsNull () const;
@@ -118,14 +162,15 @@ namespace Qybercom {
 			String Trace (bool type = false);
 			String Key () const;
 			bool HasKey () const;
-			bool HasKey (String key) const;
 			int Count () const;
 			int Capacity () const;
 
-			bool Contains (String key) const;
+			bool Contains (const char* key) const;
+			bool Contains (const String &key) const;
 
 			Value &Add (const Value &b);
 			Value &Clear ();
+			Value &Listener (IValueListener* listener);
 
 			Iterator begin ();
 			Iterator end ();
@@ -134,7 +179,8 @@ namespace Qybercom {
 			static Value Array ();
 
 			String Serialize (IValueFormat* format);
-			static Value Deserialize (IValueFormat* format, String raw);
+			//static Value Deserialize (IValueFormat* format, const char* raw);
+			static Value Deserialize (IValueFormat* format, const String &raw);
 
 			void Dump (int indent = 0);
 	};

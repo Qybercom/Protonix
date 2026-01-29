@@ -529,11 +529,11 @@ IProtonixHardware* Protonix::Hardware (String id) {
 	return nullptr;
 }
 
-IProtonixHardware* Protonix::Hardware (String id, IProtonixHardware* hardware, bool allowSignal) {
+Qybercom::Value &Protonix::Hardware (String id, IProtonixHardware* hardware, bool allowSignal) {
 	return this->HardwareOnBridge("", id, hardware, allowSignal);
 }
 
-IProtonixHardware* Protonix::HardwareOnBridge (String bridge, String id, IProtonixHardware* hardware, bool allowSignal) {
+Qybercom::Value &Protonix::HardwareOnBridge (String bridge, String id, IProtonixHardware* hardware, bool allowSignal) {
 	// TODO: add check for existent id
 
 	hardware->HardwareID(id);
@@ -542,7 +542,7 @@ IProtonixHardware* Protonix::HardwareOnBridge (String bridge, String id, IProton
 
 	this->_hardware.Add(hardware);
 
-	return hardware;
+	return hardware->HardwareConfig();
 }
 
 

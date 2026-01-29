@@ -18,7 +18,7 @@ namespace Qybercom {
 					bool _inputValue;
 
 					//Qybercom::Filter<unsigned short> _filter;
-					Qybercom::Debouncer<bool>* _debouncer;
+					Qybercom::Pipes::Debouncer<bool>* _debouncer;
 
 					//bool _input;
 					//unsigned short _pin;
@@ -35,7 +35,7 @@ namespace Qybercom {
 					static HTrigger* Input (unsigned short pin);
 					static HTrigger* Output (unsigned short pin);
 
-					Qybercom::Debouncer<bool>* Debouncer ();
+					Qybercom::Pipes::Debouncer<bool>* Debouncer ();
 
 					/*unsigned short Pin ();
 

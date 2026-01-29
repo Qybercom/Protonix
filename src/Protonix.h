@@ -124,8 +124,8 @@ namespace Qybercom {
 
 				List<IProtonixHardware*> &Hardware ();
 				IProtonixHardware* Hardware (String id);
-				IProtonixHardware* Hardware (String id, IProtonixHardware* hardware, bool allowSignal = true);
-				IProtonixHardware* HardwareOnBridge (String bridge, String id, IProtonixHardware* hardware, bool allowSignal = true);
+				Value &Hardware (String id, IProtonixHardware* hardware, bool allowSignal = true);
+				Value &HardwareOnBridge (String bridge, String id, IProtonixHardware* hardware, bool allowSignal = true);
 				template<typename T>
 				T* Hardware (String id) {
 					IProtonixHardware* base = this->Hardware(id);

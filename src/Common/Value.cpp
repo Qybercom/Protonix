@@ -59,244 +59,57 @@ Value::Value () {
 	_type = Value::TYPE::UNDEFINED;
 }
 
-Value::Value (bool v) {
-	_type = Value::TYPE::BOOL;
-	_value.BOOL = v;
+Value::Value (bool value) {
+	Set(value);
 }
 
-Value::Value (short v) {
-	_type = Value::TYPE::INT;
-	_value.INT = v;
+Value::Value (short value) {
+	Set(value);
 }
 
-Value::Value (unsigned short v) {
-	_type = Value::TYPE::INT;
-	_value.INT = v;
+Value::Value (unsigned short value) {
+	Set(value);
 }
 
-Value::Value (int v) {
-	_type = Value::TYPE::INT;
-	_value.INT = v;
+Value::Value (int value) {
+	Set(value);
 }
 
-Value::Value (unsigned int v) {
-	_type = Value::TYPE::INT;
-	_value.INT = v;
+Value::Value (unsigned int value) {
+	Set(value);
 }
 
-Value::Value (long v) {
-	_type = Value::TYPE::INT;
-	_value.INT = v;
+Value::Value (long value) {
+	Set(value);
 }
 
-Value::Value (unsigned long v) {
-	_type = Value::TYPE::INT;
-	_value.INT = v;
+Value::Value (unsigned long value) {
+	Set(value);
 }
 
-Value::Value (float v) {
-	_type = Value::TYPE::FLOAT;
-	_value.FLOAT = v;
+Value::Value (float value) {
+	Set(value);
 }
 
-Value::Value (double v) {
-	_type = Value::TYPE::FLOAT;
-	_value.FLOAT = v;
+Value::Value (double value) {
+	Set(value);
 }
 
-Value::Value (const char* s) {
-	_type = Value::TYPE::STRING;
-	_value.STRING = strDup(s);
+Value::Value (const char* value) {
+	Set(value);
 }
 
-Value::Value (String s) {
-	_type = Value::TYPE::STRING;
-	_value.STRING = strDup(s.c_str());
+Value::Value (const String &value) {
+	Set(value);
 }
 
-Value::Value (const Value &other) {
-	*this = other;
+Value::Value (const Value &value) {
+	*this = value;
 }
 
 
 Value::~Value () {
 	Clear();
-}
-
-
-Value &Value::operator= (bool v) {
-	Clear();
-
-	_type = Value::TYPE::BOOL;
-	_value.BOOL = v;
-
-	return *this;
-}
-
-Value &Value::operator= (short v) {
-	Clear();
-
-	_type = Value::TYPE::INT;
-	_value.INT = v;
-
-	return *this;
-}
-
-Value &Value::operator= (unsigned short v) {
-	Clear();
-
-	_type = Value::TYPE::INT;
-	_value.INT = v;
-
-	return *this;
-}
-
-Value &Value::operator= (int v) {
-	Clear();
-
-	_type = Value::TYPE::INT;
-	_value.INT = v;
-
-	return *this;
-}
-
-Value &Value::operator= (unsigned int v) {
-	Clear();
-
-	_type = Value::TYPE::INT;
-	_value.INT = v;
-
-	return *this;
-}
-
-Value &Value::operator= (long v) {
-	Clear();
-
-	_type = Value::TYPE::INT;
-	_value.INT = v;
-
-	return *this;
-}
-
-Value &Value::operator= (unsigned long v) {
-	Clear();
-
-	_type = Value::TYPE::INT;
-	_value.INT = v;
-
-	return *this;
-}
-
-Value &Value::operator= (float v) {
-	Clear();
-
-	_type = Value::TYPE::FLOAT;
-	_value.FLOAT = v;
-
-	return *this;
-}
-
-Value &Value::operator= (double v) {
-	Clear();
-
-	_type = Value::TYPE::FLOAT;
-	_value.FLOAT = v;
-
-	return *this;
-}
-
-Value &Value::operator= (const char* s) {
-	Clear();
-
-	_type = Value::TYPE::STRING;
-	_value.STRING = strDup(s);
-
-	return *this;
-}
-
-Value &Value::operator= (String s) {
-	Clear();
-
-	_type = Value::TYPE::STRING;
-	_value.STRING = strDup(s.c_str());
-
-	return *this;
-}
-
-Value &Value::operator= (const Value &other) {
-	if (this == &other) return *this;
-
-	Clear();
-
-	_type = other._type;
-
-	switch (_type) {
-		case Value::TYPE::BOOL: _value.BOOL = other._value.BOOL; break;
-		case Value::TYPE::INT: _value.INT = other._value.INT; break;
-		case Value::TYPE::FLOAT: _value.FLOAT = other._value.FLOAT; break;
-		case Value::TYPE::STRING: _value.STRING = strDup(other._value.STRING); break;
-		case Value::TYPE::OBJECT:
-		case Value::TYPE::ARRAY: {
-			_value.COLLECTION.items = nullptr;
-			_value.COLLECTION.count = 0;
-			_value.COLLECTION.capacity = 0;
-
-			int i = 0;
-
-			while (i < other._value.COLLECTION.count) {
-				Value &src = other._value.COLLECTION.items[i];
-
-				if (_type == Value::TYPE::OBJECT && src._key) (*this)[src._key] = src;
-				else Add(src);
-
-				i++;
-			}
-
-			break;
-		}
-		default: break;
-	}
-
-	return *this;
-}
-
-
-Value &Value::operator[] (const char* key) {
-	if (_type != Value::TYPE::OBJECT) {
-		Clear();
-
-		_type = Value::TYPE::OBJECT;
-		_value.COLLECTION.items = nullptr;
-		_value.COLLECTION.count = 0;
-		_value.COLLECTION.capacity = 0;
-	}
-
-	int i = 0;
-
-	while (i < _value.COLLECTION.count) {
-		Value &b = _value.COLLECTION.items[i];
-
-		if (b._key && strcmp(b._key, key) == 0)
-			return b;
-
-		i++;
-	}
-
-	_allocate();
-
-	Value &b = _value.COLLECTION.items[_value.COLLECTION.count++];
-	b = Value();
-	b._key = strDup(key);
-
-	return b;
-}
-
-Value &Value::operator[] (const String &key) {
-	return (*this)[key.c_str()];
-}
-
-Value &Value::operator[] (int index) {
-	return *this; // boilerplate
 }
 
 
@@ -342,6 +155,311 @@ Value::operator char* () const {
 
 Value::operator String () const {
 	return _type == Value::TYPE::STRING ? String(_value.STRING): "";
+}
+
+
+Value &Value::operator[] (const char* key) {
+	return Get(key);
+}
+
+Value &Value::operator[] (const String &key) {
+	return Get(key);
+}
+
+Value &Value::operator[] (int key) {
+	return Get(key);
+}
+
+
+Value &Value::operator= (bool value) {
+	return Set(value);
+}
+
+Value &Value::operator= (short value) {
+	return Set(value);
+}
+
+Value &Value::operator= (unsigned short value) {
+	return Set(value);
+}
+
+Value &Value::operator= (int value) {
+	return Set(value);
+}
+
+Value &Value::operator= (unsigned int value) {
+	return Set(value);
+}
+
+Value &Value::operator= (long value) {
+	return Set(value);
+}
+
+Value &Value::operator= (unsigned long value) {
+	return Set(value);
+}
+
+Value &Value::operator= (float value) {
+	return Set(value);
+}
+
+Value &Value::operator= (double value) {
+	return Set(value);
+}
+
+Value &Value::operator= (const char* value) {
+	return Set(value);
+}
+
+Value &Value::operator= (const String &value) {
+	return Set(value);
+}
+
+Value &Value::operator= (const Value &value) {
+	return Set(value);
+}
+
+
+Value &Value::Get (const char* key) {
+	if (_type != Value::TYPE::OBJECT) {
+		Clear();
+
+		_type = Value::TYPE::OBJECT;
+		_value.COLLECTION.items = nullptr;
+		_value.COLLECTION.count = 0;
+		_value.COLLECTION.capacity = 0;
+	}
+
+	int i = 0;
+
+	while (i < _value.COLLECTION.count) {
+		Value &item = _value.COLLECTION.items[i];
+
+		if (item._key && strcmp(item._key, key) == 0) {
+			item._listener = _listener;
+
+			if (item._listener != nullptr)
+				item._listener->ValueListenerGet(item);
+
+			return item;
+		}
+
+		i++;
+	}
+
+	_allocate();
+
+	Value &item = _value.COLLECTION.items[_value.COLLECTION.count++];
+	item = Value();
+	item._key = strDup(key);
+	item._listener = _listener;
+
+	if (item._listener != nullptr)
+		item._listener->ValueListenerGet(item);
+
+	return item;
+}
+
+Value &Value::Get (const String &key) {
+	//return (*this)[key.c_str()];
+	return Get(key.c_str());
+}
+
+Value &Value::Get (int key) {
+	if (_type != Value::TYPE::ARRAY) {
+		Clear();
+
+		_type = Value::TYPE::ARRAY;
+		_value.COLLECTION.items = nullptr;
+		_value.COLLECTION.count = 0;
+		_value.COLLECTION.capacity = 0;
+	}
+
+	if (key < 0) key = 0;
+
+	while (key >= _value.COLLECTION.count) {
+		_allocate();
+	}
+
+	Value &item = _value.COLLECTION.items[key];
+
+	if (_listener != nullptr)
+		_listener->ValueListenerGet(item);
+
+	return item;
+}
+
+
+Value &Value::Set (bool value) {
+	Clear();
+
+	_type = Value::TYPE::BOOL;
+	_value.BOOL = value;
+
+	if (_listener != nullptr)
+		_listener->ValueListenerSet(*this);
+
+	return *this;
+}
+
+Value &Value::Set (short value) {
+	Clear();
+
+	_type = Value::TYPE::INT;
+	_value.INT = value;
+
+	if (_listener != nullptr)
+		_listener->ValueListenerSet(*this);
+
+	return *this;
+}
+
+Value &Value::Set (unsigned short value) {
+	Clear();
+
+	_type = Value::TYPE::INT;
+	_value.INT = value;
+
+	if (_listener != nullptr)
+		_listener->ValueListenerSet(*this);
+
+	return *this;
+}
+
+Value &Value::Set (int value) {
+	Clear();
+
+	_type = Value::TYPE::INT;
+	_value.INT = value;
+
+	if (_listener != nullptr)
+		_listener->ValueListenerSet(*this);
+
+	return *this;
+}
+
+Value &Value::Set (unsigned int value) {
+	Clear();
+
+	_type = Value::TYPE::INT;
+	_value.INT = value;
+
+	if (_listener != nullptr)
+		_listener->ValueListenerSet(*this);
+
+	return *this;
+}
+
+Value &Value::Set (long value) {
+	Clear();
+
+	_type = Value::TYPE::INT;
+	_value.INT = value;
+
+	if (_listener != nullptr)
+		_listener->ValueListenerSet(*this);
+
+	return *this;
+}
+
+Value &Value::Set (unsigned long value) {
+	Clear();
+
+	_type = Value::TYPE::INT;
+	_value.INT = value;
+
+	if (_listener != nullptr)
+		_listener->ValueListenerSet(*this);
+
+	return *this;
+}
+
+Value &Value::Set (float value) {
+	Clear();
+
+	_type = Value::TYPE::FLOAT;
+	_value.FLOAT = value;
+
+	if (_listener != nullptr)
+		_listener->ValueListenerSet(*this);
+
+	return *this;
+}
+
+Value &Value::Set (double value) {
+	Clear();
+
+	_type = Value::TYPE::FLOAT;
+	_value.FLOAT = value;
+
+	if (_listener != nullptr)
+		_listener->ValueListenerSet(*this);
+
+	return *this;
+}
+
+Value &Value::Set (const char* value) {
+	Clear();
+
+	_type = Value::TYPE::STRING;
+	_value.STRING = strDup(value);
+
+	if (_listener != nullptr)
+		_listener->ValueListenerSet(*this);
+
+	return *this;
+}
+
+Value &Value::Set (const String &value) {
+	Clear();
+
+	_type = Value::TYPE::STRING;
+	_value.STRING = strDup(value.c_str());
+
+	if (_listener != nullptr)
+		_listener->ValueListenerSet(*this);
+
+	return *this;
+}
+
+Value &Value::Set (const Value &value) {
+	if (this == &value) return *this;
+
+	Clear();
+
+	_type = value._type;
+
+	switch (_type) {
+		case Value::TYPE::BOOL: _value.BOOL = value._value.BOOL; break;
+		case Value::TYPE::INT: _value.INT = value._value.INT; break;
+		case Value::TYPE::FLOAT: _value.FLOAT = value._value.FLOAT; break;
+		case Value::TYPE::STRING: _value.STRING = strDup(value._value.STRING); break;
+		case Value::TYPE::OBJECT:
+		case Value::TYPE::ARRAY: {
+			_value.COLLECTION.items = nullptr;
+			_value.COLLECTION.count = 0;
+			_value.COLLECTION.capacity = 0;
+
+			int i = 0;
+
+			while (i < value._value.COLLECTION.count) {
+				Value &src = value._value.COLLECTION.items[i];
+
+				if (_type == Value::TYPE::OBJECT && src._key) (*this)[(const char*)src._key] = src;
+				else Add(src);
+
+				i++;
+			}
+
+			break;
+		}
+		default: break;
+	}
+
+	if (_listener != nullptr)
+		_listener->ValueListenerSet(*this);
+
+	return *this;
 }
 
 
@@ -429,18 +547,6 @@ bool Value::HasKey () const {
 	return _key != nullptr;
 }
 
-bool Value::HasKey (String key) const {
-	int i = 0;
-	
-	while (i < _value.COLLECTION.count) {
-		if (_value.COLLECTION.items[i].Key() == key) return true;
-
-		i++;
-	}
-
-	return false;
-}
-
 int Value::Count () const {
 	return (_type == Value::TYPE::ARRAY || _type == Value::TYPE::OBJECT) ? _value.COLLECTION.count : -1;
 }
@@ -449,24 +555,33 @@ int Value::Capacity () const {
 	return (_type == Value::TYPE::ARRAY || _type == Value::TYPE::OBJECT) ? _value.COLLECTION.capacity : -1;
 }
 
-bool Value::Contains (String key) const {
+
+bool Value::Contains (const char* key) const {
 	if (_type != Value::TYPE::OBJECT || !_value.COLLECTION.items) return false;
 
 	int i = 0;
+	bool out = false;
 
 	while (i < _value.COLLECTION.count) {
 		char* k = _value.COLLECTION.items[i]._key;
 
-		if (k && strcmp(k, key.c_str()) == 0)
-			return true;
+		if (k && strcmp(k, key) == 0) {
+			out = true;
+			break;
+		}
 
 		i++;
 	}
 
-	return false;
+	return out;
 }
 
-Value &Value::Add (const Value &b) {
+bool Value::Contains (const String &key) const {
+	return Contains(key.c_str());
+}
+
+
+Value &Value::Add (const Value &item) {
 	if (_type != ARRAY) {
 		Clear();
 
@@ -479,7 +594,8 @@ Value &Value::Add (const Value &b) {
 	_allocate();
 
 	Value &out = _value.COLLECTION.items[_value.COLLECTION.count++];
-	out = b;
+	out = item;
+	out._listener = _listener;
 
 	return out;
 }
@@ -517,6 +633,13 @@ Value &Value::Clear () {
 	return *this;
 }
 
+Value &Value::Listener (IValueListener* listener) {
+	_listener = listener;
+
+	return *this;
+}
+
+
 Value::Iterator Value::begin () {
 	return (_type == Value::TYPE::OBJECT || _type == Value::TYPE::ARRAY) ? Iterator(_value.COLLECTION.items) : Iterator(nullptr);
 }
@@ -524,6 +647,7 @@ Value::Iterator Value::begin () {
 Value::Iterator Value::end () {
 	return (_type == Value::TYPE::OBJECT || _type == Value::TYPE::ARRAY) ? Iterator(_value.COLLECTION.items + _value.COLLECTION.count) : Iterator(nullptr);
 }
+
 
 Value Value::Object () {
 	Value b;
@@ -547,13 +671,15 @@ Value Value::Array () {
 	return b;
 }
 
+
 String Value::Serialize (IValueFormat* format) {
 	return format == nullptr ? "" : format->ValueFormatSerialize(*this);
 }
 
-Value Value::Deserialize (IValueFormat* format, String raw) {
+Value Value::Deserialize (IValueFormat* format, const String &raw) {
 	return format->ValueFormatDeserialize(raw);
 }
+
 
 void Value::Dump (int indent) {
 	Serial.print(Qybercom::indent(indent));

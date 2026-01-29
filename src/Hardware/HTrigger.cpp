@@ -60,7 +60,7 @@ Hardware::HTrigger::HTrigger (String mode, unsigned short pin) {
 	this->_inputChangedSignal = false;
 	this->_inputValue = false;
 
-	this->_debouncer = new Qybercom::Debouncer<bool>(false);
+	this->_debouncer = new Qybercom::Pipes::Debouncer<bool>(false);
 
 	/*this->_config
 		.Set("mode", mode)
@@ -125,7 +125,7 @@ Qybercom::Filter<unsigned short> &Hardware::HTrigger::Filter () {
 	return this->_filter;
 }*/
 
-Qybercom::Debouncer<bool>* Hardware::HTrigger::Debouncer () {
+Qybercom::Pipes::Debouncer<bool>* Hardware::HTrigger::Debouncer () {
 	return this->_debouncer;
 }
 
