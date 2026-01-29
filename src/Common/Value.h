@@ -24,8 +24,8 @@ namespace Qybercom {
 
 	class IValueListener {
 		public:
-			virtual void ValueListenerGet (Value &value) = 0;
-			virtual void ValueListenerSet (Value &value) = 0;
+			virtual void ValueListenerGet (Value &value) { }
+			virtual void ValueListenerSet (Value &value) { }
 	};
 
 	class Value {
@@ -97,7 +97,7 @@ namespace Qybercom {
 
 			Value &operator[] (const char* key);
 			Value &operator[] (const String &key);
-			Value &operator[] (int index);
+			Value &operator[] (int key);
 
 			Value &operator= (bool value);
 			Value &operator= (short value);
@@ -114,7 +114,7 @@ namespace Qybercom {
 
 			Value &Get (const char* key);
 			Value &Get (const String &key);
-			Value &Get (int index);
+			Value &Get (int key);
 			template<typename T>
 			T Get (const char* key) {
 				return (*this)[key];
@@ -136,6 +136,8 @@ namespace Qybercom {
 			Value &Set (const char* value);
 			Value &Set (const String &value);
 			Value &Set (const Value &value);
+			Value &Set (const char* key, const Value &value);
+			Value &Set (const String &key, const Value &value);
 			template<typename T>
 			Value &Set (const char* key, T value) {
 				return (*this)[key] = value;
@@ -144,6 +146,16 @@ namespace Qybercom {
 			Value &Set (const String &key, T value) {
 				return (*this)[key.c_str()] = value;
 			}
+			Value &Set (int key, const Value &value);
+			template<typename T>
+			Value &Set (int key, T value) {
+				return (*this)[key] = value;
+			}
+
+			Value &Replace (const Value &value);
+			Value &Replace (const char* key, const Value &value);
+			Value &Replace (const String &key, const Value &value);
+			Value &Replace (int key, const Value &value);
 
 			bool IsUndefined () const;
 			bool IsNull () const;
@@ -167,6 +179,7 @@ namespace Qybercom {
 
 			bool Contains (const char* key) const;
 			bool Contains (const String &key) const;
+			bool Contains (int key) const;
 
 			Value &Add (const Value &b);
 			Value &Clear ();

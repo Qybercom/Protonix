@@ -62,6 +62,12 @@ Hardware::HTrigger::HTrigger (String mode, unsigned short pin) {
 
 	this->_debouncer = new Qybercom::Pipes::Debouncer<bool>(false);
 
+	this->_config["mode"] = mode;
+	this->_config["pin"] = pin;
+	this->_config["debounce"] = 0;
+	this->_config["initial"] = true;
+	this->_config["interrupt"] = false;
+	this->_config["signal:InputChanged"] = "inputChanged";
 	/*this->_config
 		.Set("mode", mode)
 		.Set("pin", pin)
@@ -184,6 +190,11 @@ bool Hardware::HTrigger::HardwareSPI () {
 void Hardware::HTrigger::HardwareInitPost (Protonix* device) {
 	unsigned short pin = 0;//this->_config.Get<unsigned short>("pin", 0);
 	String mode = "";//this->_config.Get<String>("mode", "");
+
+	unsigned short pinNew = this->_config["pin"];
+	Serial.println("[debug] trigger.init.pin " + String(pinNew));
+	unsigned short debounce = this->_config["debounce"];
+	Serial.println("[debug] trigger.init.debounce " + String(debounce));
 
 	if (mode == "input") {
 		this->_bridge->BridgePinInitInputUp(pin, 0);//this->_config.Get<bool>("initial", true));

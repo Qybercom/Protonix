@@ -52,7 +52,6 @@ namespace Qybercom {
 					void HardwareOnReset (Protonix* device);
 					void HardwareOnCommand (Protonix* device, String command);
 
-					void ValueListenerGet (Value &value);
 					void ValueListenerSet (Value &value);
 			};
 		}

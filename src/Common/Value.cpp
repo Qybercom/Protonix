@@ -261,7 +261,6 @@ Value &Value::Get (const char* key) {
 }
 
 Value &Value::Get (const String &key) {
-	//return (*this)[key.c_str()];
 	return Get(key.c_str());
 }
 
@@ -462,6 +461,50 @@ Value &Value::Set (const Value &value) {
 	return *this;
 }
 
+Value &Value::Set (const char* key, const Value &value) {
+	(*this)[key] = value;
+
+	return *this;
+}
+
+Value &Value::Set (const String &key, const Value &value) {
+	(*this)[key.c_str()] = value;
+
+	return *this;
+}
+
+Value &Value::Set (int key, const Value &value) {
+	(*this)[key] = value;
+
+	return *this;
+}
+
+
+Value &Value::Replace (const Value &value) {
+	if (Contains(value.Key()))
+		Set(value.Key(), value);
+
+	return *this;
+}
+
+Value &Value::Replace (const char* key, const Value &value) {
+	if (Contains(key))
+		Set(key, value);
+
+	return *this;
+}
+
+Value &Value::Replace (const String &key, const Value &value) {
+	return Replace(key.c_str(), value);
+}
+
+Value &Value::Replace (int key, const Value &value) {
+	if (Contains(key))
+		Set(key, value);
+
+	return *this;
+}
+
 
 bool Value::IsUndefined () const {
 	return _type == Value::TYPE::UNDEFINED;
@@ -578,6 +621,13 @@ bool Value::Contains (const char* key) const {
 
 bool Value::Contains (const String &key) const {
 	return Contains(key.c_str());
+}
+
+bool Value::Contains (int key) const {
+	if (_type != Value::TYPE::ARRAY) return false;
+	if (key < 0 || key >= (int)_value.COLLECTION.count) return false;
+
+	return true;
 }
 
 
