@@ -17,14 +17,7 @@ namespace Qybercom {
 					bool _inputChangedSignal;
 					bool _inputValue;
 
-					//Qybercom::Filter<unsigned short> _filter;
 					Qybercom::Pipes::Debouncer<bool>* _debouncer;
-
-					//bool _input;
-					//unsigned short _pin;
-					//bool _interrupt;
-					//unsigned short _inputInitial;
-					//String _signalInputChanged;
 
 					bool _pipe ();
 					bool _inputChangedHandler ();
@@ -37,25 +30,11 @@ namespace Qybercom {
 
 					Qybercom::Pipes::Debouncer<bool>* Debouncer ();
 
-					/*unsigned short Pin ();
-
-					Qybercom::Filter<unsigned short> &Filter ();
-
-					unsigned short InputInitial ();
-					HTrigger* InputInitial (unsigned short value);
-
-					bool Interrupt ();
-					HTrigger* Interrupt (bool interrupt);
-
-					String SignalInputChanged ();
-					HTrigger* SignalInputChanged (String signal);*/
-
 					bool InputChanged ();
 					bool InputValue ();
 
 					bool OutputValue (unsigned short value);
 
-					//void HardwareConfigSet (String key, Any value);
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					bool HardwareI2C ();

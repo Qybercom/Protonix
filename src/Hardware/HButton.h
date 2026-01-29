@@ -13,9 +13,6 @@ namespace Qybercom {
 			class HButton : public IProtonixHardware, public IValueListener {
 				private:
 					HTrigger* _trigger;
-					String _signalChanged;
-					String _signalPressed;
-					String _signalReleased;
 
 					void _signal (Protonix* device);
 
@@ -25,23 +22,11 @@ namespace Qybercom {
 
 					HTrigger* Trigger ();
 
-					/*
-					String SignalChanged ();
-					HButton* SignalChanged (String signal);
-
-					String SignalPressed ();
-					HButton* SignalPressed (String signal);
-
-					String SignalReleased ();
-					HButton* SignalReleased (String signal);
-					*/
-
 					bool Changed ();
 					bool Active ();
 					bool Pressed (bool changed = true);
 					bool Released (bool changed = true);
 
-					//void HardwareConfigSet (String key, Any value);
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					bool HardwareI2C ();
