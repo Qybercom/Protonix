@@ -18,7 +18,7 @@ Hardware::HPlayerMP3::HPlayerMP3 (unsigned short pinRX, unsigned short pinTX) {
 bool Hardware::HPlayerMP3::_cmd (byte a1, byte a2, byte a3, byte a4) {
 	if (this->_player == nullptr) return false;
 
-	this->_log("CMD: " + String(a1) + ":" + String(a2) + ":" + String(a3) + ":" + String(a4));
+	//this->_log("CMD: " + String(a1) + ":" + String(a2) + ":" + String(a3) + ":" + String(a4));
 
 	this->_player->Write((byte)0x7E);	// Код начала команды
 	this->_player->Write((byte)0xFF);	// Все модули

@@ -8,6 +8,12 @@ Hardware::HBridgeDefault::HBridgeDefault () {
 
 }
 
+bool Hardware::HBridgeDefault::BridgePinDualPolarity (unsigned int pin) {
+	(void)pin; // TODO: add feature for per-pin check
+
+	return true;
+}
+
 bool Hardware::HBridgeDefault::BridgePinInitInput (unsigned int pin, int initial) {
 	return true
 		&& this->BridgeDigitalWrite(pin, initial)

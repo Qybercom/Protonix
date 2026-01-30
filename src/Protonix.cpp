@@ -351,7 +351,7 @@ Protonix* Protonix::Pipe () {
 	if (this->_signals.Count() != 0) {
 		//Serial.print("[signals.1]"); Serial.println(ESP.getFreeHeap());
 		for (ProtonixSignal* signal : this->_signals) {
-			Serial.println("[debug] " + signal->From() + ":" + signal->ID());
+			//Serial.println("[debug] " + signal->From() + ":" + signal->ID());
 
 			this->_device->DeviceOnSignal(this, signal);
 
@@ -401,7 +401,7 @@ Protonix* Protonix::Pipe () {
 }
 
 bool Protonix::Reboot () {
-	Serial.println("[debug] reboot");
+	//Serial.println("[debug] reboot");
 	#if defined(ESP32) || defined(ESP8266)
 		ESP.restart();
 

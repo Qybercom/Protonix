@@ -31,8 +31,12 @@ bool Hardware::HTrigger::_pipe () {
 
 	unsigned short pin = this->_config["pin"];
 	bool value = this->_bridge->BridgeDigitalRead(pin);
-	if (pin == 27)
-	Serial.println("[debug] " + String(value));
+	bool dual = this->_bridge->BridgePinDualPolarity(pin);
+
+	unsigned int debounce = this->_config["debounce"];
+	this->_debouncer->Threshold(debounce);
+
+	value = dual ? (this->_config["initial"] ? value : !value) : value;
 	value = this->_debouncer->Value(value);
 
 	if (this->_inputValue != value) {
@@ -135,7 +139,6 @@ void Hardware::HTrigger::HardwareInitPost (Protonix* device) {
 
 	if (mode == "input") {
 		this->_bridge->BridgePinInitInputUp(pin, this->_config["initial"]);
-		//this->_bridge->BridgePinInitInput(pin, this->_config["initial"]);
 
 		if (this->_config["interrupt"])
 			device->InterruptAttach(pin, CHANGE);

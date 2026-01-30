@@ -11,6 +11,8 @@ namespace Qybercom {
 				public:
 					HBridgeDefault ();
 
+					bool BridgePinDualPolarity (unsigned int pin);
+
 					bool BridgePinInitInput (unsigned int pin, int initial = 0);
 					bool BridgePinInitInputUp (unsigned int pin, int initial = 0);
 					bool BridgePinInitInputDown (unsigned int pin, int initial = 0);

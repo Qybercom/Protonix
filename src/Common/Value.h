@@ -140,16 +140,22 @@ namespace Qybercom {
 			Value &Set (const String &key, const Value &value);
 			template<typename T>
 			Value &Set (const char* key, T value) {
-				return (*this)[key] = value;
+				(*this)[key] = value;
+
+				return *this;
 			}
 			template<typename T>
 			Value &Set (const String &key, T value) {
-				return (*this)[key.c_str()] = value;
+				(*this)[key.c_str()] = value;
+
+				return *this;
 			}
 			Value &Set (int key, const Value &value);
 			template<typename T>
 			Value &Set (int key, T value) {
-				return (*this)[key] = value;
+				(*this)[key] = value;
+
+				return *this;
 			}
 
 			Value &Replace (const Value &value);

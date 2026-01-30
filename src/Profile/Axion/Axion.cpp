@@ -109,7 +109,7 @@ void Profile::Axion::Axion::ProfilePipe (Protonix* device) {
 					if (cmd.startsWith("axion:")) {
 						String trail = cmd.substring(6, cmd.length());
 
-						Serial.println("[debug] Axion command: " + trail);
+						Serial.println("[Axion] Self command: " + trail);
 
 						if (trail == "dataMemory:1")
 							this->_dataMemory = true;
@@ -255,8 +255,8 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 	#else
 	bool first = false;
 	#endif
-	if (first) {
-		Serial.print("[axion:request:1]"); Serial.println(ESP.getFreeHeap());
+	if (this->_debug && first) {
+		Serial.print("[Axion:RequestStreamDeviceData:1]"); Serial.println(ESP.getFreeHeap());
 	}
 	Value dto = Value::Object();
 
@@ -330,8 +330,8 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 
 	//dto["registry"] = device->Registry()->Raw();
 	#endif
-	if (first) {
-		Serial.print("[axion:request:2]"); Serial.println(ESP.getFreeHeap());
+	if (this->_debug && first) {
+		Serial.print("[Axion:RequestStreamDeviceData:2]"); Serial.println(ESP.getFreeHeap());
 	}
 
 	this->RequestStream(device, "/api/mechanism/status", dto);
