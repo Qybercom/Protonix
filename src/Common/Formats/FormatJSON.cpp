@@ -76,7 +76,6 @@ String Formats::FormatJSON::_parseString(const String &s, int &pos) {
 
 	while (pos < length) {
 		char c = s[pos++];
-
 		if (c == '"') break;
 
 		if (c == '\\' && pos < length) {
