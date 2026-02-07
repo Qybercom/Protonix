@@ -274,7 +274,7 @@ Protonix* Protonix::Pipe () {
 	this->_timerUptime->Pipe();
 
 	if (!this->_ready && this->_timerInitDelay->Pipe()) {
-		Serial.print("[ready.1]"); Serial.println(ESP.getFreeHeap());
+		//Serial.print("[ready.1]"); Serial.println(ESP.getFreeHeap());
 		this->_ready = true;
 		this->_timerInitDelay->Enabled(false);
 
@@ -322,7 +322,7 @@ Protonix* Protonix::Pipe () {
 		for (IProtonixHardware* hardware : this->_hardware)
 			hardware->HardwareInitPost(this);
 
-		Serial.print("[ready.2]"); Serial.println(ESP.getFreeHeap());
+		//Serial.print("[ready.2]"); Serial.println(ESP.getFreeHeap());
 		this->_device->DeviceOnReady(this);
 	}
 

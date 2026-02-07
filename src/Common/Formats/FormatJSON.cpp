@@ -28,7 +28,7 @@ Value Formats::FormatJSON::_parseValue (const String &s, int &pos) {
 
 Value Formats::FormatJSON::_parseObject (const String &s, int &pos) {
 	Value obj = Value::Object();
-	pos++; // skip '{'
+	pos++;
 	Formats::FormatJSON::_skip(s, pos);
 
 	while (pos < s.length() && s[pos] != '}') {
@@ -45,14 +45,14 @@ Value Formats::FormatJSON::_parseObject (const String &s, int &pos) {
 		Formats::FormatJSON::_skip(s, pos);
 	}
 
-	pos++; // skip '}'
+	pos++;
 
 	return obj;
 }
 
 Value Formats::FormatJSON::_parseArray (const String &s, int &pos) {
 	Value arr = Value::Array();
-	pos++; // skip '['
+	pos++;
 	Formats::FormatJSON::_skip(s, pos);
 
 	while (pos < s.length() && s[pos] != ']') {
@@ -64,38 +64,33 @@ Value Formats::FormatJSON::_parseArray (const String &s, int &pos) {
 		Formats::FormatJSON::_skip(s, pos);
 	}
 
-	pos++; // skip ']'
+	pos++;
 
 	return arr;
 }
 
 String Formats::FormatJSON::_parseString(const String &s, int &pos) {
-	pos++; // skip opening "
+	pos++;
 	String str;
 	int length = s.length();
 
 	while (pos < length) {
 		char c = s[pos++];
 
-		if (c == '"') {
-			// closing quote
-			break;
-		}
+		if (c == '"') break;
 
 		if (c == '\\' && pos < length) {
-			// escape sequence
 			char next = s[pos++];
 			switch (next) {
-				case '"':  str += '"';  break;
+				case '"': str += '"';  break;
 				case '\\': str += '\\'; break;
-				case '/':  str += '/';  break;
-				case 'b':  str += '\b'; break;
-				case 'f':  str += '\f'; break;
-				case 'n':  str += '\n'; break;
-				case 'r':  str += '\r'; break;
-				case 't':  str += '\t'; break;
+				case '/': str += '/';  break;
+				case 'b': str += '\b'; break;
+				case 'f': str += '\f'; break;
+				case 'n': str += '\n'; break;
+				case 'r': str += '\r'; break;
+				case 't': str += '\t'; break;
 				default:
-					// неизвестный экранированный символ, просто вставляем как есть
 					str += next;
 					break;
 			}
@@ -137,7 +132,7 @@ String Formats::FormatJSON::ValueFormatSerialize (Value &value) {
 			if (start) out += ",";
 			else start = true;
 
-			out += Formats::FormatJSON::ValueFormatSerialize(v);// + String(v.End() ? "" : ",");
+			out += Formats::FormatJSON::ValueFormatSerialize(v);
 		}
 
 		out += "]";
@@ -153,7 +148,7 @@ String Formats::FormatJSON::ValueFormatSerialize (Value &value) {
 			if (start) out += ",";
 			else start = true;
 
-			out += Formats::FormatJSON::ValueFormatSerialize(v);// + String(v.End() ? "" : ",");
+			out += Formats::FormatJSON::ValueFormatSerialize(v);
 		}
 
 		out += "}";
@@ -162,8 +157,47 @@ String Formats::FormatJSON::ValueFormatSerialize (Value &value) {
 	}
 
 	bool s = value.IsString();
+	String val = value.ToString();
 
-	out += (s ? "\"" : "") + value.ToString() + (s ? "\"" : "");
+	if (s) {
+		out += "\"";
+
+		int i = 0;
+		int size = val.length();
+		char c;
+
+		while (i < size) {
+			c = val.charAt(i);
+
+			switch (c) {
+				case '\"': out += "\\\""; break;
+				case '\\': out += "\\\\"; break;
+				case '/': out += "\\/"; break;
+				case '\b': out += "\\b"; break;
+				case '\f': out += "\\f"; break;
+				case '\n': out += "\\n"; break;
+				case '\r': out += "\\r"; break;
+				case '\t': out += "\\t"; break;
+
+				default:
+					if (c < 0x20) {
+						static const char hex[] = "0123456789ABCDEF";
+						out += "\\u00";
+						out += hex[(c >> 4) & 0xF];
+						out += hex[c & 0xF];
+					}
+					else {
+						out += c;
+					}
+					break;
+			}
+
+			++i;
+		}
+
+		out += "\"";
+	}
+	else out += val;
 
 	return out;
 }

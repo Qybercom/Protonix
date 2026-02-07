@@ -12,7 +12,7 @@ namespace Qybercom {
 			virtual void ValueTypeDeserialize (const String &raw) = 0;
 			virtual String ValueTypeSerialize () const = 0;
 
-			virtual ~IValueType () {}
+			virtual ~IValueType () { }
 	};
 
 	class IValueFormat {
@@ -20,17 +20,21 @@ namespace Qybercom {
 			virtual String ValueFormatMIME () = 0;
 			virtual String ValueFormatSerialize (Value &value) = 0;
 			virtual Value ValueFormatDeserialize (const String &raw) = 0;
+
+			virtual ~IValueFormat () { }
 	};
 
 	class IValueListener {
 		public:
 			virtual void ValueListenerGet (Value &value) { }
 			virtual void ValueListenerSet (Value &value) { }
+
+			virtual ~IValueListener () { }
 	};
 
 	class Value {
 		public:
-			enum TYPE { UNDEFINED, BOOL, INT, FLOAT, STRING, OBJECT, ARRAY, RAW } _type = UNDEFINED;
+			enum TYPE { UNDEFINED, NULLPTR, BOOL, INT, FLOAT, STRING, OBJECT, ARRAY, RAW } _type = UNDEFINED;
 
 			class Iterator {
 				private:
@@ -64,6 +68,7 @@ namespace Qybercom {
 
 		public:
 			Value ();
+			Value (decltype(nullptr) value);
 			Value (bool value);
 			Value (short value);
 			Value (unsigned short value);
@@ -79,6 +84,7 @@ namespace Qybercom {
 
 			~Value ();
 
+			operator decltype(nullptr) () const;
 			operator bool () const;
 			operator short () const;
 			operator unsigned short () const;
@@ -99,6 +105,7 @@ namespace Qybercom {
 			Value &operator[] (const String &key);
 			Value &operator[] (int key);
 
+			Value &operator= (decltype(nullptr) value);
 			Value &operator= (bool value);
 			Value &operator= (short value);
 			Value &operator= (unsigned short value);
@@ -124,6 +131,7 @@ namespace Qybercom {
 				return (*this)[key.c_str()];
 			}
 
+			Value &Set (decltype(nullptr) value);
 			Value &Set (bool value);
 			Value &Set (short value);
 			Value &Set (unsigned short value);

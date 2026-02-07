@@ -59,6 +59,10 @@ Value::Value () {
 	_type = Value::TYPE::UNDEFINED;
 }
 
+Value::Value (decltype(nullptr) value) {
+	Set(value);
+}
+
 Value::Value (bool value) {
 	Set(value);
 }
@@ -112,6 +116,10 @@ Value::~Value () {
 	Clear();
 }
 
+
+Value::operator decltype(nullptr) () const {
+	return nullptr;
+}
 
 Value::operator bool () const {
 	return _type == Value::TYPE::BOOL ? (bool)_value.BOOL : false;
@@ -170,6 +178,10 @@ Value &Value::operator[] (int key) {
 	return Get(key);
 }
 
+
+Value &Value::operator= (decltype(nullptr) value) {
+	return Set(value);
+}
 
 Value &Value::operator= (bool value) {
 	return Set(value);
@@ -288,6 +300,17 @@ Value &Value::Get (int key) {
 	return item;
 }
 
+
+Value &Value::Set (decltype(nullptr) value) {
+	Clear();
+
+	_type = Value::TYPE::NULLPTR;
+
+	if (_listener != nullptr)
+		_listener->ValueListenerSet(*this);
+
+	return *this;
+}
 
 Value &Value::Set (bool value) {
 	Clear();
@@ -511,7 +534,7 @@ bool Value::IsUndefined () const {
 }
 
 bool Value::IsNull () const {
-	return false;//_type == Value::TYPE::VALUE && _value != nullptr && _value->IsNull();
+	return _type == Value::TYPE::NULLPTR;
 }
 
 bool Value::IsBool () const {
@@ -553,7 +576,7 @@ Value::TYPE Value::Type () const {
 
 String Value::TypeName () const {
 	switch (_type) {
-		//case Value::TYPE::NULLPTR: return "null"; break;
+		case Value::TYPE::NULLPTR: return "null"; break;
 		case Value::TYPE::BOOL: return "bool"; break;
 		case Value::TYPE::INT:	return "int"; break;
 		case Value::TYPE::FLOAT: return "float"; break;
@@ -564,13 +587,12 @@ String Value::TypeName () const {
 
 String Value::ToString () const {
 	switch (_type) {
-		//case Value::TYPE::NULLPTR: return "null"; break;
+		case Value::TYPE::NULLPTR: return "null"; break;
 		case Value::TYPE::BOOL: return String(_value.BOOL ? "true" : "false"); break;
 		case Value::TYPE::INT: return String(_value.INT); break;
 		case Value::TYPE::FLOAT: return String(_value.FLOAT); break;
 		case Value::TYPE::STRING: return String(_value.STRING); break;
-		default: return "null"; break;
-		//default: return ""; break;
+		default: return ""; break;
 	}
 }
 
