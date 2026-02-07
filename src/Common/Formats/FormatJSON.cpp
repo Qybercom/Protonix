@@ -90,9 +90,7 @@ String Formats::FormatJSON::_parseString(const String &s, int &pos) {
 				case 'n': str += '\n'; break;
 				case 'r': str += '\r'; break;
 				case 't': str += '\t'; break;
-				default:
-					str += next;
-					break;
+				default: str += next; break;
 			}
 		}
 		else {
