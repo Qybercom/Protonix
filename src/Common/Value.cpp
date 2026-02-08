@@ -569,6 +569,10 @@ bool Value::IsNumeric () const {
 	return _type == Value::TYPE::INT || _type == Value::TYPE::FLOAT;
 }
 
+bool Value::IsScalar () const {
+	return _type != Value::TYPE::UNDEFINED && _type != Value::TYPE::ARRAY && _type != Value::TYPE::OBJECT;
+}
+
 
 Value::TYPE Value::Type () const {
 	return _type;

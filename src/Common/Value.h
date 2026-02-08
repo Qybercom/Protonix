@@ -181,6 +181,7 @@ namespace Qybercom {
 			bool IsArray () const;
 			bool IsRaw () const;
 			bool IsNumeric () const;
+			bool IsScalar () const;
 
 			TYPE Type () const;
 			String TypeName () const;
