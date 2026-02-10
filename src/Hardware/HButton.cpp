@@ -11,7 +11,7 @@ using namespace Qybercom::Protonix;
 
 void Hardware::HButton::_signal (Protonix* device) {
 	String signalChanged = this->_config["signal:Changed"];
-	if (!this->_allowSignal || !device->SignalSpawned(this->_id, signalChanged)) return;
+	if (!this->_config["allowSignal"] || !device->SignalSpawned(this->_id, signalChanged)) return;
 
 	bool active = this->_trigger->InputValue();
 	String signalPressed = this->_config["signal:Pressed"];
@@ -27,13 +27,10 @@ Hardware::HButton::HButton (unsigned short pin) {
 
 	this->_config.Listener(this);
 	this->_config["pin"] = pin;
+	this->_config["allowSignal"] = true;
 	this->_config["signal:Changed"] = "changed";
 	this->_config["signal:Pressed"] = "pressed";
 	this->_config["signal:Released"] = "released";
-}
-
-Hardware::HButton* Hardware::HButton::Init (unsigned short pin) {
-	return new Hardware::HButton(pin);
 }
 
 Hardware::HTrigger* Hardware::HButton::Trigger () {
@@ -64,7 +61,6 @@ void Hardware::HButton::HardwareInitPre (Protonix* device) {
 	this->_trigger->HardwareConfig().Set("signal:InputChanged", this->_config["signal:Changed"]);
 
 	this->_trigger->HardwareID(this->_id);
-	this->_trigger->HardwareAllowSignal(this->_allowSignal);
 	this->_trigger->HardwareBridge(this->_bridge);
 	this->_trigger->HardwareInitPre(device);
 

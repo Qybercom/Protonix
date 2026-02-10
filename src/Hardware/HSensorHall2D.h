@@ -11,35 +11,11 @@ namespace Qybercom {
 			class HSensorHall2D : public IProtonixHardware {
 				private:
 					float _value;
-					unsigned short _pinX;
-					unsigned short _pinY;
-					int _maxX;
-					int _maxY;
-					int _minX;
-					int _minY;
 
 					void _signal (Protonix* device);
 
 				public:
 					HSensorHall2D (unsigned short pinX, unsigned short pinY, int maxX = QYBERCOM_PROTONIX_ANALOG_MAX, int maxY = QYBERCOM_PROTONIX_ANALOG_MAX, int minX = 0, int minY = 0);
-
-					unsigned short PinX ();
-					HSensorHall2D* PinX (unsigned short pinX);
-
-					unsigned short PinY ();
-					HSensorHall2D* PinY (unsigned short pinY);
-
-					int MaxX ();
-					HSensorHall2D* MaxX (int maxX);
-
-					int MaxY ();
-					HSensorHall2D* MaxY (int maxY);
-
-					int MinX ();
-					HSensorHall2D* MinX (int minX);
-
-					int MinY ();
-					HSensorHall2D* MinY (int minY);
 
 					float ValueFloat ();
 					float ValueFloat (float offset);

@@ -11,13 +11,14 @@ namespace Qybercom {
 		class Protonix;
 
 		class IProtonixBridge;
+		class IProtonixHardwareContext;
 
 		class IProtonixHardware {
 			protected:
 				String _id;
-				bool _allowSignal;
 				short _dedicatedCore = -1;
 				IProtonixBridge* _bridge;
+				IProtonixHardwareContext* _context;
 				List<ProtonixHardwareCapability*> _capabilities;
 				Value _config;
 
@@ -65,22 +66,22 @@ namespace Qybercom {
 					return this->_dedicatedCore;
 				}
 
-				bool HardwareAllowSignal () {
-					return this->_allowSignal;
-				}
-
-				IProtonixHardware* HardwareAllowSignal (bool allow) {
-					this->_allowSignal = allow;
-
-					return this;
-				}
-
 				IProtonixBridge* HardwareBridge () {
 					return this->_bridge;
 				}
 
 				IProtonixHardware* HardwareBridge (IProtonixBridge* bridge) {
 					this->_bridge = bridge;
+
+					return this;
+				}
+
+				IProtonixHardwareContext* HardwareContext () {
+					return this->_context;
+				}
+
+				IProtonixHardware* HardwareContext (IProtonixHardwareContext* context) {
+					this->_context = context;
 
 					return this;
 				}
@@ -137,6 +138,22 @@ namespace Qybercom {
 
 				virtual int BridgeAnalogRead (unsigned int pin) { (void)pin; return -1; }
 				virtual bool BridgeAnalogWrite (unsigned int pin, int value) { (void)pin; (void)value; return false; }
+		};
+
+		class IProtonixHardwareContext : public IProtonixHardware {
+			protected:
+				Qybercom::Value _contextData;
+
+			public:
+				void HardwareContextData (String hardwareID, const Qybercom::Value &data) {
+					this->_contextData[hardwareID] = data;
+				}
+
+				Qybercom::Value HardwareContextData (String hardwareID) {
+					return this->_contextData[hardwareID];
+				}
+
+				virtual void HardwareContextApply (IProtonixHardware* hardware) { (void)hardware; }
 		};
 	}
 }

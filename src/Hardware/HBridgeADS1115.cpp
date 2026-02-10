@@ -17,31 +17,31 @@ unsigned int Hardware::HBridgeADS1115::CMDReadPin (unsigned short pin) {
 		| Hardware::HBridgeADS1115::FLAGS::COMP_OFF;
 }
 
-unsigned int Hardware::HBridgeADS1115::_read (byte reg) {
+unsigned int Hardware::HBridgeADS1115::_read (char reg) {
 	if (!this->_init) return 0;
 
 	Wire.beginTransmission(this->_address);
 	Wire.write(reg);
 	Wire.endTransmission();
 
-	Wire.requestFrom(this->_address, (byte)2);
+	Wire.requestFrom(this->_address, (char)2);
 
 	return ((unsigned int)Wire.read() << 8) | Wire.read();
 }
 
-bool Hardware::HBridgeADS1115::_write (byte reg, unsigned int value) {
+bool Hardware::HBridgeADS1115::_write (char reg, unsigned int value) {
 	if (!this->_init) return false;
 
 	Wire.beginTransmission(this->_address);
 	Wire.write(reg);
-	Wire.write((byte)(value >> 8));
-	Wire.write((byte)(value & 0xFF));
+	Wire.write((char)(value >> 8));
+	Wire.write((char)(value & 0xFF));
 	Wire.endTransmission();
 
 	return true;
 }
 
-Hardware::HBridgeADS1115::HBridgeADS1115 (byte address) {
+Hardware::HBridgeADS1115::HBridgeADS1115 (char address) {
 	this->_address = address;
 	this->_init = false;
 	this->_readTimer = new ProtonixTimer(10, false);
@@ -53,7 +53,7 @@ Hardware::HBridgeADS1115::HBridgeADS1115 (byte address) {
 	this->_values[3] = -1;
 }
 
-Hardware::HBridgeADS1115* Hardware::HBridgeADS1115::Init (byte address) {
+Hardware::HBridgeADS1115* Hardware::HBridgeADS1115::Init (char address) {
 	return new Hardware::HBridgeADS1115(address);
 }
 
@@ -61,11 +61,11 @@ ProtonixTimer* Hardware::HBridgeADS1115::ReadTimer () {
 	return this->_readTimer;
 }
 
-byte Hardware::HBridgeADS1115::Address () {
+char Hardware::HBridgeADS1115::Address () {
 	return this->_address;
 }
 
-Hardware::HBridgeADS1115* Hardware::HBridgeADS1115::Address (byte address) {
+Hardware::HBridgeADS1115* Hardware::HBridgeADS1115::Address (char address) {
 	this->_address = address;
 
 	return this;

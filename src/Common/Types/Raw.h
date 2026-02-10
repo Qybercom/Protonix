@@ -6,14 +6,14 @@ namespace Qybercom {
 	namespace Types {
 		class Raw {
 			private:
-				byte* _data;
+				char* _data;
 				int _size;
 
 			public:
 				Raw ();
 				template<typename T>
 				explicit Raw (const T &obj) : _size(sizeof(T)) {
-					_data = new byte[_size];
+					_data = new char[_size];
 
 					memcpy(_data, &obj, _size);
 				}

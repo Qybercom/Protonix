@@ -21,14 +21,11 @@ namespace Qybercom {
 
 			class HEncoder : public IProtonixHardware {
 				private:
-					unsigned short _pinA;
-					unsigned short _pinB;
 					volatile bool _valA;
 					volatile bool _valB;
 					volatile short _dir;
 					volatile bool _changed;
-					volatile bool _allowZero;
-					Qybercom::Filter<short> _filter; // use ~75
+					Qybercom::Pipes::Filter<short> _filter; // use ~75
 					HButton* _button;
 
 					bool _changedPipe ();
@@ -42,9 +39,6 @@ namespace Qybercom {
 					static HEncoder* WithButton (unsigned short pinA, unsigned short pinB, unsigned short pinButton, unsigned int checkInterval);
 					static HEncoder* WithButton (unsigned short pinA, unsigned short pinB, unsigned short pinButton, unsigned int checkInterval, unsigned int checkIntervalButton);
 
-					unsigned short PinA ();
-					unsigned short PinB ();
-
 					bool ValA ();
 					bool ValB ();
 
@@ -54,10 +48,7 @@ namespace Qybercom {
 
 					HButton* Button ();
 
-					bool AllowZero ();
-					HEncoder* AllowZero (bool allow);
-
-					Qybercom::Filter<short> &Filter ();
+					Qybercom::Pipes::Filter<short> &Filter ();
 
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);

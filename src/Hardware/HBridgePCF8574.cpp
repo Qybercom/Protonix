@@ -13,15 +13,15 @@ bool Hardware::HBridgePCF8574::_probe () {
 	return Wire.endTransmission() == 0;
 }
 
-byte Hardware::HBridgePCF8574::_read () {
+char Hardware::HBridgePCF8574::_read () {
 	if (!this->_init) return 0x00;
 
-	Wire.requestFrom(this->_address, (byte)1);
+	Wire.requestFrom(this->_address, (char)1);
 
 	return Wire.available() ? Wire.read() : 0xFF;
 }
 
-bool Hardware::HBridgePCF8574::_write (byte value) {
+bool Hardware::HBridgePCF8574::_write (char value) {
 	if (!this->_init) return false;
 
 	Wire.beginTransmission(this->_address);
@@ -31,22 +31,22 @@ bool Hardware::HBridgePCF8574::_write (byte value) {
 	return true;
 }
 
-Hardware::HBridgePCF8574::HBridgePCF8574 (byte address) {
+Hardware::HBridgePCF8574::HBridgePCF8574 (char address) {
 	this->_address = address;
 	this->_init = false;
-	this->_dataOut = 0xFF;   // all HIGH (input)
-	this->_modeMask = 0x00;  // all INPUT
+	this->_dataOut = 0xFF; // all HIGH (input)
+	this->_modeMask = 0x00; // all INPUT
 }
 
-Hardware::HBridgePCF8574* Hardware::HBridgePCF8574::Init (byte address) {
+Hardware::HBridgePCF8574* Hardware::HBridgePCF8574::Init (char address) {
 	return new Hardware::HBridgePCF8574(address);
 }
 
-byte Hardware::HBridgePCF8574::Address () {
+char Hardware::HBridgePCF8574::Address () {
 	return this->_address;
 }
 
-Hardware::HBridgePCF8574* Hardware::HBridgePCF8574::Address (byte address) {
+Hardware::HBridgePCF8574* Hardware::HBridgePCF8574::Address (char address) {
 	this->_address = address;
 
 	return this;
@@ -114,7 +114,7 @@ bool Hardware::HBridgePCF8574::BridgePinAvailable (unsigned int pin) {
 bool Hardware::HBridgePCF8574::BridgeDigitalRead (unsigned int pin) {
 	if (pin > 7) return false;
 
-	byte val = this->_read();
+	char val = this->_read();
 
 	return !((bool)((val >> pin) & 0x01));
 }

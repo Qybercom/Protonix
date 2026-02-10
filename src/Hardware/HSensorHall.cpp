@@ -12,39 +12,9 @@ using namespace Qybercom::Protonix;
 
 Hardware::HSensorHall::HSensorHall (unsigned short pin, int max, int min) {
 	this->_value = -1;
-	this->_pin = pin;
-	this->_max = max;
-	this->_min = min;
-}
-
-unsigned short Hardware::HSensorHall::Pin () {
-	return this->_pin;
-}
-
-Hardware::HSensorHall* Hardware::HSensorHall::Pin (unsigned short pin) {
-	this->_pin = pin;
-
-	return this;
-}
-
-int Hardware::HSensorHall::Max () {
-	return this->_max;
-}
-
-Hardware::HSensorHall* Hardware::HSensorHall::Max (int max) {
-	this->_max = max;
-
-	return this;
-}
-
-int Hardware::HSensorHall::Min () {
-	return this->_min;
-}
-
-Hardware::HSensorHall* Hardware::HSensorHall::Min (int min) {
-	this->_min = min;
-
-	return this;
+	this->_config["pin"] = pin;
+	this->_config["max"] = max;
+	this->_config["min"] = min;
 }
 
 int Hardware::HSensorHall::Value () {
@@ -56,7 +26,7 @@ bool Hardware::HSensorHall::ValueMatch (int min, int max, bool minEQ, bool maxEQ
 }
 
 int Hardware::HSensorHall::ValueMapped (int min, int max) {
-	return map(this->_value, this->_min, this->_max, min, max);
+	return map(this->_value, this->_config["min"], this->_config["max"], min, max);
 }
 
 String Hardware::HSensorHall::HardwareSummary () {
@@ -73,7 +43,7 @@ void Hardware::HSensorHall::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
 
-	this->_value = analogRead(this->_pin);
+	this->_value = this->_bridge->BridgeAnalogRead(this->_config["pin"]);
 
 	this->_capability("value:int", String(this->_value));
 }

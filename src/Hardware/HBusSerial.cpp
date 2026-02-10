@@ -8,73 +8,27 @@
 
 using namespace Qybercom::Protonix;
 
-Hardware::HBusSerial::HBusSerial (unsigned short pinRX, unsigned short pinTX, bool observable, unsigned int speed, unsigned int timeout, bool blocking) {
+Hardware::HBusSerial::HBusSerial (unsigned short pinRX, unsigned short pinTX) {
 	this->_started = false;
-
-	this->_pinRX = pinRX;
-	this->_pinTX = pinTX;
-
-	this->_speed = speed;
-
-	this->Timeout(timeout);
-	this->Blocking(blocking);
-	this->Observable(observable);
-
-	this->_cmdBuffer = "";
-	this->_lenBuffer = "";
-
 	this->_lenActive = false;
+	this->_lenBuffer = "";
+	this->_cmdBuffer = "";
 
-	this->_port = new SoftwareSerial(this->_pinRX, this->_pinTX);
+	this->_config["pinRX"] = pinRX;
+	this->_config["pinTX"] = pinTX;
+	this->_config["speed"] = 9600;
+	this->_config["timeout"] = 0;
+	this->_config["blocking"] = false;
+	this->_config["observable"] = true;
+
+	this->_port = new SoftwareSerial(
+		(int)this->_config["pinRX"],
+		(int)this->_config["pinTX"]
+	);
 }
 
 bool Hardware::HBusSerial::Started () {
 	return this->_started;
-}
-
-unsigned int Hardware::HBusSerial::PinRX () {
-	return this->_pinRX;
-}
-
-unsigned int Hardware::HBusSerial::PinTX () {
-	return this->_pinTX;
-}
-
-unsigned int Hardware::HBusSerial::Speed () {
-	return this->_speed;
-}
-
-unsigned short Hardware::HBusSerial::Timeout () {
-	return this->_timeout;
-}
-
-Hardware::HBusSerial* Hardware::HBusSerial::Timeout (unsigned short timeout) {
-	this->_timeout = timeout;
-
-	if (this->_started)
-		this->_port->setTimeout(this->_timeout);
-
-	return this;
-}
-
-bool Hardware::HBusSerial::Blocking () {
-	return this->_blocking;
-}
-
-Hardware::HBusSerial* Hardware::HBusSerial::Blocking (bool blocking) {
-	this->_blocking = blocking;
-
-	return this;
-}
-
-bool Hardware::HBusSerial::Observable () {
-	return this->_observable;
-}
-
-Hardware::HBusSerial* Hardware::HBusSerial::Observable (bool observable) {
-	this->_observable = observable;
-
-	return this;
 }
 
 SoftwareSerial* Hardware::HBusSerial::Port () {
@@ -102,7 +56,7 @@ bool Hardware::HBusSerial::Send (String s) {
 	return true;
 }
 
-bool Hardware::HBusSerial::Write (byte b) {
+bool Hardware::HBusSerial::Write (char b) {
 	if (!this->_started) return false;
 
 	this->_port->write(b);
@@ -110,8 +64,8 @@ bool Hardware::HBusSerial::Write (byte b) {
 	return true;
 }
 
-byte Hardware::HBusSerial::Read () {
-	return this->_started ? this->_port->read() : (byte)'\0';
+char Hardware::HBusSerial::Read () {
+	return this->_started ? this->_port->read() : (char)'\0';
 }
 
 String Hardware::HBusSerial::HardwareSummary () {
@@ -121,28 +75,27 @@ String Hardware::HBusSerial::HardwareSummary () {
 void Hardware::HBusSerial::HardwareInitPre (Protonix* device) {
 	(void)device;
 
-	this->_port->begin(this->_speed);
-
 	this->_started = true;
 
-	this->Timeout(this->_timeout);
+	this->_port->begin(this->_config["speed"]);
+	this->_port->setTimeout(this->_config["timeout"]);
 }
 
 void Hardware::HBusSerial::HardwarePipe (Protonix* device, short core) {
 	(void)core;
-	if (!this->_observable) return;
+	if (!this->_config["observable"]) return;
 
 	if (this->_cmdBuffer.length() >= 128)
 		this->_cmdBuffer = "";
 
 	int b = 0;
 
-	if (this->_blocking) this->_cmdBuffer = this->_port->readStringUntil('\n');
+	if (this->_config["blocking"]) this->_cmdBuffer = this->_port->readStringUntil('\n');
 	else b = this->_port->read();
 
 	//this->_log("Pipe " + String(this->_cmdBuffer));
 
-	if (this->_blocking) this->_cmdBuffer.trim();
+	if (this->_config["blocking"]) this->_cmdBuffer.trim();
 	else {
 		if (b == -1) return;
 		char bc = (char)b;

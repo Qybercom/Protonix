@@ -12,39 +12,10 @@ using namespace Qybercom::Protonix;
 
 Hardware::HPotentiometer::HPotentiometer (unsigned short pin, int max, int min) {
 	this->_value = -1;
-	this->_pin = pin;
-	this->_max = max;
-	this->_min = min;
-}
 
-unsigned short Hardware::HPotentiometer::Pin () {
-	return this->_pin;
-}
-
-Hardware::HPotentiometer* Hardware::HPotentiometer::Pin (unsigned short pin) {
-	this->_pin = pin;
-
-	return this;
-}
-
-int Hardware::HPotentiometer::Max () {
-	return this->_max;
-}
-
-Hardware::HPotentiometer* Hardware::HPotentiometer::Max (int max) {
-	this->_max = max;
-
-	return this;
-}
-
-int Hardware::HPotentiometer::Min () {
-	return this->_min;
-}
-
-Hardware::HPotentiometer* Hardware::HPotentiometer::Min (int min) {
-	this->_min = min;
-
-	return this;
+	this->_config["pin"] = pin;
+	this->_config["max"] = max;
+	this->_config["min"] = min;
 }
 
 int Hardware::HPotentiometer::Value () {
@@ -56,7 +27,7 @@ bool Hardware::HPotentiometer::ValueMatch (int min, int max, bool minEQ, bool ma
 }
 
 int Hardware::HPotentiometer::ValueMapped (int min, int max) {
-	return map(this->_value, this->_min, this->_max, min, max);
+	return map(this->_value, this->_config["min"], this->_config["max"], min, max);
 }
 
 String Hardware::HPotentiometer::HardwareSummary () {
@@ -73,7 +44,7 @@ void Hardware::HPotentiometer::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
 
-	this->_value = analogRead(this->_pin);
+	this->_value = this->_bridge->BridgeAnalogRead(this->_config["pin"]);
 
 	this->_capability("value:int", String(this->_value));
 }

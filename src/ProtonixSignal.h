@@ -25,8 +25,12 @@ namespace Qybercom {
 				bool Is (String id);
 				bool Is (String from, String id);
 
-				ProtonixSignal* Data (Value data);
 				Value &Data ();
+				ProtonixSignal* Data (Value data);
+				template<typename T>
+				ProtonixSignal* DataRaw (const T &obj) {
+					return Data(Value::Raw(obj));
+				}
 
 				~ProtonixSignal ();
 		};

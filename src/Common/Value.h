@@ -80,6 +80,7 @@ namespace Qybercom {
 			Value (double value);
 			Value (const char* value);
 			Value (const String &value);
+			Value (const Types::Raw &value);
 			Value (const Value &value);
 
 			~Value ();
@@ -96,6 +97,7 @@ namespace Qybercom {
 			operator double () const;
 			operator char* () const;
 			operator String () const;
+			operator Types::Raw () const;
 			template <typename T>
 			T As () const {
 				return static_cast<T>(*this);
@@ -117,6 +119,7 @@ namespace Qybercom {
 			Value &operator= (double value);
 			Value &operator= (const char* value);
 			Value &operator= (const String &value);
+			Value &operator= (const Types::Raw &value);
 			Value &operator= (const Value &value);
 
 			Value &Get (const char* key);
@@ -143,6 +146,7 @@ namespace Qybercom {
 			Value &Set (double value);
 			Value &Set (const char* value);
 			Value &Set (const String &value);
+			Value &Set (const Types::Raw &value);
 			Value &Set (const Value &value);
 			Value &Set (const char* key, const Value &value);
 			Value &Set (const String &key, const Value &value);
@@ -205,6 +209,12 @@ namespace Qybercom {
 
 			static Value Object ();
 			static Value Array ();
+			static Value Raw ();
+			static Value Raw (const Types::Raw &raw);
+			template<typename T>
+			static Value Raw (const T &obj) {
+				return Raw(Types::Raw(obj));
+			}
 
 			String Serialize (IValueFormat* format);
 			//static Value Deserialize (IValueFormat* format, const char* raw);

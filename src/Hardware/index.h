@@ -8,6 +8,7 @@
 #include "HBusSerial.h"
 #include "HButton.h"
 #include "HBuzzer.h"
+#include "HContextCA958.h"
 #include "HEncoder.h"
 #include "HGenericAnalog.h"
 #include "HGenericPWM.h"

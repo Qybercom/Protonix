@@ -14,13 +14,10 @@ namespace Qybercom {
 
 			class HPhotonix : public IProtonixHardware {
 				private:
-					unsigned short _pin;
-					unsigned int _length;
 					Photonix* _photonix;
 
 				public:
 					HPhotonix (unsigned short pin, unsigned int length);
-					static HPhotonix* Init (unsigned short pin, unsigned int length);
 
 					Photonix* Driver ();
 

@@ -14,7 +14,7 @@ namespace Qybercom {
 				private:
 					HBusSerial* _player;
 
-					bool _cmd (byte a1, byte a2, byte a3, byte a4);
+					bool _cmd (char a1, char a2, char a3, char a4);
 
 				public:
 					HPlayerMP3 (unsigned short pinRX, unsigned short pinTX);

@@ -11,7 +11,7 @@ Raw::Raw () {
 
 Raw::Raw (const Raw &other) {
 	_size = other._size;
-	_data = _size ? new byte[_size] : 0;
+	_data = _size ? new char[_size] : 0;
 
 	if (_size)
 		memcpy(_data, other._data, _size);
@@ -22,7 +22,7 @@ Raw &Raw::operator= (const Raw &other) {
 
 	delete[] _data;
 	_size = other._size;
-	_data = _size ? new byte[_size] : 0;
+	_data = _size ? new char[_size] : 0;
 
 	if (_size)
 		memcpy(_data, other._data, _size);

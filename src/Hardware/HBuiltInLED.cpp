@@ -8,11 +8,11 @@
 using namespace Qybercom::Protonix;
 
 Hardware::HBuiltInLED::HBuiltInLED (unsigned short pin) {
-	this->_pin = pin;
+	this->_config["pin"] = pin;
 }
 
 void Hardware::HBuiltInLED::Active (bool active) {
-	digitalWrite(this->_pin, active
+	this->_bridge->BridgeDigitalWrite(this->_config["pin"], active
 		? QYBERCOM_PROTONIX_LED_ON
 		: QYBERCOM_PROTONIX_LED_OFF
 	);
@@ -27,7 +27,7 @@ String Hardware::HBuiltInLED::HardwareSummary () {
 void Hardware::HBuiltInLED::HardwareInitPre (Protonix* device) {
 	(void)device;
 
-	pinMode(this->_pin, OUTPUT);
+	this->_bridge->BridgePinMode(this->_config["pin"], OUTPUT);
 
 	this->_capability("command", "on", "Activate LED");
 	this->_capability("command", "off", "Deactivate LED");

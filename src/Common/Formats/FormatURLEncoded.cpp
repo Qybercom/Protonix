@@ -60,7 +60,7 @@ void Formats::FormatURLEncoded::_serialize (Value &value, String &out, String &p
 		if (out.length()) out += "&";
 
 		String k = prefix;
-		String v = value.ToString();//String(value.IsNull() ? "" : value.AsValue());
+		String v = value.ToString();
 
 		Formats::FormatURLEncoded::_encode(k);
 		Formats::FormatURLEncoded::_encode(v);
@@ -80,10 +80,8 @@ void Formats::FormatURLEncoded::_path (Value &node, List<String> &keys, String &
 		bool last = (i == keysCount - 1);
 
 		if (key.length() == 0 || isNumeric(key)) {
-			//current->AsArray();
 			current = Value::Array();
 
-			// a[]=...
 			if (key.length() == 0) {
 				if (last) {
 					Value v;
@@ -105,41 +103,17 @@ void Formats::FormatURLEncoded::_path (Value &node, List<String> &keys, String &
 				continue;
 			}
 
-			// a[NUM]=...
-			int index = toNumeric(key);
-
-			// TODO: refactor
-			/*List<Value> &arr = current->AsArray();
-			int arrCount = arr.Count();
-
-			while (arrCount <= index) {
-				arr.Add(Value());
-
-				arrCount++;
-			}
-
-			if (last) {
-				arr[index] = value;
-
-				return;
-			}
-
-			current = &arr[index];*/
-
 			i++;
 
 			continue;
 		}
 
-		//current->AsObject();
-
 		if (last) {
-			//(*current)[key] = value;
 			current[key] = value;
+
 			return;
 		}
 
-		//current = &(*current)[key];
 		current = current[key];
 
 		i++;

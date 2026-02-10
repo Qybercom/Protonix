@@ -13,7 +13,7 @@ bool Hardware::HSelector3P::_changedPipe () {
 	bool out = false;
 
 	if (this->_changed) {
-		if (this->_allowZero || this->_value != 0) out = true;
+		if (this->_config["allowZero"] || this->_value != 0) out = true;
 
 		this->_changed = false;
 	}
@@ -22,16 +22,23 @@ bool Hardware::HSelector3P::_changedPipe () {
 }
 
 void Hardware::HSelector3P::_signal (Protonix* device, short value) {
-	/*if (this->_allowSignal)
-		device->Signal(this->_id, "changed")->Value(value);*/
+	if (this->_config["allowSignal"])
+		device->Signal(this->_id, "changed")->Data(value);
 }
 
-Hardware::HSelector3P::HSelector3P (unsigned short pin1, unsigned short pin2, unsigned int checkInterval) {
-	this->_trigger1 = Hardware::HTrigger::Input(pin1);//, HIGH, checkInterval);
-	this->_trigger2 = Hardware::HTrigger::Input(pin2);//, HIGH, checkInterval);
+Hardware::HSelector3P::HSelector3P (unsigned short pin1, unsigned short pin2) {
+	this->_trigger1 = Hardware::HTrigger::Input(pin1);
+	this->_trigger2 = Hardware::HTrigger::Input(pin2);
+
+	this->_config.Listener(this);
+	this->_config["pin1"] = pin1;
+	this->_config["pin2"] = pin2;
+	this->_config["allowSignal"] = true;
+	this->_config["allowZero"] = true;
+	this->_config["signal:Changed"] = "changed";
+
 	this->_value = 0;
 	this->_changed = false;
-	this->_allowZero = true;
 }
 
 Hardware::HTrigger* Hardware::HSelector3P::Trigger1 () {
@@ -50,28 +57,18 @@ short Hardware::HSelector3P::Value () {
 	return this->_value;
 }
 
-bool Hardware::HSelector3P::AllowZero () {
-	return this->_allowZero;
-}
-
-Hardware::HSelector3P* Hardware::HSelector3P::AllowZero (bool allow) {
-	this->_allowZero = allow;
-
-	return this;
-}
-
 String Hardware::HSelector3P::HardwareSummary () {
 	return "Selector with 3 positions";
 }
 
 void Hardware::HSelector3P::HardwareInitPre (Protonix* device) {
+	this->_trigger1->HardwareConfig().Set("signal:InputChanged", this->_config["signal:Changed"]);
 	this->_trigger1->HardwareID(this->_id + ":1");
-	this->_trigger1->HardwareAllowSignal(this->_allowSignal);
 	this->_trigger1->HardwareBridge(this->_bridge);
 	this->_trigger1->HardwareInitPre(device);
 
+	this->_trigger2->HardwareConfig().Set("signal:InputChanged", this->_config["signal:Changed"]);
 	this->_trigger2->HardwareID(this->_id + ":2");
-	this->_trigger2->HardwareAllowSignal(this->_allowSignal);
 	this->_trigger2->HardwareBridge(this->_bridge);
 	this->_trigger2->HardwareInitPre(device);
 
@@ -102,7 +99,7 @@ void Hardware::HSelector3P::HardwarePipe (Protonix* device, short core) {
 	short value1 = this->_trigger1->InputValue();
 	short value2 = this->_trigger2->InputValue();
 
-	//if (value1 && value2) return; // abnormal
+	if (value1 && value2) return; // abnormal
 
 	short value = 0;
 	if (value1 && !value2) value = 1;
@@ -119,6 +116,11 @@ void Hardware::HSelector3P::HardwarePipe (Protonix* device, short core) {
 	this->_capability("value:int", String(this->_value));
 }
 
+void Hardware::HSelector3P::HardwarePipeInterrupt (Protonix* device) {
+	this->_trigger1->HardwarePipeInterrupt(device);
+	this->_trigger2->HardwarePipeInterrupt(device);
+}
+
 void Hardware::HSelector3P::HardwareOnReset (Protonix* device) {
 	this->_signal(device, this->_value);
 }
@@ -127,5 +129,10 @@ void Hardware::HSelector3P::HardwareOnCommand (Protonix* device, String command)
 	(void)device;
 	(void)command;
 
-	// TODO: maybe transmit commands to triggers
+	// TODO: send command to triggers
+}
+
+void Hardware::HSelector3P::ValueListenerSet (Qybercom::Value &value) {
+	this->_trigger1->HardwareConfig().Replace(value);
+	this->_trigger2->HardwareConfig().Replace(value);
 }

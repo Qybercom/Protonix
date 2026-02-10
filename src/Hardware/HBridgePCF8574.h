@@ -11,21 +11,21 @@ namespace Qybercom {
 		namespace Hardware {
 			class HBridgePCF8574 : public IProtonixBridge {
 				private:
-					byte _address;
-					byte _dataOut;
-					byte _modeMask;
+					char _address;
+					char _dataOut;
+					char _modeMask;
 					bool _init;
 
 					bool _probe ();
-					byte _read ();
-					bool _write (byte value);
+					char _read ();
+					bool _write (char value);
 
 				public:
-					HBridgePCF8574 (byte address);
-					static HBridgePCF8574* Init (byte address);
+					HBridgePCF8574 (char address);
+					static HBridgePCF8574* Init (char address);
 
-					byte Address ();
-					HBridgePCF8574* Address (byte address);
+					char Address ();
+					HBridgePCF8574* Address (char address);
 
 					bool HardwareI2C ();
 					void HardwareI2CPre (Protonix* device);

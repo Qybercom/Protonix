@@ -10,16 +10,12 @@ namespace Qybercom {
 		namespace Hardware {
 			class HSensorMicrophone : public IProtonixHardware {
 				private:
-					unsigned short _pin;
 					bool _active;
 
 					void _signal (Protonix* device);
 
 				public:
 					HSensorMicrophone (unsigned short pin);
-
-					unsigned short Pin ();
-					HSensorMicrophone* Pin (unsigned short pin);
 
 					bool Active ();
 

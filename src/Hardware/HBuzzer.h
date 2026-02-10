@@ -10,15 +10,11 @@ namespace Qybercom {
 		namespace Hardware {
 			class HBuzzer : public IProtonixHardware {
 				private:
-					unsigned short _pin;
 					unsigned long _started;
 					unsigned long _duration;
 
 				public:
 					HBuzzer (unsigned short pin);
-
-					unsigned short Pin ();
-					HBuzzer* Pin (unsigned short pin);
 
 					void Play (short value, unsigned long duration = 0);
 					void Stop ();

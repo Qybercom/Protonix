@@ -9,9 +9,6 @@ namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
 			class HBuiltInLED : public IProtonixHardware {
-				private:
-					unsigned short _pin;
-
 				public:
 					HBuiltInLED (unsigned short pin = QYBERCOM_PROTONIX_LED_PIN);
 

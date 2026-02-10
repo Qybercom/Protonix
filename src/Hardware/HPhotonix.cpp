@@ -11,13 +11,10 @@ using namespace Qybercom::Photonix;
 using namespace Qybercom::Protonix;
 
 Hardware::HPhotonix::HPhotonix (unsigned short pin, unsigned int length) {
-	this->_pin = pin;
-	this->_length = length;
-	this->_photonix = nullptr;
-}
+	this->_config["pin"] = pin;
+	this->_config["length"] = length;
 
-Hardware::HPhotonix* Hardware::HPhotonix::Init (unsigned short pin, unsigned int length) {
-	return new Hardware::HPhotonix(pin, length);
+	this->_photonix = new Photonix(this->_config["pin"], this->_config["length"]);
 }
 
 Photonix* Hardware::HPhotonix::Driver () {
@@ -31,7 +28,6 @@ String Hardware::HPhotonix::HardwareSummary () {
 void Hardware::HPhotonix::HardwareInitPost (Protonix* device) {
 	(void)device;
 
-	this->_photonix = new Photonix(this->_pin, this->_length);
 	this->_photonix->Initialized();
 }
 

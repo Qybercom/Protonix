@@ -10,19 +10,18 @@
 namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
-			class HSelector3P : public IProtonixHardware {
+			class HSelector3P : public IProtonixHardware, public IValueListener {
 				private:
 					HTrigger* _trigger1;
 					HTrigger* _trigger2;
-					short _value;
 					bool _changed;
-					bool _allowZero;
+					short _value;
 
 					bool _changedPipe ();
 					void _signal (Protonix* device, short value);
 
 				public:
-					HSelector3P (unsigned short pin1, unsigned short pin2, unsigned int checkInterval = 0);
+					HSelector3P (unsigned short pin1, unsigned short pin2);
 
 					HTrigger* Trigger1 ();
 					HTrigger* Trigger2 ();
@@ -30,17 +29,17 @@ namespace Qybercom {
 					bool Changed ();
 					short Value ();
 
-					bool AllowZero ();
-					HSelector3P* AllowZero (bool allow);
-
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
 					bool HardwareI2C ();
 					bool HardwareSPI ();
 					void HardwareInitPost (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
+					void HardwarePipeInterrupt (Protonix* device);
 					void HardwareOnReset (Protonix* device);
 					void HardwareOnCommand (Protonix* device, String command);
+
+					void ValueListenerSet (Qybercom::Value &value);
 			};
 		}
 	}

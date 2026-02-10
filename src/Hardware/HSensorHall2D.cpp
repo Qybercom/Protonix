@@ -11,78 +11,19 @@ using namespace Qybercom;
 using namespace Qybercom::Protonix;
 
 void Hardware::HSensorHall2D::_signal (Protonix* device) {
-	/*if (this->_allowSignal)
-		device->Signal(this->_id, "angle")->Value(this->_value);*/
+	if (this->_config["allowSignal"])
+		device->Signal(this->_id, "angle")->Data(this->_value);
 }
 
 Hardware::HSensorHall2D::HSensorHall2D (unsigned short pinX, unsigned short pinY, int maxX, int maxY, int minX, int minY) {
 	this->_value = -1.0;
-	this->_pinX = pinX;
-	this->_pinY = pinY;
-	this->_maxX = maxX;
-	this->_maxY = maxY;
-	this->_minX = minX;
-	this->_minY = minY;
-}
 
-unsigned short Hardware::HSensorHall2D::PinX () {
-	return this->_pinX;
-}
-
-Hardware::HSensorHall2D* Hardware::HSensorHall2D::PinX (unsigned short pinX) {
-	this->_pinX = pinX;
-
-	return this;
-}
-
-unsigned short Hardware::HSensorHall2D::PinY () {
-	return this->_pinY;
-}
-
-Hardware::HSensorHall2D* Hardware::HSensorHall2D::PinY (unsigned short pinY) {
-	this->_pinY = pinY;
-
-	return this;
-}
-
-int Hardware::HSensorHall2D::MaxX () {
-	return this->_maxX;
-}
-
-Hardware::HSensorHall2D* Hardware::HSensorHall2D::MaxX (int maxX) {
-	this->_maxX = maxX;
-
-	return this;
-}
-
-int Hardware::HSensorHall2D::MaxY () {
-	return this->_maxY;
-}
-
-Hardware::HSensorHall2D* Hardware::HSensorHall2D::MaxY (int maxY) {
-	this->_maxY = maxY;
-
-	return this;
-}
-
-int Hardware::HSensorHall2D::MinX () {
-	return this->_minX;
-}
-
-Hardware::HSensorHall2D* Hardware::HSensorHall2D::MinX (int minX) {
-	this->_minX = minX;
-
-	return this;
-}
-
-int Hardware::HSensorHall2D::MinY () {
-	return this->_minY;
-}
-
-Hardware::HSensorHall2D* Hardware::HSensorHall2D::MinY (int minY) {
-	this->_minY = minY;
-
-	return this;
+	this->_config["pinX"] = pinX;
+	this->_config["pinY"] = pinY;
+	this->_config["maxX"] = maxX;
+	this->_config["maxY"] = maxY;
+	this->_config["minX"] = minX;
+	this->_config["minY"] = minY;
 }
 
 float Hardware::HSensorHall2D::ValueFloat () {
@@ -125,13 +66,17 @@ void Hardware::HSensorHall2D::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
 
-	int x = analogRead(this->_pinX);
-	int y = analogRead(this->_pinY);
+	int x = this->_bridge->BridgeAnalogRead(this->_config["pinX"]);
+	int y = this->_bridge->BridgeAnalogRead(this->_config["pinY"]);
 
 	this->_capability("valueX:int", String(x));
 	this->_capability("valueY:int", String(y));
 
-	float angle = angleByXY(x, y, this->_minX, this->_maxX, this->_minY, this->_maxY);
+	float angle = angleByXY(
+		x, y,
+		this->_config["minX"], this->_config["maxX"],
+		this->_config["minY"], this->_config["maxY"]
+	);
 
 	if (angle != this->_value) {
 		this->_value = angle;

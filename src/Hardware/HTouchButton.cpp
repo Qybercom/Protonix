@@ -3,35 +3,54 @@
 #include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 
+#include "HTrigger.h"
+
 #include "HTouchButton.h"
 
 using namespace Qybercom::Protonix;
 
 void Hardware::HTouchButton::_signal (Protonix* device) {
-	//device->Signal(this->_id, "changed")->Value(this->_active);
-	//device->Signal(this->_id, String(this->_active ? "touch" : "release"));
+	String signalChanged = this->_config["signal:Changed"];
+	if (!this->_config["allowSignal"] || !device->SignalSpawned(this->_id, signalChanged)) return;
+
+	bool active = this->_trigger->InputValue();
+	String signalPressed = this->_config["signal:Pressed"];
+	String signalReleased = this->_config["signal:Released"];
+
+	device->Signal(this->_id, String(active ? signalPressed : signalReleased));
+
+	this->_capability("active:bool", String(active ? "1" : "0"));
 }
 
 Hardware::HTouchButton::HTouchButton (unsigned short pin) {
-	this->_active = false;
-	this->_pin = pin;
+	this->_trigger = Hardware::HTrigger::Input(pin);
+
+	this->_config.Listener(this);
+	this->_config["pin"] = pin;
+	this->_config["allowSignal"] = true;
+	this->_config["signal:Changed"] = "changed";
+	this->_config["signal:Pressed"] = "pressed";
+	this->_config["signal:Released"] = "released";
 }
 
-unsigned short Hardware::HTouchButton::Pin () {
-	return this->_pin;
+Hardware::HTrigger* Hardware::HTouchButton::Trigger () {
+	return this->_trigger;
 }
 
-Hardware::HTouchButton* Hardware::HTouchButton::Pin (unsigned short pin) {
-	// TODO: handle reading through PCF8574
-
-	pinMode(this->_pin, INPUT_PULLUP);
-	this->_pin = pin;
-
-	return this;
+bool Hardware::HTouchButton::Changed () {
+	return this->_trigger->InputChanged();
 }
 
 bool Hardware::HTouchButton::Active () {
-	return this->_active;
+	return this->_trigger->InputValue();
+}
+
+bool Hardware::HTouchButton::Pressed (bool changed) {
+	return (changed ? this->Changed() : true) && this->_trigger->InputValue();
+}
+
+bool Hardware::HTouchButton::Released (bool changed) {
+	return (changed ? this->Changed() : true) && !this->_trigger->InputValue();
 }
 
 String Hardware::HTouchButton::HardwareSummary () {
@@ -39,26 +58,32 @@ String Hardware::HTouchButton::HardwareSummary () {
 }
 
 void Hardware::HTouchButton::HardwareInitPre (Protonix* device) {
-	(void)device;
+	this->_trigger->HardwareConfig().Set("signal:InputChanged", this->_config["signal:Changed"]);
+
+	this->_trigger->HardwareID(this->_id);
+	this->_trigger->HardwareBridge(this->_bridge);
+	this->_trigger->HardwareInitPre(device);
 
 	this->_capability("value", "active:bool", "State of the button");
+	this->_capability("active:bool", "0");
+}
+
+bool Hardware::HTouchButton::HardwareI2C () {
+	return this->_trigger->HardwareI2C();
+}
+
+bool Hardware::HTouchButton::HardwareSPI () {
+	return this->_trigger->HardwareSPI();
 }
 
 void Hardware::HTouchButton::HardwarePipe (Protonix* device, short core) {
-	(void)device;
-	(void)core;
+	this->_trigger->HardwarePipe(device, core);
 
-	int value = digitalRead(this->_pin);
-	bool active = value == HIGH;
-	bool changed = this->_active != active;
+	this->_signal(device);
+}
 
-	this->_active = active;
-
-	if (this->_allowSignal && changed) {
-		this->_signal(device);
-	}
-
-	this->_capability("active:bool", String(this->_active ? "1" : "0"));
+void Hardware::HTouchButton::HardwarePipeInterrupt (Protonix* device) {
+	this->_trigger->HardwarePipeInterrupt(device);
 }
 
 void Hardware::HTouchButton::HardwareOnReset (Protonix* device) {
@@ -68,4 +93,10 @@ void Hardware::HTouchButton::HardwareOnReset (Protonix* device) {
 void Hardware::HTouchButton::HardwareOnCommand (Protonix* device, String command) {
 	(void)device;
 	(void)command;
+
+	// TODO: send command to trigger
+}
+
+void Hardware::HTouchButton::ValueListenerSet (Value &value) {
+	this->_trigger->HardwareConfig().Replace(value);
 }

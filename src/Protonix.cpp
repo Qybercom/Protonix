@@ -162,11 +162,18 @@ void Protonix::_dedicatedTask (void* param) {
 	Protonix* device = (Protonix*)param;
 	bool run = true;
 	unsigned short core = xPortGetCoreID();
+	IProtonixHardwareContext* context = nullptr;
 
 	while (run) {
-		for (IProtonixHardware* hardware : device->_hardware)
-			if (hardware->HardwareDedicatedCore() == core)
-				hardware->HardwarePipe(device, core);
+		for (IProtonixHardware* hardware : device->_hardware) {
+			if (hardware->HardwareDedicatedCore() != core) continue;
+
+			context = hardware->HardwareContext();
+			if (context != nullptr)
+				context->HardwareContextApply(hardware);
+
+			hardware->HardwarePipe(device, core);
+		}
 
 		device->_device->DeviceOnDedicatedTask(device, core);
 
@@ -330,10 +337,15 @@ Protonix* Protonix::Pipe () {
 		network->NetworkDriverPipe(this);
 
 	//Serial.print("[hw.1]"); Serial.println(ESP.getFreeHeap());
+	IProtonixHardwareContext* context = nullptr;
 	for (IProtonixHardware* hardware : this->_hardware) {
 		#if defined(ESP32)
 		if (hardware->HardwareDedicatedCore() != -1) continue;
 		#endif
+
+		context = hardware->HardwareContext();
+		if (context != nullptr)
+			context->HardwareContextApply(hardware);
 
 		hardware->HardwarePipe(this, -1);
 	}
@@ -537,12 +549,25 @@ Qybercom::Value &Protonix::HardwareOnBridge (String bridge, String id, IProtonix
 	// TODO: add check for existent id
 
 	hardware->HardwareID(id);
-	hardware->HardwareAllowSignal(allowSignal);
 	hardware->HardwareBridge((IProtonixBridge*)this->Hardware(bridge));
+	hardware->HardwareContext(nullptr);
 
 	this->_hardware.Add(hardware);
 
 	return hardware->HardwareConfig();
+}
+
+bool Protonix::HardwareContext (String hardwareID, String contextID, const Qybercom::Value &data) {
+	IProtonixHardware* hardware = this->Hardware(hardwareID);
+	if (hardware == nullptr) return false;
+
+	IProtonixHardwareContext* context = (IProtonixHardwareContext*)this->Hardware(contextID);
+	if (context == nullptr) return false;
+
+	context->HardwareContextData(hardwareID, data);
+	hardware->HardwareContext(context);
+
+	return true;
 }
 
 

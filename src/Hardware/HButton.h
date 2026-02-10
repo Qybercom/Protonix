@@ -18,7 +18,6 @@ namespace Qybercom {
 
 				public:
 					HButton (unsigned short pin);
-					static HButton* Init (unsigned short pin);
 
 					HTrigger* Trigger ();
 

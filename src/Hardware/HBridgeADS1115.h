@@ -13,33 +13,33 @@ namespace Qybercom {
 			class HBridgeADS1115 : public IProtonixBridge {
 				public:
 					enum FLAGS {
-						OS_SINGLE   = 0x8000,
-						PGA_4_096V  = 0x0200,
+						OS_SINGLE = 0x8000,
+						PGA_4_096V = 0x0200,
 						MODE_SINGLE = 0x0100,
-						DR_128SPS   = 0x0080,
-						COMP_OFF    = 0x0003
+						DR_128SPS = 0x0080,
+						COMP_OFF = 0x0003
 					};
 
 					static unsigned int CMDReadPin (unsigned short pin);
 
 				private:
-					byte _address;
+					char _address;
 					bool _init;
 					ProtonixTimer* _readTimer;
 					unsigned short _readPin;
 					int _values[4];
 
-					unsigned int _read (byte reg);
-					bool _write (byte reg, unsigned int value);
+					unsigned int _read (char reg);
+					bool _write (char reg, unsigned int value);
 
 				public:
-					HBridgeADS1115 (byte address);
-					static HBridgeADS1115* Init (byte address);
+					HBridgeADS1115 (char address);
+					static HBridgeADS1115* Init (char address);
 
 					ProtonixTimer* ReadTimer ();
 
-					byte Address ();
-					HBridgeADS1115* Address (byte address);
+					char Address ();
+					HBridgeADS1115* Address (char address);
 
 					bool HardwareI2C ();
 					void HardwareI2CPre (Protonix* device);

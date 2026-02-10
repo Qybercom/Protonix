@@ -10,7 +10,7 @@
 using namespace Qybercom::Protonix;
 
 bool Hardware::HTrigger::_inputChangedHandler () {
-	if (!this->_allowSignal) return false;
+	if (!this->_config["allowSignal"]) return false;
 
 	bool out = false;
 
@@ -73,6 +73,7 @@ Hardware::HTrigger::HTrigger (String mode, unsigned short pin) {
 	this->_config["debounce"] = 0;
 	this->_config["initial"] = false;
 	this->_config["interrupt"] = false;
+	this->_config["allowSignal"] = true;
 	this->_config["signal:InputChanged"] = "inputChanged";
 }
 
@@ -148,7 +149,7 @@ void Hardware::HTrigger::HardwareInitPost (Protonix* device) {
 
 	if (mode == "output") {
 		this->_bridge->BridgePinMode(pin, OUTPUT);
-		this->_bridge->BridgeDigitalWrite(pin, LOW);
+		this->_bridge->BridgeDigitalWrite(pin, false);
 
 		this->_capability("command", "output:<bool>", "Set trigger' output value");
 		this->_capability("active:bool", "0");

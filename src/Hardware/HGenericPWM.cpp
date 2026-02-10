@@ -10,7 +10,7 @@
 using namespace Qybercom::Protonix;
 
 Hardware::HGenericPWM::HGenericPWM (unsigned short pin, bool inverted, unsigned int frequency, unsigned resolution) {
-	this->_pin = pin;
+	this->_config["pin"] = pin;
 	this->_inverted = inverted;
 	this->_frequency = frequency;
 	this->_resolution = resolution;
@@ -36,9 +36,9 @@ Hardware::HGenericPWM* Hardware::HGenericPWM::Frequency (unsigned int frequency)
 		#if defined(__AVR__)
 
 		#elif defined(ESP8266)
-			analogWriteFreq(this->_frequency);
+			this->_bridge->BridgeAnalogWriteFreq(this->_frequency);
 		#elif defined(ESP32)
-			ledcAttach(this->_pin, this->_frequency, this->_resolution);
+			ledcAttach((int)this->_config["pin"], this->_frequency, this->_resolution);
 		#endif
 	}
 
@@ -62,7 +62,7 @@ Hardware::HGenericPWM* Hardware::HGenericPWM::Resolution (unsigned short resolut
 		#elif defined(ESP8266)
 			analogWriteRange(this->_max);
 		#elif defined(ESP32)
-			ledcAttach(this->_pin, this->_frequency, this->_resolution);
+			ledcAttach((int)this->_config["pin"], this->_frequency, this->_resolution);
 		#endif
 	}
 
@@ -75,27 +75,27 @@ unsigned short Hardware::HGenericPWM::Resolution () {
 
 bool Hardware::HGenericPWM::Start () {
 	#if defined(__AVR__)
-		pinMode(this->_pin, OUTPUT);
+		this->_bridge->BridgePinMode(this->_config["pin"], OUTPUT);
 
 		// can be improved - fast PWM for desired pin
-		analogWrite(this->_pin, 0);
+		this->_bridge->BridgeAnalogWrite(this->_config["pin"], 0);
 
 		this->_started = true;
 
 		return true;
 	#elif defined(ESP8266)
-		pinMode(this->_pin, OUTPUT);
+		this->_bridge->BridgePinMode(this->_config["pin"], OUTPUT);
 
 		analogWriteFreq(this->_frequency);
 		analogWriteRange(this->_max);
-		analogWrite(this->_pin, this->_inverted ? this->_max : 0);
+		this->_bridge->BridgeAnalogWrite(this->_config["pin"], this->_inverted ? this->_max : 0);
 
 		this->_started = true;
 
 		return true;
 	#elif defined(ESP32)
-		ledcAttach(this->_pin, this->_frequency, this->_resolution);
-		ledcWrite(this->_pin, this->_inverted ? this->_max : 0);
+		ledcAttach((int)this->_config["pin"], this->_frequency, this->_resolution);
+		ledcWrite((int)this->_config["pin"], this->_inverted ? this->_max : 0);
 
 		this->_started = true;
 
@@ -112,11 +112,11 @@ bool Hardware::HGenericPWM::Write (unsigned int value) {
 	if (this->_inverted) value = this->_max - value;
 
 	#if defined(__AVR__)
-	analogWrite(this->_pin, value);
+	this->_bridge->BridgeAnalogWrite(this->_config["pin"], value);
 	#elif defined(ESP8266)
-	analogWrite(this->_pin, value);
+	this->_bridge->BridgeAnalogWrite(this->_config["pin"], value);
 	#elif defined(ESP32)
-	ledcWrite(this->_pin, value);
+	ledcWrite((int)this->_config["pin"], value);
 	#endif
 
 	return true;

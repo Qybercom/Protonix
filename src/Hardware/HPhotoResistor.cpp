@@ -12,39 +12,10 @@ using namespace Qybercom::Protonix;
 
 Hardware::HPhotoResistor::HPhotoResistor (unsigned short pin, int max, int min) {
 	this->_value = -1;
-	this->_pin = pin;
-	this->_max = max;
-	this->_min = min;
-}
 
-unsigned short Hardware::HPhotoResistor::Pin () {
-	return this->_pin;
-}
-
-Hardware::HPhotoResistor* Hardware::HPhotoResistor::Pin (unsigned short pin) {
-	this->_pin = pin;
-
-	return this;
-}
-
-int Hardware::HPhotoResistor::Max () {
-	return this->_max;
-}
-
-Hardware::HPhotoResistor* Hardware::HPhotoResistor::Max (int max) {
-	this->_max = max;
-
-	return this;
-}
-
-int Hardware::HPhotoResistor::Min () {
-	return this->_min;
-}
-
-Hardware::HPhotoResistor* Hardware::HPhotoResistor::Min (int min) {
-	this->_min = min;
-
-	return this;
+	this->_config["pin"] = pin;
+	this->_config["max"] = max;
+	this->_config["min"] = min;
 }
 
 int Hardware::HPhotoResistor::Value () {
@@ -56,7 +27,7 @@ bool Hardware::HPhotoResistor::ValueMatch (int min, int max, bool minEQ, bool ma
 }
 
 int Hardware::HPhotoResistor::ValueMapped (int min, int max) {
-	return map(this->_value, this->_min, this->_max, min, max);
+	return map(this->_value, this->_config["min"], this->_config["max"], min, max);
 }
 
 String Hardware::HPhotoResistor::HardwareSummary () {
@@ -66,7 +37,7 @@ String Hardware::HPhotoResistor::HardwareSummary () {
 void Hardware::HPhotoResistor::HardwareInitPre (Protonix* device) {
 	(void)device;
 
-	pinMode(this->_pin, INPUT);
+	this->_bridge->BridgePinMode(this->_config["pin"], INPUT);
 
 	this->_capability("value", "value:int", "Raw value");
 }
@@ -75,7 +46,7 @@ void Hardware::HPhotoResistor::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
 
-	this->_value = analogRead(this->_pin);
+	this->_value = this->_bridge->BridgeAnalogRead(this->_config["pin"]);
 
 	this->_capability("value:int", String(this->_value));
 }

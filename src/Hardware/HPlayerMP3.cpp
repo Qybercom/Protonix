@@ -11,23 +11,23 @@ using namespace Qybercom::Protonix;
 
 Hardware::HPlayerMP3::HPlayerMP3 (unsigned short pinRX, unsigned short pinTX) {
 	this->_player = new Hardware::HBusSerial(pinRX, pinTX);
-	this->_player->Observable(false);
+	this->_player->HardwareConfig().Set("observable", false);
 }
 
 // https://geekmatic.in.ua/pdf/Catalex_MP3_board.pdf
-bool Hardware::HPlayerMP3::_cmd (byte a1, byte a2, byte a3, byte a4) {
+bool Hardware::HPlayerMP3::_cmd (char a1, char a2, char a3, char a4) {
 	if (this->_player == nullptr) return false;
 
 	//this->_log("CMD: " + String(a1) + ":" + String(a2) + ":" + String(a3) + ":" + String(a4));
 
-	this->_player->Write((byte)0x7E);	// Код начала команды
-	this->_player->Write((byte)0xFF);	// Все модули
-	this->_player->Write((byte)0x06);	// Команда воспроизведения файла
+	this->_player->Write((char)0x7E);	// Код начала команды
+	this->_player->Write((char)0xFF);	// Все модули
+	this->_player->Write((char)0x06);	// Команда воспроизведения файла
 	this->_player->Write(a1);			// Количество байт данных
 	this->_player->Write(a2);			// Индекс папки (0x00 - корневая папка)
 	this->_player->Write(a3);			// Номера файла "в папке" либо 00 "на диске"
 	this->_player->Write(a4);			// НОМЕР ФАЙЛА В ПАПКЕ MP3
-	this->_player->Write((byte)0xEF);	// Код конца команды
+	this->_player->Write((char)0xEF);	// Код конца команды
 
 	return true;
 }
@@ -38,41 +38,41 @@ Hardware::HBusSerial* Hardware::HPlayerMP3::Port () {
 
 bool Hardware::HPlayerMP3::Play (int file, int dir) {
 	return this->_cmd(
-		dir == 0x00 ? (byte)0x03 : (byte)0x0F,	// play by index in folder (0x0F) or on disk (0x03)
-		(byte)0x00,
-		(byte)dir,								// folder index in folder (0x0F) or on disk (0x03)
-		(byte)file								// file index
+		dir == 0x00 ? (char)0x03 : (char)0x0F,	// play by index in folder (0x0F) or on disk (0x03)
+		(char)0x00,
+		(char)dir,								// folder index in folder (0x0F) or on disk (0x03)
+		(char)file								// file index
 	);
 }
 
 bool Hardware::HPlayerMP3::Pause () {
-	return this->_cmd((byte)0x0E, (byte)0x00, (byte)0x00, (byte)0x00);
+	return this->_cmd((char)0x0E, (char)0x00, (char)0x00, (char)0x00);
 }
 
 bool Hardware::HPlayerMP3::Stop () {
-	return this->_cmd((byte)0x16, (byte)0x00, (byte)0x00, (byte)0x00);
+	return this->_cmd((char)0x16, (char)0x00, (char)0x00, (char)0x00);
 }
 
 bool Hardware::HPlayerMP3::VolumeUp () {
-	return this->_cmd((byte)0x04, (byte)0x00, (byte)0x00, (byte)0x00);
+	return this->_cmd((char)0x04, (char)0x00, (char)0x00, (char)0x00);
 }
 
 bool Hardware::HPlayerMP3::VolumeDown () {
-	return this->_cmd((byte)0x05, (byte)0x00, (byte)0x00, (byte)0x00);
+	return this->_cmd((char)0x05, (char)0x00, (char)0x00, (char)0x00);
 }
 
 bool Hardware::HPlayerMP3::Volume (short value) {
-	byte volume = (byte)((value * 30) / 100);
+	char volume = (char)((value * 30) / 100);
 
-	return this->_cmd((byte)0x06, (byte)0x00, (byte)0x00, volume);
+	return this->_cmd((char)0x06, (char)0x00, (char)0x00, volume);
 }
 
 bool Hardware::HPlayerMP3::Reset () {
-	return this->_cmd((byte)0x0C, (byte)0x00, (byte)0x00, (byte)0x00);
+	return this->_cmd((char)0x0C, (char)0x00, (char)0x00, (char)0x00);
 }
 
 bool Hardware::HPlayerMP3::Wake () {
-	return this->_cmd((byte)0x0B, (byte)0x00, (byte)0x00, (byte)0x00);
+	return this->_cmd((char)0x0B, (char)0x00, (char)0x00, (char)0x00);
 }
 
 String Hardware::HPlayerMP3::HardwareSummary () {

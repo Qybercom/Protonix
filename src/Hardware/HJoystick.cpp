@@ -14,119 +14,64 @@ using namespace Qybercom;
 using namespace Qybercom::Protonix;
 
 void Hardware::HJoystick::_signalValue (Protonix* device) {
-	if (this->_allowSignal && this->_allowSignalValue) {
+	if (this->_config["allowSignal"] && this->_config["allowSignalValue"]) {
 		device
 			->Signal(this->_id, "value")
-			/*->Value(Hardware::HJoystickState(
+			->DataRaw(Hardware::HJoystickState(
 				this->_valueX, this->_valueY,
 				this->_button != nullptr && this->_button->Active(),
 				this->_calibrated
-			))*/;
+			));
 	}
 }
 
 void Hardware::HJoystick::_signalPosition (Protonix* device) {
-	if (this->_allowSignal)
+	if (this->_config["allowSignal"])
 		device
 			->Signal(this->_id, "position")
-			/*->Value(Hardware::HJoystickState(
+			->DataRaw(Hardware::HJoystickState(
 				this->_positionX, this->_positionY,
 				this->_button != nullptr && this->_button->Active(),
 				this->_calibrated
-			))*/;
+			));
 }
 
 Hardware::HJoystick::HJoystick (short pinX, short pinY, short pinButton, bool init) {
-	this->_pinX = pinX;
-	this->_pinY = pinY;
-	this->_init = init;
+	this->_config.Listener(this);
+	this->_config["pinX"] = pinX;
+	this->_config["pinY"] = pinY;
+	this->_config["init"] = init;
+	this->_config["maxX"] = QYBERCOM_PROTONIX_ANALOG_MAX;
+	this->_config["minX"] = 0;
+	this->_config["maxY"] = QYBERCOM_PROTONIX_ANALOG_MAX;
+	this->_config["minY"] = 0;
+	this->_config["calibrateAuto"] = true;
+	this->_config["allowSignal"] = true;
+	this->_config["allowSignalValue"] = false;
+
+	if (pinButton < 0) this->_button = nullptr;
+	else {
+		this->_button = new Hardware::HButton(pinButton);
+		this->_button->HardwareConfig()
+			.Set("signal:Changed", "buttonChanged")
+			.Set("signal:Pressed", "buttonPressed")
+			.Set("signal:Released", "buttonReleased");
+
+		this->_config["button"] = this->_button->HardwareConfig();
+	}
+
 	this->_valueX = -1;
 	this->_valueY = -1;
-	this->_maxX = QYBERCOM_PROTONIX_ANALOG_MAX;
-	this->_minX = 0;
-	this->_maxY = QYBERCOM_PROTONIX_ANALOG_MAX;
-	this->_minY = 0;
-
-	this->_button = pinButton < 0 ? nullptr : new Hardware::HButton(pinButton);
-
 	this->_positionChanged = false;
 	this->_positionX = 0;
 	this->_positionY = 0;
-	this->_calibrateAuto = true;
 	this->_calibrateTimeout = ProtonixTimer::Timeout(5000);
 	this->_calibrated = false;
-	this->_gapMaxX = this->_minX;
-	this->_gapMinX = this->_maxX;
-	this->_gapMaxY = this->_minY;
-	this->_gapMinY = this->_maxY;
-	this->_allowSignalValue = false;
+	this->_gapMaxX = this->_config["maxX"];
+	this->_gapMinX = this->_config["minX"];
+	this->_gapMaxY = this->_config["maxY"];
+	this->_gapMinY = this->_config["minY"];
 	this->_first = false;
-}
-
-Hardware::HJoystick* Hardware::HJoystick::Init (short pinX, short pinY, short pinButton, bool init) {
-	return new Hardware::HJoystick(pinX, pinY, pinButton, init);
-}
-
-short Hardware::HJoystick::PinX () {
-	return this->_pinX;
-}
-
-short Hardware::HJoystick::PinY () {
-	return this->_pinY;
-}
-
-bool Hardware::HJoystick::Init () {
-	return this->_init;
-}
-
-int Hardware::HJoystick::MaxX () {
-	return this->_maxX;
-}
-
-Hardware::HJoystick* Hardware::HJoystick::MaxX (int max) {
-	this->_maxX = max;
-
-	return this;
-}
-
-int Hardware::HJoystick::MinX () {
-	return this->_minX;
-}
-
-Hardware::HJoystick* Hardware::HJoystick::MinX (int min) {
-	this->_minX = min;
-
-	return this;
-}
-
-int Hardware::HJoystick::MaxY () {
-	return this->_maxY;
-}
-
-Hardware::HJoystick* Hardware::HJoystick::MaxY (int max) {
-	this->_maxY = max;
-
-	return this;
-}
-
-int Hardware::HJoystick::MinY () {
-	return this->_minY;
-}
-
-Hardware::HJoystick* Hardware::HJoystick::MinY (int min) {
-	this->_minY = min;
-
-	return this;
-}
-
-bool Hardware::HJoystick::CalibrateAuto () {
-	return this->_calibrateAuto;
-}
-
-Hardware::HJoystick* Hardware::HJoystick::CalibrateAuto (bool calibrate) {
-	this->_calibrateAuto = calibrate;
-
-	return this;
 }
 
 Hardware::HJoystick* Hardware::HJoystick::Calibrate () {
@@ -145,16 +90,6 @@ Hardware::HJoystick* Hardware::HJoystick::Calibrate (int gapMinX, int gapMaxX, i
 	this->_gapMinX = gapMinX;
 	this->_gapMaxY = gapMaxY;
 	this->_gapMinY = gapMinY;
-
-	return this;
-}
-
-bool Hardware::HJoystick::AllowSignalValue () {
-	return this->_allowSignalValue;
-}
-
-Hardware::HJoystick* Hardware::HJoystick::AllowSignalValue (bool allow) {
-	this->_allowSignalValue = allow;
 
 	return this;
 }
@@ -186,12 +121,12 @@ String Hardware::HJoystick::HardwareSummary () {
 void Hardware::HJoystick::HardwareInitPre (Protonix* device) {
 	(void)device;
 
-	if (this->_init) {
-		if (this->_pinX > -1)
-			pinMode(this->_pinX, INPUT);
+	if (this->_config["init"]) {
+		if ((int)this->_config["pinX"] > -1)
+			this->_bridge->BridgePinMode(this->_config["pinX"], INPUT);
 
-		if (this->_pinY > -1)
-			pinMode(this->_pinY, INPUT);
+		if ((int)this->_config["pinY"] > -1)
+			this->_bridge->BridgePinMode(this->_config["pinY"], INPUT);
 	}
 
 	this->_capability("value", "valueX:int", "Raw value of X-axis");
@@ -201,12 +136,8 @@ void Hardware::HJoystick::HardwareInitPre (Protonix* device) {
 	this->_capability("value", "positionY:int", "Interpolated Y-axis position (0..100%)");
 
 	if (this->_button != nullptr) {
-		/*this->_button->HardwareConfig("signal:Changed", String("buttonChanged"));
-		this->_button->HardwareConfig("signal:Pressed", String("buttonPressed"));
-		this->_button->HardwareConfig("signal:Released", String("buttonReleased"));*/
-
 		this->_button->HardwareID(this->_id);
-		this->_button->HardwareAllowSignal(this->_allowSignal);
+		this->_button->HardwareBridge(this->_bridge);
 		this->_button->HardwareInitPre(device);
 
 		this->_capability("value", "active:bool", "State of the joystick button");
@@ -220,11 +151,11 @@ void Hardware::HJoystick::HardwarePipe (Protonix* device, short core) {
 	int rawX = 0;
 	int rawY = 0;
 
-	if (this->_pinX > -1)
-		rawX = analogRead(this->_pinX);
+	if ((int)this->_config["pinX"] > -1)
+		rawX = this->_bridge->BridgeAnalogRead(this->_config["pinX"]);
 
-	if (this->_pinY > -1)
-		rawY = analogRead(this->_pinY);
+	if ((int)this->_config["pinY"] > -1)
+		rawY = this->_bridge->BridgeAnalogRead(this->_config["pinY"]);
 
 	if (this->_button != nullptr) {
 		this->_button->HardwarePipe(device, core);
@@ -232,19 +163,21 @@ void Hardware::HJoystick::HardwarePipe (Protonix* device, short core) {
 		this->_capability("active:bool", String(this->_button->Active() ? "1" : "0"));
 	}
 
-	if (this->_calibrateAuto && !this->_calibrated) {
+	if (this->_config["calibrateAuto"] && !this->_calibrated) {
 		this->_calibrateTimeout->Enabled(true);
 
 		if (this->_calibrateTimeout->Pipe()) {
 			this->_calibrated = true;
 
-			/*if (this->_allowSignal)
-				device->Signal(this->_id, "calibrated")->Value(Vector4(
-					this->_gapMaxX,
-					this->_gapMinX,
-					this->_gapMaxY,
-					this->_gapMinY
-				));*/
+			if (this->_config["allowSignal"]) {
+				Value data = Value::Object();
+				data["gapMaxX"] = this->_gapMaxX;
+				data["gapMinX"] = this->_gapMinX;
+				data["gapMaxY"] = this->_gapMaxY;
+				data["gapMinY"] = this->_gapMinY;
+
+				device->Signal(this->_id, "calibrated")->Data(data);
+			}
 		}
 		else {
 			if (rawX > this->_gapMaxX) this->_gapMaxX = rawX;
@@ -262,16 +195,16 @@ void Hardware::HJoystick::HardwarePipe (Protonix* device, short core) {
 
 		int positionX = Hardware::HJoystick::Position(
 			this->_valueX,
-			this->_minX,
-			this->_maxX,
+			this->_config["minX"],
+			this->_config["maxX"],
 			this->_gapMinX,
 			this->_gapMaxX
 		);
 
 		int positionY = Hardware::HJoystick::Position(
 			this->_valueY,
-			this->_minY,
-			this->_maxY,
+			this->_config["minY"],
+			this->_config["maxY"],
 			this->_gapMinY,
 			this->_gapMaxY
 		);
@@ -329,4 +262,13 @@ int Hardware::HJoystick::Position (int value, int valMin, int valMax, int gapMin
 		: ((float)(value - gapMax) / max);
 
 	return (int)(norm * 100);
+}
+
+void Hardware::HJoystick::ValueListenerSet (Value &value) {
+	if (this->_button != nullptr) {
+		if (value.Contains("button"))
+			this->_button->HardwareConfig().Replace(value);
+
+		// TODO: handle direct `button` config
+	}
 }

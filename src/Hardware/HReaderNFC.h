@@ -15,32 +15,27 @@ namespace Qybercom {
 			class HReaderNFC : public IProtonixHardware {
 				private:
 					bool _init;
-					unsigned short _pinSS;
-					unsigned short _pinRST;
-					bool _spi;
 					MFRC522* _spiReader;
-					bool _i2c;
 					MFRC522_I2C* _i2cReader;
-					int _i2cAddress;
 					String _uuid;
 					String _uuidActual;
 					bool _uuidChanged;
-					Qybercom::Filter<String> _filter; // use >= 1000
+					Qybercom::Pipes::Debouncer<String>* _debouncer;
 
-					HReaderNFC (unsigned short pinSS, unsigned short pinRST, unsigned int uuidReadDebounce = 0, short dedicatedCore = -1);
+					HReaderNFC (String mode, unsigned short pinRST, short dedicatedCore = -1);
 					void _signal (Protonix* device, String value);
 
 					static void _channel (unsigned short channel);
 
 				public:
-					static HReaderNFC* InitI2C (unsigned short pinSS, unsigned short pinRST, int address = 0x28, unsigned int uuidReadDebounce = 0, short dedicatedCore = -1);
-					static HReaderNFC* InitSPI (unsigned short pinSS, unsigned short pinRST, unsigned int uuidReadDebounce = 0, short dedicatedCore = -1);
+					static HReaderNFC* InitI2C (unsigned short pinRST, int address = 0x28, short dedicatedCore = -1);
+					static HReaderNFC* InitSPI (unsigned short pinSS, unsigned short pinRST, short dedicatedCore = -1);
 
 					String UUID ();
 					String UUIDActual ();
 					bool UUIDChanged ();
 
-					Qybercom::Filter<String> &Filter ();
+					Qybercom::Pipes::Debouncer<String>* Debouncer ();
 
 					String HardwareSummary ();
 

@@ -5,100 +5,102 @@
 #include "../List.hpp"
 
 namespace Qybercom {
-	template<typename T>
-	class Filter {
-		private:
-			struct Value {
-				T Data;
-				volatile unsigned long Count;
+	namespace Pipes {
+		template<typename T>
+		class Filter {
+			private:
+				struct Value {
+					T Data;
+					volatile unsigned long Count;
 
-				Value (const T &data) : Data(data), Count(0) { }
-			};
+					Value (const T &data) : Data(data), Count(0) { }
+				};
 
-			volatile unsigned long _checkLast;
-			volatile unsigned int _checkInterval;
-			List<Value> _values;
+				volatile unsigned long _checkLast;
+				volatile unsigned int _checkInterval;
+				List<Value> _values;
 
-		public:
-			Filter (unsigned int checkInterval = 0) {
-				this->_checkLast = 0;
-				this->_checkInterval = checkInterval;
-			}
+			public:
+				Filter (unsigned int checkInterval = 0) {
+					this->_checkLast = 0;
+					this->_checkInterval = checkInterval;
+				}
 
-			unsigned long CheckLast () {
-				return this->_checkLast;
-			}
+				unsigned long CheckLast () {
+					return this->_checkLast;
+				}
 
-			unsigned int CheckInterval () {
-				return this->_checkInterval;
-			}
+				unsigned int CheckInterval () {
+					return this->_checkInterval;
+				}
 
-			Filter<T> &CheckInterval (unsigned int checkInterval) {
-				this->_checkInterval = checkInterval;
-
-				return *this;
-			}
-
-			Filter<T> &Use (T value) {
-				for (Value &val : this->_values) {
-					if (val.Data != value) continue;
-
-					val.Count = val.Count + 1; // required by compiler
+				Filter<T> &CheckInterval (unsigned int checkInterval) {
+					this->_checkInterval = checkInterval;
 
 					return *this;
 				}
 
-				Value val{value};
-				val.Count = 1;
+				Filter<T> &Use (T value) {
+					for (Value &val : this->_values) {
+						if (val.Data != value) continue;
 
-				this->_values.Add(val);
+						val.Count = val.Count + 1; // required by compiler
 
-				return *this;
-			}
+						return *this;
+					}
 
-			bool Pipe () {
-				unsigned long now = micros();
-				bool out = (now - this->_checkLast) > this->_checkInterval;
+					Value val{value};
+					val.Count = 1;
 
-				if (out)
-					this->_checkLast = now;
+					this->_values.Add(val);
 
-				return out;
-			}
+					return *this;
+				}
 
-			T Actual () {
-				Value out = this->_values.First();
+				bool Pipe () {
+					unsigned long now = micros();
+					bool out = (now - this->_checkLast) > this->_checkInterval;
 
-				for (Value &val : this->_values)
-					if (val.Count > out.Count)
-						out = val;
+					if (out)
+						this->_checkLast = now;
 
-				return out.Data;
-			}
+					return out;
+				}
 
-			bool Empty () {
-				return this->_values.Count() == 0;
-			}
+				T Actual () {
+					Value out = this->_values.First();
 
-			Filter<T> &Reset () {
-				//this->_values.Clear();
-				for (Value &val : this->_values)
-					val.Count = 0;
+					for (Value &val : this->_values)
+						if (val.Count > out.Count)
+							out = val;
 
-				return *this;
-			}
+					return out.Data;
+				}
 
-			List<Value> &Values () {
-				return this->_values;
-			}
+				bool Empty () {
+					return this->_values.Count() == 0;
+				}
 
-			Filter<T> &Debug () {
-				Serial.println("[filter] Debug:");
+				Filter<T> &Reset () {
+					//this->_values.Clear();
+					for (Value &val : this->_values)
+						val.Count = 0;
 
-				for (Value &val : this->_values)
-					Serial.println(" - '" + String(val.Data) + "' : " + String(val.Count));
+					return *this;
+				}
 
-				return *this;
-			}
-	};
+				List<Value> &Values () {
+					return this->_values;
+				}
+
+				Filter<T> &Debug () {
+					Serial.println("[filter] Debug:");
+
+					for (Value &val : this->_values)
+						Serial.println(" - '" + String(val.Data) + "' : " + String(val.Count));
+
+					return *this;
+				}
+		};
+	}
 }

@@ -29,7 +29,7 @@ struct can_frame Hardware::HBusCAN::_frame (unsigned short id, String data) {
 
 	int i = 0;
 	while (i < length) {
-		frame.data[i] = (byte)data[i];
+		frame.data[i] = (char)data[i];
 
 		i++;
 	}
@@ -37,10 +37,10 @@ struct can_frame Hardware::HBusCAN::_frame (unsigned short id, String data) {
 	return frame;
 }
 
-void Hardware::HBusCAN::_process (Protonix* device, byte src, byte dst, byte priority, String data) {
-	/*device->Signal(this->_id, "parsed")->Value(
+void Hardware::HBusCAN::_process (Protonix* device, char src, char dst, char priority, String data) {
+	device->Signal(this->_id, "parsed")->DataRaw(
 		Hardware::HBusCANMessage(src, dst, priority, data)
-	);*/
+	);
 
 	device->CommandRecognizeAndProcess(data, this);
 }
@@ -57,7 +57,7 @@ String Hardware::HBusCAN::_statusRecognize (MCP2515::ERROR code) {
 	}
 }
 
-Hardware::HBusCAN::HBusCAN (unsigned short pinCS, byte address, CAN_SPEED bitrate, CAN_CLOCK clock, bool parse, unsigned int bufferMax) {
+Hardware::HBusCAN::HBusCAN (unsigned short pinCS, char address, CAN_SPEED bitrate, CAN_CLOCK clock, bool parse, unsigned int bufferMax) {
 	this->_ready = false;
 	this->_parse = parse;
 	this->_address = address;
@@ -78,7 +78,7 @@ Hardware::HBusCAN::HBusCAN (unsigned short pinCS, byte address, CAN_SPEED bitrat
 	this->_outTimer = new ProtonixTimer(1);
 }
 
-Hardware::HBusCAN* Hardware::HBusCAN::Init (unsigned short pinCS, byte address, CAN_SPEED bitrate, CAN_CLOCK clock, bool parse, unsigned int bufferMax) {
+Hardware::HBusCAN* Hardware::HBusCAN::Init (unsigned short pinCS, char address, CAN_SPEED bitrate, CAN_CLOCK clock, bool parse, unsigned int bufferMax) {
 	return new Hardware::HBusCAN(pinCS, address, bitrate, clock, parse, bufferMax);
 }
 
@@ -86,11 +86,11 @@ ProtonixTimer* Hardware::HBusCAN::OutTimer () {
 	return this->_outTimer;
 }
 
-byte Hardware::HBusCAN::Address () {
+char Hardware::HBusCAN::Address () {
 	return this->_address;
 }
 
-Hardware::HBusCAN* Hardware::HBusCAN::Address (byte address) {
+Hardware::HBusCAN* Hardware::HBusCAN::Address (char address) {
 	this->_address = address;
 
 	return this;
@@ -138,13 +138,13 @@ Hardware::HBusCAN* Hardware::HBusCAN::BufferMax (unsigned int size) {
 	return this;
 }
 
-unsigned short Hardware::HBusCAN::ID (byte priority, byte address, bool truncated) {
+unsigned short Hardware::HBusCAN::ID (char priority, char address, bool truncated) {
 	unsigned short id = 0;
 
-	id |= ((byte)(priority & 0x03)) << 9;
-	id |= ((byte)(truncated ? 1 : 0)) << 8;
-	id |= ((byte)(address & 0x0F)) << 4;
-	id |= ((byte)(this->_address & 0x0F));
+	id |= ((char)(priority & 0x03)) << 9;
+	id |= ((char)(truncated ? 1 : 0)) << 8;
+	id |= ((char)(address & 0x0F)) << 4;
+	id |= ((char)(this->_address & 0x0F));
 
 	return id;
 }
@@ -170,7 +170,7 @@ bool Hardware::HBusCAN::Send (unsigned short id, String data) {
 	return this->Send(&frame);
 }
 
-bool Hardware::HBusCAN::Send (String data, byte priority, byte address, bool truncate) {
+bool Hardware::HBusCAN::Send (String data, char priority, char address, bool truncate) {
 	if (priority > 3) priority = 3;
 	int length = data.length();
 
@@ -240,10 +240,10 @@ void Hardware::HBusCAN::HardwarePipe (Protonix* device, short core) {
 
 		if (this->_parse) {
 			unsigned short id = frame.can_id & 0x7FF;
-			byte priority = (id >> 9) & 0x03;
-			byte truncated = ((id >> 8) & 0x01);
-			byte dst = (id >> 4) & 0x0F;
-			byte src = id & 0x0F;
+			char priority = (id >> 9) & 0x03;
+			char truncated = ((id >> 8) & 0x01);
+			char dst = (id >> 4) & 0x0F;
+			char src = id & 0x0F;
 
 			if (this->Validate(src, dst, priority, truncated)) {
 				if (dst != this->_address && dst != 0x0F) return;
@@ -325,7 +325,7 @@ bool Hardware::HBusCAN::BusCommand (Protonix* device, String command) {
 	return this->Send(command);
 }
 
-bool Hardware::HBusCAN::Validate (byte src, byte dst, byte priority, byte truncated) {
+bool Hardware::HBusCAN::Validate (char src, char dst, char priority, char truncated) {
 	if (src > 0x0F) return false;
 	if (dst != this->_address && dst != 0x0F) return false;
 	if (priority > 0x03) return false;

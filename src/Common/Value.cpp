@@ -107,6 +107,10 @@ Value::Value (const String &value) {
 	Set(value);
 }
 
+Value::Value (const Types::Raw &value) {
+	Set(value);
+}
+
 Value::Value (const Value &value) {
 	*this = value;
 }
@@ -163,6 +167,10 @@ Value::operator char* () const {
 
 Value::operator String () const {
 	return _type == Value::TYPE::STRING ? String(_value.STRING): "";
+}
+
+Value::operator Types::Raw () const {
+	return _type == Value::TYPE::RAW ? *_value.RAW : Types::Raw();
 }
 
 
@@ -224,6 +232,10 @@ Value &Value::operator= (const char* value) {
 }
 
 Value &Value::operator= (const String &value) {
+	return Set(value);
+}
+
+Value &Value::operator= (const Types::Raw &value) {
 	return Set(value);
 }
 
@@ -444,6 +456,18 @@ Value &Value::Set (const String &value) {
 	return *this;
 }
 
+Value &Value::Set (const Types::Raw &value) {
+	Clear();
+
+	_type = Value::TYPE::RAW;
+	_value.RAW = new Types::Raw(value);
+
+	if (_listener != nullptr)
+		_listener->ValueListenerSet(*this);
+
+	return *this;
+}
+
 Value &Value::Set (const Value &value) {
 	if (this == &value) return *this;
 
@@ -585,6 +609,7 @@ String Value::TypeName () const {
 		case Value::TYPE::INT:	return "int"; break;
 		case Value::TYPE::FLOAT: return "float"; break;
 		case Value::TYPE::STRING: return "string"; break;
+		case Value::TYPE::RAW: return "raw"; break;
 		default: return "undefined"; break;
 	}
 }
@@ -703,6 +728,10 @@ Value &Value::Clear () {
 		_value.COLLECTION.count = 0;
 		_value.COLLECTION.capacity = 0;
 	}
+	else if (_type == Value::TYPE::RAW && _value.RAW != nullptr) {
+		delete _value.RAW;
+		_value.RAW = nullptr;
+	}
 
 	_type = Value::TYPE::UNDEFINED;
 
@@ -743,6 +772,24 @@ Value Value::Array () {
 	b._value.COLLECTION.items = nullptr;
 	b._value.COLLECTION.count = 0;
 	b._value.COLLECTION.capacity = 0;
+
+	return b;
+}
+
+Value Value::Raw () {
+	Value b;
+
+	b._type = Value::TYPE::RAW;
+	b._value.RAW = nullptr;
+
+	return b;
+}
+
+Value Value::Raw (const Types::Raw &raw) {
+	Value b;
+
+	b._type = Value::TYPE::RAW;
+	b._value.RAW = new Types::Raw(raw);
 
 	return b;
 }
@@ -799,6 +846,10 @@ void Value::Dump (int indent) {
 		Serial.println("]");
 
 		return;
+	}
+
+	if (_type == Value::TYPE::RAW) {
+		Serial.println("RAW");
 	}
 
 	Serial.println(Trace());

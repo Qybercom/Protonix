@@ -10,7 +10,6 @@ namespace Qybercom {
 		namespace Hardware {
 			class HGenericPWM : public IProtonixHardware {
 				private:
-					unsigned short  _pin;
 					bool _inverted;
 					unsigned int _frequency;
 					unsigned short _resolution;
