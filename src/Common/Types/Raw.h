@@ -6,19 +6,23 @@ namespace Qybercom {
 	namespace Types {
 		class Raw {
 			private:
-				char* _data;
 				int _size;
+				char* _data;
 
 			public:
 				Raw ();
 				template<typename T>
-				explicit Raw (const T &obj) : _size(sizeof(T)) {
+				explicit Raw (const T &obj) {
+					_size = sizeof(T);
 					_data = new char[_size];
 
-					memcpy(_data, &obj, _size);
+					if (_size != 0)
+						memcpy(_data, &obj, _size);
 				}
 				Raw (const Raw &other);
+				Raw (Raw&& other) noexcept;
 				Raw &operator= (const Raw &other);
+				Raw &operator= (Raw&& other) noexcept;
 				~Raw ();
 
 				void* Get () const;
@@ -27,17 +31,15 @@ namespace Qybercom {
 
 				template<typename T>
 				T As () const {
-					if (!Valid() || Size() != sizeof(T)) {
-						T t{};
-						return t;
-					}
-
 					T t;
 
-					memcpy(&t, _data, sizeof(T));
+					if (Valid())
+						memcpy(&t, _data, sizeof(T));
 
 					return t;
 				}
+
+				static Raw* Copy (Raw *raw);
 		};
 	}
 }

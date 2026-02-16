@@ -244,6 +244,102 @@ Value &Value::operator= (const Value &value) {
 }
 
 
+
+bool Value::operator== (const Value &other) const {
+	if (_type != other._type)
+		return false;
+
+	switch (_type) {
+		case TYPE::UNDEFINED:
+		case TYPE::NULLPTR:
+			return true;
+
+		case TYPE::BOOL:
+			return _value.BOOL == other._value.BOOL;
+
+		case TYPE::INT:
+			return _value.INT == other._value.INT;
+
+		case TYPE::FLOAT:
+			return _value.FLOAT == other._value.FLOAT;
+
+		case TYPE::STRING:
+			if (_value.STRING == nullptr && other._value.STRING == nullptr)
+				return true;
+			if (_value.STRING == nullptr || other._value.STRING == nullptr)
+				return false;
+			return strcmp(_value.STRING, other._value.STRING) == 0;
+
+		case TYPE::RAW:
+			if (_value.RAW == nullptr && other._value.RAW == nullptr)
+				return true;
+			if (_value.RAW == nullptr || other._value.RAW == nullptr)
+				return false;
+
+			if (_value.RAW->Size() != other._value.RAW->Size())
+				return false;
+
+			return memcmp(
+				_value.RAW->Get(),
+				other._value.RAW->Get(),
+				_value.RAW->Size()
+			) == 0;
+
+		case TYPE::ARRAY:
+		case TYPE::OBJECT: {
+			if (_value.COLLECTION.count != other._value.COLLECTION.count)
+				return false;
+
+			int i = 0;
+			while (i < _value.COLLECTION.count) {
+				const Value& a = _value.COLLECTION.items[i];
+				const Value& b = other._value.COLLECTION.items[i];
+
+				if (_type == TYPE::OBJECT) {
+					if ((a._key == nullptr) != (b._key == nullptr))
+						return false;
+
+					if (a._key && strcmp(a._key, b._key) != 0)
+						return false;
+				}
+
+				if (!(a == b))
+					return false;
+
+				i++;
+			}
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool Value::operator!= (const Value &other) const {
+	return !(*this == other);
+}
+
+bool Value::operator== (const char* other) const {
+	if (_type != TYPE::STRING)
+		return false;
+
+	if (_value.STRING == nullptr && other == nullptr)
+		return true;
+
+	if (_value.STRING == nullptr || other == nullptr)
+		return false;
+
+	return strcmp(_value.STRING, other) == 0;
+}
+
+bool Value::operator!= (const char* other) const {
+	return !(*this == other);
+}
+
+
+
+
 Value &Value::Get (const char* key) {
 	if (_type != Value::TYPE::OBJECT) {
 		Clear();
@@ -480,6 +576,7 @@ Value &Value::Set (const Value &value) {
 		case Value::TYPE::INT: _value.INT = value._value.INT; break;
 		case Value::TYPE::FLOAT: _value.FLOAT = value._value.FLOAT; break;
 		case Value::TYPE::STRING: _value.STRING = strDup(value._value.STRING); break;
+		case Value::TYPE::RAW: _value.RAW = Types::Raw::Copy(value._value.RAW); break;
 		case Value::TYPE::OBJECT:
 		case Value::TYPE::ARRAY: {
 			_value.COLLECTION.items = nullptr;

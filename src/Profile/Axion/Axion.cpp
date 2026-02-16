@@ -261,15 +261,15 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 	Value dto = Value::Object();
 
 	dto["active"] = device->Active();
-	dto["platform"] = device->Platform();
-	dto["build"] = device->Build();
+	/*if (first) */dto["platform"] = device->Platform();
+	/*if (first) */dto["build"] = device->Build();
 	dto["state"] = device->State();
 	dto["summary"] = device->Summary();
 
 	#if defined(ESP32) || defined(ESP8266)
 	dto["cpu"] = device->CPUFrequency();
 	dto["uptime"] = device->TimerUptime()->RunTime();
-	dto["firmware"] = device->Firmware();
+	/*if (first) */dto["firmware"] = device->Firmware();
 
 	if (this->_dataMemory) {
 		Value memory = Value::Object();
@@ -300,24 +300,24 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 	}
 	dto["sensors"] = sensors_out;
 
-	if (this->_dataHardware || first) {
+	if (true) {//this->_dataHardware || first) {
 		List<IProtonixHardware*> &hardware = device->Hardware();
 		Value hardware_out = Value::Array();
 		for (IProtonixHardware* hw : hardware) {
 			Value hwItem = Value::Object();
 
 			hwItem["id"] = hw->HardwareID();
-			hwItem["summary"] = hw->HardwareSummary();
+			/*if (first) */hwItem["summary"] = hw->HardwareSummary();
 
 			Value capabilities_out = Value::Array();
 			List<ProtonixHardwareCapability*> &capabilities = hw->HardwareCapabilities();
 			for (ProtonixHardwareCapability* capability : capabilities) {
 				Value capabilityItem = Value::Object();
 
-				capabilityItem["kind"] = capability->Kind();
+				/*if (first) */capabilityItem["kind"] = capability->Kind();
 				capabilityItem["id"] = capability->ID();
 				capabilityItem["value"] = capability->Value();
-				capabilityItem["comment"] = capability->Comment();
+				/*if (first) */capabilityItem["comment"] = capability->Comment();
 
 				capabilities_out.Add(capabilityItem);
 			}

@@ -11,6 +11,10 @@ Hardware::HContextCA958::HContextCA958 (char address) {
 	this->_config["address"] = address;
 }
 
+String Hardware::HContextCA958::HardwareSummary () {
+	return "Context adapter based on CA95X";
+}
+
 bool Hardware::HContextCA958::HardwareI2C () {
 	return true;
 }

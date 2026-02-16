@@ -8,6 +8,10 @@ Hardware::HBridgeDefault::HBridgeDefault () {
 
 }
 
+String Hardware::HBridgeDefault::HardwareSummary () {
+	return "Default bridge";
+}
+
 bool Hardware::HBridgeDefault::BridgePinDualPolarity (unsigned int pin) {
 	(void)pin; // TODO: add feature for per-pin check
 

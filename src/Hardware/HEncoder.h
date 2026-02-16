@@ -16,6 +16,7 @@ namespace Qybercom {
 				short Dir;
 				bool Button;
 
+				HEncoderState () : Dir(0), Button(false) { }
 				HEncoderState (short dir, bool button) : Dir(dir), Button(button) { }
 			};
 

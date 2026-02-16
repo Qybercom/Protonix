@@ -93,6 +93,7 @@ void Hardware::HReaderNFC::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	this->_capability("value", "uuid:string", "Current' card UUID");
+	Serial.println("[nfc] " + String(this->HardwareSPI()));
 }
 
 bool Hardware::HReaderNFC::HardwareI2C () {
@@ -192,6 +193,8 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 				i++;
 			}
 		}
+	//if (value != "")
+		Serial.println("[nfc] " + value);
 	}
 
 	value = this->_debouncer->Value(value);

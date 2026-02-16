@@ -31,6 +31,12 @@ namespace Qybercom {
 				ProtonixSignal* DataRaw (const T &obj) {
 					return Data(Value::Raw(obj));
 				}
+				template<typename T>
+				T DataRaw () {
+					Qybercom::Types::Raw raw = _data;
+
+					return raw.As<T>();
+				}
 
 				~ProtonixSignal ();
 		};

@@ -12,9 +12,11 @@ namespace Qybercom {
 				public:
 					HContextCA958 (char address = 0x70);
 
+					String HardwareSummary ();
 					bool HardwareI2C ();
 					void HardwareI2CPre (Protonix* device);
 					void HardwareI2CPost (Protonix* device);
+
 					void HardwareContextApply (IProtonixHardware* hardware);
 			};
 		}
