@@ -11,10 +11,13 @@ Raw::Raw () {
 
 Raw::Raw (const Raw &other) {
 	_size = other._size;
-	_data = _size ? new char[_size] : nullptr;
+	_data = nullptr;
 
-	if (_size != 0)
+	if (_size != 0) {
+		_data = new char[_size];
+
 		memcpy(_data, other._data, _size);
+	}
 }
 
 Raw::Raw (Raw&& other) noexcept {
@@ -30,10 +33,13 @@ Raw &Raw::operator= (const Raw &other) {
 
 	delete[] _data;
 	_size = other._size;
-	_data = _size ? new char[_size] : 0;
+	_data = nullptr;
 
-	if (_size)
+	if (_size != 0) {
+		_data = new char[_size];
+
 		memcpy(_data, other._data, _size);
+	}
 
 	return *this;
 }

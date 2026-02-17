@@ -122,10 +122,12 @@ namespace Qybercom {
 			Value &operator= (const Types::Raw &value);
 			Value &operator= (const Value &value);
 
-			bool operator== (const Value &other) const;
-			bool operator!= (const Value &other) const;
+			bool operator== (bool other) const;
+			bool operator!= (bool other) const;
 			bool operator== (const char* other) const;
 			bool operator!= (const char* other) const;
+			bool operator== (const Value &other) const;
+			bool operator!= (const Value &other) const;
 
 			Value &Get (const char* key);
 			Value &Get (const String &key);

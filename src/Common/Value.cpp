@@ -1,5 +1,7 @@
 #include <Arduino.h>
 
+
+
 #include "Utils.h"
 
 #include "Value.h"
@@ -244,10 +246,28 @@ Value &Value::operator= (const Value &value) {
 }
 
 
+bool Value::operator== (bool other) const {
+	return _type == TYPE::BOOL && _value.BOOL == other;
+}
+
+bool Value::operator!= (bool other) const {
+	return !(*this == other);
+}
+
+bool Value::operator== (const char* other) const {
+	if (_type != TYPE::STRING) return false;
+	if (_value.STRING == nullptr && other == nullptr) return true;
+	if (_value.STRING == nullptr || other == nullptr) return false;
+
+	return strcmp(_value.STRING, other) == 0;
+}
+
+bool Value::operator!= (const char* other) const {
+	return !(*this == other);
+}
 
 bool Value::operator== (const Value &other) const {
-	if (_type != other._type)
-		return false;
+	if (_type != other._type) return false;
 
 	switch (_type) {
 		case TYPE::UNDEFINED:
@@ -264,31 +284,21 @@ bool Value::operator== (const Value &other) const {
 			return _value.FLOAT == other._value.FLOAT;
 
 		case TYPE::STRING:
-			if (_value.STRING == nullptr && other._value.STRING == nullptr)
-				return true;
-			if (_value.STRING == nullptr || other._value.STRING == nullptr)
-				return false;
+			if (_value.STRING == nullptr && other._value.STRING == nullptr) return true;
+			if (_value.STRING == nullptr || other._value.STRING == nullptr) return false;
+
 			return strcmp(_value.STRING, other._value.STRING) == 0;
 
 		case TYPE::RAW:
-			if (_value.RAW == nullptr && other._value.RAW == nullptr)
-				return true;
-			if (_value.RAW == nullptr || other._value.RAW == nullptr)
-				return false;
+			if (_value.RAW == nullptr && other._value.RAW == nullptr) return true;
+			if (_value.RAW == nullptr || other._value.RAW == nullptr) return false;
+			if (_value.RAW->Size() != other._value.RAW->Size()) return false;
 
-			if (_value.RAW->Size() != other._value.RAW->Size())
-				return false;
-
-			return memcmp(
-				_value.RAW->Get(),
-				other._value.RAW->Get(),
-				_value.RAW->Size()
-			) == 0;
+			return memcmp(_value.RAW->Get(), other._value.RAW->Get(), _value.RAW->Size()) == 0;
 
 		case TYPE::ARRAY:
 		case TYPE::OBJECT: {
-			if (_value.COLLECTION.count != other._value.COLLECTION.count)
-				return false;
+			if (_value.COLLECTION.count != other._value.COLLECTION.count) return false;
 
 			int i = 0;
 			while (i < _value.COLLECTION.count) {
@@ -296,15 +306,11 @@ bool Value::operator== (const Value &other) const {
 				const Value& b = other._value.COLLECTION.items[i];
 
 				if (_type == TYPE::OBJECT) {
-					if ((a._key == nullptr) != (b._key == nullptr))
-						return false;
-
-					if (a._key && strcmp(a._key, b._key) != 0)
-						return false;
+					if ((a._key == nullptr) != (b._key == nullptr)) return false;
+					if (a._key && strcmp(a._key, b._key) != 0) return false;
 				}
 
-				if (!(a == b))
-					return false;
+				if (!(a == b)) return false;
 
 				i++;
 			}
@@ -319,25 +325,6 @@ bool Value::operator== (const Value &other) const {
 bool Value::operator!= (const Value &other) const {
 	return !(*this == other);
 }
-
-bool Value::operator== (const char* other) const {
-	if (_type != TYPE::STRING)
-		return false;
-
-	if (_value.STRING == nullptr && other == nullptr)
-		return true;
-
-	if (_value.STRING == nullptr || other == nullptr)
-		return false;
-
-	return strcmp(_value.STRING, other) == 0;
-}
-
-bool Value::operator!= (const char* other) const {
-	return !(*this == other);
-}
-
-
 
 
 Value &Value::Get (const char* key) {

@@ -14,14 +14,12 @@ using namespace Qybercom::Protonix;
 void Hardware::HReaderNFC::_signal (Protonix* device, String value) {
 	if (!this->_config["allowSignal"]) return;
 
-	String current = this->_uuid;
-
 	device->Signal(this->_id, "uuidChanged")->Data(value);
 
-	if (current == "" && value != "")
+	if (value != "")
 		device->Signal(this->_id, "tagIn")->Data(value);
 
-	if (current != "" && value == "")
+	if (value == "")
 		device->Signal(this->_id, "tagOut");
 }
 
@@ -93,7 +91,6 @@ void Hardware::HReaderNFC::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	this->_capability("value", "uuid:string", "Current' card UUID");
-	Serial.println("[nfc] " + String(this->HardwareSPI()));
 }
 
 bool Hardware::HReaderNFC::HardwareI2C () {
@@ -193,12 +190,12 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 				i++;
 			}
 		}
-	//if (value != "")
-		Serial.println("[nfc] " + value);
 	}
 
 	value = this->_debouncer->Value(value);
 	this->_uuidActual = value;
+
+	this->_capability("uuid:string", value);
 
 	if (this->_uuid != value) {
 		this->_uuid = value;
