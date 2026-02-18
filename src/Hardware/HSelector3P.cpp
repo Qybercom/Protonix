@@ -125,7 +125,7 @@ void Hardware::HSelector3P::HardwareOnReset (Protonix* device) {
 	this->_signal(device, this->_value);
 }
 
-void Hardware::HSelector3P::HardwareOnCommand (Protonix* device, String command) {
+void Hardware::HSelector3P::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 

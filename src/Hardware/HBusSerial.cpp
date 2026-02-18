@@ -120,7 +120,7 @@ void Hardware::HBusSerial::HardwarePipe (Protonix* device, short core) {
 	else {
 		//this->_log("Pipe:cmd " + String(this->_cmdBuffer));
 
-		device->CommandRecognizeAndProcess(this->_cmdBuffer, this);
+		device->Command(this->_cmdBuffer, this);
 	}
 
 	this->_cmdBuffer = "";
@@ -133,7 +133,7 @@ void Hardware::HBusSerial::HardwareOnReset (Protonix* device) {
 	(void)device;
 }
 
-void Hardware::HBusSerial::HardwareOnCommand (Protonix* device, String command) {
+void Hardware::HBusSerial::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

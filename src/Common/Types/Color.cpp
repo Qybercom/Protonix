@@ -35,7 +35,7 @@ void Color::ValueTypeDeserialize (const String &raw) {
 	A = clr[3].toFloat();
 }
 
-String Color::ValueTypeSerialize () const {
+String Color::ValueTypeSerialize () {
 	return String(R)
 		+ "," + String(G)
 		+ "," + String(B)

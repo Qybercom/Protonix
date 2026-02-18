@@ -4,55 +4,68 @@
 #include "IProtonixHardware.hpp"
 
 #include "Protonix.h"
-
-#include "Command/index.h"
+#include "ProtonixCommand.h"
 
 using namespace Qybercom::Protonix;
 
-void IProtonixDevice::DeviceHandleStdCommand (Protonix* device, IProtonixCommand* command) {
-	String name = command->CommandName();
+void IProtonixDevice::DeviceHandleCommand (Protonix* device, const ProtonixCommand &command) {
+	String name = command.Name();
+	Value arguments = command.Arguments();
+
+	Serial.println("[device] Command '" + name + "'");command.Dump();
 
 	if (name == "std:action") {
-		Command::CStdAction* cmd = (Command::CStdAction*)command;
-		String _cmd = cmd->CMD();
-		String action = cmd->Name();
+		String cmd = arguments[0];
+		String action = arguments[1];
 
-		Serial.println("[device] Action '" + _cmd + "':'" + action + "'");
+		Serial.println("[device] Action '" + cmd + "':'" + action + "'");
 
-		if (_cmd == "trigger")
+		if (cmd == "trigger")
 			device->ActionTrigger(action);
 
-		if (_cmd == "start")
+		if (cmd == "start")
 			device->ActionStart(action);
 
-		if (_cmd == "stop")
+		if (cmd == "stop")
 			device->ActionStop(action);
 	}
 
-	if (name == "std:active") {
-		Command::CStdActive* cmd = (Command::CStdActive*)command;
+	if (name == "std:on") {
+		device->Active(true);
+	}
 
-		device->Active(cmd->Active());
+	if (name == "std:off") {
+		device->Active(false);
+	}
+
+	if (name == "std:active") {
+		bool active = arguments[0];
+
+		device->Active(active);
 	}
 
 	if (name == "std:firmware") {
-		Command::CStdFirmware* cmd = (Command::CStdFirmware*)command;
+		Serial.println("[device] Command:5.1");
+		String cmd = arguments[0];
+		Serial.println("[device] Firmware '" + cmd + "'");
 
-		if (cmd->ActionUpdate()) {
-			Serial.println("[device] Firmware update requested");
+		if (cmd == "update") {
+			String version = arguments[1];
+			Serial.println("[device] Firmware update requested for version '" + version + "'");
 
-			device->FirmwareUpdateOTA(cmd->Version());
+			device->FirmwareUpdateOTA(version);
 		}
 	}
 
 	if (name == "std:hardware") {
-		Command::CStdHardware* cmd = (Command::CStdHardware*)command;
-		IProtonixHardware* hardware = device->Hardware(cmd->ID());
+		String id = arguments[0];
+
+		IProtonixHardware* hardware = device->Hardware(id);
 
 		if (hardware != nullptr) {
-			Serial.println("[device] Hardware '" + cmd->ID() + "' received command '" + cmd->CMD() + "'");
+			Serial.println("[device] Hardware '" + id + "' received command");
 
-			hardware->HardwareOnCommand(device, cmd->CMD());
+			hardware->HardwareOnCommand(device, command);
 		}
 	}
 
@@ -61,22 +74,56 @@ void IProtonixDevice::DeviceHandleStdCommand (Protonix* device, IProtonixCommand
 	}
 
 	if (name == "std:registry") {
-		Command::CStdRegistry* cmd = (Command::CStdRegistry*)command;
+		String cmd = arguments[0];
 
-		//device->Registry()->SetRaw(cmd->Key(), cmd->Value(), true);
+		if (cmd == "raw") {
+			String raw = arguments[1];
+			Serial.println("[device] Registry received command 'raw':'" + raw + "'");
+			device->Registry()->Load(raw);
+		}
+
+		if (cmd == "set") {
+			String key = arguments[1];
+			Value value = arguments[2];
+			Serial.println("[device] Registry received command 'set' for key '" + key + "' with value '" + value.ToString() + "'");
+			device->Registry()->Save(key, value);
+		}
 	}
 
 	if (name == "std:sensor") {
-		Command::CStdSensor* cmd = (Command::CStdSensor*)command;
+		String id = arguments[0];
 
-		device->SensorSet(cmd->Sensor());
+		ProtonixSensor* sensor = device->Sensor(id);
+
+		if (sensor != nullptr) {
+			Value value = arguments[1];
+			Value active = arguments[2];
+			Value failure = arguments[3];
+			Value state = arguments[4];
+
+			Serial.print("[device] Sensor '" + id + "' set value:'" + value.ToString() + "'");
+			device->Sensor(id)->Value(value);
+
+			if (!active.IsUndefined()) {
+				Serial.print(", active:" + active.ToString());
+				device->Sensor(id)->Active(active);
+			}
+
+			if (!failure.IsUndefined()) {
+				Serial.print(", failure:" + failure.ToString());
+				device->Sensor(id)->Failure(failure);
+			}
+
+			if (!state.IsUndefined()) {
+				Serial.print(", state:'" + state.ToString() + "'");
+				device->Sensor(id)->State(state);
+			}
+
+			Serial.println();
+		}
 	}
-}
 
-bool IProtonixDevice::DeviceHandleCommand (Protonix* device, IProtonixCommand* command) {
-	this->DeviceHandleStdCommand(device, command);
-
-	return command->CommandName() == "custom";
+	this->DeviceOnCommand(device, command);
 }
 
 unsigned int IProtonixDevice::DeviceTick () {
@@ -100,17 +147,7 @@ void IProtonixDevice::DeviceOnLoop (Protonix* device) {
 	(void)device;
 }
 
-void IProtonixDevice::DeviceOnCommand (Protonix* device, IProtonixCommand* command, IProtonixHardware* hardware) {
-	(void)hardware;
-	if (!this->DeviceHandleCommand(device, command)) return;
-
-	Command::CCustom* cmd = (Command::CCustom*)command;
-
-	if (cmd != nullptr)
-		this->DeviceOnCommandCustom(device, cmd->CMD());
-}
-
-void IProtonixDevice::DeviceOnCommandCustom (Protonix* device, String command) {
+void IProtonixDevice::DeviceOnCommand (Protonix* device, const ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

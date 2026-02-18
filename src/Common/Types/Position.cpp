@@ -33,7 +33,7 @@ void Position::ValueTypeDeserialize (const String &raw) {
 	Z = pos[2].toInt();
 }
 
-String Position::ValueTypeSerialize () const {
+String Position::ValueTypeSerialize () {
 	return String(X)
 		+ "," + String(Y)
 		+ "," + String(Z);

@@ -44,9 +44,10 @@ void Hardware::HPhotonix::HardwareOnReset (Protonix* device) {
 	this->_photonix->Clear();
 }
 
-void Hardware::HPhotonix::HardwareOnCommand (Protonix* device, String command) {
+void Hardware::HPhotonix::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
 	(void)device;
+	String cmd = command.Argument(0);
 
-	if (command == "clear")
+	if (cmd == "clear")
 		this->_photonix->Clear();
 }

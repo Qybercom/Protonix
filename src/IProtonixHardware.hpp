@@ -4,6 +4,8 @@
 
 #include "Common/index.h"
 
+#include "ProtonixCommand.h"
+
 #include "ProtonixHardwareCapability.h"
 
 namespace Qybercom {
@@ -107,7 +109,7 @@ namespace Qybercom {
 
 				virtual void HardwarePipe (Protonix* device, short core) { (void)device; (void)core; }
 				virtual void HardwareOnReset (Protonix* device) { (void)device; }
-				virtual void HardwareOnCommand (Protonix* device, String command) { (void)device; (void)command; }
+				virtual void HardwareOnCommand (Protonix* device, const ProtonixCommand &command) { (void)device; (void)command; }
 
 				virtual void HardwarePipeInterrupt (Protonix* device) { (void)device; }
 

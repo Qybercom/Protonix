@@ -8,7 +8,6 @@
 
 #include "IProtonixHardware.hpp"
 #include "IProtonixNetworkDriver.h"
-#include "IProtonixCommand.h"
 #include "IProtonixDevice.h"
 #include "IProtonixProfile.h"
 #include "ProtonixTimer.h"
@@ -17,6 +16,7 @@
 #include "ProtonixMemory.h"
 #include "ProtonixRegistry.h"
 #include "ProtonixSensor.h"
+#include "ProtonixCommand.h"
 
 namespace Qybercom {
 	namespace Protonix {
@@ -58,7 +58,6 @@ namespace Qybercom {
 				List<String> _actionQueue;
 
 				List<ProtonixSensor*> _sensors;
-				List<IProtonixCommand*> _commands;
 
 				void _interruptProcess ();
 				static void QYBERCOM_PROTONIX_INTERRUPT _interrupt ();
@@ -121,6 +120,8 @@ namespace Qybercom {
 				unsigned long CPUFrequency ();
 				ProtonixMemory* Memory ();
 				ProtonixRegistry* Registry ();
+				Value Registry (const String &key);
+				Protonix* Registry (const String &key, const Value &value);
 
 				List<IProtonixHardware*> &Hardware ();
 				IProtonixHardware* Hardware (String id);
@@ -136,7 +137,6 @@ namespace Qybercom {
 
 				bool BusSend (String bus, String data);
 				bool BusCommand (String bus, String command);
-				bool BusCommand (String bus, IProtonixCommand* command);
 				bool BusCommandCustom (String bus, String cmd);
 				bool BusCommandSensor (String bus, String id, String value = "", bool active = false, bool failure = false, String state = "");
 
@@ -187,11 +187,7 @@ namespace Qybercom {
 				Protonix* SensorReset (String id);
 				ProtonixSensor* Sensor (String id);
 
-				List<IProtonixCommand*> &Commands ();
-				Protonix* CommandAdd (IProtonixCommand* command);
-				IProtonixCommand* CommandRecognize (String cmd, IProtonixHardware* hardware = nullptr);
-				bool CommandProcess (IProtonixCommand* command, IProtonixHardware* hardware = nullptr);
-				bool CommandRecognizeAndProcess (String cmd, IProtonixHardware* hardware = nullptr);
+				bool Command (String command, IProtonixHardware* hardware = nullptr);
 
 				#if defined(ESP32)
 				Protonix* DedicateTaskCore0 ();

@@ -128,7 +128,7 @@ Value::operator decltype(nullptr) () const {
 }
 
 Value::operator bool () const {
-	return _type == Value::TYPE::BOOL ? (bool)_value.BOOL : false;
+	return _type == Value::TYPE::BOOL ? (bool)_value.BOOL : ToBool();//false;
 }
 
 Value::operator short () const {
@@ -168,7 +168,7 @@ Value::operator char* () const {
 }
 
 Value::operator String () const {
-	return _type == Value::TYPE::STRING ? String(_value.STRING): "";
+	return _type == Value::TYPE::STRING ? String(_value.STRING): String();
 }
 
 Value::operator Types::Raw () const {
@@ -246,28 +246,46 @@ Value &Value::operator= (const Value &value) {
 }
 
 
-bool Value::operator== (bool other) const {
-	return _type == TYPE::BOOL && _value.BOOL == other;
-}
-
-bool Value::operator!= (bool other) const {
-	return !(*this == other);
-}
-
-bool Value::operator== (const char* other) const {
-	if (_type != TYPE::STRING) return false;
-	if (_value.STRING == nullptr && other == nullptr) return true;
-	if (_value.STRING == nullptr || other == nullptr) return false;
-
-	return strcmp(_value.STRING, other) == 0;
-}
-
-bool Value::operator!= (const char* other) const {
-	return !(*this == other);
-}
+bool Value::operator== (decltype(nullptr) other) const { return *this == Value(other); }
+bool Value::operator!= (decltype(nullptr) other) const { return !(*this == other); }
+bool Value::operator== (bool other) const { return *this == Value(other); }
+bool Value::operator!= (bool other) const { return !(*this == other); }
+bool Value::operator== (short other) const { return *this == Value(other); }
+bool Value::operator!= (short other) const { return !(*this == other); }
+bool Value::operator== (unsigned short other) const { return *this == Value(other); }
+bool Value::operator!= (unsigned short other) const { return !(*this == other); }
+bool Value::operator== (int other) const { return *this == Value(other); }
+bool Value::operator!= (int other) const { return !(*this == other); }
+bool Value::operator== (unsigned int other) const { return *this == Value(other); }
+bool Value::operator!= (unsigned int other) const { return !(*this == other); }
+bool Value::operator== (long other) const { return *this == Value(other); }
+bool Value::operator!= (long other) const { return !(*this == other); }
+bool Value::operator== (unsigned long other) const { return *this == Value(other); }
+bool Value::operator!= (unsigned long other) const { return !(*this == other); }
+bool Value::operator== (float other) const { return *this == Value(other); }
+bool Value::operator!= (float other) const { return !(*this == other); }
+bool Value::operator== (double other) const { return *this == Value(other); }
+bool Value::operator!= (double other) const { return !(*this == other); }
+bool Value::operator== (const char* other) const { return *this == Value(other); }
+bool Value::operator!= (const char* other) const { return !(*this == other); }
 
 bool Value::operator== (const Value &other) const {
-	if (_type != other._type) return false;
+	if (_type != other._type) {
+		if ((IsNumeric() || _type == TYPE::BOOL) && (other.IsNumeric() || other._type == TYPE::BOOL)) {
+			return ToNumber() == other.ToNumber();
+		}
+
+		if (_type == TYPE::BOOL || other._type == TYPE::BOOL)
+			return ToBool() == other.ToBool();
+
+		if (_type == TYPE::STRING && other.IsNumeric())
+			return ToNumber() == other.ToNumber();
+
+		if (IsNumeric() && other._type == TYPE::STRING)
+			return ToNumber() == other.ToNumber();
+
+		return ToBool() == other.ToBool();
+	}
 
 	switch (_type) {
 		case TYPE::UNDEFINED:
@@ -382,9 +400,12 @@ Value &Value::Get (int key) {
 	}
 
 	if (key < 0) key = 0;
+	int i = _value.COLLECTION.count;
 
-	while (key >= _value.COLLECTION.count) {
+	while (i <= _value.COLLECTION.capacity) {
 		_allocate();
+
+		i++;
 	}
 
 	Value &item = _value.COLLECTION.items[key];
@@ -677,6 +698,28 @@ bool Value::IsNumeric () const {
 	return _type == Value::TYPE::INT || _type == Value::TYPE::FLOAT;
 }
 
+bool Value::IsNumericString () const {
+	const char* s = _value.STRING;
+	if (!s || !*s) return false;
+
+	bool hasDot = false;
+
+	while (*s) {
+		if (*s == '.') {
+			if (hasDot) return false;
+
+			hasDot = true;
+		}
+		else if (*s < '0' || *s > '9') {
+			return false;
+		}
+
+		s++;
+	}
+
+	return true;
+}
+
 bool Value::IsScalar () const {
 	return _type != Value::TYPE::UNDEFINED && _type != Value::TYPE::ARRAY && _type != Value::TYPE::OBJECT;
 }
@@ -694,7 +737,37 @@ String Value::TypeName () const {
 		case Value::TYPE::FLOAT: return "float"; break;
 		case Value::TYPE::STRING: return "string"; break;
 		case Value::TYPE::RAW: return "raw"; break;
+		case Value::TYPE::OBJECT: return "object"; break;
+		case Value::TYPE::ARRAY: return "array"; break;
 		default: return "undefined"; break;
+	}
+}
+
+bool Value::ToBool () const {
+	switch (_type) {
+		case TYPE::NULLPTR: case TYPE::UNDEFINED: return false;
+		case TYPE::BOOL: return _value.BOOL;
+		case TYPE::INT: return _value.INT != 0;
+		case TYPE::FLOAT: return _value.FLOAT != 0.0f;
+		case TYPE::STRING:
+			if (_value.STRING == nullptr) return false;
+			if (_value.STRING[0] == '\0') return false;
+			if (IsNumericString()) return atof(_value.STRING) != 0.0;
+			return true;
+		case TYPE::RAW: return _value.RAW != nullptr;
+		default: return false;
+	}
+}
+
+double Value::ToNumber () const {
+	switch (_type) {
+		case TYPE::NULLPTR: case TYPE::UNDEFINED: return false;
+		case TYPE::BOOL: return _value.BOOL ? 1.0 : 0.0;
+		case TYPE::INT: return (double)_value.INT;
+		case TYPE::FLOAT: return (double)_value.FLOAT;
+		case TYPE::STRING: return _value.STRING == nullptr ? 0.0 : atof(_value.STRING);
+		case TYPE::RAW: return _value.RAW == nullptr ? 0.0 : 1.0;
+		default: return 0.0;
 	}
 }
 
@@ -709,7 +782,7 @@ String Value::ToString () const {
 	}
 }
 
-String Value::Trace (bool type) {
+String Value::Trace (bool type) const {
 	String edge = String(_type == Value::TYPE::STRING ? "\"" : "");
 
 	return type
@@ -888,7 +961,7 @@ Value Value::Deserialize (IValueFormat* format, const String &raw) {
 }
 
 
-void Value::Dump (int indent) {
+void Value::Dump (int indent) const {
 	Serial.print(Qybercom::indent(indent));
 
 	if (_key != nullptr) {

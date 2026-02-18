@@ -52,7 +52,7 @@ void Hardware::HSensorHall::HardwareOnReset (Protonix* device) {
 	(void)device;
 }
 
-void Hardware::HSensorHall::HardwareOnCommand (Protonix* device, String command) {
+void Hardware::HSensorHall::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

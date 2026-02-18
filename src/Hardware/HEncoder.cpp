@@ -27,7 +27,6 @@ Hardware::HEncoder::HEncoder (unsigned short pinA, unsigned short pinB, unsigned
 	this->_config["pinA"] = pinA;
 	this->_config["pinB"] = pinB;
 	this->_config["allowSignal"] = true;
-	//this->_config["allowZero"] = false;
 
 	this->_filter.CheckInterval(checkInterval);
 
@@ -71,16 +70,6 @@ short Hardware::HEncoder::Dir () {
 }
 
 bool Hardware::HEncoder::Changed () {
-	/*bool out = false;
-
-	if (this->_changed) {
-		if (this->_config["allowZero"] || this->_dir != 0) out = true;
-		Serial.println("pipe:changed:" + String(this->_dir));
-
-		this->_changed = false;
-	}
-
-	return out;*/
 	bool out = this->_changed;
 
 	if (this->_changed)
@@ -159,7 +148,7 @@ void Hardware::HEncoder::HardwareOnReset (Protonix* device) {
 	this->_signal(device);
 }
 
-void Hardware::HEncoder::HardwareOnCommand (Protonix* device, String command) {
+void Hardware::HEncoder::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

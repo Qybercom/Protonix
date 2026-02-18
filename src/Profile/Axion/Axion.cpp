@@ -124,7 +124,7 @@ void Profile::Axion::Axion::ProfilePipe (Protonix* device) {
 							this->_dataHardware = false;
 					}
 					else {
-						bool ok = device->CommandRecognizeAndProcess(cmd);
+						bool ok = device->Command(cmd);
 
 						if (this->_debug || !ok)
 							Serial.println("[Axion:OnStreamEvent:Command] Result: " + String(ok));

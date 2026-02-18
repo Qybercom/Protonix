@@ -93,7 +93,7 @@ void Hardware::HWeightHX711::HardwarePipe (Protonix* device, short core) {
 
 		this->_weight = (average - offset) / (scale == 0.0 ? 1.0 : scale) * 0.035274;
 
-		//device->Signal(this->_id, "weight")->Value(this->_weight);
+		device->Signal(this->_id, "weight")->Data(this->_weight);
 	}
 
 	this->_capability("weight:int", String(this->_weight));
@@ -103,7 +103,7 @@ void Hardware::HWeightHX711::HardwareOnReset (Protonix* device) {
 	(void)device;
 }
 
-void Hardware::HWeightHX711::HardwareOnCommand (Protonix* device, String command) {
+void Hardware::HWeightHX711::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

@@ -27,8 +27,6 @@
 
 #include "Hardware/HBridgeDefault.h"
 
-#include "Command/index.h"
-
 using namespace Qybercom::Protonix;
 
 Protonix* Protonix::Protonix::_instance;
@@ -54,17 +52,6 @@ Protonix::Protonix (IProtonixDevice* device, IProtonixProfile* profile) {
 	this->Hardware("", new Hardware::HBridgeDefault());
 
 	this->_networkDefault = nullptr;
-
-	this->_commands.Add(new Command::CCustom());
-	#if defined(ESP32) || defined(ESP8266)
-	this->_commands.Add(new Command::CStdAction());
-	this->_commands.Add(new Command::CStdActive());
-	this->_commands.Add(new Command::CStdFirmware());
-	this->_commands.Add(new Command::CStdHardware());
-	this->_commands.Add(new Command::CStdRegistry());
-	#endif
-	this->_commands.Add(new Command::CStdReboot());
-	this->_commands.Add(new Command::CStdSensor());
 
 	this->_active = true;
 
@@ -528,6 +515,16 @@ ProtonixRegistry* Protonix::Registry () {
 	return this->_registry;
 }
 
+Qybercom::Value Protonix::Registry (const String &key) {
+	return this->_registry->Data().Get(key);
+}
+
+Protonix* Protonix::Registry (const String &key, const Qybercom::Value &value) {
+	this->_registry->Data().Set(key, value);
+
+	return this;
+}
+
 
 
 Qybercom::List<IProtonixHardware*> &Protonix::Hardware () {
@@ -582,10 +579,6 @@ bool Protonix::BusCommand (String bus, String command) {
 	IProtonixBus* hardware = (IProtonixBus*)this->Hardware(bus);
 
 	return hardware == nullptr ? false : hardware->BusCommand(this, command);
-}
-
-bool Protonix::BusCommand (String bus, IProtonixCommand* command) {
-	return command->CommandSerialize() ? this->BusCommand(bus, command->CommandBuffer()) : false;
 }
 
 bool Protonix::BusCommandCustom (String bus, String command) {
@@ -958,38 +951,15 @@ ProtonixSensor* Protonix::Sensor (String id) {
 
 
 
-Qybercom::List<IProtonixCommand*> &Protonix::Commands () {
-	return this->_commands;
-}
+bool Protonix::Command (String command, IProtonixHardware* hardware) {
+	ProtonixCommand cmd;
 
-Protonix* Protonix::CommandAdd (IProtonixCommand* command) {
-	this->_commands.Add(command);
+	cmd.ValueTypeDeserialize(command);
+	cmd.Hardware(hardware);
 
-	return this;
-}
-
-IProtonixCommand* Protonix::CommandRecognize (String cmd, IProtonixHardware* hardware) {
-	for (IProtonixCommand* command : this->_commands)
-		if (command->CommandRecognize(this, cmd, hardware))
-			return command;
-
-	return nullptr;
-}
-
-bool Protonix::CommandProcess (IProtonixCommand* command, IProtonixHardware* hardware) {
-	this->_device->DeviceOnCommand(this, command, hardware);
+	this->_device->DeviceHandleCommand(this, cmd);
 
 	return true;
-}
-
-bool Protonix::CommandRecognizeAndProcess (String cmd, IProtonixHardware* hardware) {
-	IProtonixCommand* command = this->CommandRecognize(cmd, hardware);
-	bool out = false;
-
-	if (command != nullptr)
-		out = this->CommandProcess(command, hardware);
-
-	return out;
 }
 
 

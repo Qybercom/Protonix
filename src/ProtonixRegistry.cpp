@@ -22,14 +22,8 @@ Qybercom::Value &ProtonixRegistry::Data () {
 	return this->_data;
 }
 
-ProtonixRegistry* ProtonixRegistry::Debug (bool debug) {
-	this->_debug = debug;
-
-	return this;
-}
-
-bool ProtonixRegistry::Debug () {
-	return this->_debug;
+String &ProtonixRegistry::Raw () {
+	return this->_raw;
 }
 
 bool ProtonixRegistry::Load () {
@@ -48,24 +42,28 @@ bool ProtonixRegistry::Load () {
 		Serial.print("[registry:eeprom.1]"); Serial.println(ESP.getFreeHeap());
 	}
 
-	this->_format = Protonix::Instance()->Format("application/json");
-
 	const unsigned int size = QYBERCOM_PROTONIX_MEMORY_EEPROM_SIZE - QYBERCOM_PROTONIX_REGISTRY_START;
 	char raw[size];
 
 	this->_memory->EEPROMGet(QYBERCOM_PROTONIX_REGISTRY_START, raw);
 
-	this->_raw = String(raw);
+	return this->Load(String(raw));
+}
+
+bool ProtonixRegistry::Load (String raw) {
+	this->_raw = raw;
 	this->_raw.trim();
 
 	if (this->_debug)
-		Serial.println("[registry:eeprom] Ready: `" + this->_raw + "`");
+		Serial.println("[registry:eeprom.1] Ready: `" + this->_raw + "`");
+
+	this->_format = Protonix::Instance()->Format("application/json");
 
 	this->_data = Qybercom::Value::Deserialize(this->_format, this->_raw);
 	this->_loaded = true;
 
 	if (this->_debug) {
-		Serial.print("[registry:eeprom.2]"); Serial.println(ESP.getFreeHeap());
+		Serial.print("[registry:eeprom.2] RAM:"); Serial.println(ESP.getFreeHeap());
 
 		this->_data.Dump();
 	}
@@ -73,11 +71,7 @@ bool ProtonixRegistry::Load () {
 	return true;
 }
 
-String &ProtonixRegistry::Raw () {
-	return this->_raw;
-}
-
-bool ProtonixRegistry::Commit () {
+bool ProtonixRegistry::Save () {
 	this->_raw = this->_data.Serialize(this->_format);
 
 	const unsigned int size = QYBERCOM_PROTONIX_MEMORY_EEPROM_SIZE - QYBERCOM_PROTONIX_REGISTRY_START;
@@ -94,4 +88,20 @@ bool ProtonixRegistry::Commit () {
 	this->_memory->EEPROMSet(QYBERCOM_PROTONIX_REGISTRY_START, raw);
 
 	return this->_memory->EEPROMCommit();
+}
+
+bool ProtonixRegistry::Save (String key, const Value &value) {
+	this->_data.Set(key, value);
+
+	return this->Save();
+}
+
+ProtonixRegistry* ProtonixRegistry::Debug (bool debug) {
+	this->_debug = debug;
+
+	return this;
+}
+
+bool ProtonixRegistry::Debug () {
+	return this->_debug;
 }

@@ -241,7 +241,7 @@ void Hardware::HJoystick::HardwareOnReset (Protonix* device) {
 	this->_signalPosition(device);
 }
 
-void Hardware::HJoystick::HardwareOnCommand (Protonix* device, String command) {
+void Hardware::HJoystick::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 

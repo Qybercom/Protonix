@@ -90,7 +90,7 @@ void Hardware::HTouchButton::HardwareOnReset (Protonix* device) {
 	this->_signal(device);
 }
 
-void Hardware::HTouchButton::HardwareOnCommand (Protonix* device, String command) {
+void Hardware::HTouchButton::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 

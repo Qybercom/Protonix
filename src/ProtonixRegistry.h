@@ -21,15 +21,16 @@ namespace Qybercom {
 				ProtonixRegistry (ProtonixMemory* memory);
 
 				Value &Data ();
+				String &Raw ();
+
+				bool Load ();
+				bool Load (String raw);
+
+				bool Save ();
+				bool Save (String key, const Value &value);
 
 				ProtonixRegistry* Debug (bool debug);
 				bool Debug ();
-
-				bool Load ();
-
-				String &Raw ();
-
-				bool Commit ();
 		};
 	}
 }

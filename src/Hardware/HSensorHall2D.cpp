@@ -91,7 +91,7 @@ void Hardware::HSensorHall2D::HardwareOnReset (Protonix* device) {
 	this->_signal(device);
 }
 
-void Hardware::HSensorHall2D::HardwareOnCommand (Protonix* device, String command) {
+void Hardware::HSensorHall2D::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

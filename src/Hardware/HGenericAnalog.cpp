@@ -44,7 +44,7 @@ void Hardware::HGenericAnalog::HardwareOnReset (Protonix* device) {
 	(void)device;
 }
 
-void Hardware::HGenericAnalog::HardwareOnCommand (Protonix* device, String command) {
+void Hardware::HGenericAnalog::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

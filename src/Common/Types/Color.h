@@ -15,7 +15,7 @@ namespace Qybercom {
 			Color (short r = 0, short g = 0, short b = 0, float a = 1.0);
 
 			void ValueTypeDeserialize (const String &raw);
-			String ValueTypeSerialize () const;
+			String ValueTypeSerialize ();
 		};
 	}
 }

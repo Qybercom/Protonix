@@ -10,7 +10,7 @@ namespace Qybercom {
 	class IValueType {
 		public:
 			virtual void ValueTypeDeserialize (const String &raw) = 0;
-			virtual String ValueTypeSerialize () const = 0;
+			virtual String ValueTypeSerialize () = 0;
 
 			virtual ~IValueType () { }
 	};
@@ -122,8 +122,26 @@ namespace Qybercom {
 			Value &operator= (const Types::Raw &value);
 			Value &operator= (const Value &value);
 
+			bool operator== (decltype(nullptr) other) const;
+			bool operator!= (decltype(nullptr) other) const;
 			bool operator== (bool other) const;
 			bool operator!= (bool other) const;
+			bool operator== (short other) const;
+			bool operator!= (short other) const;
+			bool operator== (unsigned short other) const;
+			bool operator!= (unsigned short other) const;
+			bool operator== (int other) const;
+			bool operator!= (int other) const;
+			bool operator== (unsigned int other) const;
+			bool operator!= (unsigned int other) const;
+			bool operator== (long other) const;
+			bool operator!= (long other) const;
+			bool operator== (unsigned long other) const;
+			bool operator!= (unsigned long other) const;
+			bool operator== (float other) const;
+			bool operator!= (float other) const;
+			bool operator== (double other) const;
+			bool operator!= (double other) const;
 			bool operator== (const char* other) const;
 			bool operator!= (const char* other) const;
 			bool operator== (const Value &other) const;
@@ -192,12 +210,17 @@ namespace Qybercom {
 			bool IsArray () const;
 			bool IsRaw () const;
 			bool IsNumeric () const;
+			bool IsNumericString () const;
 			bool IsScalar () const;
 
 			TYPE Type () const;
 			String TypeName () const;
+
+			bool ToBool () const;
+			double ToNumber () const;
 			String ToString () const;
-			String Trace (bool type = false);
+
+			String Trace (bool type = false) const;
 			String Key () const;
 			bool HasKey () const;
 			int Count () const;
@@ -227,6 +250,6 @@ namespace Qybercom {
 			//static Value Deserialize (IValueFormat* format, const char* raw);
 			static Value Deserialize (IValueFormat* format, const String &raw);
 
-			void Dump (int indent = 0);
+			void Dump (int indent = 0) const;
 	};
 }

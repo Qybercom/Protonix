@@ -42,7 +42,7 @@ void Hardware::HBusCAN::_process (Protonix* device, char src, char dst, char pri
 		Hardware::HBusCANMessage(src, dst, priority, data)
 	);
 
-	device->CommandRecognizeAndProcess(data, this);
+	device->Command(data, this);
 }
 
 String Hardware::HBusCAN::_statusRecognize (MCP2515::ERROR code) {
@@ -236,7 +236,7 @@ void Hardware::HBusCAN::HardwarePipe (Protonix* device, short core) {
 	else {
 		//this->_log("Raw frame: " + Hardware::HBusCAN::_statusRecognize(result) + " : " + String(frame.can_id, HEX));
 
-		//device->Signal(this->_id, "raw")->Value(frame);
+		device->Signal(this->_id, "raw")->DataRaw(frame);
 
 		if (this->_parse) {
 			unsigned short id = frame.can_id & 0x7FF;
@@ -308,7 +308,7 @@ void Hardware::HBusCAN::HardwareOnReset (Protonix* device) {
 	(void)device;
 }
 
-void Hardware::HBusCAN::HardwareOnCommand (Protonix* device, String command) {
+void Hardware::HBusCAN::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

@@ -7,5 +7,4 @@
 #include "Common/index.h"
 #include "Hardware/index.h"
 #include "Network/index.h"
-#include "Command/index.h"
 #include "Profile/index.h"

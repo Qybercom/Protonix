@@ -13,7 +13,7 @@ namespace Qybercom {
 			Range (double min = 0.0, double max = 0.0);
 
 			void ValueTypeDeserialize (const String &raw);
-			String ValueTypeSerialize () const;
+			String ValueTypeSerialize ();
 		};
 	}
 }

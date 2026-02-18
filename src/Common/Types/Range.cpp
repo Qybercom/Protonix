@@ -17,6 +17,6 @@ void Range::ValueTypeDeserialize (const String &raw) {
 	Max = raw.substring(delim + 1).toDouble();
 }
 
-String Range::ValueTypeSerialize () const {
+String Range::ValueTypeSerialize () {
 	return String(Min) + "," + String(Max);
 }
