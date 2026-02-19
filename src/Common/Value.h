@@ -232,6 +232,7 @@ namespace Qybercom {
 
 			Value &Add (const Value &b);
 			Value &Clear ();
+			Value &Flush ();
 			Value &Listener (IValueListener* listener);
 
 			Iterator begin ();

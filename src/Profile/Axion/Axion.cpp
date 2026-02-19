@@ -261,15 +261,15 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 	Value dto = Value::Object();
 
 	dto["active"] = device->Active();
-	/*if (first) */dto["platform"] = device->Platform();
-	/*if (first) */dto["build"] = device->Build();
+	if (first) dto["platform"] = device->Platform();
+	if (first) dto["build"] = device->Build();
 	dto["state"] = device->State();
 	dto["summary"] = device->Summary();
 
 	#if defined(ESP32) || defined(ESP8266)
 	dto["cpu"] = device->CPUFrequency();
 	dto["uptime"] = device->TimerUptime()->RunTime();
-	/*if (first) */dto["firmware"] = device->Firmware();
+	if (first) dto["firmware"] = device->Firmware();
 
 	if (this->_dataMemory) {
 		Value memory = Value::Object();
@@ -328,7 +328,8 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 		dto["hardware"] = hardware_out;
 	}
 
-	//dto["registry"] = device->Registry()->Raw();
+	dto["registry"] = device->Registry()->Raw();
+
 	#endif
 	if (this->_debug && first) {
 		Serial.print("[Axion:RequestStreamDeviceData:2]"); Serial.println(ESP.getFreeHeap());

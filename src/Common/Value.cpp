@@ -895,6 +895,22 @@ Value &Value::Clear () {
 	return *this;
 }
 
+Value &Value::Flush () {
+	if (IsArray()) {
+		this->~Value();
+
+		*this = Value::Array();
+	}
+
+	if (IsObject()) {
+		this->~Value();
+
+		*this = Value::Object();
+	}
+
+	return *this;
+}
+
 Value &Value::Listener (IValueListener* listener) {
 	_listener = listener;
 

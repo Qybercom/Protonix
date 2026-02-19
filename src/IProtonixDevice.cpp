@@ -78,15 +78,28 @@ void IProtonixDevice::DeviceHandleCommand (Protonix* device, const ProtonixComma
 
 		if (cmd == "raw") {
 			String raw = arguments[1];
+
 			Serial.println("[device] Registry received command 'raw':'" + raw + "'");
+
 			device->Registry()->Load(raw);
 		}
 
 		if (cmd == "set") {
 			String key = arguments[1];
-			Value value = arguments[2];
+			Value value = Value::Deserialize(
+				Protonix::Instance()->Format("application/json"),
+				arguments[2].ToString()
+			);
+
 			Serial.println("[device] Registry received command 'set' for key '" + key + "' with value '" + value.ToString() + "'");
+
 			device->Registry()->Save(key, value);
+		}
+
+		if (cmd == "clear") {
+			Serial.println("[device] Registry received command 'clear'");
+
+			device->Registry()->Clear();
 		}
 	}
 

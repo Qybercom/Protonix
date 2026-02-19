@@ -29,6 +29,8 @@ namespace Qybercom {
 				bool Save ();
 				bool Save (String key, const Value &value);
 
+				bool Clear ();
+
 				ProtonixRegistry* Debug (bool debug);
 				bool Debug ();
 		};

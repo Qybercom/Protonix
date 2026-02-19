@@ -46,24 +46,32 @@ bool ProtonixRegistry::Load () {
 	char raw[size];
 
 	this->_memory->EEPROMGet(QYBERCOM_PROTONIX_REGISTRY_START, raw);
+	String out = String(raw);
+	out.trim();
 
-	return this->Load(String(raw));
+	if (this->_debug)
+		Serial.println("[registry:eeprom.2] Ready: `" + out + "`");
+
+	return this->Load(out);
 }
 
 bool ProtonixRegistry::Load (String raw) {
-	this->_raw = raw;
-	this->_raw.trim();
-
-	if (this->_debug)
-		Serial.println("[registry:eeprom.1] Ready: `" + this->_raw + "`");
-
 	this->_format = Protonix::Instance()->Format("application/json");
+	raw.replace("\\\"", "\"");
 
-	this->_data = Qybercom::Value::Deserialize(this->_format, this->_raw);
+	this->_data = Qybercom::Value::Deserialize(this->_format, raw);
+	Qybercom::Value testList = Qybercom::Value::Array();
+	testList.Add("first");
+	testList.Add("second");
+	testList.Add(1);
+	testList.Add(2);
+	testList.Add(true);
+	this->_data["statuette"] = testList;
+	this->_raw = this->_data.Serialize(this->_format);
 	this->_loaded = true;
 
-	if (this->_debug) {
-		Serial.print("[registry:eeprom.2] RAM:"); Serial.println(ESP.getFreeHeap());
+	if (true) {//this->_debug) {
+		Serial.print("[registry:eeprom] RAM:"); Serial.println(ESP.getFreeHeap());
 
 		this->_data.Dump();
 	}
@@ -92,6 +100,12 @@ bool ProtonixRegistry::Save () {
 
 bool ProtonixRegistry::Save (String key, const Value &value) {
 	this->_data.Set(key, value);
+
+	return this->Save();
+}
+
+bool ProtonixRegistry::Clear () {
+	this->_data.Flush();
 
 	return this->Save();
 }
