@@ -8,17 +8,27 @@
 using namespace Qybercom::Protonix;
 
 Hardware::TM1637Char::TM1637Char (char c) {
-	this->_value = c;
+	Value(c);
 }
 
 Hardware::TM1637Char::TM1637Char (char c, bool dot) {
-	this->_value = Encode(c);
-
-	Dot(dot);
+	Value(c, dot);
 }
 
 char Hardware::TM1637Char::Value () {
-	return this->_value;
+	return _value;
+}
+
+Hardware::TM1637Char &Hardware::TM1637Char::Value (char c) {
+	_value = c;
+
+	return *this;
+}
+
+Hardware::TM1637Char &Hardware::TM1637Char::Value (char c, bool dot) {
+	_value = Encode(c);
+
+	return Dot(dot);
 }
 
 Hardware::TM1637Char &Hardware::TM1637Char::Dot (bool on) {
@@ -154,14 +164,28 @@ bool Hardware::HTM1637::Write (char b) {
 }
 
 bool Hardware::HTM1637::Render (String value) {
+	Hardware::TM1637Char c[4] = { ' ', ' ', ' ', ' ' };
 	int length = value.length();
+	int i = 0;
+	int pos = 0;
 
-	Hardware::TM1637Char c1(length < 1 ? ' ' : value.charAt(0), false);
-	Hardware::TM1637Char c2(length < 2 ? ' ' : value.charAt(1), false);
-	Hardware::TM1637Char c3(length < 3 ? ' ' : value.charAt(2), false);
-	Hardware::TM1637Char c4(length < 4 ? ' ' : value.charAt(3), false);
+	while (i < length && pos < 4) {
+		char ci = value.charAt(i);
 
-	return this->Render(c1, c2, c3, c4);
+		if (ci == '.' || ci == ':') {
+			if (pos > 0)
+				c[pos - 1].Dot(true);
+		}
+		else {
+			c[pos].Value(ci, false);
+
+			pos++;
+		}
+
+		i++;
+	}
+
+	return this->Render(c[0], c[1], c[2], c[3]);
 }
 
 bool Hardware::HTM1637::Render (char c1, char c2, char c3, char c4) {
@@ -191,6 +215,15 @@ bool Hardware::HTM1637::Render (Hardware::TM1637Char c1, Hardware::TM1637Char c2
 	return true;
 }
 
+bool Hardware::HTM1637::Clear () {
+	return this->Render(
+		0b00000000,
+		0b00000000,
+		0b00000000,
+		0b00000000
+	);
+}
+
 String Hardware::HTM1637::HardwareSummary () {
 	return "TM1637 display";
 }
@@ -210,13 +243,7 @@ void Hardware::HTM1637::HardwareInitPre (Protonix* device) {
 
 void Hardware::HTM1637::HardwareInitPost (Protonix* device) {
 	this->Brightness(this->_config["brightness"]);
-
-	this->Render(
-		0b00111111,
-		0b11111111,
-		Hardware::TM1637Char('Y', false),
-		Hardware::TM1637Char('y', false)
-	);
+	this->Clear();
 }
 
 void Hardware::HTM1637::HardwarePipe (Protonix* device, short core) {

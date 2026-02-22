@@ -17,8 +17,13 @@ namespace Qybercom {
 				public:
 					TM1637Char (char c);
 					TM1637Char (char c, bool dot);
+
 					char Value ();
+					TM1637Char &Value (char c);
+					TM1637Char &Value (char c, bool dot);
+
 					TM1637Char &Dot (bool on = true);
+
 					static char Encode (char c);
 			};
 
@@ -37,6 +42,7 @@ namespace Qybercom {
 					bool Render (TM1637Char c1, TM1637Char c2, TM1637Char c3, TM1637Char c4);
 					bool Render (char c1, char c2, char c3, char c4);
 					bool Render (String value);
+					bool Clear ();
 
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);
