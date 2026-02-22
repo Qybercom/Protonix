@@ -60,17 +60,10 @@ bool ProtonixRegistry::Load (String raw) {
 	raw.replace("\\\"", "\"");
 
 	this->_data = Qybercom::Value::Deserialize(this->_format, raw);
-	Qybercom::Value testList = Qybercom::Value::Array();
-	testList.Add("first");
-	testList.Add("second");
-	testList.Add(1);
-	testList.Add(2);
-	testList.Add(true);
-	this->_data["statuette"] = testList;
 	this->_raw = this->_data.Serialize(this->_format);
 	this->_loaded = true;
 
-	if (true) {//this->_debug) {
+	if (this->_debug) {
 		Serial.print("[registry:eeprom] RAM:"); Serial.println(ESP.getFreeHeap());
 
 		this->_data.Dump();

@@ -54,7 +54,7 @@ void Hardware::HSensorMicrophone::HardwareOnReset (Protonix* device) {
 	this->_signal(device);
 }
 
-void Hardware::HSensorMicrophone::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
+void Hardware::HSensorMicrophone::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

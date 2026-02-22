@@ -48,7 +48,7 @@ const Qybercom::Value &ProtonixCommand::Arguments () const {
 	return _arguments;
 }
 
-Qybercom::Value ProtonixCommand::Argument (unsigned int i) const {
+Qybercom::Value ProtonixCommand::Argument (unsigned int i) {
 	return _arguments[i];
 }
 

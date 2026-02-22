@@ -104,6 +104,6 @@ void Hardware::HPlayerMP3::HardwareOnReset (Protonix* device) {
 	this->Stop();
 }
 
-void Hardware::HPlayerMP3::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
+void Hardware::HPlayerMP3::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
 	this->_player->HardwareOnCommand(device, command);
 }

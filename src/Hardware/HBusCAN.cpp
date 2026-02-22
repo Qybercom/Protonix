@@ -308,7 +308,7 @@ void Hardware::HBusCAN::HardwareOnReset (Protonix* device) {
 	(void)device;
 }
 
-void Hardware::HBusCAN::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
+void Hardware::HBusCAN::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

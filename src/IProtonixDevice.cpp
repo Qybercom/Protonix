@@ -8,7 +8,7 @@
 
 using namespace Qybercom::Protonix;
 
-void IProtonixDevice::DeviceHandleCommand (Protonix* device, const ProtonixCommand &command) {
+void IProtonixDevice::DeviceHandleCommand (Protonix* device, ProtonixCommand &command) {
 	String name = command.Name();
 	Value arguments = command.Arguments();
 
@@ -160,7 +160,7 @@ void IProtonixDevice::DeviceOnLoop (Protonix* device) {
 	(void)device;
 }
 
-void IProtonixDevice::DeviceOnCommand (Protonix* device, const ProtonixCommand &command) {
+void IProtonixDevice::DeviceOnCommand (Protonix* device, ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

@@ -51,9 +51,9 @@ void Hardware::HRelay::HardwareOnReset (Protonix* device) {
 	this->Close();
 }
 
-void Hardware::HRelay::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
+void Hardware::HRelay::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
 	(void)device;
-	String cmd = command.Argument(0);
+	String cmd = command.Argument(1);
 
 	if (cmd == "open") this->Open();
 	if (cmd == "close") this->Close();

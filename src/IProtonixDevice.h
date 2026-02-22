@@ -12,14 +12,14 @@ namespace Qybercom {
 
 		class IProtonixDevice {
 			public:
-				void DeviceHandleCommand (Protonix* device, const ProtonixCommand &command);
+				void DeviceHandleCommand (Protonix* device, ProtonixCommand &command);
 
 				virtual unsigned int DeviceTick ();
 				virtual void DeviceOnReady (Protonix* device);
 				virtual void DeviceOnTick (Protonix* device);
 				virtual void DeviceOnLoop (Protonix* device);
 				virtual void DeviceOnAction (Protonix* device, ProtonixAction* action);
-				virtual void DeviceOnCommand (Protonix* device, const ProtonixCommand &command);
+				virtual void DeviceOnCommand (Protonix* device, ProtonixCommand &command);
 				virtual void DeviceOnSignal (Protonix* device, ProtonixSignal* signal);
 				#if defined(ESP32)
 				virtual void DeviceOnDedicatedTask (Protonix* device, unsigned short core);

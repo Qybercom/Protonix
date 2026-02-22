@@ -23,6 +23,7 @@
 #include "HSensorHall.h"
 #include "HSensorHall2D.h"
 #include "HSensorMicrophone.h"
+#include "HTM1637.h"
 #include "HTouchButton.h"
 #include "HTrigger.h"
 #include "HWeightHX711.h"

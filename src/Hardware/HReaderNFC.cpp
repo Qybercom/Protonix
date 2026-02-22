@@ -209,7 +209,7 @@ void Hardware::HReaderNFC::HardwareOnReset (Protonix* device) {
 	this->_signal(device, this->_uuid);
 }
 
-void Hardware::HReaderNFC::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
+void Hardware::HReaderNFC::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

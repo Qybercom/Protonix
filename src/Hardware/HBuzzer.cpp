@@ -67,9 +67,9 @@ void Hardware::HBuzzer::HardwareOnReset (Protonix* device) {
 	this->Stop();
 }
 
-void Hardware::HBuzzer::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
+void Hardware::HBuzzer::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
 	(void)device;
-	String cmd = command.Argument(0);
+	String cmd = command.Argument(1);
 
 	if (cmd == "stop")
 		this->Stop();

@@ -148,7 +148,7 @@ void Hardware::HEncoder::HardwareOnReset (Protonix* device) {
 	this->_signal(device);
 }
 
-void Hardware::HEncoder::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
+void Hardware::HEncoder::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

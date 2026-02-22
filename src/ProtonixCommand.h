@@ -27,7 +27,7 @@ namespace Qybercom {
 				String Name () const;
 				Value &Arguments ();
 				const Value &Arguments() const;
-				Value Argument (unsigned int i = 0) const;
+				Value Argument (unsigned int i = 0);
 				String Group () const;
 				String Command () const;
 

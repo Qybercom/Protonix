@@ -87,7 +87,7 @@ namespace Qybercom {
 					void HardwareSPIPost (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
 					void HardwareOnReset (Protonix* device);
-					void HardwareOnCommand (Protonix* device, const ProtonixCommand &command);
+					void HardwareOnCommand (Protonix* device, ProtonixCommand &command);
 
 					bool BusSend (Protonix* device, String data);
 					bool BusCommand (Protonix* device, String command);

@@ -187,12 +187,12 @@ void Hardware::HTrigger::HardwareOnReset (Protonix* device) {
 		this->OutputValue(false);
 }
 
-void Hardware::HTrigger::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
+void Hardware::HTrigger::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
 	(void)device;
 	String mode = this->_config["mode"];
 
 	if (mode == "output") {
-		bool value = command.Argument(0);
+		bool value = command.Argument(1);
 
 		this->OutputValue(value);
 	}

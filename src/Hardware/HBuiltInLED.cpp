@@ -40,7 +40,7 @@ void Hardware::HBuiltInLED::HardwareOnReset (Protonix* device) {
 	this->Active(false);
 }
 
-void Hardware::HBuiltInLED::HardwareOnCommand (Protonix* device, const ProtonixCommand &command) {
+void Hardware::HBuiltInLED::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
 	(void)device;
 	String cmd = command.Argument(1);
 
