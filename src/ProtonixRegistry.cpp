@@ -103,6 +103,10 @@ bool ProtonixRegistry::Clear () {
 	return this->Save();
 }
 
+void ProtonixRegistry::Dump () {
+	this->_data.Dump();
+}
+
 ProtonixRegistry* ProtonixRegistry::Debug (bool debug) {
 	this->_debug = debug;
 

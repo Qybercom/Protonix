@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "../Value.h"
+#include "../Utils.h"
 
 #include "FormatJSON.h"
 
@@ -12,13 +13,14 @@ void Formats::FormatJSON::_skip (const String &s, int &pos) {
 
 Value Formats::FormatJSON::_parseValue (const String &s, int &pos) {
 	Formats::FormatJSON::_skip(s, pos);
-	if (pos >= s.length()) return Value();
+	int len = s.length();
+	if (pos >= len) return Value();
 
 	char c = s[pos];
 	if (c == '{') return Formats::FormatJSON::_parseObject(s, pos);
 	if (c == '[') return Formats::FormatJSON::_parseArray(s, pos);
 	if (c == '"') return Value(Formats::FormatJSON::_parseString(s, pos));
-	if (isDigit(c) || c == '-') return Value(Formats::FormatJSON::_parseNumber(s, pos));
+	if (isNumeric(s.substring(pos, len - 2)) || c == '-') return Value(Formats::FormatJSON::_parseNumber(s, pos));
 	if (s.substring(pos, pos + 4) == "true") { pos += 4; return Value(true); }
 	if (s.substring(pos, pos + 5) == "false") { pos += 5; return Value(false); }
 	if (s.substring(pos, pos + 4) == "null") { pos += 4; return Value(); }
@@ -118,6 +120,8 @@ String Formats::FormatJSON::ValueFormatMIME () {
 String Formats::FormatJSON::ValueFormatSerialize (Value &value) {
 	String out = "";
 
+	if (value.IsUndefined()) return out;
+
 	if (value.HasKey())
 		out += "\"" + value.Key() + "\":";
 
@@ -142,10 +146,14 @@ String Formats::FormatJSON::ValueFormatSerialize (Value &value) {
 		bool start = false;
 
 		for (Value &v : value) {
-			if (start) out += ",";
-			else start = true;
+			String ov = Formats::FormatJSON::ValueFormatSerialize(v);
 
-			out += Formats::FormatJSON::ValueFormatSerialize(v);
+			if (ov.length() != 0) {
+				if (start) out += ",";
+				else start = true;
+
+				out += ov;
+			}
 		}
 
 		out += "}";

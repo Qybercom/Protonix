@@ -202,12 +202,15 @@ bool Qybercom::isNumeric (const String &s) {
 	if (l == 0) return false;
 
 	int i = 0;
+	bool dot = false;
 
 	while (i < l) {
-		char c = s[i];
+		char c = s.charAt(i);
 
-		if (c < '0' || c > '9')
-			return false;
+		if (c < '0' || c > '9') {
+			if (!dot && c == '.') dot = true;
+			else return false;
+		}
 
 		i++;
 	}

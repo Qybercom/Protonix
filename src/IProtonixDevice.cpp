@@ -86,10 +86,17 @@ void IProtonixDevice::DeviceHandleCommand (Protonix* device, ProtonixCommand &co
 
 		if (cmd == "set") {
 			String key = arguments[1];
-			Value value = Value::Deserialize(
-				Protonix::Instance()->Format("application/json"),
-				arguments[2].ToString()
-			);
+			String val = arguments[2];
+			int valLen = val.length();
+			bool str = true;
+			if (val[0] == '{' && val[valLen - 1] == '}') str = false;
+			if (val[0] == '[' && val[valLen - 1] == ']') str = false;
+			if (Qybercom::isNumeric(val)) str = false;
+			if (val == "true" || val == "false" || val == "null") str = false;
+			if (str) val = "\"" + val + "\"";
+
+			Value value = Value::Deserialize(Protonix::Instance()->Format("application/json"), val);
+			value.Dump();
 
 			Serial.println("[device] Registry received command 'set' for key '" + key + "' with value '" + value.ToString() + "'");
 
@@ -100,6 +107,12 @@ void IProtonixDevice::DeviceHandleCommand (Protonix* device, ProtonixCommand &co
 			Serial.println("[device] Registry received command 'clear'");
 
 			device->Registry()->Clear();
+		}
+
+		if (cmd == "dump") {
+			Serial.println("[device] Registry received command 'dump'");
+
+			device->Registry()->Dump();
 		}
 	}
 

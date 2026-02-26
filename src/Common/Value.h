@@ -98,6 +98,17 @@ namespace Qybercom {
 			operator char* () const;
 			operator String () const;
 			operator Types::Raw () const;
+			template<typename T>
+			T AsType () const {
+				IValueType* test = (T*)nullptr;
+				(void)test;
+
+				T out;
+				String raw = *this;
+				out.ValueTypeDeserialize(raw);
+
+				return out;
+			}
 			template <typename T>
 			T As () const {
 				return static_cast<T>(*this);

@@ -31,6 +31,8 @@ namespace Qybercom {
 
 				bool Clear ();
 
+				void Dump ();
+
 				ProtonixRegistry* Debug (bool debug);
 				bool Debug ();
 		};
