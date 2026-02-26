@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+#include "Common/index.h"
+
 namespace Qybercom {
 	namespace Protonix {
 		class ProtonixHardwareCapability {
@@ -25,6 +27,8 @@ namespace Qybercom {
 
 				String Comment ();
 				ProtonixHardwareCapability* Comment (String comment);
+
+				Qybercom::Value DTO (bool first);
 		};
 	}
 }

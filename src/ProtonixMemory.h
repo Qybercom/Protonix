@@ -3,6 +3,8 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 
+#include "Common/index.h"
+
 namespace Qybercom {
 	namespace Protonix {
 		class ProtonixMemory {
@@ -56,6 +58,8 @@ namespace Qybercom {
 
 					return out;
 				}
+
+				Qybercom::Value DTO (bool first);
 		};
 	}
 }

@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+#include "Common/index.h"
+
 namespace Qybercom {
 	namespace Protonix {
 		class ProtonixSensor {
@@ -40,6 +42,9 @@ namespace Qybercom {
 				String State ();
 
 				String Summary ();
+
+				Qybercom::Value DTO (bool first);
+
 				void Reset ();
 		};
 	}

@@ -979,3 +979,49 @@ Protonix* Protonix::DedicateTaskCore1 () {
 	return this;
 }
 #endif
+
+
+
+Qybercom::Value Protonix::DTO (bool first) {
+	Qybercom::Value out = Qybercom::Value::Object();
+
+	out["active"] = this->_active;
+	if (first) out["platform"] = this->_platform;
+	if (first) out["build"] = this->_build;
+	out["state"] = this->_state;
+	out["summary"] = this->_summary;
+
+	#if defined(ESP32) || defined(ESP8266)
+	out["cpu"] = this->CPUFrequency();
+	out["uptime"] = this->_timerUptime->RunTime();
+	if (first) out["firmware"] = this->_firmware;
+
+	out["memory"] = this->_memory->DTO(first);
+
+	Qybercom::Value sensors = Qybercom::Value::Array();
+	for (ProtonixSensor* sensor : this->_sensors)
+		sensors.Add(sensor->DTO(first));
+	out["sensors"] = sensors;
+
+	Qybercom::Value hardware = Qybercom::Value::Array();
+	for (IProtonixHardware* hw : this->_hardware) {
+		Qybercom::Value hwItem = Qybercom::Value::Object();
+
+		hwItem["id"] = hw->HardwareID();
+		//hwItem["summary"] = hw->HardwareSummary();
+
+		Qybercom::Value capabilities_out = Qybercom::Value::Array();
+		List<ProtonixHardwareCapability*> &capabilities = hw->HardwareCapabilities();
+		//for (ProtonixHardwareCapability* capability : capabilities)
+		//	capabilities_out.Add(capability->DTO(first));
+		hwItem["capabilities"] = capabilities_out;
+
+		hardware.Add(hwItem);
+	}
+	out["hardware"] = hardware;
+
+	out["registry"] = this->_registry->Raw();
+	#endif
+
+	return out;
+}

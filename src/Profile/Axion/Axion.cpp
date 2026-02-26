@@ -258,79 +258,12 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 	if (this->_debug && first) {
 		Serial.print("[Axion:RequestStreamDeviceData:1]"); Serial.println(ESP.getFreeHeap());
 	}
-	Value dto = Value::Object();
 
-	dto["active"] = device->Active();
-	if (first) dto["platform"] = device->Platform();
-	if (first) dto["build"] = device->Build();
-	dto["state"] = device->State();
-	dto["summary"] = device->Summary();
+	unsigned long t = micros();
+	Value dto = device->DTO(first);
+	unsigned long dt = micros() - t;
+	Serial.println("[Axion] telemetry " + String(dt));
 
-	#if defined(ESP32) || defined(ESP8266)
-	dto["cpu"] = device->CPUFrequency();
-	dto["uptime"] = device->TimerUptime()->RunTime();
-	if (first) dto["firmware"] = device->Firmware();
-
-	if (this->_dataMemory) {
-		Value memory = Value::Object();
-
-		memory["ram_free"] = device->Memory()->RAMFree();
-		//memory["ram_used"] = device->Memory()->RAMUsed();
-		memory["ram_total"] = device->Memory()->RAMTotal();
-		//memory["ram_fragmented"] = device->Memory()->RAMFragmented();
-		memory["flash_free"] = device->Memory()->FlashFree();
-		//memory["flash_used"] = device->Memory()->FlashUsed();
-		memory["flash_total"] = device->Memory()->FlashTotal();
-
-		dto["memory"] = memory;
-	}
-
-	List<ProtonixSensor*> &sensors = device->Sensors();
-	Value sensors_out = Value::Array();
-	for (ProtonixSensor* sensor : sensors) {
-		Value sItem = Value::Object();
-
-		sItem["id"] = sensor->ID();
-		sItem["value"] = sensor->Value();
-		sItem["active"] = sensor->Active();
-		sItem["failure"] = sensor->Failure();
-		sItem["state"] = sensor->State();
-
-		sensors_out.Add(sItem);
-	}
-	dto["sensors"] = sensors_out;
-
-	if (true) {//this->_dataHardware || first) {
-		List<IProtonixHardware*> &hardware = device->Hardware();
-		Value hardware_out = Value::Array();
-		for (IProtonixHardware* hw : hardware) {
-			Value hwItem = Value::Object();
-
-			hwItem["id"] = hw->HardwareID();
-			/*if (first) */hwItem["summary"] = hw->HardwareSummary();
-
-			Value capabilities_out = Value::Array();
-			List<ProtonixHardwareCapability*> &capabilities = hw->HardwareCapabilities();
-			for (ProtonixHardwareCapability* capability : capabilities) {
-				Value capabilityItem = Value::Object();
-
-				/*if (first) */capabilityItem["kind"] = capability->Kind();
-				capabilityItem["id"] = capability->ID();
-				capabilityItem["value"] = capability->Value();
-				/*if (first) */capabilityItem["comment"] = capability->Comment();
-
-				capabilities_out.Add(capabilityItem);
-			}
-			hwItem["capabilities"] = capabilities_out;
-
-			hardware_out.Add(hwItem);
-		}
-		dto["hardware"] = hardware_out;
-	}
-
-	dto["registry"] = device->Registry()->Raw();
-
-	#endif
 	if (this->_debug && first) {
 		Serial.print("[Axion:RequestStreamDeviceData:2]"); Serial.println(ESP.getFreeHeap());
 	}

@@ -1,5 +1,7 @@
 #include <Arduino.h>
 
+#include "Common/index.h"
+
 #include "ProtonixHardwareCapability.h"
 
 using namespace Qybercom::Protonix;
@@ -49,4 +51,15 @@ ProtonixHardwareCapability* ProtonixHardwareCapability::Comment (String comment)
 	this->_comment = comment;
 
 	return this;
+}
+
+Qybercom::Value ProtonixHardwareCapability::DTO (bool first) {
+	Qybercom::Value out = Qybercom::Value::Object();
+
+	out["kind"] = this->_kind;
+	out["id"] = this->_id;
+	out["value"] = this->_value;
+	out["comment"] = this->_comment;
+
+	return out;
 }

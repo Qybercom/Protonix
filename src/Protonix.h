@@ -146,8 +146,8 @@ namespace Qybercom {
 				IProtonixNetworkDriver* NetworkDefault ();
 				IProtonixNetworkDriver* NetworkDefault (String name);
 
-				List<Qybercom::IValueFormat*> &Formats ();
-				Qybercom::IValueFormat* Format (String mime);
+				List<IValueFormat*> &Formats ();
+				IValueFormat* Format (String mime);
 
 				List<ProtonixSignal*> &Signals ();
 				Protonix* Signal (ProtonixSignal* signal);
@@ -193,6 +193,8 @@ namespace Qybercom {
 				Protonix* DedicateTaskCore0 ();
 				Protonix* DedicateTaskCore1 ();
 				#endif
+
+				Value DTO (bool first = false);
 		};
 	}
 }

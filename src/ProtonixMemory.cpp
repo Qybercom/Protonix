@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 
+#include "Common/index.h"
+
 #include "_platforms.h"
 #include "ProtonixMemory.h"
 
@@ -145,4 +147,22 @@ void ProtonixMemory::EEPROMEnd () {
 	#endif
 
 	this->_eepromReady = false;
+}
+
+
+
+Qybercom::Value ProtonixMemory::DTO (bool first) {
+	(void)first;
+
+	Value out = Value::Object();
+
+	out["ram_free"] = this->RAMFree();
+	//out["ram_used"] = this->RAMUsed();
+	out["ram_total"] = this->RAMTotal();
+	//out["ram_fragmented"] = this->RAMFragmented();
+	out["flash_free"] = this->FlashFree();
+	//out["flash_used"] = this->FlashUsed();
+	out["flash_total"] = this->FlashTotal();
+
+	return out;
 }

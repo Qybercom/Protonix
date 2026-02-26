@@ -34,7 +34,7 @@ void Value::_allocate () {
 	int min = _value.COLLECTION.count + 1;
 	if (_value.COLLECTION.capacity >= min) return;
 
-	int capacity = _value.COLLECTION.capacity ? _value.COLLECTION.capacity + 2 : 2;//* 2 : 2;
+	int capacity = _value.COLLECTION.capacity ? _value.COLLECTION.capacity * 4 : 4;
 	if (capacity < min) capacity = min;
 
 	Value* storage = new Value[capacity];

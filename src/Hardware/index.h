@@ -33,7 +33,6 @@
  * MCP23017 (https://github.com/blemasle/arduino-mcp23017)
  * keypad 3x4, 4x4 (IOXhop_I2CKeypad.h or Keypad.h)
  * 7seg
- * clock7seg (https://github.com/AKJ7/TM1637)
  * led text display (LiquidCrystal_I2C.h)
  * radio module (RCSwitch.h)
  * servo motor (Stepper.h) (check HGenericPWM)

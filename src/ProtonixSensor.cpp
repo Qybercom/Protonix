@@ -136,6 +136,20 @@ String ProtonixSensor::Summary () {
 		+ "]";
 }
 
+Qybercom::Value ProtonixSensor::DTO (bool first) {
+	(void)first;
+
+	Qybercom::Value out = Qybercom::Value::Object();
+
+	out["id"] = this->_id;
+	out["value"] = this->_value;
+	out["active"] = this->_active;
+	out["failure"] = this->_failure;
+	out["state"] = this->_state;
+
+	return out;
+}
+
 void ProtonixSensor::Reset () {
 	this->Value("");
 	this->Active(false);
