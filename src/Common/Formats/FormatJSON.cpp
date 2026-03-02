@@ -126,16 +126,7 @@ Value Formats::FormatJSON::_parseNumber (const String &s, int &pos) {
 		pos++;
 	}
 
-	if (dot)
-		Serial.println(precision);
-
-	Value v = dot ? Value(Qybercom::stringToDouble(out.c_str()), precision) : Value(out.toInt());
-	if (dot) {
-		Serial.println("[json] " + String(v.Precision()));
-		v.Dump();
-	}
-
-	return v;
+	return dot ? Value(Qybercom::stringToDouble(out.c_str()), precision) : Value(out.toInt());
 }
 
 String Formats::FormatJSON::ValueFormatMIME () {
