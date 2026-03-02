@@ -65,6 +65,13 @@ void IProtonixDevice::DeviceHandleCommand (Protonix* device, ProtonixCommand &co
 		if (hardware != nullptr) {
 			Serial.println("[device] Hardware '" + id + "' received command");
 
+			String cmd = arguments[1];
+			if (cmd == "capabilities") {
+				bool flag = arguments[2];
+
+				hardware->HardwareCapabilitiesOut(flag);
+			}
+
 			hardware->HardwareOnCommand(device, command);
 		}
 	}

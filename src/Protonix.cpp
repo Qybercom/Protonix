@@ -1008,20 +1008,8 @@ Qybercom::Value Protonix::DTO (bool first) {
 	out["sensors"] = sensors;
 
 	Qybercom::Value hardware = Qybercom::Value::Array();
-	for (IProtonixHardware* hw : this->_hardware) {
-		Qybercom::Value hwItem = Qybercom::Value::Object();
-
-		hwItem["id"] = hw->HardwareID();
-		hwItem["summary"] = hw->HardwareSummary();
-
-		Qybercom::Value capabilities_out = Qybercom::Value::Array();
-		List<ProtonixHardwareCapability*> &capabilities = hw->HardwareCapabilities();
-		for (ProtonixHardwareCapability* capability : capabilities)
-			capabilities_out.Add(capability->DTO(first));
-		hwItem["capabilities"] = capabilities_out;
-
-		hardware.Add(hwItem);
-	}
+	for (IProtonixHardware* hw : this->_hardware)
+		hardware.Add(hw->DTO(first));
 	out["hardware"] = hardware;
 
 	out["registry"] = this->_registry->Raw();

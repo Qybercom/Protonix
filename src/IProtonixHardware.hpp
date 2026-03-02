@@ -22,6 +22,7 @@ namespace Qybercom {
 				IProtonixBridge* _bridge;
 				IProtonixHardwareContext* _context;
 				List<ProtonixHardwareCapability*> _capabilities;
+				bool _capabilitiesOut = false;
 				Value _config;
 
 				ProtonixHardwareCapability* _capability (String kind, String id, String comment) {
@@ -100,8 +101,33 @@ namespace Qybercom {
 					return this->_capabilities;
 				}
 
+				IProtonixHardware* HardwareCapabilitiesOut (bool flag) {
+					this->_capabilitiesOut = flag;
+
+					return this;
+				}
+
+				bool HardwareCapabilitiesOut () {
+					return this->_capabilitiesOut;
+				}
+
 				Value &HardwareConfig () {
 					return this->_config;
+				}
+
+				Value DTO (bool first) {
+					(void)first;
+					Value out = Value::Object();
+
+					out["id"] = this->_id;
+					out["summary"] = this->HardwareSummary();
+					out["capabilities"] = Value::Array();
+
+					if (this->_capabilitiesOut)
+						for (ProtonixHardwareCapability* capability : this->_capabilities)
+							out["capabilities"].Add(capability->DTO(first));
+
+					return out;
 				}
 
 				virtual String HardwareSummary () { return ""; }
