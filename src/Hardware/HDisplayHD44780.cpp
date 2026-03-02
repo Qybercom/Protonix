@@ -132,28 +132,52 @@ bool Hardware::HDisplayHD44780::Write (String value, short alignment) {
 
 	i = 0;
 	len = out.length();
+
 	while (i < len) {
 		if (height > -1 && cursorY >= height) {
 			if (overflowReplace) {
 				this->Cursor(0, 0);
-
 				cursorX = 0;
 				cursorY = 0;
 			}
 			else break;
 		}
 
-		char c = out.charAt(i);
+		String line;
+		while (i < len) {
+			char c = out.charAt(i);
+			i++;
 
-		if (c != '\n')
-			this->WriteChar(c);
+			if (c == '\n') break;
 
-		if (c == '\n') { cursorX = 0; cursorY++; }
-		else cursorX++;
+			line += c;
+		}
 
+		int lineLen = line.length();
+		int offset = 0;
+
+		if (alignment == 0) {
+			offset = (width - lineLen) / 2;
+			if (offset < 0) offset = 0;
+		}
+		else if (alignment == 1) {
+			offset = width - lineLen;
+			if (offset < 0) offset = 0;
+		}
+
+		cursorX = offset;
 		this->Cursor(cursorX, cursorY);
 
-		i++;
+		int j = 0;
+		while (j < lineLen && cursorX < width) {
+			this->WriteChar(line.charAt(j));
+
+			cursorX++;
+
+			j++;
+		}
+
+		cursorY++;
 	}
 
 	return true;
