@@ -33,7 +33,7 @@ namespace Qybercom {
 
 					bool Command (char cmd);
 					bool WriteChar (char value);
-					bool Write (String value);
+					bool Write (String value, short alignment = -1);
 					bool Clear ();
 					bool Cursor (int x = -1, int y = -1);
 					bool Char (unsigned short code, char data[8]);

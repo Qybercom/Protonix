@@ -53,10 +53,6 @@ Hardware::HBridgeADS1115::HBridgeADS1115 (char address) {
 	this->_values[3] = -1;
 }
 
-Hardware::HBridgeADS1115* Hardware::HBridgeADS1115::Init (char address) {
-	return new Hardware::HBridgeADS1115(address);
-}
-
 ProtonixTimer* Hardware::HBridgeADS1115::ReadTimer () {
 	return this->_readTimer;
 }
@@ -69,6 +65,17 @@ Hardware::HBridgeADS1115* Hardware::HBridgeADS1115::Address (char address) {
 	this->_address = address;
 
 	return this;
+}
+
+String Hardware::HBridgeADS1115::HardwareSummary () {
+	return "ADS1115 expander";
+}
+
+void Hardware::HBridgeADS1115::HardwareInitPre (Protonix* device) {
+	this->_capability("value", "pin0:int", "Pin 0 value");
+	this->_capability("value", "pin1:int", "Pin 1 value");
+	this->_capability("value", "pin2:int", "Pin 2 value");
+	this->_capability("value", "pin3:int", "Pin 3 value");
 }
 
 bool Hardware::HBridgeADS1115::HardwareI2C () {
@@ -138,6 +145,7 @@ bool Hardware::HBridgeADS1115::BridgeAnalogWrite (unsigned int pin, int value) {
 void Hardware::HBridgeADS1115::HardwarePipe (Protonix* device, short core) {
 	if (this->_readTimer->Pipe()) {
 		this->_values[this->_readPin] = this->_read(0x00);
+		this->_capability("pin" + String(this->_readPin) + ":int", String(this->_values[this->_readPin]));
 
 		this->_readPin = this->_readPin + 1;
 		if (this->_readPin > 3) this->_readPin = 0;

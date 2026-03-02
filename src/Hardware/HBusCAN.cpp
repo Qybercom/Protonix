@@ -78,10 +78,6 @@ Hardware::HBusCAN::HBusCAN (unsigned short pinCS, char address, CAN_SPEED bitrat
 	this->_outTimer = new ProtonixTimer(1);
 }
 
-Hardware::HBusCAN* Hardware::HBusCAN::Init (unsigned short pinCS, char address, CAN_SPEED bitrate, CAN_CLOCK clock, bool parse, unsigned int bufferMax) {
-	return new Hardware::HBusCAN(pinCS, address, bitrate, clock, parse, bufferMax);
-}
-
 ProtonixTimer* Hardware::HBusCAN::OutTimer () {
 	return this->_outTimer;
 }

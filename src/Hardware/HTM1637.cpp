@@ -224,15 +224,35 @@ void Hardware::HTM1637::HardwareInitPre (Protonix* device) {
 	this->_capability("value", "brightness:int", "Brightness 0..7");
 	//this->_capability("value", "content:string", "Content");
 
+	this->_capability("command", "brightness", "Control brightness");
+	this->_capability("command", "clear", "Clear");
+
 	this->_init = true;
 }
 
 void Hardware::HTM1637::HardwareInitPost (Protonix* device) {
-	//this->Brightness(this->_config["brightness"]);
+	unsigned short brightness = this->_config["brightness"];
+	this->_config["brightness"] = brightness;
+
 	this->Clear();
 }
 
 void Hardware::HTM1637::HardwarePipe (Protonix* device, short core) {
+}
+
+void Hardware::HTM1637::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
+	(void)device;
+	String cmd = command.Argument(1);
+
+	if (cmd == "brightness") {
+		unsigned short value = command.Argument(2);
+
+		this->_config["brightness"] = value;
+	}
+
+	if (cmd == "clear") {
+		this->Clear();
+	}
 }
 
 void Hardware::HTM1637::ValueListenerSet (Value &value) {

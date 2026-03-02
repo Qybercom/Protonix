@@ -34,13 +34,14 @@ namespace Qybercom {
 
 				public:
 					HBridgeADS1115 (char address);
-					static HBridgeADS1115* Init (char address);
 
 					ProtonixTimer* ReadTimer ();
 
 					char Address ();
 					HBridgeADS1115* Address (char address);
 
+					String HardwareSummary ();
+					void HardwareInitPre (Protonix* device);
 					bool HardwareI2C ();
 					void HardwareI2CPre (Protonix* device);
 					void HardwareI2CPost (Protonix* device);

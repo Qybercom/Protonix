@@ -34,7 +34,6 @@ namespace Qybercom {
 
 				public:
 					HEncoder (unsigned short pinA, unsigned short pinB, unsigned int checkInterval = 0);
-					static HEncoder* Init (unsigned short pinA, unsigned short pinB, unsigned int checkInterval = 0);
 
 					static HEncoder* WithButton (unsigned short pinA, unsigned short pinB, unsigned short pinButton);
 					static HEncoder* WithButton (unsigned short pinA, unsigned short pinB, unsigned short pinButton, unsigned int checkInterval);

@@ -113,10 +113,13 @@ Protonix::Protonix (IProtonixDevice* device, IProtonixProfile* profile) {
 	if (month == "Nov") month = "11";
 	if (month == "Dec") month = "12";
 
+	String day = String(__DATE__).substring(4, 6);
+	if (day[0] == ' ') day[0] = '0';
+
 	this->_build = ""
 		+ String(__DATE__).substring(7, 11) + "-"
 		+ month + "-"
-		+ String(__DATE__).substring(4, 6) + " "
+		+ day + " "
 		+ String(__TIME__);
 
 	this->_state = "";

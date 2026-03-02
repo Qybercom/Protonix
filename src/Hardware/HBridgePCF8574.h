@@ -22,15 +22,17 @@ namespace Qybercom {
 
 				public:
 					HBridgePCF8574 (char address);
-					static HBridgePCF8574* Init (char address);
 
 					char Address ();
 					HBridgePCF8574* Address (char address);
 
+					String HardwareSummary ();
+					void HardwareInitPre (Protonix* device);
 					bool HardwareI2C ();
 					void HardwareI2CPre (Protonix* device);
 					void HardwareI2CPost (Protonix* device);
 					void HardwarePipe (Protonix* device, short core);
+					void HardwareOnCommand (Protonix* device, ProtonixCommand &command);
 
 					bool BridgePinInitInput (unsigned int pin, int initial = 0);
 					bool BridgePinInitInputUp (unsigned int pin, int initial = 0);

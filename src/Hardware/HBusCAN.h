@@ -53,7 +53,6 @@ namespace Qybercom {
 
 				public:
 					HBusCAN (unsigned short pinCS, char address, CAN_SPEED bitrate = CAN_125KBPS, CAN_CLOCK clock = MCP_16MHZ, bool parse = true, unsigned int bufferMax = 70);
-					static HBusCAN* Init (unsigned short pinCS, char address, CAN_SPEED bitrate = CAN_125KBPS, CAN_CLOCK clock = MCP_16MHZ, bool parse = true, unsigned int bufferMax = 70);
 
 					ProtonixTimer* OutTimer ();
 

@@ -84,6 +84,7 @@ Hardware::HDisplayHD44780::HDisplayHD44780 (
 	this->_config["backlight"] = true;
 	this->_config["width"] = 20;
 	this->_config["height"] = -1;
+	this->_config["overflowReplace"] = true;
 }
 
 bool Hardware::HDisplayHD44780::Command (char cmd) {
@@ -94,25 +95,63 @@ bool Hardware::HDisplayHD44780::WriteChar (char value) {
 	return this->_send(value, true);
 }
 
-bool Hardware::HDisplayHD44780::Write (String value) {
+bool Hardware::HDisplayHD44780::Write (String value, short alignment) {
 	if (!this->_init) return false;
 
 	int i = 0;
 	int len = value.length();
 
+	short width = this->_config["width"];
+	short height = this->_config["height"];
+	bool overflowReplace = this->_config["overflowReplace"];
 	int cursorX = this->_capability("cursorX:int").toInt();
 	int cursorY = this->_capability("cursorY:int").toInt();
 
+	if (height > -1 && cursorY >= height) {
+		if (overflowReplace) this->Cursor(0, 0);
+		else return true;
+	}
+
+	int col = cursorX;
+	String out;
 	while (i < len) {
 		char c = value.charAt(i);
 
-		this->WriteChar(c);
+		out += c;
+		if (c != '\n') col++;
 
-		if (c == '\n') cursorY++;
+		if (col >= width) {
+			out += '\n';
+			col = 0;
+		}
+
+		if (c == '\n') col = 0;
+
+		i++;
+	}
+
+	i = 0;
+	len = out.length();
+	while (i < len) {
+		if (height > -1 && cursorY >= height) {
+			if (overflowReplace) {
+				this->Cursor(0, 0);
+
+				cursorX = 0;
+				cursorY = 0;
+			}
+			else break;
+		}
+
+		char c = out.charAt(i);
+
+		if (c != '\n')
+			this->WriteChar(c);
+
+		if (c == '\n') { cursorX = 0; cursorY++; }
 		else cursorX++;
 
-		this->_capability("cursorX:int", String(cursorX));
-		this->_capability("cursorY:int", String(cursorY));
+		this->Cursor(cursorX, cursorY);
 
 		i++;
 	}
@@ -125,6 +164,7 @@ bool Hardware::HDisplayHD44780::Clear () {
 
 	this->Command(0x01);
 	delay(2);
+	this->Cursor(0, 0);
 
 	return true;
 }
@@ -169,7 +209,7 @@ bool Hardware::HDisplayHD44780::Char (unsigned short code, char data[8]) {
 }
 
 String Hardware::HDisplayHD44780::HardwareSummary () {
-	return "DisplayHD44780 display";
+	return "HD44780-compatible display";
 }
 
 void Hardware::HDisplayHD44780::HardwareInitPre (Protonix* device) {
@@ -179,6 +219,9 @@ void Hardware::HDisplayHD44780::HardwareInitPre (Protonix* device) {
 	//this->_capability("value", "content:string", "Content");
 
 	this->_capability("command", "backlight", "Control backlight");
+	this->_capability("command", "write", "Write at current cursor");
+	this->_capability("command", "clear", "Clear");
+	this->_capability("command", "cursor", "Cursor");
 
 	this->_init = true;
 }
@@ -226,8 +269,9 @@ void Hardware::HDisplayHD44780::HardwareOnCommand (Protonix* device, ProtonixCom
 
 	if (cmd == "write") {
 		String value = command.Argument(2);
+		Qybercom::Value alignment = command.Argument(3);
 
-		this->Write(value);
+		this->Write(value, alignment.IsUndefined() ? -1 : (unsigned short)alignment);
 	}
 
 	if (cmd == "clear") {

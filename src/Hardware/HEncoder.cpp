@@ -33,10 +33,6 @@ Hardware::HEncoder::HEncoder (unsigned short pinA, unsigned short pinB, unsigned
 	this->_button = nullptr;
 }
 
-Hardware::HEncoder* Hardware::HEncoder::Init (unsigned short pinA, unsigned short pinB, unsigned int checkInterval) {
-	return new Hardware::HEncoder(pinA, pinB, checkInterval);
-}
-
 Hardware::HEncoder* Hardware::HEncoder::WithButton (unsigned short pinA, unsigned short pinB, unsigned short pinButton) {
 	return Hardware::HEncoder::WithButton(pinA, pinB, pinButton, 0, 0);
 }

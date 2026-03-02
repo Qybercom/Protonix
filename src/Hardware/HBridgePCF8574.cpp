@@ -38,10 +38,6 @@ Hardware::HBridgePCF8574::HBridgePCF8574 (char address) {
 	this->_modeMask = 0x00; // all INPUT
 }
 
-Hardware::HBridgePCF8574* Hardware::HBridgePCF8574::Init (char address) {
-	return new Hardware::HBridgePCF8574(address);
-}
-
 char Hardware::HBridgePCF8574::Address () {
 	return this->_address;
 }
@@ -50,6 +46,23 @@ Hardware::HBridgePCF8574* Hardware::HBridgePCF8574::Address (char address) {
 	this->_address = address;
 
 	return this;
+}
+
+String Hardware::HBridgePCF8574::HardwareSummary () {
+	return "PCF8574 expander";
+}
+
+void Hardware::HBridgePCF8574::HardwareInitPre (Protonix* device) {
+	this->_capability("value", "pin0:bool", "Pin 0 value");
+	this->_capability("value", "pin1:bool", "Pin 1 value");
+	this->_capability("value", "pin2:bool", "Pin 2 value");
+	this->_capability("value", "pin3:bool", "Pin 3 value");
+	this->_capability("value", "pin4:bool", "Pin 4 value");
+	this->_capability("value", "pin5:bool", "Pin 5 value");
+	this->_capability("value", "pin6:bool", "Pin 6 value");
+	this->_capability("value", "pin7:bool", "Pin 7 value");
+
+	this->_capability("command", "pin", "Pin # value");
 }
 
 bool Hardware::HBridgePCF8574::HardwareI2C () {
@@ -67,6 +80,18 @@ void Hardware::HBridgePCF8574::HardwareI2CPost (Protonix* device) {
 	this->_write(0xFF);
 
 	this->_init = true;
+}
+
+void Hardware::HBridgePCF8574::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
+	(void)device;
+	String cmd = command.Argument(1);
+
+	if (cmd == "pin") {
+		unsigned short pin = command.Argument(2);
+		bool value = command.Argument(3);
+
+		this->BridgeDigitalWrite(pin, value);
+	}
 }
 
 bool Hardware::HBridgePCF8574::BridgePinInitInput (unsigned int pin, int initial) {
@@ -116,7 +141,10 @@ bool Hardware::HBridgePCF8574::BridgeDigitalRead (unsigned int pin) {
 
 	char val = this->_read();
 
-	return !((bool)((val >> pin) & 0x01));
+	bool out = !((bool)((val >> pin) & 0x01));
+	this->_capability("pin" + String(pin) + ":bool", String(out));
+
+	return out;
 }
 
 bool Hardware::HBridgePCF8574::BridgeDigitalWrite (unsigned int pin, bool value) {
@@ -128,7 +156,11 @@ bool Hardware::HBridgePCF8574::BridgeDigitalWrite (unsigned int pin, bool value)
 	if (value) this->_dataOut |= (1 << pin);
 	else this->_dataOut &= ~(1 << pin);
 
-	return this->_write(this->_dataOut);
+	bool out = this->_write(this->_dataOut);
+
+	this->_capability("pin" + String(pin) + ":bool", String(value));
+
+	return out;
 }
 
 int Hardware::HBridgePCF8574::BridgeAnalogRead (unsigned int pin) {
