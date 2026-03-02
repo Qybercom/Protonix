@@ -12,18 +12,31 @@ ProtonixCommand::ProtonixCommand () {
 	_name = "";
 	_arguments = Value();
 	_hardware = nullptr;
+	_partFormat = nullptr;
 }
 
 ProtonixCommand::ProtonixCommand (const String &name) {
 	_name = name;
 	_arguments = Value();
 	_hardware = nullptr;
+	_partFormat = nullptr;
 }
 
 ProtonixCommand::ProtonixCommand (const String &name, const Value &arguments) {
 	_name = name;
 	_arguments = arguments;
 	_hardware = nullptr;
+	_partFormat = nullptr;
+}
+
+ProtonixCommand &ProtonixCommand::PartFormat (Qybercom::IValueFormat* format) {
+	_partFormat = format;
+
+	return *this;
+}
+
+Qybercom::IValueFormat* ProtonixCommand::PartFormat () const {
+	return _partFormat;
 }
 
 ProtonixCommand &ProtonixCommand::Hardware (IProtonixHardware* hardware) {
@@ -68,8 +81,16 @@ bool ProtonixCommand::IsStd () const {
 	return Group() == "std";
 }
 
+bool ProtonixCommand::IsStd (String cmd) const {
+	return IsStd() && Command() == cmd;
+}
+
 bool ProtonixCommand::IsCustom () const {
 	return Group() == "custom";
+}
+
+bool ProtonixCommand::IsCustom (String cmd) const {
+	return IsCustom() && Command() == cmd;
 }
 
 void ProtonixCommand::Dump () const {
@@ -96,7 +117,21 @@ void ProtonixCommand::ValueTypeDeserialize (const String &raw) {
 		if (delimiter) {
 			String part = raw.substring(start, i);
 
-			if (name) _arguments.Add(part);
+			if (name) {
+				if (_partFormat == nullptr) _arguments.Add(part);
+				else {
+					int partLen = part.length();
+
+					bool str = true;
+					if (part[0] == '{' && part[partLen - 1] == '}') str = false;
+					if (part[0] == '[' && part[partLen - 1] == ']') str = false;
+					if (Qybercom::isNumeric(part)) str = false;
+					if (part == "true" || part == "false" || part == "null") str = false;
+					if (str) part = "\"" + part + "\"";
+
+					_arguments.Add(Value::Deserialize(_partFormat, part));
+				}
+			}
 			else {
 				_name = part;
 				name = true;

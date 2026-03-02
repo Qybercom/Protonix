@@ -954,6 +954,7 @@ ProtonixSensor* Protonix::Sensor (String id) {
 bool Protonix::Command (String command, IProtonixHardware* hardware) {
 	ProtonixCommand cmd;
 
+	cmd.PartFormat(this->Format("application/json"));
 	cmd.ValueTypeDeserialize(command);
 	cmd.Hardware(hardware);
 
@@ -1008,12 +1009,12 @@ Qybercom::Value Protonix::DTO (bool first) {
 		Qybercom::Value hwItem = Qybercom::Value::Object();
 
 		hwItem["id"] = hw->HardwareID();
-		//hwItem["summary"] = hw->HardwareSummary();
+		hwItem["summary"] = hw->HardwareSummary();
 
 		Qybercom::Value capabilities_out = Qybercom::Value::Array();
 		List<ProtonixHardwareCapability*> &capabilities = hw->HardwareCapabilities();
-		//for (ProtonixHardwareCapability* capability : capabilities)
-		//	capabilities_out.Add(capability->DTO(first));
+		for (ProtonixHardwareCapability* capability : capabilities)
+			capabilities_out.Add(capability->DTO(first));
 		hwItem["capabilities"] = capabilities_out;
 
 		hardware.Add(hwItem);

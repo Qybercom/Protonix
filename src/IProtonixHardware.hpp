@@ -47,6 +47,14 @@ namespace Qybercom {
 					return false;
 				}
 
+				String _capability (String id) {
+					for (ProtonixHardwareCapability* capability : this->_capabilities)
+						if (capability->ID() == id)
+							return capability->Value();
+
+					return String();
+				}
+
 				bool _log (String message, bool ret = true) {
 					Serial.println("[hardware:" + this->_id + "] " + message);
 

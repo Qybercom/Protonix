@@ -4,8 +4,6 @@
 
 #include "Common/Value.h"
 
-//#include "IProtonixHardware.hpp"
-
 namespace Qybercom {
 	namespace Protonix {
 		class IProtonixHardware;
@@ -15,11 +13,15 @@ namespace Qybercom {
 				String _name;
 				Value _arguments;
 				IProtonixHardware* _hardware;
+				IValueFormat* _partFormat;
 
 			public:
 				ProtonixCommand ();
 				ProtonixCommand (const String &name);
 				ProtonixCommand (const String &name, const Value &arguments);
+
+				ProtonixCommand &PartFormat (IValueFormat* format);
+				IValueFormat* PartFormat () const;
 
 				ProtonixCommand &Hardware (IProtonixHardware* hardware);
 				IProtonixHardware* Hardware () const;
@@ -32,7 +34,9 @@ namespace Qybercom {
 				String Command () const;
 
 				bool IsStd () const;
+				bool IsStd (String cmd) const;
 				bool IsCustom () const;
+				bool IsCustom (String cmd) const;
 
 				void Dump () const;
 

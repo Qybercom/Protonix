@@ -119,20 +119,6 @@ Hardware::HTM1637::HTM1637 (unsigned short pinCLK, unsigned short pinDT) {
 	this->_config["brightness"] = 7; // 0..7
 }
 
-bool Hardware::HTM1637::Brightness (unsigned short brightness) {
-	if (brightness > 7) brightness = 7;
-
-	this->_capability("brightness:int", String(brightness));
-
-	if (!this->_init) return false;
-
-	this->_start();
-	this->Write(0x88 | brightness);
-	this->_stop();
-
-	return true;
-}
-
 bool Hardware::HTM1637::Write (char b) {
 	if (!this->_init) return false;
 
@@ -242,7 +228,7 @@ void Hardware::HTM1637::HardwareInitPre (Protonix* device) {
 }
 
 void Hardware::HTM1637::HardwareInitPost (Protonix* device) {
-	this->Brightness(this->_config["brightness"]);
+	//this->Brightness(this->_config["brightness"]);
 	this->Clear();
 }
 
@@ -250,6 +236,16 @@ void Hardware::HTM1637::HardwarePipe (Protonix* device, short core) {
 }
 
 void Hardware::HTM1637::ValueListenerSet (Value &value) {
-	if (value.Key() == "brightness")
-		this->Brightness((unsigned short)value);
+	if (value.Key() == "brightness") {
+		unsigned short brightness = (unsigned short)value;
+		if (brightness > 7) brightness = 7;
+
+		this->_capability("brightness:int", String(brightness));
+
+		if (this->_init) {
+			this->_start();
+			this->Write(0x88 | brightness);
+			this->_stop();
+		}
+	}
 }

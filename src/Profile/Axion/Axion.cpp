@@ -262,7 +262,7 @@ void Profile::Axion::Axion::RequestStreamDeviceData (Protonix* device) {
 	unsigned long t = micros();
 	Value dto = device->DTO(first);
 	unsigned long dt = micros() - t;
-	Serial.println("[Axion] telemetry " + String(dt));
+	//Serial.println("[Axion] telemetry " + String(dt));
 
 	if (this->_debug && first) {
 		Serial.print("[Axion:RequestStreamDeviceData:2]"); Serial.println(ESP.getFreeHeap());

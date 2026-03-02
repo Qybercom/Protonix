@@ -25,6 +25,11 @@ namespace Qybercom {
 
 	String indent (unsigned int size);
 
+	bool isNumeric (const String &s, bool &dot, bool &sign);
+	bool isNumeric (const String &s, bool &dot);
 	bool isNumeric (const String &s);
-	int toNumeric (const String &s);
+
+	double stringToDouble (const char* str, int &pos);
+	double stringToDouble (const char* str);
+	String doubleToString (double value, int precision = -1);
 }

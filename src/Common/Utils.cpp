@@ -197,18 +197,18 @@ String Qybercom::indent (unsigned int size) {
 	return out;
 }
 
-bool Qybercom::isNumeric (const String &s) {
+bool Qybercom::isNumeric (const String &s, bool &dot, bool &sign) {
 	int l = s.length();
 	if (l == 0) return false;
 
 	int i = 0;
-	bool dot = false;
 
 	while (i < l) {
 		char c = s.charAt(i);
 
 		if (c < '0' || c > '9') {
-			if (!dot && c == '.') dot = true;
+			if (!sign && c == '-' && i == 0) sign = true;
+			else if (!dot && c == '.') dot = true;
 			else return false;
 		}
 
@@ -218,16 +218,87 @@ bool Qybercom::isNumeric (const String &s) {
 	return true;
 }
 
-int Qybercom::toNumeric (const String &s) {
-	int v = 0;
-	int i = 0;
-	int l = s.length();
+bool Qybercom::isNumeric (const String &s, bool &dot) {
+	bool sign = false;
 
-	while (i < l) {
-		v = v * 10 + (s[i] - '0');
+	return isNumeric(s, dot, sign);
+}
 
+bool Qybercom::isNumeric (const String &s) {
+	bool dot = false;
+	bool sign = false;
+
+	return isNumeric(s, dot, sign);
+}
+
+double Qybercom::stringToDouble (const char* str, int &pos) {
+	double result = 0.0;
+	bool negative = false;
+	int i = pos;
+
+	while (str[i] == ' ') i++;
+
+	if (str[i] == '-') {
+		negative = true;
+		i++;
+	}
+	else if (str[i] == '+') {
 		i++;
 	}
 
-	return v;
+	while (str[i] >= '0' && str[i] <= '9') {
+		result = result * 10.0 + (str[i] - '0');
+		i++;
+	}
+
+	if (str[i] == '.' || str[i] == ',') {
+		i++;
+
+		double factor = 0.1;
+		while (str[i] >= '0' && str[i] <= '9') {
+			result += (str[i] - '0') * factor;
+			factor *= 0.1;
+			i++;
+		}
+	}
+
+	pos = i;
+	if (negative) result = -result;
+
+	return result;
+}
+
+double Qybercom::stringToDouble (const char* str) {
+	int i = 0;
+
+	return Qybercom::stringToDouble(str, i);
+}
+
+String Qybercom::doubleToString (double value, int precision) {
+	char buffer[64];
+
+	#if defined(ESP32)
+	const int maxPrecision = 15;
+	#else
+	const int maxPrecision = 6;
+	#endif
+
+	if (precision >= 0) {
+		dtostrf(value, 0, precision, buffer);
+
+		return String(buffer);
+	}
+
+	for (int p = 0; p <= maxPrecision; p++) {
+		dtostrf(value, 0, p, buffer);
+
+		double back = atof(buffer);
+
+		if (back == value)
+			return String(buffer);
+	}
+
+	dtostrf(value, 0, maxPrecision, buffer);
+
+	return String(buffer);
 }

@@ -63,6 +63,7 @@ namespace Qybercom {
 
 			char* _key = nullptr;
 			IValueListener* _listener = nullptr;
+			short _precision = -1;
 
 			void _allocate ();
 
@@ -76,8 +77,8 @@ namespace Qybercom {
 			Value (unsigned int value);
 			Value (long value);
 			Value (unsigned long value);
-			Value (float value);
-			Value (double value);
+			Value (float value, short precision = -1);
+			Value (double value, short precision = -1);
 			Value (const char* value);
 			Value (const String &value);
 			Value (const Types::Raw &value);
@@ -178,8 +179,8 @@ namespace Qybercom {
 			Value &Set (unsigned int value);
 			Value &Set (long value);
 			Value &Set (unsigned long value);
-			Value &Set (float value);
-			Value &Set (double value);
+			Value &Set (float value, short precision = -1);
+			Value &Set (double value, short precision = -1);
 			Value &Set (const char* value);
 			Value &Set (const String &value);
 			Value &Set (const Types::Raw &value);
@@ -228,7 +229,8 @@ namespace Qybercom {
 			String TypeName () const;
 
 			bool ToBool () const;
-			double ToNumber () const;
+			long ToInt () const;
+			double ToFloat () const;
 			String ToString () const;
 
 			String Trace (bool type = false) const;
@@ -236,6 +238,7 @@ namespace Qybercom {
 			bool HasKey () const;
 			int Count () const;
 			int Capacity () const;
+			short Precision () const;
 
 			bool Contains (const char* key) const;
 			bool Contains (const String &key) const;
@@ -259,7 +262,6 @@ namespace Qybercom {
 			}
 
 			String Serialize (IValueFormat* format);
-			//static Value Deserialize (IValueFormat* format, const char* raw);
 			static Value Deserialize (IValueFormat* format, const String &raw);
 
 			void Dump (int indent = 0) const;

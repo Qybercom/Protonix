@@ -43,6 +43,7 @@ void Value::_allocate () {
 	while (i < _value.COLLECTION.count) {
 		storage[i] = _value.COLLECTION.items[i];
 		storage[i]._key = _value.COLLECTION.items[i]._key ? strDup(_value.COLLECTION.items[i]._key) : nullptr;
+		storage[i]._precision = _value.COLLECTION.items[i]._precision;
 
 		delete[] _value.COLLECTION.items[i]._key;
 
@@ -93,12 +94,12 @@ Value::Value (unsigned long value) {
 	Set(value);
 }
 
-Value::Value (float value) {
-	Set(value);
+Value::Value (float value, short precision) {
+	Set(value, precision);
 }
 
-Value::Value (double value) {
-	Set(value);
+Value::Value (double value, short precision) {
+	Set(value, precision);
 }
 
 Value::Value (const char* value) {
@@ -128,47 +129,47 @@ Value::operator decltype(nullptr) () const {
 }
 
 Value::operator bool () const {
-	return _type == Value::TYPE::BOOL ? (bool)_value.BOOL : ToBool();//false;
+	return ToBool();
 }
 
 Value::operator short () const {
-	return _type == Value::TYPE::INT ? (short)_value.INT : 0;
+	return ToInt();
 }
 
 Value::operator unsigned short () const {
-	return _type == Value::TYPE::INT ? (unsigned short)_value.INT : 0;
+	return ToInt();
 }
 
 Value::operator int () const {
-	return _type == Value::TYPE::INT ? (int)_value.INT : 0;
+	return ToInt();
 }
 
 Value::operator unsigned int () const {
-	return _type == Value::TYPE::INT ? (unsigned int)_value.INT : 0;
+	return ToInt();
 }
 
 Value::operator long () const {
-	return _type == Value::TYPE::INT ? (long)_value.INT : 0;
+	return ToInt();
 }
 
 Value::operator unsigned long () const {
-	return _type == Value::TYPE::INT ? (unsigned long)_value.INT : 0;
+	return ToInt();
 }
 
 Value::operator float () const {
-	return _type == Value::TYPE::FLOAT ? (float)_value.FLOAT : 0.0f;
+	return ToFloat();
 }
 
 Value::operator double () const {
-	return _type == Value::TYPE::FLOAT ? (double)_value.FLOAT : 0.0;
+	return ToFloat();
 }
 
 Value::operator char* () const {
-	return _type == Value::TYPE::STRING ? _value.STRING : nullptr;
+	return (char*)ToString().c_str();
 }
 
 Value::operator String () const {
-	return _type == Value::TYPE::STRING ? String(_value.STRING): String();
+	return ToString();
 }
 
 Value::operator Types::Raw () const {
@@ -272,17 +273,17 @@ bool Value::operator!= (const char* other) const { return !(*this == other); }
 bool Value::operator== (const Value &other) const {
 	if (_type != other._type) {
 		if ((IsNumeric() || _type == TYPE::BOOL) && (other.IsNumeric() || other._type == TYPE::BOOL)) {
-			return ToNumber() == other.ToNumber();
+			return ToFloat() == other.ToFloat();
 		}
 
 		if (_type == TYPE::BOOL || other._type == TYPE::BOOL)
 			return ToBool() == other.ToBool();
 
 		if (_type == TYPE::STRING && other.IsNumeric())
-			return ToNumber() == other.ToNumber();
+			return ToFloat() == other.ToFloat();
 
 		if (IsNumeric() && other._type == TYPE::STRING)
-			return ToNumber() == other.ToNumber();
+			return ToFloat() == other.ToFloat();
 
 		return ToBool() == other.ToBool();
 	}
@@ -512,11 +513,12 @@ Value &Value::Set (unsigned long value) {
 	return *this;
 }
 
-Value &Value::Set (float value) {
+Value &Value::Set (float value, short precision) {
 	Clear();
 
 	_type = Value::TYPE::FLOAT;
 	_value.FLOAT = value;
+	_precision = precision;
 
 	if (_listener != nullptr)
 		_listener->ValueListenerSet(*this);
@@ -524,11 +526,12 @@ Value &Value::Set (float value) {
 	return *this;
 }
 
-Value &Value::Set (double value) {
+Value &Value::Set (double value, short precision) {
 	Clear();
 
 	_type = Value::TYPE::FLOAT;
 	_value.FLOAT = value;
+	_precision = precision;
 
 	if (_listener != nullptr)
 		_listener->ValueListenerSet(*this);
@@ -578,6 +581,7 @@ Value &Value::Set (const Value &value) {
 	Clear();
 
 	_type = value._type;
+	_precision = value._precision;
 
 	switch (_type) {
 		case Value::TYPE::BOOL: _value.BOOL = value._value.BOOL; break;
@@ -700,24 +704,8 @@ bool Value::IsNumeric () const {
 
 bool Value::IsNumericString () const {
 	const char* s = _value.STRING;
-	if (!s || !*s) return false;
 
-	bool hasDot = false;
-
-	while (*s) {
-		if (*s == '.') {
-			if (hasDot) return false;
-
-			hasDot = true;
-		}
-		else if (*s < '0' || *s > '9') {
-			return false;
-		}
-
-		s++;
-	}
-
-	return true;
+	return !s || !*s ? false : isNumeric(String(s));
 }
 
 bool Value::IsScalar () const {
@@ -733,7 +721,7 @@ String Value::TypeName () const {
 	switch (_type) {
 		case Value::TYPE::NULLPTR: return "null"; break;
 		case Value::TYPE::BOOL: return "bool"; break;
-		case Value::TYPE::INT:	return "int"; break;
+		case Value::TYPE::INT: return "int"; break;
 		case Value::TYPE::FLOAT: return "float"; break;
 		case Value::TYPE::STRING: return "string"; break;
 		case Value::TYPE::RAW: return "raw"; break;
@@ -752,20 +740,32 @@ bool Value::ToBool () const {
 		case TYPE::STRING:
 			if (_value.STRING == nullptr) return false;
 			if (_value.STRING[0] == '\0') return false;
-			if (IsNumericString()) return atof(_value.STRING) != 0.0;
+			if (IsNumericString()) return Qybercom::stringToDouble(_value.STRING) != 0.0;
 			return true;
 		case TYPE::RAW: return _value.RAW != nullptr;
 		default: return false;
 	}
 }
 
-double Value::ToNumber () const {
+long Value::ToInt () const {
 	switch (_type) {
-		case TYPE::NULLPTR: case TYPE::UNDEFINED: return false;
+		case TYPE::NULLPTR: case TYPE::UNDEFINED: return 0;
+		case TYPE::BOOL: return _value.BOOL ? 1 : 0;
+		case TYPE::INT: return (long)_value.INT;
+		case TYPE::FLOAT: return (long)_value.FLOAT;
+		case TYPE::STRING: return _value.STRING == nullptr ? 0 : (long)stringToDouble(_value.STRING);
+		case TYPE::RAW: return _value.RAW == nullptr ? 0 : 1;
+		default: return 0;
+	}
+}
+
+double Value::ToFloat () const {
+	switch (_type) {
+		case TYPE::NULLPTR: case TYPE::UNDEFINED: return 0.0;
 		case TYPE::BOOL: return _value.BOOL ? 1.0 : 0.0;
 		case TYPE::INT: return (double)_value.INT;
 		case TYPE::FLOAT: return (double)_value.FLOAT;
-		case TYPE::STRING: return _value.STRING == nullptr ? 0.0 : atof(_value.STRING);
+		case TYPE::STRING: return _value.STRING == nullptr ? 0.0 : stringToDouble(_value.STRING);
 		case TYPE::RAW: return _value.RAW == nullptr ? 0.0 : 1.0;
 		default: return 0.0;
 	}
@@ -776,7 +776,7 @@ String Value::ToString () const {
 		case Value::TYPE::NULLPTR: return "null"; break;
 		case Value::TYPE::BOOL: return String(_value.BOOL ? "true" : "false"); break;
 		case Value::TYPE::INT: return String(_value.INT); break;
-		case Value::TYPE::FLOAT: return String(_value.FLOAT); break;
+		case Value::TYPE::FLOAT: return doubleToString(_value.FLOAT, _precision); break;
 		case Value::TYPE::STRING: return String(_value.STRING); break;
 		default: return ""; break;
 	}
@@ -804,6 +804,10 @@ int Value::Count () const {
 
 int Value::Capacity () const {
 	return (_type == Value::TYPE::ARRAY || _type == Value::TYPE::OBJECT) ? _value.COLLECTION.capacity : -1;
+}
+
+short Value::Precision () const {
+	return _precision;
 }
 
 

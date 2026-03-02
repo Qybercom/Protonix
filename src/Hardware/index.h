@@ -9,6 +9,7 @@
 #include "HButton.h"
 #include "HBuzzer.h"
 #include "HContextCA958.h"
+#include "HDisplayHD44780.h"
 #include "HEncoder.h"
 #include "HGenericAnalog.h"
 #include "HGenericPWM.h"
@@ -32,8 +33,6 @@
  *
  * MCP23017 (https://github.com/blemasle/arduino-mcp23017)
  * keypad 3x4, 4x4 (IOXhop_I2CKeypad.h or Keypad.h)
- * 7seg
- * led text display (LiquidCrystal_I2C.h)
  * radio module (RCSwitch.h)
  * servo motor (Stepper.h) (check HGenericPWM)
  * gas/particle sensor

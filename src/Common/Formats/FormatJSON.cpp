@@ -11,16 +11,18 @@ void Formats::FormatJSON::_skip (const String &s, int &pos) {
 	while (pos < s.length() && (s[pos] == ' ' || s[pos] == '\n' || s[pos] == '\r' || s[pos] == '\t')) pos++;
 }
 
-Value Formats::FormatJSON::_parseValue (const String &s, int &pos) {
+Value Formats::FormatJSON::_parseValue (const String &s, int &pos, const bool root) {
 	Formats::FormatJSON::_skip(s, pos);
 	int len = s.length();
 	if (pos >= len) return Value();
 
 	char c = s[pos];
+	bool dot = false;
+
 	if (c == '{') return Formats::FormatJSON::_parseObject(s, pos);
 	if (c == '[') return Formats::FormatJSON::_parseArray(s, pos);
-	if (c == '"') return Value(Formats::FormatJSON::_parseString(s, pos));
-	if (isNumeric(s.substring(pos, len - 2)) || c == '-') return Value(Formats::FormatJSON::_parseNumber(s, pos));
+	if (c == '"') return Formats::FormatJSON::_parseString(s, pos);
+	if (isNumeric(root ? s : s.substring(pos, len - 2), dot)) return Formats::FormatJSON::_parseNumber(s, pos);
 	if (s.substring(pos, pos + 4) == "true") { pos += 4; return Value(true); }
 	if (s.substring(pos, pos + 5) == "false") { pos += 5; return Value(false); }
 	if (s.substring(pos, pos + 4) == "null") { pos += 4; return Value(); }
@@ -71,7 +73,7 @@ Value Formats::FormatJSON::_parseArray (const String &s, int &pos) {
 	return arr;
 }
 
-String Formats::FormatJSON::_parseString(const String &s, int &pos) {
+Value Formats::FormatJSON::_parseString(const String &s, int &pos) {
 	pos++;
 	String str;
 	int length = s.length();
@@ -99,18 +101,41 @@ String Formats::FormatJSON::_parseString(const String &s, int &pos) {
 		}
 	}
 
-	return str;
+	return Value(str);
 }
 
-int Formats::FormatJSON::_parseNumber (const String &s, int &pos) {
-	String num;
+Value Formats::FormatJSON::_parseNumber (const String &s, int &pos) {
+	String out;
 	int length = s.length();
+	bool dot = false;
+	bool sign = false;
+	short precision = -1;
 
-	while (pos < length && (isDigit(s[pos]) || s[pos] == '.' || s[pos] == '-')) {
-		num += s[pos++];
+	while (pos < length) {
+		char c = s.charAt(pos);
+
+		if (c < '0' || c > '9') {
+			if (!sign && c == '-' && pos == 0) sign = true;
+			else if (!dot && c == '.') dot = true;
+			else break;
+		}
+
+		out += c;
+		if (dot) precision++;
+
+		pos++;
 	}
 
-	return num.indexOf('.') >= 0 ? num.toFloat() : num.toInt();
+	if (dot)
+		Serial.println(precision);
+
+	Value v = dot ? Value(Qybercom::stringToDouble(out.c_str()), precision) : Value(out.toInt());
+	if (dot) {
+		Serial.println("[json] " + String(v.Precision()));
+		v.Dump();
+	}
+
+	return v;
 }
 
 String Formats::FormatJSON::ValueFormatMIME () {
@@ -210,5 +235,5 @@ String Formats::FormatJSON::ValueFormatSerialize (Value &value) {
 Value Formats::FormatJSON::ValueFormatDeserialize (const String &raw) {
 	int pos = 0;
 
-	return Formats::FormatJSON::_parseValue(raw, pos);
+	return Formats::FormatJSON::_parseValue(raw, pos, true);
 }
