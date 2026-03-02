@@ -990,15 +990,15 @@ Qybercom::Value Protonix::DTO (bool first) {
 	Qybercom::Value out = Qybercom::Value::Object();
 
 	out["active"] = this->_active;
-	if (first) out["platform"] = this->_platform;
-	if (first) out["build"] = this->_build;
+	out["platform"] = this->_platform;
+	out["build"] = this->_build;
 	out["state"] = this->_state;
 	out["summary"] = this->_summary;
 
 	#if defined(ESP32) || defined(ESP8266)
 	out["cpu"] = this->CPUFrequency();
 	out["uptime"] = this->_timerUptime->RunTime();
-	if (first) out["firmware"] = this->_firmware;
+	out["firmware"] = this->_firmware;
 
 	out["memory"] = this->_memory->DTO(first);
 
