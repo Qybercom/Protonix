@@ -13,6 +13,7 @@
 #include "HEncoder.h"
 #include "HGenericAnalog.h"
 #include "HGenericPWM.h"
+#include "HISMBandRFModule.h"
 #include "HJoystick.h"
 #include "HPhotonix.h"
 #include "HPhotoResistor.h"

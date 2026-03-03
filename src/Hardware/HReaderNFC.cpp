@@ -23,12 +23,6 @@ void Hardware::HReaderNFC::_signal (Protonix* device, String value) {
 		device->Signal(this->_id, "tagOut");
 }
 
-/*void Hardware::HReaderNFC::_channel (unsigned short channel) {
-	Wire.beginTransmission(0x70);
-	Wire.write(1 << channel);
-	Wire.endTransmission();
-}*/
-
 Hardware::HReaderNFC::HReaderNFC (String mode, unsigned short pinRST, short dedicatedCore) {
 	this->_dedicatedCore = dedicatedCore;
 
@@ -139,7 +133,6 @@ void Hardware::HReaderNFC::HardwareSPIPost (Protonix* device) {
 
 void Hardware::HReaderNFC::HardwareInitPost (Protonix* device) {
 	if (this->HardwareI2C()) {
-		//Hardware::HReaderNFC::_channel(this->_config["pinSS"]);
 		this->_i2cReader->PCD_Init();
 
 		this->_init = true;
@@ -158,7 +151,6 @@ void Hardware::HReaderNFC::HardwarePipe (Protonix* device, short core) {
 	this->_debouncer->Threshold(debounce);
 
 	if (this->HardwareI2C() && this->_i2cReader != nullptr) {
-		//Hardware::HReaderNFC::_channel(this->_config["pinSS"]);
 		this->_i2cReader->PCD_Init();
 
 		card = this->_i2cReader->PICC_IsNewCardPresent();

@@ -25,8 +25,6 @@ namespace Qybercom {
 					HReaderNFC (String mode, unsigned short pinRST, short dedicatedCore = -1);
 					void _signal (Protonix* device, String value);
 
-					static void _channel (unsigned short channel);
-
 				public:
 					static HReaderNFC* InitI2C (unsigned short pinRST, int address = 0x28, short dedicatedCore = -1);
 					static HReaderNFC* InitSPI (unsigned short pinSS, unsigned short pinRST, short dedicatedCore = -1);
