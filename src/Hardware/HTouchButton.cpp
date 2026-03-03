@@ -87,6 +87,8 @@ void Hardware::HTouchButton::HardwarePipeInterrupt (Protonix* device) {
 }
 
 void Hardware::HTouchButton::HardwareOnReset (Protonix* device) {
+	this->_trigger->HardwareOnReset(device);
+
 	this->_signal(device);
 }
 

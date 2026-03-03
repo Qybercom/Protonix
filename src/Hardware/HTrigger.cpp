@@ -108,8 +108,6 @@ bool Hardware::HTrigger::OutputValue (unsigned short value) {
 	String mode = this->_config["mode"];
 	if (mode != "output") return false;
 
-	//this->_log("OutputValue " + String(value));
-
 	unsigned short pin = this->_config["pin"];
 
 	this->_bridge->BridgeDigitalWrite(pin, value);

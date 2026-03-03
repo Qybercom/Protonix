@@ -122,6 +122,9 @@ void Hardware::HSelector3P::HardwarePipeInterrupt (Protonix* device) {
 }
 
 void Hardware::HSelector3P::HardwareOnReset (Protonix* device) {
+	this->_trigger1->HardwareOnReset(device);
+	this->_trigger2->HardwareOnReset(device);
+
 	this->_signal(device, this->_value);
 }
 
