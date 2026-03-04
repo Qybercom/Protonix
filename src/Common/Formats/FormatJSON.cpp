@@ -8,13 +8,15 @@
 using namespace Qybercom;
 
 void Formats::FormatJSON::_skip (const String &s, int &pos) {
-	while (pos < s.length() && (s[pos] == ' ' || s[pos] == '\n' || s[pos] == '\r' || s[pos] == '\t')) pos++;
+	int length = s.length();
+
+	while (pos < length && (s[pos] == ' ' || s[pos] == '\n' || s[pos] == '\r' || s[pos] == '\t')) pos++;
 }
 
 Value Formats::FormatJSON::_parseValue (const String &s, int &pos, const bool root) {
 	Formats::FormatJSON::_skip(s, pos);
-	int len = s.length();
-	if (pos >= len) return Value();
+	int length = s.length();
+	if (pos >= length) return Value();
 
 	char c = s[pos];
 	bool dot = false;
@@ -22,7 +24,7 @@ Value Formats::FormatJSON::_parseValue (const String &s, int &pos, const bool ro
 	if (c == '{') return Formats::FormatJSON::_parseObject(s, pos);
 	if (c == '[') return Formats::FormatJSON::_parseArray(s, pos);
 	if (c == '"') return Formats::FormatJSON::_parseString(s, pos);
-	if (isNumeric(root ? s : s.substring(pos, len - 2), dot)) return Formats::FormatJSON::_parseNumber(s, pos);
+	if (isNumeric(root ? s : s.substring(pos, length - 2), dot)) return Formats::FormatJSON::_parseNumber(s, pos);
 	if (s.substring(pos, pos + 4) == "true") { pos += 4; return Value(true); }
 	if (s.substring(pos, pos + 5) == "false") { pos += 5; return Value(false); }
 	if (s.substring(pos, pos + 4) == "null") { pos += 4; return Value(); }
@@ -32,10 +34,13 @@ Value Formats::FormatJSON::_parseValue (const String &s, int &pos, const bool ro
 
 Value Formats::FormatJSON::_parseObject (const String &s, int &pos) {
 	Value obj = Value::Object();
+	int length = s.length();
+
 	pos++;
+
 	Formats::FormatJSON::_skip(s, pos);
 
-	while (pos < s.length() && s[pos] != '}') {
+	while (pos < length && s[pos] != '}') {
 		String key = Formats::FormatJSON::_parseString(s, pos);
 
 		Formats::FormatJSON::_skip(s, pos);
@@ -56,10 +61,13 @@ Value Formats::FormatJSON::_parseObject (const String &s, int &pos) {
 
 Value Formats::FormatJSON::_parseArray (const String &s, int &pos) {
 	Value arr = Value::Array();
+	int length = s.length();
+
 	pos++;
+
 	Formats::FormatJSON::_skip(s, pos);
 
-	while (pos < s.length() && s[pos] != ']') {
+	while (pos < length && s[pos] != ']') {
 		Value value = Formats::FormatJSON::_parseValue(s, pos);
 		arr.Add(value);
 		Formats::FormatJSON::_skip(s, pos);

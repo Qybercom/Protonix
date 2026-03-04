@@ -143,7 +143,7 @@ bool ProtonixTimer::Pipe () {
 	if (diff < 0)
 		this->_overflows = this->_overflows + 1; // required by compiler
 
-	bool elapsed = diff < 0 || diff >= (long)this->_interval;
+	bool elapsed = diff <= 0 || diff >= (long)this->_interval;
 
 	this->_totalMS = (unsigned long long)this->_overflows * TIMER_MAX + current;
 	this->_totalS = this->_totalMS / 1000;

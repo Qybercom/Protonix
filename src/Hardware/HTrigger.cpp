@@ -118,10 +118,11 @@ bool Hardware::HTrigger::OutputValue (unsigned short value) {
 }
 
 String Hardware::HTrigger::HardwareSummary () {
-	return "Trigger " + this->_config["mode"];
+	return String("Trigger ") + (String)this->_config["mode"];
 }
 
 void Hardware::HTrigger::HardwareInitPre (Protonix* device) {
+	(void)device;
 }
 
 bool Hardware::HTrigger::HardwareI2C () {

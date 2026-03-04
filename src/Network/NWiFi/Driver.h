@@ -18,7 +18,7 @@ namespace Qybercom {
 						String _statusRecognize (int code);
 
 					public:
-						Driver (String ssid, String password, String mac, String hostname, bool connectAuto = true, unsigned int timerCheck = 1000);
+						Driver (String ssid, String password, String mac, String hostname, bool connectAuto = true, unsigned int timerCheck = 5000);
 
 						bool NetworkDriverConnect ();
 						bool NetworkDriverConnected ();

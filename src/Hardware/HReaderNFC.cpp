@@ -132,6 +132,8 @@ void Hardware::HReaderNFC::HardwareSPIPost (Protonix* device) {
 }
 
 void Hardware::HReaderNFC::HardwareInitPost (Protonix* device) {
+	(void)device;
+
 	if (this->HardwareI2C()) {
 		this->_i2cReader->PCD_Init();
 

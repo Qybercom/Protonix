@@ -419,6 +419,7 @@ Value &Value::Get (int key) {
 
 
 Value &Value::Set (decltype(nullptr) value) {
+	(void)value;
 	Clear();
 
 	_type = Value::TYPE::NULLPTR;

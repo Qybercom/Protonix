@@ -237,6 +237,8 @@ String Hardware::HDisplayHD44780::HardwareSummary () {
 }
 
 void Hardware::HDisplayHD44780::HardwareInitPre (Protonix* device) {
+	(void)device;
+
 	this->_capability("value", "backlight:bool", "Backlight");
 	this->_capability("value", "cursorX:int", "Cursor column");
 	this->_capability("value", "cursorY:int", "Cursor row");
@@ -251,6 +253,8 @@ void Hardware::HDisplayHD44780::HardwareInitPre (Protonix* device) {
 }
 
 void Hardware::HDisplayHD44780::HardwareInitPost (Protonix* device) {
+	(void)device;
+
 	unsigned short i = 0;
 	while (i < 8) {
 		this->_bridge->BridgePinInitOutput(i);
@@ -279,6 +283,8 @@ void Hardware::HDisplayHD44780::HardwareInitPost (Protonix* device) {
 }
 
 void Hardware::HDisplayHD44780::HardwarePipe (Protonix* device, short core) {
+	(void)device;
+	(void)core;
 }
 
 void Hardware::HDisplayHD44780::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {

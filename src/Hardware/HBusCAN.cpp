@@ -252,24 +252,24 @@ void Hardware::HBusCAN::HardwarePipe (Protonix* device, short core) {
 					i++;
 				}
 
-				bool empty = this->_inBuffer[src] == nullptr;
+				bool empty = this->_inBuffer[(short)src] == nullptr;
 
 				if (truncated == 0 && empty) this->_process(device, src, dst, priority, raw);
 				else {
 					if (empty)
-						this->_inBuffer[src] = new List<String>();
+						this->_inBuffer[(short)src] = new List<String>();
 
-					if (truncated != 0) this->_inBuffer[src]->Add(raw);
+					if (truncated != 0) this->_inBuffer[(short)src]->Add(raw);
 					else {
-						unsigned int size = this->_inBuffer[src]->Count();
+						unsigned int size = this->_inBuffer[(short)src]->Count();
 						String* out = new String[size];
 
-						for (String &chunk : *this->_inBuffer[src])
+						for (String &chunk : *this->_inBuffer[(short)src])
 							out[(int)(chunk[0] - '0')] = chunk.substring(1);
 
-						this->_inBuffer[src]->Clear();
-						delete this->_inBuffer[src];
-						this->_inBuffer[src] = nullptr;
+						this->_inBuffer[(short)src]->Clear();
+						delete this->_inBuffer[(short)src];
+						this->_inBuffer[(short)src] = nullptr;
 
 						String data = "";
 						unsigned int i = 0;

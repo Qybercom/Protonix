@@ -37,6 +37,8 @@ void Hardware::HBuiltInLED::HardwareInitPre (Protonix* device) {
 }
 
 void Hardware::HBuiltInLED::HardwareOnReset (Protonix* device) {
+	(void)device;
+
 	this->Active(false);
 }
 

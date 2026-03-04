@@ -53,7 +53,7 @@ namespace Qybercom {
 						else {
 							long diff = millis() - this->_timer;
 
-							out = diff >= this->_timeout;
+							out = diff >= (long)this->_timeout;
 						}
 					}
 					else {

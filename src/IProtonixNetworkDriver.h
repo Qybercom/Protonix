@@ -18,7 +18,7 @@ namespace Qybercom {
 				String _kind;
 				String _name;
 				String _mac;
-				uint8_t _macBuffer[6];
+				unsigned char _macBuffer[6];
 				String _hostname;
 				ProtonixTimer* _timerConnect;
 				bool _ready;

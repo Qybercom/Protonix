@@ -19,6 +19,7 @@ using namespace Qybercom::Protonix;
 String Network::NWiFi::Driver::_statusRecognize (int code) {
 	switch (code) {
 		case -1: return "__init__"; break;
+		#if defined(ESP32)
 		case 0: return "WL_IDLE_STATUS"; break;
 		case 1: return "WL_NO_SSID_AVAIL"; break;
 		case 2: return "WL_SCAN_COMPLETED"; break;
@@ -32,6 +33,14 @@ String Network::NWiFi::Driver::_statusRecognize (int code) {
 		case 9: return "WL_AP_FAILED"; break;
 		case 254: return "WL_STOPPED"; break;
 		case 255: return "WL_NO_SHIELD"; break;
+		#elif defined(ESP8266)
+		case 0: return "WL_IDLE_STATUS"; break;
+		case 1: return "WL_NO_SSID_AVAIL"; break;
+		case 3: return "WL_CONNECTED"; break;
+		case 4: return "WL_CONNECT_FAILED"; break;
+		case 6: return "WL_CONNECT_WRONG_PASSWORD"; break;
+		case 7: return "WL_DISCONNECTED"; break;
+		#endif
 		default: return "__unknown__"; break;
 	}
 }
@@ -46,13 +55,13 @@ Network::NWiFi::Driver::Driver (String ssid, String password, String mac, String
 
 bool Network::NWiFi::Driver::NetworkDriverConnect () {
 	if (!this->_ready)
-		return this->_log("Only 1 NDWiFi driver supported", false);
+		return this->_log("Only 1 NWiFi driver supported", false);
 
 	this->_log("Connect");
 	this->_macParse();
 
 	#if defined(ESP32) || defined(ESP8266)
-		WiFi.disconnect(true);
+		//WiFi.disconnect(true);
 	#endif
 
 	// TODO: add AP mode
@@ -62,6 +71,7 @@ bool Network::NWiFi::Driver::NetworkDriverConnect () {
 		WiFi.mode(WIFI_STA);
 		esp_wifi_set_mac(WIFI_IF_STA, &this->_macBuffer[0]);
 	#elif defined(ESP8266)
+		// NOTE: There is need a timeout between attempts
 		WiFi.mode(WIFI_STA);
 		wifi_set_macaddr(STATION_IF, &this->_macBuffer[0]);
 		WiFi.setHostname(this->_hostname.c_str());
@@ -69,7 +79,12 @@ bool Network::NWiFi::Driver::NetworkDriverConnect () {
 	#endif
 
 	#if defined(ESP32) || defined(ESP8266)
-		WiFi.begin(this->_ssid, this->_password);
+		int status = WiFi.begin(this->_ssid, this->_password);
+
+		if (status != this->_status)
+			this->_log("Connection status: " + this->_statusRecognize(status));
+
+		this->_status = status;
 	#endif
 
 	return true;

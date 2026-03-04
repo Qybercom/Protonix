@@ -54,6 +54,8 @@ ProtonixHardwareCapability* ProtonixHardwareCapability::Comment (String comment)
 }
 
 Qybercom::Value ProtonixHardwareCapability::DTO (bool first) {
+	(void)first;
+
 	Qybercom::Value out = Qybercom::Value::Object();
 
 	out["kind"] = this->_kind;

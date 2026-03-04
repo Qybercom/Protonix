@@ -215,6 +215,8 @@ String Hardware::HTM1637::HardwareSummary () {
 }
 
 void Hardware::HTM1637::HardwareInitPre (Protonix* device) {
+	(void)device;
+
 	this->_bridge->BridgePinMode((unsigned short)this->_config["pinCLK"], OUTPUT);
 	this->_bridge->BridgePinMode((unsigned short)this->_config["pinDT"], OUTPUT);
 
@@ -231,6 +233,8 @@ void Hardware::HTM1637::HardwareInitPre (Protonix* device) {
 }
 
 void Hardware::HTM1637::HardwareInitPost (Protonix* device) {
+	(void)device;
+
 	unsigned short brightness = this->_config["brightness"];
 	this->_config["brightness"] = brightness;
 
@@ -238,6 +242,8 @@ void Hardware::HTM1637::HardwareInitPost (Protonix* device) {
 }
 
 void Hardware::HTM1637::HardwarePipe (Protonix* device, short core) {
+	(void)device;
+	(void)core;
 }
 
 void Hardware::HTM1637::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {

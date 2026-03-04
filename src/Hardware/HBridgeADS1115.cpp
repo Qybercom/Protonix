@@ -72,6 +72,8 @@ String Hardware::HBridgeADS1115::HardwareSummary () {
 }
 
 void Hardware::HBridgeADS1115::HardwareInitPre (Protonix* device) {
+	(void)device;
+
 	this->_capability("value", "pin0:int", "Pin 0 value");
 	this->_capability("value", "pin1:int", "Pin 1 value");
 	this->_capability("value", "pin2:int", "Pin 2 value");
@@ -95,18 +97,28 @@ void Hardware::HBridgeADS1115::HardwareI2CPost (Protonix* device) {
 }
 
 bool Hardware::HBridgeADS1115::BridgePinInitInput (unsigned int pin, int initial) {
+	(void)initial;
+
 	return this->BridgePinMode(pin, INPUT);
 }
 
 bool Hardware::HBridgeADS1115::BridgePinInitInputUp (unsigned int pin, int initial) {
+	(void)pin;
+	(void)initial;
+
 	return false;
 }
 
 bool Hardware::HBridgeADS1115::BridgePinInitInputDown (unsigned int pin, int initial) {
+	(void)pin;
+	(void)initial;
+
 	return false;
 }
 
 bool Hardware::HBridgeADS1115::BridgePinInitOutput (unsigned int pin) {
+	(void)pin;
+
 	return false;
 }
 
@@ -124,10 +136,15 @@ bool Hardware::HBridgeADS1115::BridgePinAvailable (unsigned int pin) {
 }
 
 bool Hardware::HBridgeADS1115::BridgeDigitalRead (unsigned int pin) {
+	(void)pin;
+
 	return false;
 }
 
 bool Hardware::HBridgeADS1115::BridgeDigitalWrite (unsigned int pin, bool value) {
+	(void)pin;
+	(void)value;
+
 	return false;
 }
 
@@ -139,10 +156,16 @@ int Hardware::HBridgeADS1115::BridgeAnalogRead (unsigned int pin) {
 }
 
 bool Hardware::HBridgeADS1115::BridgeAnalogWrite (unsigned int pin, int value) {
+	(void)pin;
+	(void)value;
+
 	return false;
 }
 
 void Hardware::HBridgeADS1115::HardwarePipe (Protonix* device, short core) {
+	(void)device;
+	(void)core;
+
 	if (this->_readTimer->Pipe()) {
 		this->_values[this->_readPin] = this->_read(0x00);
 		this->_capability("pin" + String(this->_readPin) + ":int", String(this->_values[this->_readPin]));

@@ -20,6 +20,13 @@ bool IProtonixNetworkDriver::_init (bool single, String kind, String name, Strin
 	this->_connectAttempt = false;
 	this->_connectAuto = connectAuto;
 
+	unsigned short i = 0;
+	while (i < 6) {
+		this->_macBuffer[i] = '0';
+
+		i++;
+	}
+
 	if (!single || _id == 0) {
 		this->_ready = true;
 
@@ -73,12 +80,13 @@ bool IProtonixNetworkDriver::NetworkDriverPipe (Protonix* device) {
 
 	if (this->_timerConnect->Pipe()) {
 		this->_connected = this->NetworkDriverConnected();
+		this->_connectAttempt = true;
 
 		if (this->_connected)
 			this->_connectAttempt = false;
 
-		if (!this->_connected && this->_connectAuto && !this->_connectAttempt) {
-			this->_connectAttempt = true;
+		if (!this->_connected && this->_connectAuto && this->_connectAttempt) {
+			this->_connectAttempt = false;
 
 			this->NetworkDriverConnect();
 		}

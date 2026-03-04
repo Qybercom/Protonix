@@ -316,8 +316,12 @@ Protonix* Protonix::Pipe () {
 				hardware->HardwareSPIPost(this);
 		}
 
-		for (IProtonixHardware* hardware : this->_hardware)
+		Serial.print("[ready.hw]"); Serial.println(ESP.getFreeHeap());
+		for (IProtonixHardware* hardware : this->_hardware) {
+			Serial.print("[hw] " + hardware->HardwareID() + "... ");
 			hardware->HardwareInitPost(this);
+			Serial.println("OK");
+		}
 
 		//Serial.print("[ready.2]"); Serial.println(ESP.getFreeHeap());
 		this->_device->DeviceOnReady(this);
@@ -546,6 +550,8 @@ Qybercom::Value &Protonix::Hardware (String id, IProtonixHardware* hardware, boo
 }
 
 Qybercom::Value &Protonix::HardwareOnBridge (String bridge, String id, IProtonixHardware* hardware, bool allowSignal) {
+	(void)allowSignal;
+
 	// TODO: add check for existent id
 
 	hardware->HardwareID(id);

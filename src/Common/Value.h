@@ -26,8 +26,8 @@ namespace Qybercom {
 
 	class IValueListener {
 		public:
-			virtual void ValueListenerGet (Value &value) { }
-			virtual void ValueListenerSet (Value &value) { }
+			virtual void ValueListenerGet (Value &value) { (void)value; }
+			virtual void ValueListenerSet (Value &value) { (void)value; }
 
 			virtual ~IValueListener () { }
 	};

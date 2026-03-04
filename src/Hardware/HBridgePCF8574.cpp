@@ -53,6 +53,8 @@ String Hardware::HBridgePCF8574::HardwareSummary () {
 }
 
 void Hardware::HBridgePCF8574::HardwareInitPre (Protonix* device) {
+	(void)device;
+
 	this->_capability("value", "pin0:bool", "Pin 0 value");
 	this->_capability("value", "pin1:bool", "Pin 1 value");
 	this->_capability("value", "pin2:bool", "Pin 2 value");
@@ -95,15 +97,23 @@ void Hardware::HBridgePCF8574::HardwareOnCommand (Protonix* device, ProtonixComm
 }
 
 bool Hardware::HBridgePCF8574::BridgePinInitInput (unsigned int pin, int initial) {
+	(void)initial;
+
 	return this->BridgePinMode(pin, INPUT);
 }
 
 bool Hardware::HBridgePCF8574::BridgePinInitInputUp (unsigned int pin, int initial) {
+	(void)initial;
+
 	return this->BridgePinMode(pin, INPUT_PULLUP);
 }
 
 bool Hardware::HBridgePCF8574::BridgePinInitInputDown (unsigned int pin, int initial) {
+	(void)initial;
+
 	#if defined(ESP8266) || !defined(INPUT_PULLDOWN)
+	(void)pin;
+
 	return false;
 	#else
 	return this->BridgePinMode(pin, INPUT_PULLDOWN);
@@ -164,13 +174,21 @@ bool Hardware::HBridgePCF8574::BridgeDigitalWrite (unsigned int pin, bool value)
 }
 
 int Hardware::HBridgePCF8574::BridgeAnalogRead (unsigned int pin) {
+	(void)pin;
+
 	return -1;
 }
 
 bool Hardware::HBridgePCF8574::BridgeAnalogWrite (unsigned int pin, int value) {
+	(void)pin;
+	(void)value;
+
 	return false;
 }
 
 void Hardware::HBridgePCF8574::HardwarePipe (Protonix* device, short core) {
+	(void)device;
+	(void)core;
+
 	// TODO: add interrupt
 }

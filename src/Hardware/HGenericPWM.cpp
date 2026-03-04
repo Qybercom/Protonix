@@ -36,7 +36,7 @@ Hardware::HGenericPWM* Hardware::HGenericPWM::Frequency (unsigned int frequency)
 		#if defined(__AVR__)
 
 		#elif defined(ESP8266)
-			this->_bridge->BridgeAnalogWriteFreq(this->_frequency);
+			//this->_bridge->BridgeAnalogWriteFreq(this->_frequency);
 		#elif defined(ESP32)
 			ledcAttach((int)this->_config["pin"], this->_frequency, this->_resolution);
 		#endif

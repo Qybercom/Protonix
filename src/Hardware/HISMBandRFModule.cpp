@@ -81,6 +81,8 @@ void Hardware::HISMBandRFModule::HardwareInitPost (Protonix* device) {
 }
 
 void Hardware::HISMBandRFModule::HardwarePipe (Protonix* device, short core) {
+	(void)core;
+
 	int raw = this->_remote->available() ? this->_remote->getReceivedValue() : -1;
 	String value = String(raw);
 	this->_valueActual = value;
