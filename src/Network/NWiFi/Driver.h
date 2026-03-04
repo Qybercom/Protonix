@@ -5,6 +5,14 @@
 #include "../../IProtonixNetworkDriver.h"
 #include "../../IProtonixNetworkClient.h"
 
+#if defined(ESP32)
+	#define QYBERCOM_PROTONIX_NETWORK_WIFI_TIMEOUT_CONNECT 5000
+#elif defined(ESP8266)
+	#define QYBERCOM_PROTONIX_NETWORK_WIFI_TIMEOUT_CONNECT 10000
+#else
+	#define QYBERCOM_PROTONIX_NETWORK_WIFI_TIMEOUT_CONNECT 1000
+#endif
+
 namespace Qybercom {
 	namespace Protonix {
 		namespace Network {
@@ -18,7 +26,7 @@ namespace Qybercom {
 						String _statusRecognize (int code);
 
 					public:
-						Driver (String ssid, String password, String mac, String hostname, bool connectAuto = true, unsigned int timerCheck = 5000);
+						Driver (String ssid, String password, String mac, String hostname, bool connectAuto = true, unsigned int timerCheck = QYBERCOM_PROTONIX_NETWORK_WIFI_TIMEOUT_CONNECT);
 
 						bool NetworkDriverConnect ();
 						bool NetworkDriverConnected ();

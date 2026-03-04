@@ -60,8 +60,8 @@ bool Network::NWiFi::Driver::NetworkDriverConnect () {
 	this->_log("Connect");
 	this->_macParse();
 
-	#if defined(ESP32) || defined(ESP8266)
-		//WiFi.disconnect(true);
+	#if defined(ESP8266)
+		WiFi.disconnect(true);
 	#endif
 
 	// TODO: add AP mode
@@ -79,6 +79,9 @@ bool Network::NWiFi::Driver::NetworkDriverConnect () {
 	#endif
 
 	#if defined(ESP32) || defined(ESP8266)
+		#if defined(ESP8266)
+		delay(500);
+		#endif
 		int status = WiFi.begin(this->_ssid, this->_password);
 
 		if (status != this->_status)
