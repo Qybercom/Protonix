@@ -1,8 +1,9 @@
 #pragma once
 
 #include <Arduino.h>
-
 #include <SoftwareSerial.h>
+
+#include "../Common/index.h"
 
 #include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
@@ -10,9 +11,9 @@
 namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
-			class HBusSerial : public IProtonixBus {
+			class HBusSerial : public IProtonixBus, public IValueListener {
 				private:
-					bool _started;
+					bool _init;
 					bool _lenActive;
 					String _lenBuffer;
 					String _cmdBuffer;
@@ -21,7 +22,6 @@ namespace Qybercom {
 				public:
 					HBusSerial (unsigned short pinRX, unsigned short pinTX);
 
-					bool Started ();
 					SoftwareSerial* Port ();
 
 					bool SendCommand (String command);
@@ -37,6 +37,8 @@ namespace Qybercom {
 
 					bool BusSend (Protonix* device, String data);
 					bool BusCommand (Protonix* device, String command);
+
+					void ValueListenerSet (Value &value);
 			};
 		}
 	}

@@ -961,6 +961,10 @@ ProtonixSensor* Protonix::Sensor (String id) {
 
 
 bool Protonix::Command (String command, IProtonixHardware* hardware) {
+	// legacy
+	if (command.startsWith("std:sensor:"))
+		command.replace("std:sensor:", "std:sensor;");
+
 	ProtonixCommand cmd;
 
 	cmd.PartFormat(this->Format("application/json"));

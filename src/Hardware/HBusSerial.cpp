@@ -9,11 +9,12 @@
 using namespace Qybercom::Protonix;
 
 Hardware::HBusSerial::HBusSerial (unsigned short pinRX, unsigned short pinTX) {
-	this->_started = false;
+	this->_init = false;
 	this->_lenActive = false;
 	this->_lenBuffer = "";
 	this->_cmdBuffer = "";
 
+	this->_config.Listener(this);
 	this->_config["pinRX"] = pinRX;
 	this->_config["pinTX"] = pinTX;
 	this->_config["speed"] = 9600;
@@ -25,10 +26,6 @@ Hardware::HBusSerial::HBusSerial (unsigned short pinRX, unsigned short pinTX) {
 		(int)this->_config["pinRX"],
 		(int)this->_config["pinTX"]
 	);
-}
-
-bool Hardware::HBusSerial::Started () {
-	return this->_started;
 }
 
 SoftwareSerial* Hardware::HBusSerial::Port () {
@@ -47,7 +44,7 @@ bool Hardware::HBusSerial::SendCommand (String command) {
 }
 
 bool Hardware::HBusSerial::Send (String s) {
-	if (!this->_started) return false;
+	if (!this->_init) return false;
 
 	this->_log("[debug] Send " + s);
 
@@ -57,7 +54,7 @@ bool Hardware::HBusSerial::Send (String s) {
 }
 
 bool Hardware::HBusSerial::Write (char b) {
-	if (!this->_started) return false;
+	if (!this->_init) return false;
 
 	this->_port->write(b);
 
@@ -65,7 +62,7 @@ bool Hardware::HBusSerial::Write (char b) {
 }
 
 char Hardware::HBusSerial::Read () {
-	return this->_started ? this->_port->read() : (char)'\0';
+	return this->_init ? this->_port->read() : (char)'\0';
 }
 
 String Hardware::HBusSerial::HardwareSummary () {
@@ -75,10 +72,17 @@ String Hardware::HBusSerial::HardwareSummary () {
 void Hardware::HBusSerial::HardwareInitPre (Protonix* device) {
 	(void)device;
 
-	this->_started = true;
+	this->_capability("command", "speed", "Set speed");
+	this->_capability("command", "timeout", "Set timeout");
+	this->_capability("command", "blocking", "Set blocking");
+	this->_capability("command", "observable", "Set observable");
+	this->_capability("command", "send", "Send string");
+	this->_capability("command", "sendComamnd", "Send Protonix-compatible command");
 
 	this->_port->begin(this->_config["speed"]);
 	this->_port->setTimeout(this->_config["timeout"]);
+
+	this->_init = true;
 }
 
 void Hardware::HBusSerial::HardwarePipe (Protonix* device, short core) {
@@ -135,7 +139,37 @@ void Hardware::HBusSerial::HardwareOnReset (Protonix* device) {
 
 void Hardware::HBusSerial::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
 	(void)device;
-	(void)command;
+	String cmd = command.Argument(1);
+
+	if (cmd == "speed") {
+		int speed = command.Argument(2);
+		this->_config["speed"] = speed;
+	}
+
+	if (cmd == "timeout") {
+		int timeout = command.Argument(2);
+		this->_config["timeout"] = timeout;
+	}
+
+	if (cmd == "blocking") {
+		bool blocking = command.Argument(2);
+		this->_config["blocking"] = blocking;
+	}
+
+	if (cmd == "observable") {
+		bool observable = command.Argument(2);
+		this->_config["observable"] = observable;
+	}
+
+	if (cmd == "send") {
+		String data = command.Argument(2);
+		this->Send(data);
+	}
+
+	if (cmd == "sendCommand") {
+		String data = command.Argument(2);
+		this->SendCommand(data);
+	}
 }
 
 bool Hardware::HBusSerial::BusSend (Protonix* device, String data) {
@@ -148,4 +182,16 @@ bool Hardware::HBusSerial::BusCommand (Protonix* device, String command) {
 	(void)device;
 
 	return this->SendCommand(command);
+}
+
+void Hardware::HBusSerial::ValueListenerSet (Value &value) {
+	String key = value.Key();
+
+	if (this->_init) {
+		if (key == "speed")
+			this->_port->begin((int)value);
+
+		if (key == "timeout")
+			this->_port->setTimeout((int)value);
+	}
 }
