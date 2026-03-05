@@ -316,9 +316,9 @@ Protonix* Protonix::Pipe () {
 				hardware->HardwareSPIPost(this);
 		}
 
-		Serial.print("[ready.hw]"); Serial.println(ESP.getFreeHeap());
+		//Serial.print("[ready.hw]"); Serial.println(ESP.getFreeHeap());
 		for (IProtonixHardware* hardware : this->_hardware) {
-			Serial.print("[hw] " + hardware->HardwareID() + "... ");
+			Serial.print("[hardware] " + hardware->HardwareID() + "... ");
 			hardware->HardwareInitPost(this);
 			Serial.println("OK");
 		}

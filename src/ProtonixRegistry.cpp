@@ -46,7 +46,16 @@ bool ProtonixRegistry::Load () {
 	char raw[size];
 
 	this->_memory->EEPROMGet(QYBERCOM_PROTONIX_REGISTRY_START, raw);
-	String out = String(raw);
+
+	String out;
+	unsigned int i = 0;
+	while (i < size) {
+		char c = raw[i];
+		if (c == '\0') break;
+
+		out += c;
+		i++;
+	}
 	out.trim();
 
 	if (this->_debug)
@@ -64,7 +73,7 @@ bool ProtonixRegistry::Load (String raw) {
 	this->_loaded = true;
 
 	if (this->_debug) {
-		Serial.print("[registry:eeprom] RAM:"); Serial.println(ESP.getFreeHeap());
+		Serial.print("[registry:eeprom.4] RAM:"); Serial.println(ESP.getFreeHeap());
 
 		this->_data.Dump();
 	}
