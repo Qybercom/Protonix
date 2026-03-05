@@ -127,6 +127,9 @@ namespace Qybercom {
 				IProtonixHardware* Hardware (String id);
 				Value &Hardware (String id, IProtonixHardware* hardware, bool allowSignal = true);
 				Value &HardwareOnBridge (String bridge, String id, IProtonixHardware* hardware, bool allowSignal = true);
+				Value &HardwareOnBus (String bus, String id, IProtonixHardware* hardware, bool allowSignal = true);
+				bool HardwareBridge (String hardware, String bridge);
+				bool HardwareBus (String hardware, String bus);
 				bool HardwareContext (String hardware, String context, const Value &data);
 				template<typename T>
 				T* Hardware (String id) {

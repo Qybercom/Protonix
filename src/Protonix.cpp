@@ -556,11 +556,51 @@ Qybercom::Value &Protonix::HardwareOnBridge (String bridge, String id, IProtonix
 
 	hardware->HardwareID(id);
 	hardware->HardwareBridge((IProtonixBridge*)this->Hardware(bridge));
+	hardware->HardwareBus(nullptr);
 	hardware->HardwareContext(nullptr);
 
 	this->_hardware.Add(hardware);
 
 	return hardware->HardwareConfig();
+}
+
+Qybercom::Value &Protonix::HardwareOnBus (String bus, String id, IProtonixHardware* hardware, bool allowSignal) {
+	(void)allowSignal;
+
+	// TODO: add check for existent id
+
+	hardware->HardwareID(id);
+	hardware->HardwareBridge((IProtonixBridge*)this->Hardware(""));
+	hardware->HardwareBus((IProtonixBus*)this->Hardware(bus));
+	hardware->HardwareContext(nullptr);
+
+	this->_hardware.Add(hardware);
+
+	return hardware->HardwareConfig();
+}
+
+bool Protonix::HardwareBridge (String hardwareID, String bridgeID) {
+	IProtonixHardware* hardware = this->Hardware(hardwareID);
+	if (hardware == nullptr) return false;
+
+	IProtonixBridge* bridge = (IProtonixBridge*)this->Hardware(bridgeID);
+	if (bridge == nullptr) return false;
+
+	hardware->HardwareBridge(bridge);
+
+	return true;
+}
+
+bool Protonix::HardwareBus (String hardwareID, String busID) {
+	IProtonixHardware* hardware = this->Hardware(hardwareID);
+	if (hardware == nullptr) return false;
+
+	IProtonixBus* bus = (IProtonixBus*)this->Hardware(busID);
+	if (bus == nullptr) return false;
+
+	hardware->HardwareBus(bus);
+
+	return true;
 }
 
 bool Protonix::HardwareContext (String hardwareID, String contextID, const Qybercom::Value &data) {

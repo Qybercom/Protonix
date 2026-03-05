@@ -13,6 +13,7 @@ namespace Qybercom {
 		class Protonix;
 
 		class IProtonixBridge;
+		class IProtonixBus;
 		class IProtonixHardwareContext;
 
 		class IProtonixHardware {
@@ -20,6 +21,7 @@ namespace Qybercom {
 				String _id;
 				short _dedicatedCore = -1;
 				IProtonixBridge* _bridge;
+				IProtonixBus* _bus;
 				IProtonixHardwareContext* _context;
 				List<ProtonixHardwareCapability*> _capabilities;
 				bool _capabilitiesOut = false;
@@ -83,6 +85,16 @@ namespace Qybercom {
 
 				IProtonixHardware* HardwareBridge (IProtonixBridge* bridge) {
 					this->_bridge = bridge;
+
+					return this;
+				}
+
+				IProtonixBus* HardwareBus () {
+					return this->_bus;
+				}
+
+				IProtonixHardware* HardwareBus (IProtonixBus* bus) {
+					this->_bus = bus;
 
 					return this;
 				}
