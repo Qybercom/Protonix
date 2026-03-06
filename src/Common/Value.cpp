@@ -544,7 +544,13 @@ Value &Value::Set (const char* value) {
 	Clear();
 
 	_type = Value::TYPE::STRING;
+	#if defined(ESP32)
+	portENTER_CRITICAL(&_mux);
 	_value.STRING = strDup(value);
+	portEXIT_CRITICAL(&_mux);
+	#else
+	_value.STRING = strDup(value);
+	#endif
 
 	if (_listener != nullptr)
 		_listener->ValueListenerSet(*this);
@@ -556,7 +562,13 @@ Value &Value::Set (const String &value) {
 	Clear();
 
 	_type = Value::TYPE::STRING;
+	#if defined(ESP32)
+	portENTER_CRITICAL(&_mux);
 	_value.STRING = strDup(value.c_str());
+	portEXIT_CRITICAL(&_mux);
+	#else
+	_value.STRING = strDup(value.c_str());
+	#endif
 
 	if (_listener != nullptr)
 		_listener->ValueListenerSet(*this);
@@ -588,7 +600,15 @@ Value &Value::Set (const Value &value) {
 		case Value::TYPE::BOOL: _value.BOOL = value._value.BOOL; break;
 		case Value::TYPE::INT: _value.INT = value._value.INT; break;
 		case Value::TYPE::FLOAT: _value.FLOAT = value._value.FLOAT; break;
-		case Value::TYPE::STRING: _value.STRING = strDup(value._value.STRING); break;
+		case Value::TYPE::STRING:
+			#if defined(ESP32)
+			portENTER_CRITICAL(&_mux);
+			_value.STRING = strDup(value._value.STRING);
+			portEXIT_CRITICAL(&_mux);
+			#else
+			_value.STRING = strDup(value._value.STRING);
+			#endif
+		break;
 		case Value::TYPE::RAW: _value.RAW = Types::Raw::Copy(value._value.RAW); break;
 		case Value::TYPE::OBJECT:
 		case Value::TYPE::ARRAY: {
@@ -778,7 +798,17 @@ String Value::ToString () const {
 		case Value::TYPE::BOOL: return String(_value.BOOL ? "true" : "false"); break;
 		case Value::TYPE::INT: return String(_value.INT); break;
 		case Value::TYPE::FLOAT: return doubleToString(_value.FLOAT, _precision); break;
-		case Value::TYPE::STRING: return String(_value.STRING); break;
+		case Value::TYPE::STRING:
+			#if defined(ESP32)
+			char* ptr;
+			portENTER_CRITICAL(&_mux);
+			ptr = _value.STRING;
+			portEXIT_CRITICAL(&_mux);
+			return ptr ? String(ptr) : String();
+			#else
+			return String(_value.STRING);
+			#endif
+		break;
 		default: return ""; break;
 	}
 }
@@ -864,10 +894,24 @@ Value &Value::Add (const Value &item) {
 }
 
 Value &Value::Clear () {
+	#if defined(ESP32)
+	if (_type == Value::TYPE::STRING) {
+		portENTER_CRITICAL(&_mux);
+
+		if (_value.STRING) {
+			char* tmp = _value.STRING;
+			_value.STRING = nullptr;
+			delete[] tmp;
+		}
+
+		portEXIT_CRITICAL(&_mux);
+	}
+	#else
 	if (_type == Value::TYPE::STRING && _value.STRING) {
 		delete[] _value.STRING;
 		_value.STRING = nullptr;
 	}
+	#endif
 	else if ((_type == Value::TYPE::OBJECT || _type == Value::TYPE::ARRAY) && _value.COLLECTION.items) {
 		int i = 0;
 

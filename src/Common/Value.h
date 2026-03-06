@@ -64,6 +64,9 @@ namespace Qybercom {
 			char* _key = nullptr;
 			IValueListener* _listener = nullptr;
 			short _precision = -1;
+			#if defined(ESP32)
+			mutable portMUX_TYPE _mux = portMUX_INITIALIZER_UNLOCKED;
+    		#endif
 
 			void _allocate ();
 

@@ -7,15 +7,15 @@ namespace Qybercom {
 		template<typename T>
 		class Debouncer {
 			private:
-				T _current;
-				T _target;
-				unsigned int _targetCount;
-				unsigned int _threshold;
+				volatile T _current;
+				volatile T _target;
+				volatile unsigned int _targetCount;
+				volatile unsigned int _threshold;
 
 			public:
 				Debouncer (T initial, unsigned int threshold = 0) {
-					this->_current = initial;
-					this->_target = initial;
+					((T&)this->_current) = initial;
+					((T&)this->_target) = initial;
 					this->_targetCount = 0;
 					this->_threshold = threshold;
 				}
@@ -43,21 +43,21 @@ namespace Qybercom {
 				}
 
 				T Value (T value) {
-					T out = this->_current;
+					T out = (T&)this->_current;
 
-					if (value == this->_current) {
-						this->_target = this->_current;
+					if (value == ((T&)this->_current)) {
+						((T&)this->_target) = ((T&)this->_current);
 						this->_targetCount = 0;
 					}
 					else {
-						if (value != this->_target)
+						if (value != ((T&)this->_target))
 							this->_targetCount = 0;
 
-						this->_target = value;
+						((T&)this->_target) = value;
 						this->_targetCount = this->_targetCount + 1;
 
 						if (this->_targetCount >= this->_threshold) {
-							this->_current = value;
+							((T&)this->_current) = value;
 							this->_targetCount = 0;
 						}
 					}
