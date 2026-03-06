@@ -49,7 +49,7 @@ void Hardware::HTemperatureDS18::HardwarePipe (Protonix* device, short core) {
 	bus->Select(rom);
 	bus->Write(0x44); // Start temperature conversion
 
-	delay(50);
+	//delay(50);
 
 	bus->Reset();
 	bus->Select(rom);
