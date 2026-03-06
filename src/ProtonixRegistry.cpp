@@ -48,18 +48,28 @@ bool ProtonixRegistry::Load () {
 	this->_memory->EEPROMGet(QYBERCOM_PROTONIX_REGISTRY_START, raw);
 
 	String out;
-	unsigned int i = 0;
-	while (i < size) {
-		char c = raw[i];
-		if (c == '\0') break;
 
-		out += c;
-		i++;
+	if (raw[0] == '{') {
+		unsigned int i = 0;
+
+		while (i < size) {
+			char c = raw[i];
+			if (c == '\0') break;
+
+			out += c;
+
+			i++;
+		}
+
+		out.trim();
+
+		int length = out.length();
+		if (out[length - 1] != '}')
+			Serial.println("[registry:eeprom] Corrupted EEPROM JSON: `" + out + "`");
 	}
-	out.trim();
 
 	if (this->_debug)
-		Serial.println("[registry:eeprom.2] Ready: `" + out + "`");
+		Serial.println("[registry:eeprom] Ready: `" + out + "`");
 
 	return this->Load(out);
 }
