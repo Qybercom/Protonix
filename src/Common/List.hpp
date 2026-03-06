@@ -65,6 +65,10 @@ namespace Qybercom {
 
 			unsigned int _countMax;
 
+			#if defined(ESP32)
+			mutable portMUX_TYPE _mux = portMUX_INITIALIZER_UNLOCKED;
+    		#endif
+
 			void _reindex () {
 				Node* cur = _head;
 				int idx = 0;
@@ -100,6 +104,10 @@ namespace Qybercom {
 					else PopFirst();*/
 				}
 
+				#if defined(ESP32)
+				portENTER_CRITICAL(&_mux);
+				#endif
+
 				Node* node = new Node(data);
 
 				if (!_head) _head = _tail = node;
@@ -110,12 +118,17 @@ namespace Qybercom {
 				}
 				else {
 					node->Prev = _tail;
-					_tail->Next = node;
+					if (_tail != nullptr)
+						_tail->Next = node;
 					_tail = node;
 				}
 
 				_count++;
 				_reindex();
+
+				#if defined(ESP32)
+				portEXIT_CRITICAL(&_mux);
+				#endif
 
 				return *this;
 			}
