@@ -9,8 +9,9 @@
 #include "HBusSerial.h"
 #include "HButton.h"
 #include "HBuzzer.h"
-#include "HContextCA958.h"
+#include "HContextCA954.h"
 #include "HDisplayHD44780.h"
+#include "HDisplayTM1637.h"
 #include "HEncoder.h"
 #include "HGenericAnalog.h"
 #include "HGenericPWM.h"
@@ -23,20 +24,19 @@
 #include "HReaderNFC.h"
 #include "HRelay.h"
 #include "HSelector3P.h"
+#include "HSensorFlowYFB5.h"
 #include "HSensorHall.h"
 #include "HSensorHall2D.h"
 #include "HSensorMicrophone.h"
-#include "HTemperatureDS18.h"
-#include "HTM1637.h"
+#include "HSensorTemperatureDS18.h"
+#include "HSensorWeightHX711.h"
 #include "HTouchButton.h"
 #include "HTrigger.h"
-#include "HWeightHX711.h"
 /*
  * awaiting implementation
  *
  * MCP23017 (https://github.com/blemasle/arduino-mcp23017)
  * keypad 3x4, 4x4 (IOXhop_I2CKeypad.h or Keypad.h)
- * radio module (RCSwitch.h)
  * servo motor (Stepper.h) (check HGenericPWM)
  * gas/particle sensor
  * audio output (i2s output)

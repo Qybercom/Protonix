@@ -3,7 +3,7 @@
 #include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 
-#include "HTM1637.h"
+#include "HDisplayTM1637.h"
 
 using namespace Qybercom::Protonix;
 
@@ -81,7 +81,7 @@ char Hardware::TM1637Char::Encode (char c) {
 }
 
 
-bool Hardware::HTM1637::_start () {
+bool Hardware::HDisplayTM1637::_start () {
 	if (!this->_init) return false;
 
 	this->_bridge->BridgeDigitalWrite((unsigned short)this->_config["pinDT"], true);
@@ -94,7 +94,7 @@ bool Hardware::HTM1637::_start () {
 	return true;
 }
 
-bool Hardware::HTM1637::_stop () {
+bool Hardware::HDisplayTM1637::_stop () {
 	if (!this->_init) return false;
 
 	this->_bridge->BridgeDigitalWrite((unsigned short)this->_config["pinCLK"], false);
@@ -110,7 +110,7 @@ bool Hardware::HTM1637::_stop () {
 	return true;
 }
 
-Hardware::HTM1637::HTM1637 (unsigned short pinCLK, unsigned short pinDT) {
+Hardware::HDisplayTM1637::HDisplayTM1637 (unsigned short pinCLK, unsigned short pinDT) {
 	this->_init = false;
 
 	this->_config.Listener(this);
@@ -119,7 +119,7 @@ Hardware::HTM1637::HTM1637 (unsigned short pinCLK, unsigned short pinDT) {
 	this->_config["brightness"] = 7; // 0..7
 }
 
-bool Hardware::HTM1637::Write (char b) {
+bool Hardware::HDisplayTM1637::Write (char b) {
 	if (!this->_init) return false;
 
 	unsigned short i = 0;
@@ -149,7 +149,7 @@ bool Hardware::HTM1637::Write (char b) {
 	return ack;
 }
 
-bool Hardware::HTM1637::Render (String value) {
+bool Hardware::HDisplayTM1637::Render (String value) {
 	Hardware::TM1637Char c[4] = { ' ', ' ', ' ', ' ' };
 	int length = value.length();
 	int i = 0;
@@ -174,7 +174,7 @@ bool Hardware::HTM1637::Render (String value) {
 	return this->Render(c[0], c[1], c[2], c[3]);
 }
 
-bool Hardware::HTM1637::Render (char c1, char c2, char c3, char c4) {
+bool Hardware::HDisplayTM1637::Render (char c1, char c2, char c3, char c4) {
 	return this->Render(
 		Hardware::TM1637Char(c1),
 		Hardware::TM1637Char(c2),
@@ -183,7 +183,7 @@ bool Hardware::HTM1637::Render (char c1, char c2, char c3, char c4) {
 	);
 }
 
-bool Hardware::HTM1637::Render (Hardware::TM1637Char c1, Hardware::TM1637Char c2, Hardware::TM1637Char c3, Hardware::TM1637Char c4) {
+bool Hardware::HDisplayTM1637::Render (Hardware::TM1637Char c1, Hardware::TM1637Char c2, Hardware::TM1637Char c3, Hardware::TM1637Char c4) {
 	if (!this->_init) return false;
 
 	this->_start();
@@ -201,7 +201,7 @@ bool Hardware::HTM1637::Render (Hardware::TM1637Char c1, Hardware::TM1637Char c2
 	return true;
 }
 
-bool Hardware::HTM1637::Clear () {
+bool Hardware::HDisplayTM1637::Clear () {
 	return this->Render(
 		0b00000000,
 		0b00000000,
@@ -210,11 +210,11 @@ bool Hardware::HTM1637::Clear () {
 	);
 }
 
-String Hardware::HTM1637::HardwareSummary () {
+String Hardware::HDisplayTM1637::HardwareSummary () {
 	return "TM1637 display";
 }
 
-void Hardware::HTM1637::HardwareInitPre (Protonix* device) {
+void Hardware::HDisplayTM1637::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	this->_bridge->BridgePinMode((unsigned short)this->_config["pinCLK"], OUTPUT);
@@ -232,7 +232,7 @@ void Hardware::HTM1637::HardwareInitPre (Protonix* device) {
 	this->_init = true;
 }
 
-void Hardware::HTM1637::HardwareInitPost (Protonix* device) {
+void Hardware::HDisplayTM1637::HardwareInitPost (Protonix* device) {
 	(void)device;
 
 	unsigned short brightness = this->_config["brightness"];
@@ -241,12 +241,12 @@ void Hardware::HTM1637::HardwareInitPost (Protonix* device) {
 	this->Clear();
 }
 
-void Hardware::HTM1637::HardwarePipe (Protonix* device, short core) {
+void Hardware::HDisplayTM1637::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
 }
 
-void Hardware::HTM1637::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
+void Hardware::HDisplayTM1637::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
 	(void)device;
 	String cmd = command.Argument(1);
 
@@ -261,7 +261,7 @@ void Hardware::HTM1637::HardwareOnCommand (Protonix* device, ProtonixCommand &co
 	}
 }
 
-void Hardware::HTM1637::ValueListenerSet (Value &value) {
+void Hardware::HDisplayTM1637::ValueListenerSet (Value &value) {
 	if (value.Key() == "brightness") {
 		unsigned short brightness = (unsigned short)value;
 		if (brightness > 7) brightness = 7;

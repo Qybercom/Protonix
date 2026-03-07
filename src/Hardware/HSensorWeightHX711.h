@@ -8,7 +8,7 @@
 namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
-			class HWeightHX711 : public IProtonixHardware {
+			class HSensorWeightHX711 : public IProtonixHardware {
 				private:
 					long _value;
 					long _weight;
@@ -16,7 +16,7 @@ namespace Qybercom {
 					long _readingsValue;
 
 				public:
-					HWeightHX711 (unsigned short pinDT, unsigned short pinSCK);
+					HSensorWeightHX711 (unsigned short pinDT, unsigned short pinSCK);
 
 					long Value ();
 					long Weight ();

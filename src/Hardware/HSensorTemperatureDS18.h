@@ -8,13 +8,13 @@
 namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
-			class HTemperatureDS18 : public IProtonixHardware {
+			class HSensorTemperatureDS18 : public IProtonixHardware {
 				private:
 					bool _init;
 					float _value;
 
 				public:
-					HTemperatureDS18 (String rom = "");
+					HSensorTemperatureDS18 (String rom = "");
 
 					float Value ();
 

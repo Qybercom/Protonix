@@ -3,11 +3,11 @@
 #include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
 
-#include "HWeightHX711.h"
+#include "HSensorWeightHX711.h"
 
 using namespace Qybercom::Protonix;
 
-Hardware::HWeightHX711::HWeightHX711 (unsigned short pinDT, unsigned short pinSCK) {
+Hardware::HSensorWeightHX711::HSensorWeightHX711 (unsigned short pinDT, unsigned short pinSCK) {
 	this->_value = 0;
 	this->_weight = 0;
 	this->_readingsCounter = 0;
@@ -20,19 +20,19 @@ Hardware::HWeightHX711::HWeightHX711 (unsigned short pinDT, unsigned short pinSC
 	this->_config["offset"] = 0;
 }
 
-long Hardware::HWeightHX711::Value () {
+long Hardware::HSensorWeightHX711::Value () {
 	return this->_value;
 }
 
-long Hardware::HWeightHX711::Weight () {
+long Hardware::HSensorWeightHX711::Weight () {
 	return this->_weight;
 }
 
-String Hardware::HWeightHX711::HardwareSummary () {
+String Hardware::HSensorWeightHX711::HardwareSummary () {
 	return "Weight sensor through HX711 DAC";
 }
 
-void Hardware::HWeightHX711::HardwareInitPre (Protonix* device) {
+void Hardware::HSensorWeightHX711::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	this->_bridge->BridgePinInitOutput(this->_config["pinSCK"]);
@@ -44,7 +44,7 @@ void Hardware::HWeightHX711::HardwareInitPre (Protonix* device) {
 	this->_capability("value", "weight:int", "Interpolated weight");
 }
 
-void Hardware::HWeightHX711::HardwarePipe (Protonix* device, short core) {
+void Hardware::HSensorWeightHX711::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
 
@@ -99,11 +99,11 @@ void Hardware::HWeightHX711::HardwarePipe (Protonix* device, short core) {
 	this->_capability("weight:int", String(this->_weight));
 }
 
-void Hardware::HWeightHX711::HardwareOnReset (Protonix* device) {
+void Hardware::HSensorWeightHX711::HardwareOnReset (Protonix* device) {
 	(void)device;
 }
 
-void Hardware::HWeightHX711::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
+void Hardware::HSensorWeightHX711::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

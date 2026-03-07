@@ -6,37 +6,37 @@
 #include "../Protonix.h"
 
 #include "HBusOneWire.h"
-#include "HTemperatureDS18.h"
+#include "HSensorTemperatureDS18.h"
 
 using namespace Qybercom::Protonix;
 
-Hardware::HTemperatureDS18::HTemperatureDS18 (String rom) {
+Hardware::HSensorTemperatureDS18::HSensorTemperatureDS18 (String rom) {
 	this->_value = 0.0;
 
 	this->_config["ROM"] = rom;
 }
 
-float Hardware::HTemperatureDS18::Value () {
+float Hardware::HSensorTemperatureDS18::Value () {
 	return this->_value;
 }
 
-String Hardware::HTemperatureDS18::HardwareSummary () {
+String Hardware::HSensorTemperatureDS18::HardwareSummary () {
 	return "DS18-compatible temperature sensor";
 }
 
-void Hardware::HTemperatureDS18::HardwareInitPre (Protonix* device) {
+void Hardware::HSensorTemperatureDS18::HardwareInitPre (Protonix* device) {
 	(void)device;
 
 	this->_capability("value", "value:float", "Temperature value");
 }
 
-void Hardware::HTemperatureDS18::HardwareInitPost (Protonix* device) {
+void Hardware::HSensorTemperatureDS18::HardwareInitPost (Protonix* device) {
 	(void)device;
 
 	this->_init = true;
 }
 
-void Hardware::HTemperatureDS18::HardwarePipe (Protonix* device, short core) {
+void Hardware::HSensorTemperatureDS18::HardwarePipe (Protonix* device, short core) {
 	(void)device;
 	(void)core;
 
@@ -76,15 +76,15 @@ void Hardware::HTemperatureDS18::HardwarePipe (Protonix* device, short core) {
 	this->_capability("value:float", String(this->_value));
 }
 
-void Hardware::HTemperatureDS18::HardwarePipeInterrupt (Protonix* device) {
+void Hardware::HSensorTemperatureDS18::HardwarePipeInterrupt (Protonix* device) {
 	(void)device;
 }
 
-void Hardware::HTemperatureDS18::HardwareOnReset (Protonix* device) {
+void Hardware::HSensorTemperatureDS18::HardwareOnReset (Protonix* device) {
 	(void)device;
 }
 
-void Hardware::HTemperatureDS18::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
+void Hardware::HSensorTemperatureDS18::HardwareOnCommand (Protonix* device, ProtonixCommand &command) {
 	(void)device;
 	(void)command;
 }

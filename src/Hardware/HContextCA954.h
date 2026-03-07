@@ -8,9 +8,9 @@
 namespace Qybercom {
 	namespace Protonix {
 		namespace Hardware {
-			class HContextCA958 : public IProtonixHardwareContext {
+			class HContextCA954 : public IProtonixHardwareContext {
 				public:
-					HContextCA958 (char address = 0x70);
+					HContextCA954 (char address = 0x70);
 
 					String HardwareSummary ();
 					bool HardwareI2C ();

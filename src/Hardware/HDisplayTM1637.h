@@ -27,7 +27,7 @@ namespace Qybercom {
 					static char Encode (char c);
 			};
 
-			class HTM1637 : public IProtonixHardware, public IValueListener {
+			class HDisplayTM1637 : public IProtonixHardware, public IValueListener {
 				private:
 					bool _init;
 
@@ -35,7 +35,7 @@ namespace Qybercom {
 					bool _stop ();
 
 				public:
-					HTM1637 (unsigned short pinCLK, unsigned short pinDT);
+					HDisplayTM1637 (unsigned short pinCLK, unsigned short pinDT);
 
 					bool Brightness (unsigned short brightness);
 					bool Write (char b);
