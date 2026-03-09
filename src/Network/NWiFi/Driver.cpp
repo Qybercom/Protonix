@@ -66,7 +66,7 @@ bool Network::NWiFi::Driver::NetworkDriverConnect () {
 
 	// TODO: add AP mode
 	// https://randomnerdtutorials.com/esp32-set-custom-hostname-arduino/#comment-741757
-	#if defined(ESP32)
+	#if defined(ESP32) || defined(ESP32)
 		WiFi.setHostname(this->_hostname.c_str());
 		WiFi.mode(WIFI_STA);
 		esp_wifi_set_mac(WIFI_IF_STA, &this->_macBuffer[0]);

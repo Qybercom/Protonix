@@ -81,7 +81,7 @@ ProtonixSensor::ProtonixSensor (String id, bool active, bool failure, String sta
 ProtonixSensor::ProtonixSensor (String id, String value, String state) {
 	this->ID(id);
 	this->Value(value);
-	this->Failure(false);
+	this->Active(false);
 	this->Failure(false);
 	this->State(state);
 }

@@ -357,7 +357,8 @@ Protonix* Protonix::Pipe () {
 	if (this->_signals.Count() != 0) {
 		//Serial.print("[signals.1]"); Serial.println(ESP.getFreeHeap());
 		for (ProtonixSignal* signal : this->_signals) {
-			//Serial.println("[debug] " + signal->From() + ":" + signal->ID());
+		    // IMPORTANT! following line useful for micro-blocking of inter-core signals, "polyfill" for mutex
+			Serial.println("[signal] " + signal->From() + ":" + signal->ID());
 
 			this->_device->DeviceOnSignal(this, signal);
 
