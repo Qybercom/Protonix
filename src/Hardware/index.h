@@ -17,6 +17,7 @@
 #include "HGenericPWM.h"
 #include "HISMBandRFModule.h"
 #include "HJoystick.h"
+#include "HKeypad.h"
 #include "HPhotonix.h"
 #include "HPhotoResistor.h"
 #include "HPlayerMP3.h"
@@ -36,7 +37,6 @@
  * awaiting implementation
  *
  * MCP23017 (https://github.com/blemasle/arduino-mcp23017)
- * keypad 3x4, 4x4 (IOXhop_I2CKeypad.h or Keypad.h)
  * servo motor (Stepper.h) (check HGenericPWM)
  * gas/particle sensor
  * audio output (i2s output)

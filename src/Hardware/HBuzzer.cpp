@@ -1,7 +1,5 @@
 #include <Arduino.h>
 
-#include "../IProtonixHardware.hpp"
-
 #include "HBuzzer.h"
 
 using namespace Qybercom::Protonix;
