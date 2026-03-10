@@ -24,6 +24,7 @@ Hardware::HSensorHall2D::HSensorHall2D (unsigned short pinX, unsigned short pinY
 	this->_config["maxY"] = maxY;
 	this->_config["minX"] = minX;
 	this->_config["minY"] = minY;
+	this->_config["allowSignal"] = true;
 }
 
 float Hardware::HSensorHall2D::ValueFloat () {
