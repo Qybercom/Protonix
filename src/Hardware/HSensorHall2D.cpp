@@ -60,7 +60,7 @@ void Hardware::HSensorHall2D::HardwareInitPre (Protonix* device) {
 
 	this->_capability("value", "valueX:int", "Raw X-axis value");
 	this->_capability("value", "valueY:int", "Raw Y-axis value");
-	this->_capability("value", "angle:int", "Interpolated angle (0..360deg)");
+	this->_capability("value", "angle:float", "Interpolated angle (0..360deg)");
 }
 
 void Hardware::HSensorHall2D::HardwarePipe (Protonix* device, short core) {
@@ -85,7 +85,7 @@ void Hardware::HSensorHall2D::HardwarePipe (Protonix* device, short core) {
 		this->_signal(device);
 	}
 
-	this->_capability("angle:int", String(angle));
+	this->_capability("angle:float", String(angle));
 }
 
 void Hardware::HSensorHall2D::HardwareOnReset (Protonix* device) {

@@ -24,10 +24,12 @@ Value Formats::FormatJSON::_parseValue (const String &s, int &pos, const bool ro
 	if (c == '{') return Formats::FormatJSON::_parseObject(s, pos);
 	if (c == '[') return Formats::FormatJSON::_parseArray(s, pos);
 	if (c == '"') return Formats::FormatJSON::_parseString(s, pos);
-	if (isNumeric(root ? s : s.substring(pos, length - 2), dot)) return Formats::FormatJSON::_parseNumber(s, pos);
 	if (s.substring(pos, pos + 4) == "true") { pos += 4; return Value(true); }
 	if (s.substring(pos, pos + 5) == "false") { pos += 5; return Value(false); }
-	if (s.substring(pos, pos + 4) == "null") { pos += 4; return Value(); }
+	if (s.substring(pos, pos + 4) == "null") { pos += 4; return Value(nullptr); }
+
+	Value number = Formats::FormatJSON::_parseNumber(s, pos);
+	if (!number.IsUndefined()) return number;
 
 	return Value();
 }
@@ -118,12 +120,13 @@ Value Formats::FormatJSON::_parseNumber (const String &s, int &pos) {
 	bool dot = false;
 	bool sign = false;
 	short precision = -1;
+	int start = pos;
 
 	while (pos < length) {
 		char c = s.charAt(pos);
 
 		if (c < '0' || c > '9') {
-			if (!sign && c == '-' && pos == 0) sign = true;
+			if (!sign && c == '-' && pos == start) sign = true;
 			else if (!dot && c == '.') dot = true;
 			else break;
 		}
@@ -133,6 +136,8 @@ Value Formats::FormatJSON::_parseNumber (const String &s, int &pos) {
 
 		pos++;
 	}
+
+	if (out.length() == 0) return Value();
 
 	return dot ? Value(Qybercom::stringToDouble(out.c_str()), precision) : Value(out.toInt());
 }

@@ -101,7 +101,7 @@ int Qybercom::angleByXYRounded (int x, int y, int minX, int maxX, int minY, int 
 }
 
 float Qybercom::angleOffset (float value, float offset) {
-	float out = value - offset;
+	float out = value + offset;
 
 	if (out < 0)
 		out = 360.0 + out;
@@ -251,7 +251,7 @@ double Qybercom::stringToDouble (const char* str, int &pos) {
 		i++;
 	}
 
-	if (str[i] == '.' || str[i] == ',') {
+	if (str[i] == '.') {
 		i++;
 
 		double factor = 0.1;
