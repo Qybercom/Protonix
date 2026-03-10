@@ -122,6 +122,10 @@ namespace Qybercom {
 				ProtonixRegistry* Registry ();
 				Value Registry (const String &key);
 				Protonix* Registry (const String &key, const Value &value);
+				template<typename T>
+				T Registry (const String &key) {
+					return this->_registry->Data().Get(key).AsType<T>();
+				}
 
 				List<IProtonixHardware*> &Hardware ();
 				IProtonixHardware* Hardware (String id);
