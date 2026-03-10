@@ -16,7 +16,7 @@ Hardware::HSensorWeightHX711::HSensorWeightHX711 (unsigned short pinDT, unsigned
 	this->_config["pinDT"] = pinDT;
 	this->_config["pinSCK"] = pinSCK;
 	this->_config["scale"] = 1.0;
-	this->_config["reading"] = 1;
+	this->_config["readings"] = 1;
 	this->_config["offset"] = 0;
 }
 

@@ -19,7 +19,6 @@ Value Formats::FormatJSON::_parseValue (const String &s, int &pos, const bool ro
 	if (pos >= length) return Value();
 
 	char c = s[pos];
-	bool dot = false;
 
 	if (c == '{') return Formats::FormatJSON::_parseObject(s, pos);
 	if (c == '[') return Formats::FormatJSON::_parseArray(s, pos);
