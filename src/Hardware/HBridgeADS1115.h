@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Arduino.h>
-#include <Wire.h>
 
 #include "../IProtonixHardware.hpp"
 #include "../Protonix.h"
@@ -23,7 +22,6 @@ namespace Qybercom {
 					static unsigned int CMDReadPin (unsigned short pin);
 
 				private:
-					char _address;
 					bool _init;
 					ProtonixTimer* _readTimer;
 					unsigned short _readPin;
@@ -36,9 +34,6 @@ namespace Qybercom {
 					HBridgeADS1115 (char address);
 
 					ProtonixTimer* ReadTimer ();
-
-					char Address ();
-					HBridgeADS1115* Address (char address);
 
 					String HardwareSummary ();
 					void HardwareInitPre (Protonix* device);

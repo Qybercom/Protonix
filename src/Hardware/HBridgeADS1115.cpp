@@ -20,11 +20,13 @@ unsigned int Hardware::HBridgeADS1115::CMDReadPin (unsigned short pin) {
 unsigned int Hardware::HBridgeADS1115::_read (char reg) {
 	if (!this->_init) return 0;
 
-	Wire.beginTransmission(this->_address);
+	short address = this->_config["address"];
+
+	Wire.beginTransmission(address);
 	Wire.write(reg);
 	Wire.endTransmission();
 
-	Wire.requestFrom(this->_address, (char)2);
+	Wire.requestFrom(address, (char)2);
 
 	return ((unsigned int)Wire.read() << 8) | Wire.read();
 }
@@ -32,7 +34,9 @@ unsigned int Hardware::HBridgeADS1115::_read (char reg) {
 bool Hardware::HBridgeADS1115::_write (char reg, unsigned int value) {
 	if (!this->_init) return false;
 
-	Wire.beginTransmission(this->_address);
+	short address = this->_config["address"];
+
+	Wire.beginTransmission(address);
 	Wire.write(reg);
 	Wire.write((char)(value >> 8));
 	Wire.write((char)(value & 0xFF));
@@ -42,7 +46,6 @@ bool Hardware::HBridgeADS1115::_write (char reg, unsigned int value) {
 }
 
 Hardware::HBridgeADS1115::HBridgeADS1115 (char address) {
-	this->_address = address;
 	this->_init = false;
 	this->_readTimer = new ProtonixTimer(10, false);
 	this->_readPin = 0;
@@ -51,20 +54,12 @@ Hardware::HBridgeADS1115::HBridgeADS1115 (char address) {
 	this->_values[1] = -1;
 	this->_values[2] = -1;
 	this->_values[3] = -1;
+
+	this->_config["address"] = address;
 }
 
 ProtonixTimer* Hardware::HBridgeADS1115::ReadTimer () {
 	return this->_readTimer;
-}
-
-char Hardware::HBridgeADS1115::Address () {
-	return this->_address;
-}
-
-Hardware::HBridgeADS1115* Hardware::HBridgeADS1115::Address (char address) {
-	this->_address = address;
-
-	return this;
 }
 
 String Hardware::HBridgeADS1115::HardwareSummary () {
@@ -74,6 +69,7 @@ String Hardware::HBridgeADS1115::HardwareSummary () {
 void Hardware::HBridgeADS1115::HardwareInitPre (Protonix* device) {
 	(void)device;
 
+	this->_capability("value", "address:string", "Address");
 	this->_capability("value", "pin0:int", "Pin 0 value");
 	this->_capability("value", "pin1:int", "Pin 1 value");
 	this->_capability("value", "pin2:int", "Pin 2 value");

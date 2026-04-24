@@ -29,6 +29,7 @@
 #include "HSensorHall.h"
 #include "HSensorHall2D.h"
 #include "HSensorMicrophone.h"
+#include "HSensorOrientationMPU6050.h"
 #include "HSensorTemperatureDS18.h"
 #include "HSensorWeightHX711.h"
 #include "HTouchButton.h"
